@@ -74,6 +74,16 @@ function getQueueFlags($flag)
 	return getFlags($flags, $flag);
 }
 
+function getSampleCountFlags($flag)
+{
+	$flags = array();
+	for ($i = 0; $i < 7; ++$i) 
+	{
+		$flags[pow(2, $i)] = pow(2, $i);
+	}
+	return getFlags($flags, $flag);
+}
+
 // Generate a simple ul/li list for the flags
 function listFlags($flags)
 {

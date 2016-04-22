@@ -149,7 +149,22 @@
 					if ($fname == 'reportid')
 						continue;
 					echo "<tr><td class='key'>$fname</td>";
-					echo "<td>".$row[$i]."</td>";
+					if (strpos($fname, 'SampleCounts'))
+					{
+						$sampleCountflags = getSampleCountFlags($row[$i]);						
+						if (count($sampleCountflags) > 0)
+						{
+							echo "<td>".implode(",", $sampleCountflags)."</td>";
+						}
+						else
+						{
+							echo "<td><font color='red'>none</font></td>";
+						}
+					}
+					else
+					{
+						echo "<td>".$row[$i]."</td>";
+					}
 					echo "</td></tr>\n";
 				}				
 			}
