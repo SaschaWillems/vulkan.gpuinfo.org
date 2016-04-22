@@ -24,15 +24,15 @@
 	// Navigation
 	echo "<div>";
 	echo "<ul class='nav nav-tabs'>";
-	echo "	<li class='active'><a data-toggle='tab' href='#memory-tabs-1'>Memory types <span class='badge'>$memtypecount</span></a></li>";
-	echo "	<li><a data-toggle='tab' href='#memory-tabs-2'>Memory heaps <span class='badge'>$memheapcount</span></a></li>";
+	echo "	<li class='active'><a data-toggle='tab' href='#memorytypes'>Memory types <span class='badge'>$memtypecount</span></a></li>";
+	echo "	<li><a data-toggle='tab' href='#memoryheaps'>Memory heaps <span class='badge'>$memheapcount</span></a></li>";
 	echo "</ul>";
 	echo "</div>";
 	
 	echo "<div class='tab-content'>";	
 	
 	// Memory types
-	echo "<div id='memory-tabs-1' class='tab-pane fade in active reportdiv'>";
+	echo "<div id='memorytypes' class='tab-pane fade in active reportdiv'>";
 	
 	$sqlresult = mysql_query("select * from devicememorytypes where reportid = $reportID") or die(mysql_error());
 	$index = 0;
@@ -74,7 +74,7 @@
 	echo "</div>";	
 	
 	// Memory heaps
-	echo "<div id='memory-tabs-2' class='tab-pane fade reportdiv'>";
+	echo "<div id='memoryheaps' class='tab-pane fade reportdiv'>";
 	
 ?>	
 	<div class="alert alert-warning" role="alert">

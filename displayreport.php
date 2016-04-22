@@ -94,26 +94,26 @@
 			// Nav ========================================================================================
 			echo "<div>";
 			echo "<ul class='nav nav-tabs'>";
-			echo "	<li class='active'><a data-toggle='tab' href='#tabs-1'>Device</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tabs-2'>Features</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tabs-3'>Limits</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tabs-4'>Extensions <span class='badge'>$extcount</span></a></li>";
-			echo "	<li><a data-toggle='tab' href='#tabs-5'>Formats <span class='badge'>$formatcount</span></a></a></li>";
-			echo "	<li><a data-toggle='tab' href='#tabs-6'>Queue families <span class='badge'>$queuecount</span></a></li>";
-			echo "	<li><a data-toggle='tab' href='#tabs-7'>Memory <span class='badge'>$memtypecount</span></a></a></li>";
-			echo "	<li><a data-toggle='tab' href='#tabs-8'>Layers <span class='badge'>$layercount</span></a></li>";
+			echo "	<li class='active'><a data-toggle='tab' href='#device'>Device</a></li>";
+			echo "	<li><a data-toggle='tab' href='#features'>Features</a></li>";
+			echo "	<li><a data-toggle='tab' href='#limits'>Limits</a></li>";
+			echo "	<li><a data-toggle='tab' href='#extensions'>Extensions <span class='badge'>$extcount</span></a></li>";
+			echo "	<li><a data-toggle='tab' href='#formats'>Formats <span class='badge'>$formatcount</span></a></a></li>";
+			echo "	<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'>$queuecount</span></a></li>";
+			echo "	<li><a data-toggle='tab' href='#memory'>Memory <span class='badge'>$memtypecount</span></a></a></li>";
+			echo "	<li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>";
 			echo "</ul>";
 			echo "</div>";
 			
 			echo "<div class='tablediv tab-content' style='width:75%;'>";
 					
 			// Device properites ============================================================================
-			echo "<div id='tabs-1' class='tab-pane fade in active reportdiv'>";
+			echo "<div id='device' class='tab-pane fade in active reportdiv'>";
 			include './displayreport_properties.php';									
 			echo "</div>";
 			
 			// Device features ==============================================================================
-			echo "<div id='tabs-2' class='tab-pane fade reportdiv'>";
+			echo "<div id='features' class='tab-pane fade reportdiv'>";
 			echo "<table id='devicefeatures' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
 			echo "<thead><tr><td class='caption'>Feature</td><td class='caption'>Value</td></tr></thead><tbody>";
 			
@@ -136,7 +136,7 @@
 			echo "</div>";			
 			
 			// Device limits ================================================================================
-			echo "<div id='tabs-3' class='tab-pane fade reportdiv'>";
+			echo "<div id='limits' class='tab-pane fade reportdiv'>";
 			echo "<table id='devicelimits' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
 			echo "<thead><tr><td class='caption'>Limit</td><td class='caption'>Value</td></tr></thead><tbody>";
 			
@@ -158,27 +158,27 @@
 			echo "</div>";					
 			
 			// Extensions ===================================================================================
-			echo "<div id='tabs-4' class='tab-pane fade reportdiv'>";
+			echo "<div id='extensions' class='tab-pane fade reportdiv'>";
 			include './displayreport_extensions.php';					
 			echo "</div>";	
 			
 			// Formats ======================================================================================
-			echo "<div id='tabs-5' class='tab-pane fade reportdiv'>";
+			echo "<div id='formats' class='tab-pane fade reportdiv'>";
 			include './displayreport_formats.php';		
 			echo "</div>";		
 						
 			// Queues =======================================================================================
-			echo "<div id='tabs-6' class='tab-pane fade reportdiv'>";			
+			echo "<div id='queuefamilies' class='tab-pane fade reportdiv'>";			
 			include './displayreport_queues.php';
 			echo "</div>";
 			
 			// Memory properties ============================================================================
-			echo "<div id='tabs-7' class='tab-pane fade reportdiv'>";		
+			echo "<div id='memory' class='tab-pane fade reportdiv'>";		
 			include './displayreport_memory.php';
 			echo "</div>";
 			
 			// Layers =======================================================================================
-			echo "<div id='tabs-8' class='tab-pane fade reportdiv'>";
+			echo "<div id='layers' class='tab-pane fade reportdiv'>";
 			include './displayreport_layers.php';
 			echo "</div>";					
 						
@@ -330,8 +330,27 @@
 				'</tr>' +
 			'</table>';
 		}
-	</script>
-	
+		
+		$(function() 
+		{
+			var a = document.location.hash;
+			if (a) 
+			{
+				// Nested memory tabs, need to show parent tab too
+				if ((a === '#memorytypes') || (a === '#memoryheaps'))
+				{
+					$('.nav a[href=\\#memory]').tab('show');
+					console.log(a);
+				}
+				$('.nav a[href=\\'+a+']').tab('show');
+			}
+		
+			$('a[data-toggle="tab"]').on('show.bs.tab', function (e) 
+			{
+				window.location.hash = e.target.hash;
+			});
+		});	
+	   </script>	
 	</div>
 	
 	<?php include './footer.inc'; ?>
