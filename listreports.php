@@ -162,6 +162,7 @@
 					p.devicename as Device,
 					ifnull(p.driverversionraw, p.driverversion) as Driver,
 					p.vendorid,
+					p.apiversion as api,
 					VendorId(p.vendorid) as 'Vendor',
 					p.devicetype as 'Type',
 					r.osname as 'OS',
@@ -203,6 +204,11 @@
 						{
 							echo "<td><a href='displayreport.php?id=$reportid'>$value</a></td>\n";
 							continue;
+						}
+						
+						if ($fname == 'Type') 
+						{
+							$value = strtolower(str_replace('_GPU', '', $value));
 						}
 						
 						if ($fname == 'Driver')

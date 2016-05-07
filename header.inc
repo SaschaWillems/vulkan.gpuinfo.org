@@ -15,7 +15,7 @@
 	<script type="text/javascript" src="external/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="external/dataTables.bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/dataTables.fixedHeader.min.js"></script>
-	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script>
+<!--	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script> -->
 	<script type="text/javascript" src="external/responsive.bootstrap.min.js"></script>
 
 </head>
