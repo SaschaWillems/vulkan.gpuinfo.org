@@ -249,7 +249,7 @@
 				//"lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
 				//"orderCellsTop": true,
 				"sDom": 'flipt',
-				columnDefs: [ { orderable: false, targets: [7] } ],				
+				columnDefs: [ { orderable: false, targets: [7] }, {type: 'natural-nohtml', targets: 2} ],				
 				
 				initComplete: function () {
 					var api = this.api();
