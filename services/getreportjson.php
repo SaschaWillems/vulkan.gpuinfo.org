@@ -87,8 +87,8 @@
 	
 	if ($sqlcount > 0) 
 	{
-		header('HTTP/ 200 report_present '.$sqlrow[0].'');
-		echo _format_json($sqlrow[1], true);
+		header('Content-Type: application/json');
+		echo _format_json($sqlrow[1], false);
 	} 
 	else 
 	{
