@@ -249,14 +249,14 @@
 				//"lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
 				//"orderCellsTop": true,
 				"sDom": 'flipt',
-				columnDefs: [ { orderable: false, targets: [7] }, {type: 'natural-nohtml', targets: 2} ],				
+				columnDefs: [  { orderable: false, targets: [7] }, {type: 'natural-nohtml', targets: 2} ],						
 				
 				initComplete: function () {
 					var api = this.api();
 								
 					api.columns().indexes().flatten().each( function ( i ) 
 					{
-						if ((i > 1) && (i < 7)) 
+						if (i < 8) 
 						{						
 							var column = api.column( i );
 							var title = column.header().innerText;
@@ -264,9 +264,7 @@
 							.appendTo( $(column.header()) )
 							.on( 'change', function () 
 							{
-								var val = $.fn.dataTable.util.escapeRegex(
-								$(this).val()
-								);
+								var val = $.fn.dataTable.util.escapeRegex($(this).val());
 
 								column
 								.search( val ? '^'+val+'$' : '', true, false )
@@ -275,7 +273,9 @@
 
 							column.data().unique().sort().each( function ( d, j ) 
 							{
-								select.append( '<option value="'+d+'">'+d+'</option>' )
+								var regex = /(<([^>]+)>)/ig
+								var text = d.replace(regex, "");
+								select.append( '<option value="'+text+'">'+text+'</option>' )
 							} );
 						};
 					} );
