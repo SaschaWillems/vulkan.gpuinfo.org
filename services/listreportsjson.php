@@ -1,0 +1,118 @@
+<?php
+	/* 		
+	*
+	* Vulkan hardware capability database server implementation
+	*	
+	* Copyright (C) 2011-2015 by Sascha Willems (www.saschawillems.de)
+	*	
+	* This code is free software, you can redistribute it and/or
+	* modify it under the terms of the GNU Affero General Public
+	* License version 3 as published by the Free Software Foundation.
+	*	
+	* Please review the following information to ensure the GNU Lesser
+	* General Public License version 3 requirements will be met:
+	* http://www.gnu.org/licenses/agpl-3.0.de.html
+	*	
+	* The code is distributed WITHOUT ANY WARRANTY; without even the
+	* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+	* PURPOSE.  See the GNU AGPL 3.0 for more details.		
+	*
+	*/
+
+	// Return list of all available reports as json
+	
+	include './../dbconfig.php';
+	
+	/**
+	 * Formats a JSON string for pretty printing
+	 *
+	 * @param string $json The JSON to make pretty
+	 * @param bool $html Insert nonbreaking spaces and <br />s for tabs and linebreaks
+	 * @return string The prettified output
+	 * @author Jay Roberts (https://github.com/GloryFish)
+	 */
+     function _format_json($json, $html = false) {
+		$tabcount = 0; 
+		$result = ''; 
+		$inquote = false; 
+		$ignorenext = false; 
+		if ($html) { 
+		    $tab = "&nbsp;&nbsp;&nbsp;"; 
+		    $newline = "<br/>"; 
+		} else { 
+		    $tab = "\t"; 
+		    $newline = "\n"; 
+		} 
+		for($i = 0; $i < strlen($json); $i++) { 
+		    $char = $json[$i]; 
+		    if ($ignorenext) { 
+		        $result .= $char; 
+		        $ignorenext = false; 
+		    } else { 
+		        switch($char) { 
+		            case '{': 
+		                $tabcount++; 
+		                $result .= $char . $newline . str_repeat($tab, $tabcount); 
+		                break; 
+		            case '}': 
+		                $tabcount--; 
+		                $result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char; 
+		                break; 
+		            case ',': 
+		                $result .= $char . $newline . str_repeat($tab, $tabcount); 
+		                break; 
+		            case '"': 
+		                $inquote = !$inquote; 
+		                $result .= $char; 
+		                break; 
+		            case '\\': 
+		                if ($inquote) $ignorenext = true; 
+		                $result .= $char; 
+		                break; 
+		            default: 
+		                $result .= $char; 
+		        } 
+		    } 
+		} 
+		return $result; 
+	}
+	
+	dbConnect();	
+			
+	$reportid = mysql_real_escape_string($_GET['id']);	
+	
+	$sqlresult = mysql_query("
+		select 
+			concat('0x', hex(cast(vendorid as unsigned))) as vendorid,
+			concat('0x', hex(cast(deviceid as unsigned))) as deviceid,
+			VendorID(vendorid) as vendorname,
+			devicename,
+			devicetype,
+			apiversion,
+			driverversionraw,
+			driverversion,
+			concat('http://vulkan.gpuinfo.org/services/getreportjson.php?id=', reportid) as url
+		from deviceproperties
+		order by vendorid"
+	) or die(mysql_error());
+	$sqlcount = mysql_num_rows($sqlresult);   
+	
+	if ($sqlcount > 0) 
+	{
+		header('Content-Type: application/json');
+		
+		$rows = array();
+		while($r = mysql_fetch_assoc($sqlresult)) 
+		{
+			$rows[] = $r;
+		}
+		echo _format_json(json_encode($rows), false);			
+	} 
+	else 
+	{
+		header('HTTP/ 404 empty_response');
+		echo "no reports on list";
+	}
+
+	dbDisconnect();	
+?>
