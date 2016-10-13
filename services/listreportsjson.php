@@ -83,16 +83,20 @@
 	
 	$sqlresult = mysql_query("
 		select 
-			concat('0x', hex(cast(vendorid as unsigned))) as vendorid,
-			concat('0x', hex(cast(deviceid as unsigned))) as deviceid,
-			VendorID(vendorid) as vendorname,
-			devicename,
-			devicetype,
-			apiversion,
-			driverversionraw,
-			driverversion,
-			concat('http://vulkan.gpuinfo.org/services/getreportjson.php?id=', reportid) as url
-		from deviceproperties
+			concat('0x', hex(cast(dp.vendorid as unsigned))) as vendorid,
+			concat('0x', hex(cast(dp.deviceid as unsigned))) as deviceid,
+			VendorID(dp.vendorid) as vendorname,
+			dp.devicename,
+			dp.devicetype,
+			dp.apiversion,
+			dp.driverversionraw,
+			dp.driverversion,
+			r.osname,
+			r.osversion,
+			r.osarchitecture,
+			concat('http://vulkan.gpuinfo.org/services/getreportjson.php?id=', dp.reportid) as url
+		from deviceproperties dp
+		join reports r on r.id = dp.reportid
 		order by vendorid"
 	) or die(mysql_error());
 	$sqlcount = mysql_num_rows($sqlresult);   
