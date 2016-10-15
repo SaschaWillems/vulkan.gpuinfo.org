@@ -23,20 +23,30 @@
 	include './header.inc';	
 	
 	dbConnect();	
-	
-	echo "<div class='header'>";
-		echo "<h4 style='margin-left:10px;'>Listing device features</h4>";
-	echo "</div>";				
 ?>
+	
+<style>
+	.dataTables_filter {
+		display: none;
+	}
+</style>
+
+<div class='header'>
+	<h4 style='margin-left:10px;'>Listing device features</h4>
+</div>
 
 <center>	
-	<div class="tablediv">
-	
-	<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:100%;'>
+	<div class="tablediv">	
+
+	<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 		<thead>
-			<tr>
+			<tr colspan="3">
+				<td colspan=3>Filter: <input type="text" id="searchbox" placeholder="Type to filter..." class="form-control input-sm" size=35></td>			
+			</tr>				
+			<tr>				
 				<td class="caption">Feature</td>
-				<td class="caption">Coverage</td>
+				<td class="caption">Supported</td>
+				<td class="caption">Unsupported</td>
 			</tr>
 		</thead>
 		<tbody>
@@ -48,9 +58,12 @@
 			while($row = mysql_fetch_row($sqlresult))
 			{
 				$count = mysql_result(mysql_query("select count(*) from devicefeatures where `".$row[0]."` = 1"), 0);  	
+				$supported = number_format((($count/$reportCount)*100.0), 0);
+				$unsupported = number_format(100.0 - (($count/$reportCount)*100.0), 0);
 				echo "<tr>";
-				echo "<td width='25%'><a href='listreports.php?feature=".$row[0]."'>".$row[0]."</a> (<a href='listreports.php?feature=".$row[0]."&option=not'>not</a>)</td>";
-				echo "<td>".number_format((($count/$reportCount)*100.0), 0)."%</td>";
+				echo "<td>".$row[0]."</td>";
+				echo "<td><a class='supported' href='listreports.php?feature=".$row[0]."'>".$supported."%</a></td>";
+				echo "<td><a class='unsupported' href='listreports.php?feature=".$row[0]."&option=not'>".$unsupported."%</a></td>";
 				echo "</tr>";
 			}
 						
@@ -71,6 +84,11 @@
 				"bInfo": false,
 				"sDom": 'flipt',
 			});
+
+			$("#searchbox").on("keyup search input paste cut", function() {
+				table.search(this.value).draw();
+			});  
+
 		} );	
 	</script>
 

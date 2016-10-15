@@ -23,17 +23,27 @@
 	include './header.inc';	
 	
 	dbConnect();	
-	
-	echo "<div class='header'>";
-		echo "<h4 style='margin-left:10px;'>Listing device limits</h4>";
-	echo "</div>";				
+
 ?>
+	
+<style>
+	.dataTables_filter {
+		display: none;
+	}
+</style>
+
+<div class='header'>
+	<h4 style='margin-left:10px;'>Listing device limits</h4>
+</div>
 
 <center>	
 	<div class="tablediv">
 	
-	<table id="features" class="table table-striped table-bordered table-hover reporttable responsive" style='width:100%;'>
+	<table id="features" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
 		<thead>
+			<tr colspan="3">
+				<td colspan=3>Filter: <input type="text" id="searchbox" placeholder="Type to filter..." class="form-control input-sm" size=35></td>			
+			</tr>			
 			<tr>
 				<td class="caption">Limit</td>
 				<td class="caption">Min</td>
@@ -48,11 +58,11 @@
 			$columns = array();
 			while($row = mysql_fetch_row($sqlresult))
 			{
-				$range = mysql_fetch_row(mysql_query("select min(`".$row[0]."`), max(`".$row[0]."`) from devicelimits"));
+				$range = mysql_fetch_row(mysql_query("select min(`".$row[0]."`) as lower, max(`".$row[0]."`) from devicelimits where `".$row[0]."` <> 0"));
 				echo "<tr>";
 				echo "<td><a href='listreports.php?limit=".$row[0]."'>".$row[0]."</a></td>";		
-				echo "<td>".number_format($range[0])."</td>";
-				echo "<td>".number_format($range[1])."</td>";
+				echo "<td class='unsupported'>".round($range[0], 3)."</td>";
+				echo "<td class='supported'>".round($range[1], 3)."</td>";
 				echo "</tr>";
 			}
 						
@@ -73,6 +83,11 @@
 				"bInfo": false,				
 				"sDom": 'flipt',				
 			});
+
+			$("#searchbox").on("keyup search input paste cut", function() {
+				table.search(this.value).draw();
+			});  
+
 		} );	
 	</script>
 
