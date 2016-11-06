@@ -318,3 +318,33 @@ CREATE TABLE `VkPhysicalDeviceType` (
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `devicesurfacemodes` (
+  `reportid` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `presentmode` int(11) DEFAULT NULL,
+  PRIMARY KEY (`reportid`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `devicesurfaceformats` (
+  `reportid` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `format` int(11) DEFAULT NULL,
+  `colorSpace` int(11) DEFAULT NULL,
+  PRIMARY KEY (`reportid`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `devicesurfacecapabilities` (
+  `reportid` int(11) NOT NULL,
+  `minImageCount` int(11) DEFAULT NULL,
+  `maxImageCount` int(11) DEFAULT NULL,
+  `maxImageArrayLayers` int(11) DEFAULT NULL,
+  `minImageExtent.width` int(11) DEFAULT NULL,
+  `minImageExtent.height` int(11) DEFAULT NULL,
+  `maxImageExtent.width` int(11) DEFAULT NULL,
+  `maxImageExtent.height` int(11) DEFAULT NULL,
+  `supportedUsageFlags` int(11) DEFAULT NULL,
+  `supportedTransforms` int(11) DEFAULT NULL,
+  `supportedCompositeAlpha` int(11) DEFAULT NULL,
+  PRIMARY KEY (`reportid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
