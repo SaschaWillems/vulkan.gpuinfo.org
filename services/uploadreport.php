@@ -283,6 +283,60 @@
 			$sqlresult = mysql_query($sqlstr) or die(mysql_error());		
 		}
 	}
+
+	// Surface properties
+	$hassurfacecaps = false;
+	if (array_key_exists('surfacecapabilites', $json))
+	{
+		$hassurfacecaps = true;
+		// Caps
+		$surfacecaps = $json['surfacecapabilites'];
+		$sqlstr = "
+			INSERT INTO devicesurfacecapabilities
+				(reportid, minImageCount, maxImageCount, maxImageArrayLayers, `minImageExtent.width`, `minImageExtent.height`, 
+				`maxImageExtent.width`, `maxImageExtent.height`, supportedUsageFlags, supportedTransforms, supportedCompositeAlpha)
+			VALUES
+				(".
+					$reportid.",".
+					$surfacecaps['minImageCount'].",".
+					$surfacecaps['maxImageCount'].",".
+					$surfacecaps['maxImageArrayLayers'].",".
+					$surfacecaps['minImageExtent.width'].",".
+					$surfacecaps['minImageExtent.height'].",".
+					$surfacecaps['maxImageExtent.width'].",".
+					$surfacecaps['maxImageExtent.height'].",".
+					$surfacecaps['supportedUsageFlags'].",".
+					$surfacecaps['supportedTransforms'].",".
+					$surfacecaps['supportedCompositeAlpha'].
+				")";							
+		$sqlresult = mysql_query($sqlstr) or die(mysql_error()."\n".$sqlstr);
+		// Present modes
+		$jsonnode = $json['surfacecapabilites']['presentmodes']; 
+		if (is_array($jsonnode)) {
+			foreach ($jsonnode as $presentmode)
+			{
+				$sqlstr = "
+					insert into devicesurfacemodes
+						(reportid, presentmode)
+					values	
+						($reportid, ".$presentmode['presentMode'].")";
+				$sqlresult = mysql_query($sqlstr) or die(mysql_error());		
+			}
+		}	
+		// Surface formats	 		
+		$jsonnode = $json['surfacecapabilites']['surfaceformats']; 
+		if (is_array($jsonnode)) {
+			foreach ($jsonnode as $surfaceformat)
+			{
+				$sqlstr = "
+					insert into devicesurfaceformats
+						(reportid, format, colorSpace)
+					values	
+						($reportid, ".$surfaceformat['format'].", ".$surfaceformat['colorSpace'].")";
+				$sqlresult = mysql_query($sqlstr) or die(mysql_error());		
+			}
+		}	
+	}
 		
 	mysql_query("COMMIT");
 		
