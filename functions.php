@@ -43,6 +43,48 @@ function getFormatFlags($flag)
 	return getFlags($flags, $flag);
 }
 
+function getImageUsageFlags($flag)
+{
+	$flags = array(
+		0x0001 => "TRANSFER_SRC_BIT",
+		0x0002 => "TRANSFER_DST_BIT",
+		0x0004 => "SAMPLED_BIT",
+		0x0008 => "STORAGE_BIT",
+		0x0010 => "COLOR_ATTACHMENT_BIT",
+		0x0020 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+		0x0040 => "TRANSIENT_ATTACHMENT_BIT",
+		0x0080 => "INPUT_ATTACHMENT_BIT",
+	);
+	return getFlags($flags, $flag);
+}
+
+function getSurfaceTransformFlags($flag)
+{
+	$flags = array(
+		0x0001 => "IDENTITY_BIT_KHR",
+		0x0002 => "ROTATE_90_BIT_KHR",
+		0x0004 => "ROTATE_180_BIT_KHR",
+		0x0008 => "ROTATE_270_BIT_KHR",
+		0x0010 => "HORIZONTAL_MIRROR_BIT_KHR",
+		0x0020 => "HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR",
+		0x0040 => "HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR",
+		0x0080 => "HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR",
+		0x0100 => "INHERIT_BIT_KHR",
+	);
+	return getFlags($flags, $flag);	
+}
+
+function getCompositeAlphaFlags($flag)
+{
+	$flags = array(
+		0x0001 => "OPAQUE_BIT_KHR",
+		0x0002 => "PRE_MULTIPLIED_BIT_KHR",
+		0x0004 => "POST_MULTIPLIED_BIT_KHR",
+		0x0008 => "INHERIT_BIT_KHR",
+	);
+	return getFlags($flags, $flag);	
+}
+
 function getMemoryTypeFlags($flag)
 {
 	$flags = array(
@@ -97,6 +139,41 @@ function listFlags($flags)
 	else
 	{
 		echo "none";
+	}
+}
+
+function getPresentMode($value)
+{
+	$modes = array(
+		"IMMEDIATE_KHR" => 0,
+		"MAILBOX_KHR" => 1,
+		"FIFO_KHR" => 2,
+		"FIFO_RELAXED_KHR" => 3,
+	);
+	if (in_array($value, $modes))
+	{
+		$key = array_search($value, $modes);
+		return $key;
+	}
+	else
+	{
+		return "unknown"; 
+	}
+}
+
+function getColorSpace($value)
+{
+	$modes = array(
+		"SRGB_NONLINEAR_KHR" => 0,
+	);
+	if (in_array($value, $modes))
+	{
+		$key = array_search($value, $modes);
+		return $key;
+	}
+	else
+	{
+		return "unknown"; 
 	}
 }
 
