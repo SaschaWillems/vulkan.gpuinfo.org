@@ -74,7 +74,7 @@
 	echo "</div>";
 
 	// Surface formats	
-	echo "<div id='surfaceformats' class='tab-pane fade in active reportdiv'>";
+	echo "<div id='surfaceformats' class='tab-pane fade reportdiv'>";
 	echo "<table id='devicesurfaceformats' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>";
 	echo "<thead><tr><td class='caption'>Index</td><td class='caption'>Format</td><td class='caption'>Colorspace</td></tr></thead><tbody>";	
 	
@@ -101,8 +101,8 @@
 	echo "</tbody></table>";	
 	echo "</div>";	
 	
-	// Surface formats	
-	echo "<div id='presentmodes' class='tab-pane fade in active reportdiv'>";
+	// Present modes	
+	echo "<div id='presentmodes' class='tab-pane fade reportdiv'>";
 	echo "<table id='devicepresentmodes' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>";
 	echo "<thead><tr><td class='caption'>Present mode</td></tr></thead><tbody>";	
 	
