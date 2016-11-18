@@ -76,11 +76,12 @@
 			}
 			
 			// Counters
-			$extcount = mysql_result(mysql_query("select count(*) from deviceextensions where reportid = $reportID"), 0);			
+			$extcount = mysql_result(mysql_query("select count(*) from deviceextensions where reportid = $reportID"), 0);
 			$formatcount = mysql_result(mysql_query("select count(*) from deviceformats where reportid = $reportID and (lineartilingfeatures > 0 or optimaltilingfeatures > 0 or bufferfeatures > 0)"), 0);			
 			$queuecount = mysql_result(mysql_query("select count(*) from devicequeues where reportid = $reportID"), 0);			
 			$memtypecount = mysql_result(mysql_query("select count(*) from devicememorytypes where reportid = $reportID"), 0);			
 			$layercount = mysql_result(mysql_query("select count(*) from devicelayers where reportid = $reportID"), 0);			
+			$hassurfacecaps = (mysql_result(mysql_query("select count(*) from devicesurfacecapabilities where reportid"), 0)) > 0;
 		
 			echo "<center>";				
 		
@@ -101,6 +102,10 @@
 			echo "	<li><a data-toggle='tab' href='#formats'>Formats <span class='badge'>$formatcount</span></a></a></li>";
 			echo "	<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'>$queuecount</span></a></li>";
 			echo "	<li><a data-toggle='tab' href='#memory'>Memory <span class='badge'>$memtypecount</span></a></a></li>";
+			if ($hassurfacecaps) 
+			{
+				echo "	<li><a data-toggle='tab' href='#surface'>Surface</a></a></li>";
+			}
 			echo "	<li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>";
 			echo "</ul>";
 			echo "</div>";
@@ -191,8 +196,16 @@
 			echo "<div id='memory' class='tab-pane fade reportdiv'>";		
 			include './displayreport_memory.php';
 			echo "</div>";
-			
-			// Layers =======================================================================================
+
+			// Surface properties ============================================================================
+			if ($hassurfacecaps)
+			{	
+				echo "<div id='surface' class='tab-pane fade reportdiv'>";
+				include './displayreport_surface.php';
+				echo "</div>";					
+			}
+
+			// Layers ========================================================================================
 			echo "<div id='layers' class='tab-pane fade reportdiv'>";
 			include './displayreport_layers.php';
 			echo "</div>";					
@@ -203,7 +216,7 @@
 	<script>
 		$(document).ready(
 		function() {
-			var tableNames = ['deviceproperties', 'devicefeatures', 'devicelimits', 'deviceextensions', 'deviceformats', 'devicelayers', 'devicequeues', 'devicememory', 'devicelayerextensions', 'devicememoryheaps', 'devicememorytypes'];
+			var tableNames = ['deviceproperties', 'devicefeatures', 'devicelimits', 'deviceextensions', 'deviceformats', 'devicelayers', 'devicequeues', 'devicememory', 'devicelayerextensions', 'devicememoryheaps', 'devicememorytypes', 'devicesurfaceproperties'];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(
