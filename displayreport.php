@@ -81,7 +81,7 @@
 			$queuecount = mysql_result(mysql_query("select count(*) from devicequeues where reportid = $reportID"), 0);			
 			$memtypecount = mysql_result(mysql_query("select count(*) from devicememorytypes where reportid = $reportID"), 0);			
 			$layercount = mysql_result(mysql_query("select count(*) from devicelayers where reportid = $reportID"), 0);			
-			$hassurfacecaps = (mysql_result(mysql_query("select count(*) from devicesurfacecapabilities where reportid"), 0)) > 0;
+			$hassurfacecaps = (mysql_result(mysql_query("select count(*) from devicesurfacecapabilities where reportid = $reportID"), 0)) > 0;
 		
 			echo "<center>";				
 		
