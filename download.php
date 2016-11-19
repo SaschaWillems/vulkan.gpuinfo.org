@@ -32,6 +32,10 @@
 			</div>
 			<div class="page-header">
 				<h3>Changelog</h3>
+				<h4>Beta 1.2 - 2016-11-19</h4>
+				<ul>
+					<li><b>New feature: </b> Added support for os-specific surface capabilities</li>
+				</ul>
 				<h4>Beta 1.1 - 2016-04-03</h4>
 				<ul>
 					<li><b>Fixed : </b>Memory type flags now displayed correct</li>
@@ -42,7 +46,7 @@
 			<div class="page-header">
 				<h3>Windows</h3>
 				<ul>
-					<li><a href="downloads/vulkancapsviewer_1_1_win64.zip">Beta 1.1 (64-Bit)</a> (API-Version 1.0.3)</li>
+					<li><a href="downloads/vulkancapsviewer_1_2_win64.zip">Beta 1.2 (64-Bit)</a></li>
 				</ul>
 			</div>
 			<div>
@@ -50,16 +54,21 @@
 			<div class="page-header">
 				<h3>Linux</h3>
 				<ul>
-					<li><a href="downloads/vulkancapsviewer_1_1_linux64.tar.gz">Beta 1.1 (64-Bit)</a> (API-Version 1.0.3)</li>
+					<li><a href="downloads/vulkancapsviewer_1_2_linux64.tar.gz">Beta 1.2 (64-Bit)</a></li>
 				</ul>
 			</div>
 			<div>
 			</div>
 			<div class="page-header">
-				<h3>Android</h3>				
+				<h3>Android</h3>								
 				<ul>
-					<li><a href="downloads/vulkancapsviewer_1_1_arm.apk">ARM(v7) Beta 1.1</a> (API-Version 1.0.3)</li>
-					<li><a href="downloads/vulkancapsviewer_1_1_x86.apk">x86 Beta 1.1</a> (API-Version 1.0.3)</li>
+					<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer">Google Playstore entry</a></li>
+					<li>APKs for manual installation
+					<ul>
+						<li><a href="downloads/vulkancapsviewer_1_2_arm.apk">ARM(v7) Beta 1.2</a></li>
+						<li><a href="downloads/vulkancapsviewer_1_2_x86.apk">x86 Beta 1.2</a></li>
+					</ul>
+					</li>
 				</ul>				
 			</div>
 		</div>    
