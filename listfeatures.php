@@ -36,13 +36,13 @@
 </div>
 
 <center>	
-	<div class="tablediv">	
+
+	<div class="tablediv">
+
+	<?php include ("filter.php"); ?>
 
 	<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 		<thead>
-			<tr colspan="3">
-				<td colspan=3>Filter: <input type="text" id="searchbox" placeholder="Type to filter..." class="form-control input-sm" size=35></td>			
-			</tr>				
 			<tr>				
 				<td class="caption">Feature</td>
 				<td class="caption">Supported</td>

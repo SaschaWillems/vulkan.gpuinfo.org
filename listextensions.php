@@ -31,9 +31,35 @@
 	echo "</div>";				
 ?>
 
+<style>
+	.dataTables_filter {
+		display: none;
+	}
+</style>
+
+<script>
+	$(document).ready(function() {
+		var table = $('#extensions').DataTable({
+			"pageLength" : -1,
+			"paging" : false,
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"bInfo": false,		
+		});
+
+		$("#searchbox").on("keyup search input paste cut", function() {
+			table.search(this.value).draw();
+		});  		
+
+	} );	
+</script>
+
 <center>	
 	<div class="tablediv">
-	<table id="extensions" class="table table-striped table-bordered table-hover reporttable responsive"  style='width:100%;' >
+
+	<?php include ("filter.php"); ?>
+
+	<table id="extensions" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
 		<?php		
 		
             $sqlstr = "select name, coverage from viewExtensions";                
@@ -50,7 +76,7 @@
 			while ($row = mysql_fetch_row($sqlresult))
             {
 				echo "<tr>";						
-				echo "<td class='value' width='25%'><a href='listreports.php?extension=".$row[0]."'>".$row[0]."</a> (<a href='listreports.php?extension=".$row[0]."&option=not'>not</a>)</td>";
+				echo "<td class='value'><a href='listreports.php?extension=".$row[0]."'>".$row[0]."</a> (<a href='listreports.php?extension=".$row[0]."&option=not'>not</a>)</td>";
 				echo "<td class='value'>".round(($row[1]/$reportCount*100), 2)."%</td>";
 				echo "</tr>";	    
             }            			
@@ -59,18 +85,7 @@
 	</tbody>
 </table>  
 
-<script>
-	$(document).ready(function() {
-		$('#extensions').DataTable({
-			"pageLength" : -1,
-			"paging" : false,
-			"stateSave": false, 
-			"searchHighlight" : true,	
-			"bInfo": false,
-			"sDom": 'flipt',	
-		});
-	} );	
-</script>
+
 </div>
 
 <?php include './footer.inc'; ?>

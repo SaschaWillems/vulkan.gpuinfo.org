@@ -23,7 +23,7 @@ body {
 .error {
 	width:50%;
 	margin-top: 50px;
-	paddint-bottom : 25px;
+	padding-bottom : 25px;
 }
 
 .datatables_filter { 
@@ -47,13 +47,13 @@ th, td {
 
 
 .tablehead {
-	#color:#a31d21;	
-	#font-weight:bold !important;
-	#background: #ABABAB;
-	#color:#FFFFFF;
+	/*color:#a31d21;*/	
+	/*font-weight:bold !important;*/
+	/*background: #ABABAB;*/
+	/*color:#FFFFFF;*/
 	color:#a31d21;
 	padding:5px;
-	#font-size:1.1em;
+	/*font-size:1.1em;*/
 }
 
 .table-striped>tbody>tr:nth-of-type(odd) {
@@ -91,6 +91,26 @@ th, td {
 
 .reporttable {
 	/*width:auto;*/
+}
+
+.borderless tr td {
+    border: none !important;
+    padding: 0px !important;
+}
+
+.filterdiv {
+	width:15%;
+	min-width: 400px;
+	padding-bottom: 10px;	
+}
+
+.filtertable {
+    border: none !important;
+    padding: 5px !important;
+}
+
+.filtertable td {
+	padding-right:5px;
 }
 
 .nav-tabs > li, .nav-pills > li {

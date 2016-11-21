@@ -23,7 +23,6 @@
 	include './header.inc';	
 	
 	dbConnect();	
-
 ?>
 	
 <style>
@@ -38,12 +37,11 @@
 
 <center>	
 	<div class="tablediv">
+
+	<?php include ("filter.php"); ?>
 	
 	<table id="features" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
 		<thead>
-			<tr colspan="3">
-				<td colspan=3>Filter: <input type="text" id="searchbox" placeholder="Type to filter..." class="form-control input-sm" size=35></td>			
-			</tr>			
 			<tr>
 				<td class="caption">Limit</td>
 				<td class="caption">Min</td>
