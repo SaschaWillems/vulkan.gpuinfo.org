@@ -37,6 +37,7 @@
 	$sqlWhere = '';
 	$sqlSelectPre = '';
 	$sqlOrderBy = 'order by id desc';
+	$alertText = '';
 
 	if ($_GET['option'] != '')
 	{
@@ -136,8 +137,8 @@
 		$sqlResult = mysql_query("select VkFormat(format) from devicesurfaceformats where format = ".$surfaceformat);
 		$surfaceformatname = mysql_result($sqlResult, 0);
 		$headerText = "Listing all reports supporting surface format <b>".$surfaceformatname."</b>";		
-		$sqlWhere = "
-			where id in (select reportid from devicesurfaceformats df where df.format = ".$surfaceformat.")";
+		$sqlWhere = "where id in (select reportid from devicesurfaceformats df where df.format = ".$surfaceformat.")";
+		$alertText = "<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)";
 	}
 
 	// List by submitter
@@ -186,6 +187,11 @@
 				left join
 				deviceproperties p on (p.reportid = r.id) ".$sqlWhere." ".$sqlOrderBy) or die(mysql_error());							
 				
+				if ($alertText != "")
+				{
+					echo "<div class='alert alert-warning' role='alert'>".$alertText."</div>";
+				}
+
 				echo "<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
 				echo "<thead><tr>";
 				
