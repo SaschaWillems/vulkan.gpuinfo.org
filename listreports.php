@@ -124,8 +124,22 @@
 		$headerText = "Listing all reports supporting <b>".$bufferformatfeature."</b> for <b>buffer usage</b>";		
 		$sqlWhere = "
 			where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = '".$bufferformatfeature."' and df.bufferfeatures > 0)";
-	}	
-	
+	}
+
+	// List by surface format	
+	$surfaceformat = mysql_real_escape_string($_GET['surfaceformat']);
+
+	if ($surfaceformat != '')
+	{
+		$defaultHeader = false;
+		$headerClass = "header-green";
+		$sqlResult = mysql_query("select VkFormat(format) from devicesurfaceformats where format = ".$surfaceformat);
+		$surfaceformatname = mysql_result($sqlResult, 0);
+		$headerText = "Listing all reports supporting surface format <b>".$surfaceformatname."</b>";		
+		$sqlWhere = "
+			where id in (select reportid from devicesurfaceformats df where df.format = ".$surfaceformat.")";
+	}
+
 	// List by submitter
 	$submitter = mysql_real_escape_string($_GET['submitter']);	
 	if ($submitter != '')
