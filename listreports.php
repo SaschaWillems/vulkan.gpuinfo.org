@@ -141,6 +141,18 @@
 		$alertText = "<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)";
 	}
 
+	// List by surface present mode	
+	$surfacepresentmode = mysql_real_escape_string($_GET['surfacepresentmode']);
+
+	if ($surfacepresentmode != '')
+	{
+		$defaultHeader = false;
+		$headerClass = "header-green";
+		$headerText = "Listing all reports supporting present mode <b>".getPresentMode($surfacepresentmode)."</b>";		
+		$sqlWhere = "where id in (select reportid from devicesurfacemodes dsp where dsp.presentmode = ".$surfacepresentmode.")";
+		$alertText = "<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)";
+	}	
+
 	// List by submitter
 	$submitter = mysql_real_escape_string($_GET['submitter']);	
 	if ($submitter != '')
