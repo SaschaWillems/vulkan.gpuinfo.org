@@ -40,8 +40,9 @@
 		p.residencyAlignedMipSize, 
 		p.residencyNonResidentStrict, 
 		p.residencyStandard2DBlockShape, 
-		p.residencyStandard2DMSBlockShape, 
-		p.residencyStandard3DBlockShape		
+		p.residencyStandard2DMultisampleBlockShape, 
+		p.residencyStandard3DBlockShape,
+		p.pipelineCacheUUID	
 	from reports r
 	left join
 	deviceproperties p on (p.reportid = r.id)
@@ -53,24 +54,26 @@
 		{
 			$fname = mysql_field_name($sqlresult, $i);		  			
 			$value = $row[$i];
-			if ($fname == 'submitter')
-			{
+			if ($fname == 'submitter') {
 				$value = '<a href="listreports.php?submitter='.$value.'">'.$value.'</a>';
 			}
-			if (strpos($fname, 'residency') !== false)
-			{
+			if (strpos($fname, 'residency') !== false) {
 				$class = ($value == 1) ? "supported" : "unsupported";
 				$support = ($value == 1) ? "true" : "false";
 				$value = "<span class='".$class."'>".$support."</span>";
 			}
-			if (($fname == 'driverversion') | ($fname == 'vendorid'))
-			{
+			if (($fname == 'driverversion') | ($fname == 'vendorid')) {
 				continue;
 			}
-			if ($fname == 'driverversionraw')
-			{
+			if ($fname == 'driverversionraw') {
 				$fname = 'driverversion';
 				$value = getDriverVerson($value, $row[2], $row[5]);
+			}
+			if ($fname == 'pipelineCacheUUID') {
+				$arr = unserialize($value);
+				foreach ($arr as &$val) 
+					$val = strtoupper(dechex($val));
+				$value = implode($arr);
 			}
 			echo "<tr><td class='key'>".$fname."</td><td>".$value."</td></tr>\n";
 		}				
