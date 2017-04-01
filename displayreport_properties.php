@@ -78,6 +78,12 @@
 			echo "<tr><td class='key'>".$fname."</td><td>".$value."</td></tr>\n";
 		}				
 	}
+
+	// Platform details (when available)
+	$sqlresult = mysql_query("select name, value from deviceplatformdetails dpfd join platformdetails pfd on dpfd.platformdetailid = pfd.id order by name asc");
+	while($row = mysql_fetch_row($sqlresult)) {
+		echo "<tr><td class='key'>".$row[0]."</td><td>".$row[1]."</td></tr>\n";
+	}
 	
 	echo "</tbody></table>";	
 ?>

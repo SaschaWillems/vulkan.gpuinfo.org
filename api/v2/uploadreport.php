@@ -567,6 +567,37 @@
 		}
 	}
 
+	// Platform details
+	{		
+		$jsonnode = $json['platformdetails']; 
+		$index = 0;
+		foreach ($jsonnode as $key => $value) {
+			try {
+				// Add to global mapping table (if not already present)
+				$sql = "INSERT IGNORE INTO platformdetails (name) VALUES (:name)";
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute(array(":name" => $key));				
+				// Device
+				$sql = "SELECT id FROM platformdetails WHERE name = :name";
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute(array(":name" => $key));
+				$id = $stmnt->fetchColumn();			
+				// Insert
+				$sql = "INSERT INTO deviceplatformdetails 
+							(reportid, platformdetailid, value) 
+						VALUES 
+							(:reportid, :platformdetailid, :value)";
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute(array(
+					":reportid" => $reportid, 
+					":platformdetailid" => $id, 
+					":value" => $value));
+			} catch (Exception $e) {
+				die('Error while trying to upload report (error at platform details)');
+			}														
+		}
+	}	
+
 	DB::$connection->commit();
 		
 	echo "res_uploaded";	  	
