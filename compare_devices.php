@@ -44,8 +44,9 @@
 			p.residencyAlignedMipSize, 
 			p.residencyNonResidentStrict, 
 			p.residencyStandard2DBlockShape, 
-			p.residencyStandard2DMSBlockShape, 
-			p.residencyStandard3DBlockShape		
+			p.residencyStandard2DMultisampleBlockShape, 
+			p.residencyStandard3DBlockShape,
+			p.pipelineCacheUUID
 		from reports r
 		left join
 		deviceproperties p on (p.reportid = r.id)				
@@ -66,8 +67,16 @@
 		{
 			$caption = mysql_field_name($sqlresult, $colindex);		  
 			
-			if ($caption != "reportid")
-			{
+			if ($caption == 'pipelineCacheUUID') {
+				$arr = unserialize($data);
+				foreach ($arr as &$val) 
+					$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
+				$reportdata[] = implode($arr);
+				$colindex++;
+				continue;
+			}
+
+			if ($caption != "reportid") {
 				$reportdata[] = $data;	  
 				$captions[]   = $caption;
 			}									

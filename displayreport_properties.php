@@ -72,7 +72,7 @@
 			if ($fname == 'pipelineCacheUUID') {
 				$arr = unserialize($value);
 				foreach ($arr as &$val) 
-					$val = strtoupper(dechex($val));
+					$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
 				$value = implode($arr);
 			}
 			echo "<tr><td class='key'>".$fname."</td><td>".$value."</td></tr>\n";
