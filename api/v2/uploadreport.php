@@ -270,7 +270,7 @@
 			die('Error while trying to upload report (error at device features)');
 		}									
 	}
-
+	
 	// Image and buffer formats
 	{
 		$jsonnode = $json['formats']; 
@@ -598,6 +598,51 @@
 		}
 	}	
 
+	// Extended feature set
+	if (array_key_exists('extended', $json)) {
+		$extended = $json['extended'];
+		// Device features
+		if (array_key_exists('devicefeatures2', $extended)) {
+			foreach ($extended['devicefeatures2'] as $feature) {
+				$sql = "INSERT INTO devicefeatures2
+							(reportid, name, extension, supported)
+						VALUES
+							(:reportid, :name, :extension, :supported)";
+				try {
+					$values = array(
+						":reportid" => $reportid, 
+						":name" => $feature['name'], 
+						":extension" => $feature['extension'], 
+						":supported" => $feature['supported']);
+					$stmnt = DB::$connection->prepare($sql);
+					$stmnt->execute($values);
+				} catch (Exception $e) {
+					die('Error while trying to upload report (error at device extended device features)');
+				}							
+			}
+		}
+		// Device properties			
+		if (array_key_exists('deviceproperties2', $extended)) {
+			foreach ($extended['deviceproperties2'] as $property) {
+				$sql = "INSERT INTO deviceproperties2
+							(reportid, name, extension, value)
+						VALUES
+							(:reportid, :name, :extension, :value)";
+				try {
+					$values = array(
+						":reportid" => $reportid, 
+						":name" => $property['name'], 
+						":extension" => $property['extension'], 
+						":value" => $property['value']);
+					$stmnt = DB::$connection->prepare($sql);
+					$stmnt->execute($values);
+				} catch (Exception $e) {
+					die('Error while trying to upload report (error at device extended device properties)');
+				}							
+			}		
+		}		
+	}
+	
 	DB::$connection->commit();
 		
 	echo "res_uploaded";	  	
