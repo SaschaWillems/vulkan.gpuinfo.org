@@ -55,7 +55,7 @@
 			from reports r
 			left join
 			deviceproperties p on (p.reportid = r.id)
-			where r.id = $reportID") or die(mysql_error());			
+			where r.id = $reportID") or die("Error: Could not get requested report!");			
 			$row = mysql_fetch_assoc($sqlresult);
 			$present = (mysql_num_rows($sqlresult) > 0);
 			$devicedescription = $row['vendor']." ".$row['devicename'];
@@ -82,6 +82,7 @@
 			$memtypecount = mysql_result(mysql_query("select count(*) from devicememorytypes where reportid = $reportID"), 0);			
 			$layercount = mysql_result(mysql_query("select count(*) from devicelayers where reportid = $reportID"), 0);			
 			$hassurfacecaps = (mysql_result(mysql_query("select count(*) from devicesurfacecapabilities where reportid = $reportID"), 0)) > 0;
+			$hasextended =  (mysql_result(mysql_query("select (select count(*) from devicefeatures2 where reportid = $reportID) + (select count(*) from deviceproperties2 where reportid = $reportID)"), 0)) > 0;
 		
 			echo "<center>";				
 		
@@ -98,15 +99,17 @@
 			echo "	<li class='active'><a data-toggle='tab' href='#device'>Device</a></li>";
 			echo "	<li><a data-toggle='tab' href='#features'>Features</a></li>";
 			echo "	<li><a data-toggle='tab' href='#limits'>Limits</a></li>";
+			if ($hasextended) {
+				echo "	<li><a data-toggle='tab' href='#extended'>Extended</a></a></li>";
+			}
 			echo "	<li><a data-toggle='tab' href='#extensions'>Extensions <span class='badge'>$extcount</span></a></li>";
 			echo "	<li><a data-toggle='tab' href='#formats'>Formats <span class='badge'>$formatcount</span></a></a></li>";
 			echo "	<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'>$queuecount</span></a></li>";
 			echo "	<li><a data-toggle='tab' href='#memory'>Memory <span class='badge'>$memtypecount</span></a></a></li>";
-			if ($hassurfacecaps) 
-			{
+			if ($hassurfacecaps) {
 				echo "	<li><a data-toggle='tab' href='#surface'>Surface</a></a></li>";
 			}
-			echo "	<li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>";
+			// echo "	<li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>";
 			echo "</ul>";
 			echo "</div>";
 			
@@ -121,7 +124,7 @@
 			echo "<div id='features' class='tab-pane fade reportdiv'>";
 			echo "<table id='devicefeatures' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
 			echo "<thead><tr><td class='caption'>Feature</td><td class='caption'>Value</td></tr></thead><tbody>";
-			
+			// Basic
 			$sqlresult = mysql_query("select * from devicefeatures where reportid = $reportID") or die(mysql_error());
 			while($row = mysql_fetch_row($sqlresult))
 			{
@@ -173,9 +176,16 @@
 					echo "</td></tr>\n";
 				}				
 			}
-			
+
 			echo "</tbody></table>";					
-			echo "</div>";					
+			echo "</div>";		
+
+			// Extended features and properites =============================================================
+			if ($hasextended) {	
+				echo "<div id='extended' class='tab-pane fade reportdiv'>";
+				include './displayreport_extended.php';
+				echo "</div>";					
+			}		
 			
 			// Extensions ===================================================================================
 			echo "<div id='extensions' class='tab-pane fade reportdiv'>";
@@ -206,10 +216,11 @@
 			}
 
 			// Layers ========================================================================================
+			/*
 			echo "<div id='layers' class='tab-pane fade reportdiv'>";
 			include './displayreport_layers.php';
 			echo "</div>";					
-						
+			*/					
 			
 ?>
 
@@ -228,10 +239,11 @@
 							"bAutoWidth": false,
 							"sDom": 'flpt',
 							"deferRender": true,
+							"processing": true,
 						}
 					);
 			}	
-			
+					
 			// Collapsible format flags
 			var table = $('#deviceformats').DataTable();
 			table.columns(5).visible(false);
@@ -364,9 +376,8 @@
 			var a = document.location.hash;
 			if (a) 
 			{
-				// Nested memory tabs, need to show parent tab too
-				if ((a === '#memorytypes') || (a === '#memoryheaps'))
-				{
+				// Nested tabs, need to show parent tab too
+				if ((a === '#memorytypes') || (a === '#memoryheaps')) {
 					$('.nav a[href=\\#memory]').tab('show');
 					console.log(a);
 				}
