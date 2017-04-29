@@ -68,7 +68,21 @@
 		DB::disconnect();
 		exit();	  
 	}			
-	
+
+	// Check if device is blacklisted
+	try {
+		$sql = "select count(*) from blacklist where devicename = :devicename";
+		$stmnt = DB::$connection->prepare($sql);
+		$stmnt->execute(array(":devicename" => $json['properties']['deviceName']));
+		if ($stmnt->rowCount() > 0) { 
+			echo "This device has been black-listed and can't be uploaded to the database!";
+			DB::disconnect();
+			exit();	  	
+		}
+	} catch (Exception $e) {
+		die('Error while trying to upload report (error at black list check)');
+	}		
+		
 	// Check if report is already present
 	{
 		$sql = "select id from reports where
@@ -79,9 +93,9 @@
 			osversion = :osversion and
 			osarchitecture = :osarchitecture";
 		$params = array(
-			":devicename" => $json['deviceproperties']['deviceName'],
-			":driverversion" => $json['deviceproperties']['driverVersion'],
-			":apiversion" => $json['deviceproperties']['apiVersion'],
+			":devicename" => $json['properties']['deviceName'],
+			":driverversion" => $json['properties']['driverVersion'],
+			":apiversion" => $json['properties']['apiVersion'],
 			":osname" => $json['environment']['name'],
 			":osversion" => $json['environment']['version'],
 			":osarchitecture" => $json['environment']['architecture'],
