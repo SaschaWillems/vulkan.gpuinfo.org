@@ -71,11 +71,11 @@
 
 	// Check if device is blacklisted
 	try {
-		$sql = "select count(*) from blacklist where devicename = :devicename";
+		$sql = "select * from blacklist where devicename = :devicename";
 		$stmnt = DB::$connection->prepare($sql);
 		$stmnt->execute(array(":devicename" => $json['properties']['deviceName']));
 		if ($stmnt->rowCount() > 0) { 
-			echo "This device has been black-listed and can't be uploaded to the database!";
+			echo "Device ".$json['properties']['deviceName']." has been black-listed and can't be uploaded to the database!";
 			DB::disconnect();
 			exit();	  	
 		}
