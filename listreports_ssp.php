@@ -73,21 +73,24 @@
 			"dom": 'lrtip',	
 			"pageLength" : 25,		
 			"order": [[ 0, 'desc' ]],
+			"columnDefs": [
+				{ "orderable": false, "targets": 9 }
+			],
 			"ajax": {
 				url :"responses/listreports.php",
 				type: "post",
 			},
-			"aoColumns": [
-				{ mData: 'id' },
-				{ mData: 'device' },
-				{ mData: 'driver' },
-				{ mData: 'api' },
-				{ mData: 'vendor' },
-				{ mData: 'type' },
-				{ mData: 'os' },
-				{ mData: 'version' },
-				{ mData: 'platform' },
-				{ mData: 'compare' },
+			"columns": [
+				{ data: 'id' },
+				{ data: 'device' },
+				{ data: 'driver' },
+				{ data: 'api' },
+				{ data: 'vendor' },
+				{ data: 'devicetype' },
+				{ data: 'osname' },
+				{ data: 'osversion' },
+				{ data: 'osarchitecture' },
+				{ data: 'compare' },
 			],
 			// Pass order by column information to server side script
 			fnServerParams: function(data) {

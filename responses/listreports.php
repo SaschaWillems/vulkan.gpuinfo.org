@@ -74,10 +74,10 @@
                 'driver' => $device["driverversion"], 
                 'api' => $device["api"], 
                 'vendor' => $device["vendor"],
-				'type' => strtolower(str_replace('_GPU', '', $device["devicetype"])),
-				'os' => $device["osname"],
-				'version' => $device["osversion"],
-				'platform' => $device["osarchitecture"],
+				'devicetype' => strtolower(str_replace('_GPU', '', $device["devicetype"])),
+				'osname' => $device["osname"],
+				'osversion' => $device["osversion"],
+				'osarchitecture' => $device["osarchitecture"],
                 'compare' => '<center><input type="checkbox" name="id['.$device["id"].']"></center>'
             );
         }        
