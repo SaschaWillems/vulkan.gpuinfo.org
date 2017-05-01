@@ -38,7 +38,8 @@
     for ($i = 0; $i < sizeof($_REQUEST['columns']); $i++) {
         $column = $_REQUEST['columns'][$i];
         if ($column['search']['value'] != '') {
-            $filters[] = $searchColumns[$i]." like '%".$column['search']['value']."%'";
+            $filters[] = $searchColumns[$i].' like :filter_'.$i;
+            $params['filter_'.$i] = '%'.$column['search']['value'].'%';
         }
     }
     if (sizeof($filters) > 0) {
