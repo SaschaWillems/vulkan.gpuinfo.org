@@ -324,3 +324,40 @@ a:link {  text-decoration:none !important; }
 a:visited {  text-decoration:none !important; }
 a:focus {  text-decoration:none !important; }
 a:hover {  text-decoration:none !important; }
+
+.filterinput {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 5px;
+	font-weight: normal;
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #BCBCBC;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: #BCBCBC;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: #BCBCBC;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: #BCBCBC;
+}
+
+.button {
+	background-color: #EEEEEE;
+    border: 1px solid #ddd;
+	padding: 6px 12px;
+	border-radius: 4px;
+	color: #337ab7;
+	font-weight: normal;
+}
+
+.button:hover {
+	background-color: #BCBCBC;
+    border: 1px solid #ddd;
+	padding: 6px 12px;
+	border-radius: 4px;
+	color: #000;
+}

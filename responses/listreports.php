@@ -31,7 +31,6 @@
 
     $searchColumns = array('id', 'p.devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
     $search = $_REQUEST['columns'][1]['search']['value'];
-    $whereClause = '';
 
     $filters = array();
     for ($i = 0; $i < sizeof($_REQUEST['columns']); $i++) {
@@ -43,6 +42,49 @@
     if (sizeof($filters) > 0) {
         $searchClause = 'having '.implode(' and ', $filters);
     }
+
+    $whereClause = '';
+    $negate = false;
+	if (isset($_REQUEST['filter']['option'])) {
+		if ($_REQUEST['filter']['option'] == 'not') {
+			$negate = true;
+		}
+    }        
+	// Filters
+    // Extension
+	if (isset($_REQUEST['filter']['extension'])) {
+	    $extension = $_REQUEST['filter']['extension'];
+        if ($extension != '') {
+            $whereClause = "where r.id ".($negate ? "not" : "")."in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = '".$extension."')";
+        }
+	}
+    // Feature
+	if (isset($_REQUEST['filter']['feature'])) {
+	    $feature = $_REQUEST['filter']['feature'];
+        if ($feature != '') {
+            $whereClause = "where r.id in (select distinct(reportid) from devicefeatures df where df.".$feature." = ".($negate ? "0" : "1").")";
+        }    
+    }
+    // Submitter
+    if (isset($_REQUEST['filter']['submitter'])) {
+	    $submitter = $_REQUEST['filter']['submitter'];
+        if ($submitter != '') {
+            $whereClause = "where r.submitter = '".$submitter."'";
+        }
+	}
+	// Format support
+	$linearformatfeature = $_REQUEST['filter']['linearformat'];
+	$optimalformatfeature =$_REQUEST['filter']['optimalformat'];
+	$bufferformatfeature = $_REQUEST['filter']['bufferformat'];	
+	if ($linearformatfeature != '') {
+		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = '".$linearformatfeature."' and df.lineartilingfeatures > 0)";
+	}	
+	if ($optimalformatfeature != '') {
+		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = '".$optimalformatfeature."' and df.optimaltilingfeatures > 0)";
+	}	
+	if ($bufferformatfeature != '') {
+		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = '".$bufferformatfeature."' and df.bufferfeatures > 0)";
+	}    
 
     $sql = "select 
         r.id,
@@ -59,8 +101,10 @@
         from reports r
         left join
         deviceproperties p on (p.reportid = r.id)
+        ".$whereClause."
         ".$searchClause."                
         order by ".$orderByColumn." ".$orderByDir;
+
     $paging = "LIMIT ".$_REQUEST["length"]. " OFFSET ".$_REQUEST["start"];
 
     $devices = DB::$connection->prepare($sql." ".$paging);
@@ -88,7 +132,7 @@
     $totalCount = $stmnt->fetchColumn(); 
 
     $filteredCount = $totalCount;
-    if ($searchClause != '') {
+    if (($searchClause != '') or ($whereClause != ''))  {
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute();
         $filteredCount = $stmnt->rowCount();     

@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -19,16 +19,80 @@
 		*
 	*/
 
-	include './dbconfig.php';
 	include './header.inc';	
 	include './functions.php';	
-
-	dbConnect();
 
 ?>
 
 <center>
+
+<?php
+	// Header
+	$defaultHeader = true;
+    $negate = false;
+	if (isset($_GET['option'])) {
+		if ($_GET['option'] == 'not') {
+			$negate = true;
+		}
+    }	
+	// Extension
+	$extension = $_GET['extension'];
+	if ($extension != '') {
+		$defaultHeader = false;
+		if (!$negate) {
+			$headerClass = "header-green";		
+			$headerText = "Listing all reports supporting <b>".$extension."</b>";		
+		} else {
+			$headerClass = "header-red";
+			$headerText = "Listing all reports not supporting <b>".$extension."</b>";		
+		}
+	}
+	// Feature
+	$feature = $_GET['feature'];	
+	if ($feature != '') {
+		$defaultHeader = false;
+		if (!$negate) {
+			$headerClass = "header-green";
+			$headerText = "Listing all reports supporting <b>".$feature."</b>";		
+		} else {
+			$headerClass = "header-red";
+			$headerText = "Listing all reports not supporting <b>".$feature."</b>";		
+		}
+	}	
+	// Submitter
+	$submitter = $_GET['submitter'];	
+	if ($submitter != '') {
+		$defaultHeader = false;
+		$headerClass = "header-blue";
+		$headerText = "Listing all reports submitted by <b>".$submitter."</b>";		
+	}		
+	// Format support
+	$linearformatfeature = $_GET['linearformat'];
+	$optimalformatfeature = $_GET['optimalformat'];
+	$bufferformatfeature = $_GET['bufferformat'];	
+	if ($linearformatfeature != '') {
+		$defaultHeader = false;
+		$headerClass = "header-green";				
+		$headerText = "Listing all reports supporting <b>".$linearformatfeature."</b> for <b>linear tiling</b>";		
+	}	
+	if ($optimalformatfeature != '') {
+		$defaultHeader = false;
+		$headerClass = "header-green";				
+		$headerText = "Listing all reports supporting <b>".$optimalformatfeature."</b> for <b>optimal tiling</b>";		
+	}
+	if ($bufferformatfeature != '') {
+		$defaultHeader = false;
+		$headerClass = "header-green";				
+		$headerText = "Listing all reports supporting <b>".$bufferformatfeature."</b> for <b>buffer usage</b>";		
+	}	
+
+	echo "<div class='".$headerClass."' style='width:auto;'>";	
+	echo "	<h4>".$headerText."</h4>";
+	echo "</div>";		
+?>
+
 	<div class="tablediv">	
+
 		<form method="get" action="compare.php?compare">	
 		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>
 			<thead>
@@ -78,7 +142,17 @@
 			],
 			"ajax": {
 				url :"responses/listreports.php",
-				type: "post",
+				data: {
+					"filter": {
+						'extension' : '<?php echo $_GET["extension"] ?>' ,
+						'feature' : '<?php echo $_GET["feature"] ?>' ,
+						'submitter' : '<?php echo $_GET["submitter"] ?>',
+						'linearformat' : '<?php echo $_GET["linearformat"] ?>',
+						'optimalformat' : '<?php echo $_GET["optimalformat"] ?>',
+						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
+						'option' : '<?php echo $_GET["option"] ?>',
+					}
+				},
 			},
 			"columns": [
 				{ data: 'id' },
