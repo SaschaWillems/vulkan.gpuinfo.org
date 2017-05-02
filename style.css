@@ -190,8 +190,15 @@ h4 {
 
 .header-blue {
 	background: #d9edf7;
-	color:##31708f;
+	color: #31708f;
     line-height: 40px;	
+	padding:5px;
+	text-align:center;
+}
+
+.header-yellow {
+	background-color: #fcf8e3;
+	color: #8a6d3b;
 	padding:5px;
 	text-align:center;
 }

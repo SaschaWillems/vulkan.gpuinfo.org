@@ -29,6 +29,7 @@
 <?php
 	// Header
 	$defaultHeader = true;
+	$alertText = null;	
     $negate = false;
 	if (isset($_GET['option'])) {
 		if ($_GET['option'] == 'not') {
@@ -89,15 +90,40 @@
 	$limit = $_GET['limit'];
 	if ($limit != '') {
 		$defaultHeader = false;
+		$headerClass = "header-green";
 		$headerText = "Listing limits for <b>".$limit."</b>";		
 	}	
+	// Surface format	
+	$surfaceformat = $_GET['surfaceformat'];
+	if ($surfaceformat != '') {
+		$defaultHeader = false;
+		$headerClass = "header-green";
+		$headerText = "Listing all reports supporting surface format <b>".$surfaceformat."</b>";		
+		$alertText = "<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)";
+	}
+
+	// Surface present mode	
+	$surfacepresentmode = $_GET['surfacepresentmode'];
+	if ($surfacepresentmode != '') {
+		$defaultHeader = false;
+		$headerClass = "header-green";
+		$headerText = "Listing all reports supporting present mode <b>".getPresentMode($surfacepresentmode)."</b>";		
+		$alertText = "<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)";
+	}		
 
 	echo "<div class='".$headerClass."' style='width:auto;'>";	
 	echo "	<h4>".$headerText."</h4>";
 	echo "</div>";		
+
+	if (isset($alertText)) {
+		echo "<div class='header-yellow'>".$alertText."</div>";
+	}	
 ?>
 
 	<div class="tablediv">	
+
+		<?php
+		?>
 
 		<form method="get" action="compare.php?compare">	
 		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>
@@ -160,6 +186,8 @@
 						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
 						'devicelimit' : '<?php echo $_GET["limit"] ?>',
 						'option' : '<?php echo $_GET["option"] ?>',
+						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
+						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
 					}
 				},
 			},

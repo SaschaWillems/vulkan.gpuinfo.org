@@ -67,7 +67,7 @@
 	}
 	// Format support
 	$linearformatfeature = $_REQUEST['filter']['linearformat'];
-	$optimalformatfeature =$_REQUEST['filter']['optimalformat'];
+	$optimalformatfeature = $_REQUEST['filter']['optimalformat'];
 	$bufferformatfeature = $_REQUEST['filter']['bufferformat'];	
 	if ($linearformatfeature != '') {
 		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_linearformatfeature and df.lineartilingfeatures > 0)";
@@ -87,6 +87,19 @@
         array_unshift($searchColumns, 'devicelimit');
 		$selectAddColumns = ",(select dl.".$limit." from devicelimits dl where dl.reportid = r.id) as devicelimit";
 	}    
+	// Surface format	
+	$surfaceformat = $_REQUEST['filter']['surfaceformat'];
+	if ($surfaceformat != '') {
+		$whereClause = "where id in (select reportid from devicesurfaceformats dsf join VkFormat f on dsf.format = f.value where f.name = :filter_surfaceformat)";
+        $params['filter_surfaceformat'] = $surfaceformat;        
+	}
+
+	// Surface present mode	
+	$surfacepresentmode = $_REQUEST['filter']['surfacepresentmode'];
+	if ($surfacepresentmode != '') {
+		$whereClause = "where id in (select reportid from devicesurfacemodes dsp where dsp.presentmode = :filter_surfacepresentmode)";
+        $params['filter_surfacepresentmode'] = $surfacepresentmode;        
+	}	    
 
     // Per-column, filtering
     $filters = array();
