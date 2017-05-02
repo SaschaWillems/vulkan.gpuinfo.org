@@ -85,6 +85,12 @@
 		$headerClass = "header-green";				
 		$headerText = "Listing all reports supporting <b>".$bufferformatfeature."</b> for <b>buffer usage</b>";		
 	}	
+	// List (and order) by limit
+	$limit = $_GET['limit'];
+	if ($limit != '') {
+		$defaultHeader = false;
+		$headerText = "Listing limits for <b>".$limit."</b>";		
+	}	
 
 	echo "<div class='".$headerClass."' style='width:auto;'>";	
 	echo "	<h4>".$headerText."</h4>";
@@ -98,6 +104,7 @@
 			<thead>
 				<tr>
 					<th></th>
+					<?php if (isset($_GET["limit"])) echo "<th>limit</th>" ?>
 					<th>device</th>
 					<th>driver</th>
 					<th>api</th>
@@ -110,6 +117,7 @@
 				</tr>
 				<tr>
 					<td>id</td>
+					<?php if (isset($_GET["limit"])) echo "<td>Limit</td>" ?>
 					<td>Device</td>
 					<td>Driver</td>
 					<td>Api</td>
@@ -118,7 +126,7 @@
 					<td>OS</tdth>
 					<td>Version</td>
 					<td>Platform</td>
-					<td>Compare</td>
+					<td></td>
 				</tr>
 			</thead>		
 		</table>
@@ -138,7 +146,7 @@
 			"pageLength" : 25,		
 			"order": [[ 0, 'desc' ]],
 			"columnDefs": [
-				{ "orderable": false, "targets": 9 }
+				{ "orderable": false, "targets": <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>  }
 			],
 			"ajax": {
 				url :"responses/listreports.php",
@@ -150,12 +158,14 @@
 						'linearformat' : '<?php echo $_GET["linearformat"] ?>',
 						'optimalformat' : '<?php echo $_GET["optimalformat"] ?>',
 						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
+						'devicelimit' : '<?php echo $_GET["limit"] ?>',
 						'option' : '<?php echo $_GET["option"] ?>',
 					}
 				},
 			},
 			"columns": [
 				{ data: 'id' },
+				<?php if (isset($_GET["limit"])) echo "{ data: 'devicelimit'},\n" ?>
 				{ data: 'device' },
 				{ data: 'driver' },
 				{ data: 'api' },
@@ -176,9 +186,9 @@
 
 		// Per-Column filter boxes
 		$('#reports thead th').each( function (i) {
-			if ((i != 0) && (i != 9)) {
-				var title = $('#reports thead th').eq( $(this).index() ).text();
-				var w = (i > 1) ? 120 : 240;
+			var title = $('#reports thead th').eq( $(this).index() ).text();
+			if ((title !== 'id') && (title !== '')) {
+				var w = (title != 'device') ? 120 : 240;
 				$(this).html( '<input type="text" placeholder="'+title+'" data-index="'+i+'" style="width: '+w+'px;" class="filterinput" />' );
 			}
 		}); 

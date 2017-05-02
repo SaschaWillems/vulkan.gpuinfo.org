@@ -30,23 +30,11 @@
     $orderByDir = $_REQUEST['order'][0]['dir'];
 
     $searchColumns = array('id', 'p.devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
-    $search = $_REQUEST['columns'][1]['search']['value'];
 
     $params = array();
 
-    $filters = array();
-    for ($i = 0; $i < sizeof($_REQUEST['columns']); $i++) {
-        $column = $_REQUEST['columns'][$i];
-        if ($column['search']['value'] != '') {
-            $filters[] = $searchColumns[$i].' like :filter_'.$i;
-            $params['filter_'.$i] = '%'.$column['search']['value'].'%';
-        }
-    }
-    if (sizeof($filters) > 0) {
-        $searchClause = 'having '.implode(' and ', $filters);
-    }
-
     $whereClause = '';
+    $selectAddColumns = '';
     $negate = false;
 	if (isset($_REQUEST['filter']['option'])) {
 		if ($_REQUEST['filter']['option'] == 'not') {
@@ -93,6 +81,25 @@
 		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformatfeature and df.bufferfeatures > 0)";
         $params['filter_bufferformatfeature'] = $bufferformatfeature;
 	}    
+	// Limit
+	$limit = $_REQUEST['filter']['devicelimit'];
+	if ($limit != '') {
+        array_unshift($searchColumns, 'devicelimit');
+		$selectAddColumns = ",(select dl.".$limit." from devicelimits dl where dl.reportid = r.id) as devicelimit";
+	}    
+
+    // Per-column, filtering
+    $filters = array();
+    for ($i = 0; $i < sizeof($_REQUEST['columns']); $i++) {
+        $column = $_REQUEST['columns'][$i];
+        if ($column['search']['value'] != '') {
+            $filters[] = $searchColumns[$i].' like :filter_'.$i;
+            $params['filter_'.$i] = '%'.$column['search']['value'].'%';
+        }
+    }
+    if (sizeof($filters) > 0) {
+        $searchClause = 'having '.implode(' and ', $filters);
+    }    
 
     $sql = "select 
         r.id,
@@ -106,6 +113,7 @@
         r.osname,
         r.osversion,
         r.osarchitecture
+        ".$selectAddColumns."
         from reports r
         left join
         deviceproperties p on (p.reportid = r.id)
@@ -122,6 +130,7 @@
             $driver = getDriverVerson($device["driver"], "", $device["vendorid"]);
             $data[] = array(
                 'id' => $device["id"], 
+                'devicelimit' => ($limit != '') ? $device["devicelimit"] : null,
                 'device' => '<a href="displayreport.php?id='.$device["id"].'">'.$device["device"].'</a>', 
                 'driver' => $device["driverversion"], 
                 'api' => $device["api"], 
