@@ -23,13 +23,8 @@
 	include './header.inc';	
 	include './functions.php'; 
 	
-	dbConnect();	
+	DB::connect();
 	
-	$sqlResult = mysql_query("SELECT count(distinct(presentmode)) FROM viewSurfacePresentModes");
-	$sqlCount = mysql_result($sqlResult, 0);
-	echo "<div class='header'>";
-		echo "<h4>Listing all available surface present modes ($sqlCount)</h4>";
-	echo "</div>";				
 ?>
 
 <style>
@@ -56,6 +51,11 @@
 	} );	
 </script>
 
+<div class='header'>
+	<h4>Listing all available surface present modes</h4>
+</div>
+
+
 <center>	
 	<div class="tablediv">
 
@@ -66,31 +66,33 @@
 	<!-- <?php include ("filter.php"); ?> -->
 
 	<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
-		<?php		
-		
-            $sqlstr = "select presentmode, coverage from viewSurfacePresentModes";                
-			$sqlresult = mysql_query($sqlstr) or die(mysql_error());  
-			
-			$reportCount = mysql_result(mysql_query("SELECT count(*) from reports"), 0);
-		
-			echo "<thead><tr>";  
-			
-			echo "<td class='caption'>Mode</td>";		   
-			echo "<td class='caption'>Reports</td>";		   
-			echo "</tr></thead><tbody>";
-
-			while ($row = mysql_fetch_row($sqlresult))
-            {
-				echo "<tr>";						
-				echo "<td class='value'><a href='listreports.php?surfacepresentmode=".$row[0]."'>".getPresentMode($row[0])."</a> (<a href='listreports.php?surfacepresentmode=".$row[2]."&option=not'>not</a>)</td>";
-				echo "<td class='value'>".$row[1]."</td>";
-				echo "</tr>";	    
-            }            			
-			dbDisconnect();	
-		?>   
-	</tbody>
+		<thead>
+			<tr>			
+				<td>Mode</td>	   
+				<td>Reports</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+				try {
+					$sql = "select presentmode, coverage from viewSurfacePresentModes";                
+					$modes = DB::$connection->prepare($sql);
+					$modes->execute($params);
+					if ($modes->rowCount() > 0) { 		
+						foreach ($modes as $mode) {
+							echo "<tr>";						
+							echo "<td class='value'><a href='listreports.php?surfacepresentmode=".$mode['presentmode']."'>".getPresentMode($mode['presentmode'])."</a> (<a href='listreports.php?surfacepresentmode=".$mode['presentmode']."&option=not'>not</a>)</td>";
+							echo "<td class='value'>".$mode['coverage']."</td>";
+							echo "</tr>";	    
+						}
+					}
+				} catch (PDOException $e) {
+					echo "<b>Error while fetcthing data!</b><br>";
+				}
+				DB::disconnect();				
+			?>   
+		</tbody>
 </table>  
-
 
 </div>
 
