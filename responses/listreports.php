@@ -46,7 +46,7 @@
 	if (isset($_REQUEST['filter']['extension'])) {
 	    $extension = $_REQUEST['filter']['extension'];
         if ($extension != '') {
-            $whereClause = "where r.id ".($negate ? "not" : "")."in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
             $params['filter_extension'] = $extension;
         }
 	}
@@ -74,7 +74,7 @@
         $params['filter_linearformatfeature'] = $linearformatfeature;
 	}	
 	if ($optimalformatfeature != '') {
-		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_optimalformatfeature and df.optimaltilingfeatures > 0)";
+		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_optimalformatfeature and df.optimaltilingfeatures > 0)";
         $params['filter_optimalformatfeature'] = $optimalformatfeature;
 	}	
 	if ($bufferformatfeature != '') {
@@ -93,7 +93,6 @@
 		$whereClause = "where id in (select reportid from devicesurfaceformats dsf join VkFormat f on dsf.format = f.value where f.name = :filter_surfaceformat)";
         $params['filter_surfaceformat'] = $surfaceformat;        
 	}
-
 	// Surface present mode	
 	$surfacepresentmode = $_REQUEST['filter']['surfacepresentmode'];
 	if ($surfacepresentmode != '') {

@@ -86,7 +86,7 @@ th, td {
 	padding-left: 40px;
 	padding-right: 40px;
 	/*max-width: 1024px;*/
-	width:auto;
+	/*width:auto;*/
 }
 
 .reporttable {
@@ -172,39 +172,38 @@ h4 {
 	text-align:center;
 }
 
+.header-span {
+    line-height: 1.5em;	
+	margin-bottom: 10px;
+	padding-left: 10px;
+	text-align: center;
+}
+
 .header-green {
-	background: #dff0d8;
-	color:#3c763d;
-    line-height: 40px;	
-	padding:5px;
-	text-align:center;
+	color: #4F8A10;
+	background: #DFF2BF;
+	border-left: 4px solid #3c763d;
 }
 
 .header-red {
-	background: #f2dede;
-	color:#a94442;
-    line-height: 40px;	
-	padding:5px;
-	text-align:center;
+	color: #D8000C;
+	background: #FFBABA;
+	border-left: 4px solid #a94442;
 }
 
 .header-blue {
-	background: #d9edf7;
-	color: #31708f;
-    line-height: 40px;	
-	padding:5px;
-	text-align:center;
+	color: #00529B;
+	background: #BDE5F8;
+	border-left: 4px solid #31708f;
 }
 
 .header-yellow {
+	color: #9F6000;
 	background-color: #fcf8e3;
-	color: #8a6d3b;
-	padding:5px;
-	text-align:center;
+	border-left: 4px solid #8a6d3b;
 }
 
-.tableheader 
-{
+.tableheader {
 	border-bottom:1px solid gray;
 	color:#31a9db;
 	text-align:left;

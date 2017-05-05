@@ -40,93 +40,79 @@
 	$extension = $_GET['extension'];
 	if ($extension != '') {
 		$defaultHeader = false;
-		if (!$negate) {
-			$headerClass = "header-green";		
-			$headerText = "Listing all reports supporting <b>".$extension."</b>";		
-		} else {
-			$headerClass = "header-red";
-			$headerText = "Listing all reports not supporting <b>".$extension."</b>";		
-		}
+		$headerClass = $negate ? "header-red" : "header-green";			
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting <b>".$extension."</b>";	
+		$caption .= " (<a href='listreports.php?extension=".$extension.($negate ? "" : "&option=not")."'>toggle</a>)";
 	}
 	// Feature
 	$feature = $_GET['feature'];	
 	if ($feature != '') {
 		$defaultHeader = false;
-		if (!$negate) {
-			$headerClass = "header-green";
-			$headerText = "Listing all reports supporting <b>".$feature."</b>";		
-		} else {
-			$headerClass = "header-red";
-			$headerText = "Listing all reports not supporting <b>".$feature."</b>";		
-		}
+		$headerClass = $negate ? "header-red" : "header-green";			
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting <b>".$feature."</b>";	
+		$caption .= " (<a href='listreports.php?feature=".$feature.($negate ? "" : "&option=not")."'>toggle</a>)";
 	}	
 	// Submitter
 	$submitter = $_GET['submitter'];	
 	if ($submitter != '') {
 		$defaultHeader = false;
 		$headerClass = "header-blue";
-		$headerText = "Listing all reports submitted by <b>".$submitter."</b>";		
+		$caption = "Reports submitted by <b>".$submitter."</b>";		
 	}		
 	// Format support
 	$linearformatfeature = $_GET['linearformat'];
-	$optimalformatfeature = $_GET['optimalformat'];
-	$bufferformatfeature = $_GET['bufferformat'];	
 	if ($linearformatfeature != '') {
 		$defaultHeader = false;
-		$headerClass = "header-green";				
-		$headerText = "Listing all reports supporting <b>".$linearformatfeature."</b> for <b>linear tiling</b>";		
+		$headerClass = $negate ? "header-red" : "header-green";				
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting <b>".$linearformatfeature."</b> for <b>linear tiling</b>";		
+		$caption .= " (<a href='listreports.php?linearformat=".$linearformatfeature.($negate ? "" : "&option=not")."'>toggle</a>)";				
 	}	
+	$optimalformatfeature = $_GET['optimalformat'];
 	if ($optimalformatfeature != '') {
 		$defaultHeader = false;
-		$headerClass = "header-green";				
-		$headerText = "Listing all reports supporting <b>".$optimalformatfeature."</b> for <b>optimal tiling</b>";		
+		$headerClass = $negate ? "header-red" : "header-green";				
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting <b>".$optimalformatfeature."</b> for <b>optimal tiling</b>";		
+		$caption .= " (<a href='listreports.php?optimalformatfeature=".$optimalformatfeature.($negate ? "" : "&option=not")."'>toggle</a>)";				
 	}
+	$bufferformatfeature = $_GET['bufferformat'];	
 	if ($bufferformatfeature != '') {
 		$defaultHeader = false;
-		$headerClass = "header-green";				
-		$headerText = "Listing all reports supporting <b>".$bufferformatfeature."</b> for <b>buffer usage</b>";		
+		$headerClass = $negate ? "header-red" : "header-green";				
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting <b>".$bufferformatfeature."</b> for <b>buffer usage</b>";		
+		$caption .= " (<a href='listreports.php?bufferformat=".$bufferformat.($negate ? "" : "&option=not")."'>toggle</a>)";				
 	}	
 	// List (and order) by limit
 	$limit = $_GET['limit'];
 	if ($limit != '') {
 		$defaultHeader = false;
 		$headerClass = "header-green";
-		$headerText = "Listing limits for <b>".$limit."</b>";		
+		$caption = "Listing limits for <b>".$limit."</b>";		
 	}	
 	// Surface format	
 	$surfaceformat = $_GET['surfaceformat'];
 	if ($surfaceformat != '') {
 		$defaultHeader = false;
-		$headerClass = "header-green";
-		$headerText = "Listing all reports supporting surface format <b>".$surfaceformat."</b>";		
+		$headerClass = $negate ? "header-red" : "header-green";	
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting surface format <b>".$surfaceformat."</b>";		
 		$alertText = "<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)";
+		$caption .= " (<a href='listreports.php?surfaceformat=".$surfaceformat.($negate ? "" : "&option=not")."'>toggle</a>)";		
 	}
-
 	// Surface present mode	
 	$surfacepresentmode = $_GET['surfacepresentmode'];
 	if ($surfacepresentmode != '') {
 		$defaultHeader = false;
-		$headerClass = "header-green";
-		$headerText = "Listing all reports supporting present mode <b>".getPresentMode($surfacepresentmode)."</b>";		
+		$headerClass = $negate ? "header-red" : "header-green";	
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting surface present mode <b>".getPresentMode($surfacepresentmode)."</b>";		
 		$alertText = "<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)";
+		$caption .= " (<a href='listreports.php?surfacepresentmode=".$surfacepresentmode.($negate ? "" : "&option=not")."'>toggle</a>)";		
 	}		
-
-	echo "<div class='".$headerClass."' style='width:auto;'>";	
-	echo "	<h4>".$headerText."</h4>";
-	echo "</div>";		
-
-	if (isset($alertText)) {
-		echo "<div class='header-yellow'>".$alertText."</div>";
-	}	
 ?>
 
 	<div class="tablediv">	
 
-		<?php
-		?>
-
 		<form method="get" action="compare.php?compare">	
 		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>
+			<caption class='<?php echo $headerClass ?> header-span'><?php echo $caption ?></caption>
 			<thead>
 				<tr>
 					<th></th>
@@ -168,6 +154,7 @@
 			"serverSide": true,
 			"paging" : true,		
 			"searching": true,	
+			"lengthChange": false,
 			"dom": 'lrtip',	
 			"pageLength" : 25,		
 			"order": [[ 0, 'desc' ]],
