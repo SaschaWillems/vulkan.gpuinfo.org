@@ -90,13 +90,13 @@
 	// Surface format	
 	$surfaceformat = $_REQUEST['filter']['surfaceformat'];
 	if ($surfaceformat != '') {
-		$whereClause = "where id in (select reportid from devicesurfaceformats dsf join VkFormat f on dsf.format = f.value where f.name = :filter_surfaceformat)";
+		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from devicesurfaceformats dsf join VkFormat f on dsf.format = f.value where f.name = :filter_surfaceformat)";
         $params['filter_surfaceformat'] = $surfaceformat;        
 	}
 	// Surface present mode	
 	$surfacepresentmode = $_REQUEST['filter']['surfacepresentmode'];
 	if ($surfacepresentmode != '') {
-		$whereClause = "where id in (select reportid from devicesurfacemodes dsp where dsp.presentmode = :filter_surfacepresentmode)";
+		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from devicesurfacemodes dsp where dsp.presentmode = :filter_surfacepresentmode)";
         $params['filter_surfacepresentmode'] = $surfacepresentmode;        
 	}	    
 
