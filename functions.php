@@ -208,8 +208,8 @@ function getDriverVerson($versionraw, $versiontext, $vendorid)
 				);
 		}
 		// Use Vulkan version conventions if vendor mapping is not available
-		return sprintf("%d.%d.%d %s", 
-			($versionraw >> 22) & 0x3ff,
+		return sprintf("%d.%d.%d", 
+			($versionraw >> 22),
 			($versionraw >> 12) & 0x3ff,
 			($versionraw) & 0xfff,
 			"<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true' title='The version number conversion scheme for this vendor is not yet available'></span>"
