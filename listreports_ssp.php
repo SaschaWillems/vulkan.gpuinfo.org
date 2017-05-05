@@ -142,6 +142,7 @@
 				</tr>
 			</thead>		
 		</table>
+		<div id="errordiv" style="color:#D8000C;"></div>		
 		</form>
 	</div>
 </center>
@@ -177,6 +178,10 @@
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
 					}
 				},
+				error: function (xhr, error, thrown) {
+					$('#errordiv').html('Could not fetch data (' + error + ')');
+					$('#reports_processing').hide();
+				}				
 			},
 			"columns": [
 				{ data: 'id' },
