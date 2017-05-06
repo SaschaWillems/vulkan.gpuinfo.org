@@ -160,7 +160,10 @@
 			"pageLength" : 25,		
 			"order": [[ 0, 'desc' ]],
 			"columnDefs": [
-				{ "orderable": false, "targets": <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>  }
+				{ 
+					"orderable": false, "targets": [ <?php echo (isset($_GET["limit"])) ? "10" : "9" ?> ],
+					"searchable": false, "targets": [ 0, <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>] ,
+			    }
 			],
 			"ajax": {
 				url :"responses/listreports.php",
