@@ -22,16 +22,48 @@
     include '../dbconfig.php';
     include '../functions.php';
 
-    $data = array();
-
     DB::connect();
+
+    $data = array();
+    $params = array();    
              
-    $orderByColumn = $_REQUEST['order'][0]['column'];
-    $orderByDir = $_REQUEST['order'][0]['dir'];
+    // Ordering
+    $orderByColumn = '';
+    $orderByDir = '';
+    if (isset($_REQUEST['order']) && count($_REQUEST['order'] > 0)) {
+        $orderByColumn = $_REQUEST['order'][0]['column'];
+        $orderByDir = $_REQUEST['order'][0]['dir'];
+    }
 
-    $searchColumns = array('id', 'p.devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
+    // Paging
+    $paging = '';
+    if (isset($_REQUEST['start'] ) && $_REQUEST['length'] != '-1') {
+        $paging = "LIMIT ".$_REQUEST["length"]. " OFFSET ".$_REQUEST["start"];
+    }  
 
-    $params = array();
+    // Filtering
+    $searchColumns = array('id');
+
+	// Dynamic limit column
+	$limit = $_REQUEST['filter']['devicelimit'];
+	if ($limit != '') {
+        array_push($searchColumns, 'devicelimit');
+	}    
+
+    array_push($searchColumns, 'p.devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
+
+    // Per-column, filtering
+    $filters = array();
+    for ($i = 0; $i < count($_REQUEST['columns']); $i++) {
+        $column = $_REQUEST['columns'][$i];
+        if (($column['searchable'] == 'true') && ($column['search']['value'] != '')) {
+            $filters[] = $searchColumns[$i].' like :filter_'.$i;
+            $params['filter_'.$i] = '%'.$column['search']['value'].'%';
+        }
+    }
+    if (sizeof($filters) > 0) {
+        $searchClause = 'having '.implode(' and ', $filters);
+    }        
 
     $whereClause = '';
     $selectAddColumns = '';
@@ -81,12 +113,6 @@
 		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformatfeature and df.bufferfeatures > 0)";
         $params['filter_bufferformatfeature'] = $bufferformatfeature;
 	}    
-	// Limit
-	$limit = $_REQUEST['filter']['devicelimit'];
-	if ($limit != '') {
-        array_unshift($searchColumns, 'devicelimit');
-		$selectAddColumns = ",(select dl.".$limit." from devicelimits dl where dl.reportid = r.id) as devicelimit";
-	}    
 	// Surface format	
 	$surfaceformat = $_REQUEST['filter']['surfaceformat'];
 	if ($surfaceformat != '') {
@@ -99,19 +125,11 @@
 		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from devicesurfacemodes dsp where dsp.presentmode = :filter_surfacepresentmode)";
         $params['filter_surfacepresentmode'] = $surfacepresentmode;        
 	}	    
-
-    // Per-column, filtering
-    $filters = array();
-    for ($i = 0; $i < sizeof($_REQUEST['columns']); $i++) {
-        $column = $_REQUEST['columns'][$i];
-        if ($column['search']['value'] != '') {
-            $filters[] = $searchColumns[$i].' like :filter_'.$i;
-            $params['filter_'.$i] = '%'.$column['search']['value'].'%';
-        }
-    }
-    if (sizeof($filters) > 0) {
-        $searchClause = 'having '.implode(' and ', $filters);
-    }    
+	// Limit
+	$limit = $_REQUEST['filter']['devicelimit'];
+	if ($limit != '') {
+		$selectAddColumns = ",(select dl.".$limit." from devicelimits dl where dl.reportid = r.id) as devicelimit";
+	}    
 
     $sql = "select 
         r.id,
@@ -129,11 +147,9 @@
         from reports r
         left join
         deviceproperties p on (p.reportid = r.id)
-        ".$whereClause."
-        ".$searchClause."                
+        ".$whereClause."        
+        ".$searchClause."        
         order by ".$orderByColumn." ".$orderByDir;
-
-    $paging = "LIMIT ".$_REQUEST["length"]. " OFFSET ".$_REQUEST["start"];
 
     $devices = DB::$connection->prepare($sql." ".$paging);
     $devices->execute($params);
