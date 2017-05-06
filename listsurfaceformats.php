@@ -74,7 +74,7 @@
 					if ($modes->rowCount() > 0) { 		
 						foreach ($modes as $mode) {
 							echo "<tr>";						
-							echo "<td class='value'><a href='listreports.php?surfaceformat=".$mode['formatname']."'>".getPresentMode($mode['formatname'])."</a> (<a href='listreports.php?surfaceformat=".$mode['formatname']."&option=not'>not</a>)</td>";
+							echo "<td class='value'><a href='listreports.php?surfaceformat=".$mode['formatname']."'>".$mode['formatname']."</a> (<a href='listreports.php?surfaceformat=".$mode['formatname']."&option=not'>not</a>)</td>";
 							echo "<td class='value'>".$mode['coverage']."</td>";
 							echo "</tr>";	    
 						}
