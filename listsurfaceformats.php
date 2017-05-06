@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -22,13 +22,7 @@
 	include './dbconfig.php';
 	include './header.inc';	
 	
-	dbConnect();	
-	
-	$sqlResult = mysql_query("SELECT count(distinct(format)) FROM devicesurfaceformats");
-	$sqlCount = mysql_result($sqlResult, 0);
-	echo "<div class='header'>";
-		echo "<h4>Listing all available surface formats ($sqlCount)</h4>";
-	echo "</div>";				
+	DB::connect();				
 ?>
 
 <style>
@@ -65,28 +59,31 @@
 	<?php include ("filter.php"); ?>
 
 	<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
-		<?php		
-		
-            $sqlstr = "select formatname, coverage, format from viewSurfaceFormats";                
-			$sqlresult = mysql_query($sqlstr) or die(mysql_error());  
-			
-			$reportCount = mysql_result(mysql_query("SELECT count(*) from reports"), 0);
-		
-			echo "<thead><tr>";  
-			
-			echo "<td class='caption'>Format</td>";		   
-			echo "<td class='caption'>Reports</td>";		   
-			echo "</tr></thead><tbody>";
-
-			while ($row = mysql_fetch_row($sqlresult))
-            {
-				echo "<tr>";						
-				echo "<td class='value'><a href='listreports.php?surfaceformat=".$row[2]."'>".$row[0]."</a> (<a href='listreports.php?surfaceformat=".$row[2]."&option=not'>not</a>)</td>";
-				echo "<td class='value'>".$row[1]."</td>";
-				echo "</tr>";	    
-            }            			
-			dbDisconnect();	
-		?>   
+		<thead>
+			<tr>			
+				<td>Format</td>
+				<td>Reports</td>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+				try {
+					$sql = "select formatname, coverage, format from viewSurfaceFormats";                
+					$modes = DB::$connection->prepare($sql);
+					$modes->execute($params);
+					if ($modes->rowCount() > 0) { 		
+						foreach ($modes as $mode) {
+							echo "<tr>";						
+							echo "<td class='value'><a href='listreports.php?surfaceformat=".$mode['formatname']."'>".getPresentMode($mode['formatname'])."</a> (<a href='listreports.php?surfaceformat=".$mode['formatname']."&option=not'>not</a>)</td>";
+							echo "<td class='value'>".$mode['coverage']."</td>";
+							echo "</tr>";	    
+						}
+					}
+				} catch (PDOException $e) {
+					echo "<b>Error while fetcthing data!</b><br>";
+				}
+				DB::disconnect();				
+			?>  
 	</tbody>
 </table>  
 
