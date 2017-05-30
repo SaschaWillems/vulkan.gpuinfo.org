@@ -46,13 +46,14 @@
 				<td class="caption">Limit</td>
 				<td class="caption">Min</td>
 				<td class="caption">Max</td>
+				<td class="caption">Requirement</td>
 			</tr>
 		</thead>
 		<tbody>
 		
 		<?php		
 			$reportCount = mysql_result(mysql_query("select count(*) from reports"), 0);
-			$sqlresult = mysql_query("select COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')") or die(mysql_error());  	
+			$sqlresult = mysql_query("select COLUMN_NAME as name, (select feature from limitrequirements where limitname = name) as requirement from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')") or die(mysql_error());  	
 			$columns = array();
 			while($row = mysql_fetch_row($sqlresult))
 			{
@@ -61,6 +62,7 @@
 				echo "<td><a href='listreports.php?limit=".$row[0]."'>".$row[0]."</a></td>";		
 				echo "<td class='unsupported'>".round($range[0], 3)."</td>";
 				echo "<td class='supported'>".round($range[1], 3)."</td>";
+				echo "<td>".$row[1]."</td>";
 				echo "</tr>";
 			}
 						
