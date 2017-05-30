@@ -57,7 +57,14 @@
 			$columns = array();
 			while($row = mysql_fetch_row($sqlresult))
 			{
-				$range = mysql_fetch_row(mysql_query("select min(`".$row[0]."`) as lower, max(`".$row[0]."`) from devicelimits where `".$row[0]."` <> 0"));
+				$sql = "select min(`".$row[0]."`) as lower, max(`".$row[0]."`) from devicelimits dl where ";
+				// Apply limit requirement if prsent
+				if ($row[1] != null) {
+					$sql .= " dl.reportid in (select distinct(reportid) from devicefeatures df where df.".$row[1]." = 1) and";
+				}
+				$sql .= " `".$row[0]."` <> 0";
+				// Fix for invalid reports reporting a supported feature as zero				
+				$range = mysql_fetch_row(mysql_query($sql));
 				echo "<tr>";
 				echo "<td><a href='listreports.php?limit=".$row[0]."'>".$row[0]."</a></td>";		
 				echo "<td class='unsupported'>".round($range[0], 3)."</td>";
