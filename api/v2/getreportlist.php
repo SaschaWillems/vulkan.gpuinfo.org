@@ -97,7 +97,7 @@
 			concat('http://vulkan.gpuinfo.org/services/getreportjson.php?id=', dp.reportid) as url
 			from deviceproperties dp
 			join reports r on r.id = dp.reportid
-			where r.version >= '1.2'
+			where r.version >= '1.4'
 			order by vendorid, devicename, apiversion desc, driverversionraw";
 
 		$stmnt = DB::$connection->prepare($sql);
@@ -117,7 +117,7 @@
 		} 
 		else {
 			header('HTTP/ 404 empty_response');
-			echo "no reports on list";
+			echo json_encode(array("info", "No reports with version > 1.4"));
 		}
 	} catch (Exception $e) {
 		header('HTTP/ 500 server_error');
