@@ -21,6 +21,7 @@
 
 	include './header.inc';	
 	include './functions.php';	
+	include './dbconfig.php';	
 
 ?>
 
@@ -87,6 +88,16 @@
 		$defaultHeader = false;
 		$headerClass = "header-green";
 		$caption = "Listing limits for <b>".$limit."</b>";		
+		// Check if a limit requirement rule has to be applied (see Table 36. of the specs)
+		DB::connect();	
+		$sql = "select feature from limitrequirements where limitname = :limit";  
+		$reqs = DB::$connection->prepare($sql);
+		$reqs->execute(array(":limit" => $limit));
+		if ($reqs->rowCount() > 0) {
+			$req = $reqs->fetch();
+			$caption .= "<br>(Feature requirement ".$req["feature"]." is applied)";
+		}
+		DB::disconnect();
 	}	
 	// Surface format	
 	$surfaceformat = $_GET['surfaceformat'];
@@ -106,13 +117,23 @@
 		$alertText = "<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)";
 		$caption .= " (<a href='listreports.php?surfacepresentmode=".$surfacepresentmode.($negate ? "" : "&option=not")."'>toggle</a>)";		
 	}		
+
+	if ($defaultHeader) {
+		echo "<div class='header'>";	
+		echo "	<h4>Reports</h4>";
+		echo "</div>";		
+	}	
 ?>
 
 	<div class="tablediv">	
 
 		<form method="get" action="compare.php?compare">	
-		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>
-			<caption class='<?php echo $headerClass ?> header-span'><?php echo $caption ?></caption>
+		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
+			<?php
+				if (!$defaultHeader) {
+					echo "<caption class='".$headerClass." header-span'>".$caption."</caption>";
+				}
+			?>
 			<thead>
 				<tr>
 					<th></th>
@@ -161,8 +182,8 @@
 			"order": [[ 0, 'desc' ]],
 			"columnDefs": [
 				{ 
-					"orderable": false, "targets": [ <?php echo (isset($_GET["limit"])) ? "10" : "9" ?> ],
 					"searchable": false, "targets": [ 0, <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>] ,
+					"orderable": false, "targets": <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>,					
 			    }
 			],
 			"ajax": {

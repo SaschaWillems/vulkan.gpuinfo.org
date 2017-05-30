@@ -129,6 +129,14 @@
 	$limit = $_REQUEST['filter']['devicelimit'];
 	if ($limit != '') {
 		$selectAddColumns = ",(select dl.`".$limit."` from devicelimits dl where dl.reportid = r.id) as devicelimit";
+		// Check if a limit requirement rule has to be applied (see Table 36. of the specs)
+		$sql = "select feature from limitrequirements where limitname = :limit";  
+		$reqs = DB::$connection->prepare($sql);
+		$reqs->execute(array(":limit" => $limit));
+		if ($reqs->rowCount() > 0) {
+			$req = $reqs->fetch();
+		    $whereClause = "where r.id in (select distinct(reportid) from devicefeatures df where df.".$req["feature"]." = 1)";
+		}
 	}    
 
     $sql = "select 
