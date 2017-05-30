@@ -128,7 +128,7 @@
 	// Limit
 	$limit = $_REQUEST['filter']['devicelimit'];
 	if ($limit != '') {
-		$selectAddColumns = ",(select dl.".$limit." from devicelimits dl where dl.reportid = r.id) as devicelimit";
+		$selectAddColumns = ",(select dl.`".$limit."` from devicelimits dl where dl.reportid = r.id) as devicelimit";
 	}    
 
     $sql = "select 
