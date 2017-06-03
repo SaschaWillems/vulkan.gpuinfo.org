@@ -138,6 +138,14 @@
 		    $whereClause = "where r.id in (select distinct(reportid) from devicefeatures df where df.".$req["feature"]." = 1)";
 		}
 	}    
+    // Devicename
+    if (isset($_REQUEST['filter']['devicename'])) {
+	    $devicename = $_REQUEST['filter']['devicename'];
+        if ($devicename != '') {
+            $whereClause = "where r.devicename = :filter_devicename";
+            $params['filter_devicename'] = $devicename;            
+        }
+	}    
 
     $sql = "select 
         r.id,

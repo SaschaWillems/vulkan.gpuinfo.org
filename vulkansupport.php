@@ -71,7 +71,7 @@
 			$osfilter = ["and osname = 'windows'", "and osname not in ('windows', 'android')", "and osname = 'android'"];
 			for ($i = 0; $i < sizeof($targets); $i++) {
 				echo "<div id='".$targets[$i]."' class='tab-pane fade ".(($i == 0) ? "in active" : "")." reportdiv'>";
-				$sql = "select dp.devicename, VendorId(vendorid) as vendor, max(apiversionraw) as apiversion, max(reportid) as reportid, count(*) as `count`
+				$sql = "select dp.devicename, VendorId(vendorid) as vendor, max(apiversionraw) as apiversion
 					from deviceproperties dp
 					join reports r on r.id = dp.reportid
 					where VendorId(vendorid) != ''
@@ -89,7 +89,7 @@
 						$lastVendor = $device["vendor"];
 						echo "<h3>".$device["vendor"]."</h3>";
 					}
-					echo "<a href='displayreport.php?id=".$device["reportid"]."'>".$device["devicename"]."</a> <span style='color:#ABABAB;'>(".versionToString($device["apiversion"]).")</span><br>";
+					echo "<a href='listreports.php?devicename=".$device["devicename"]."'>".$device["devicename"]."</a> <span style='color:#ABABAB;'>(".versionToString($device["apiversion"]).")</span><br>";
 				}					
 
 				echo "</div>";				

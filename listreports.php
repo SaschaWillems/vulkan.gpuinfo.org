@@ -117,6 +117,13 @@
 		$alertText = "<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)";
 		$caption .= " (<a href='listreports.php?surfacepresentmode=".$surfacepresentmode.($negate ? "" : "&option=not")."'>toggle</a>)";		
 	}		
+	// Device name
+	$devicename = $_GET['devicename'];
+	if ($devicename != '') {
+		$defaultHeader = false;
+		$headerClass = "header-blue";
+		$caption = "Reports for <b>".$devicename."</b>";		
+	}		
 
 	if ($defaultHeader) {
 		echo "<div class='header'>";	
@@ -200,6 +207,7 @@
 						'option' : '<?php echo $_GET["option"] ?>',
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
+						'devicename' : '<?php echo $_GET["devicename"] ?>',
 					}
 				},
 				error: function (xhr, error, thrown) {
