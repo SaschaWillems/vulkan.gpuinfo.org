@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -21,21 +21,7 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
-	
-	dbConnect();	
-	
-	$sqlResult = mysql_query("SELECT count(*) FROM extensions");
-	$sqlCount = mysql_result($sqlResult, 0);
-	echo "<div class='header'>";
-		echo "<h4>Listing all available extensions ($sqlCount)</h4>";
-	echo "</div>";				
 ?>
-
-<style>
-	.dataTables_filter {
-		display: none;
-	}
-</style>
 
 <script>
 	$(document).ready(function() {
@@ -44,7 +30,9 @@
 			"paging" : false,
 			"stateSave": false, 
 			"searchHighlight" : true,	
-			"bInfo": false,		
+			"dom": 'f',			
+			"bInfo": false,	
+			"order": [[ 0, "asc" ]]	
 		});
 
 		$("#searchbox").on("keyup search input paste cut", function() {
@@ -54,38 +42,50 @@
 	} );	
 </script>
 
+<div class='header'>
+	<h4>Listing all available extensions</h4>
+</div>			
+
 <center>	
-	<div class="tablediv">
+	<div class='parentdiv'>
+	<div class='tablediv' style='width:auto; display: inline-block;'>
 
-	<?php include ("filter.php"); ?>
+	<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<thead>
+			<tr>			
+				<th>Extensions</th>
+				<th>Supported</th>
+			</tr>
+		</thead>
+		<tbody>		
+			<?php		
+				DB::connect();
+				try {
+					$res =DB::$connection->prepare("select count(*) from reports"); 
+					$res->execute(); 
+					$reportCount = $res->fetchColumn(); 
 
-	<table id="extensions" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
-		<?php		
-		
-            $sqlstr = "select name, coverage from viewExtensions";                
-			$sqlresult = mysql_query($sqlstr) or die(mysql_error());  
-			
-			$reportCount = mysql_result(mysql_query("SELECT count(*) from reports"), 0);
-		
-			echo "<thead><tr>";  
-			
-			echo "<td class='caption'>Extensions</td>";		   
-			echo "<td class='caption'>Coverage</td>";		   
-			echo "</tr></thead><tbody>";
+					$extensions = DB::$connection->prepare("select name, coverage from viewExtensions");
+					$extensions->execute($params);
 
-			while ($row = mysql_fetch_row($sqlresult))
-            {
-				echo "<tr>";						
-				echo "<td class='value'><a href='listreports.php?extension=".$row[0]."'>".$row[0]."</a> (<a href='listreports.php?extension=".$row[0]."&option=not'>not</a>)</td>";
-				echo "<td class='value'>".round(($row[1]/$reportCount*100), 2)."%</td>";
-				echo "</tr>";	    
-            }            			
-			dbDisconnect();	
-		?>   
-	</tbody>
-</table>  
+					if ($extensions->rowCount() > 0) { 
+						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
+							echo "<tr>";						
+							echo "<td class='value'><a href='listreports.php?extension=".$extension[0]."'>".$extension[0]."</a> (<a href='listreports.php?extension=".$extension[0]."&option=not'>not</a>)</td>";
+							echo "<td class='value'>".round(($extension[1]/$reportCount*100), 2)."%</td>";
+							echo "</tr>";	       
+						}
+					}
 
+				} catch (PDOException $e) {
+					echo "<b>Error while fetcthing data!</b><br>";
+				}
+				DB::disconnect();
+			?>   
+		</tbody>
+	</table>  
 
+</div>
 </div>
 
 <?php include './footer.inc'; ?>
