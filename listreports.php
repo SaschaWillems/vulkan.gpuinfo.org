@@ -80,7 +80,7 @@
 		$defaultHeader = false;
 		$headerClass = $negate ? "header-red" : "header-green";				
 		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting <b>".$bufferformatfeature."</b> for <b>buffer usage</b>";		
-		$caption .= " (<a href='listreports.php?bufferformat=".$bufferformat.($negate ? "" : "&option=not")."'>toggle</a>)";				
+		$caption .= " (<a href='listreports.php?bufferformat=".$bufferformatfeature.($negate ? "" : "&option=not")."'>toggle</a>)";				
 	}	
 	// List (and order) by limit
 	$limit = $_GET['limit'];
