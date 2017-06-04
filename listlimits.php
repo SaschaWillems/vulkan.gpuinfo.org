@@ -25,7 +25,7 @@
 
 <script>
 	$(document).ready(function() {
-		var table = $('#features').DataTable({
+		var table = $('#limits').DataTable({
 			"pageLength" : -1,
 			"paging" : false,
 			"stateSave": false, 
@@ -45,7 +45,7 @@
 	<div class='parentdiv'>
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 	
-	<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+	<table id="limits" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 		<thead>
 			<tr>
 				<td>Limit</td>
