@@ -73,7 +73,7 @@
 		$defaultHeader = false;
 		$headerClass = $negate ? "header-red" : "header-green";				
 		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting <b>".$optimalformatfeature."</b> for <b>optimal tiling</b>";		
-		$caption .= " (<a href='listreports.php?optimalformatfeature=".$optimalformatfeature.($negate ? "" : "&option=not")."'>toggle</a>)";				
+		$caption .= " (<a href='listreports.php?optimalformat=".$optimalformatfeature.($negate ? "" : "&option=not")."'>toggle</a>)";				
 	}
 	$bufferformatfeature = $_GET['bufferformat'];	
 	if ($bufferformatfeature != '') {
