@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2015 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -21,87 +21,87 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
-	
-	dbConnect();	
 ?>
-	
-<style>
-	.dataTables_filter {
-		display: none;
-	}
-</style>
 
+<script>
+	$(document).ready(function() {
+		var table = $('#features').DataTable({
+			"pageLength" : -1,
+			"paging" : false,
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"dom": 'f',			
+			"bInfo": false,	
+			"order": [[ 0, "asc" ]]	
+		});
+	} );	
+</script>
+	
 <div class='header'>
 	<h4 style='margin-left:10px;'>Listing device limits</h4>
 </div>
 
 <center>	
-	<div class="tablediv">
-
-	<?php include ("filter.php"); ?>
+	<div class='parentdiv'>
+	<div class='tablediv' style='width:auto; display: inline-block;'>
 	
-	<table id="features" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
+	<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 		<thead>
 			<tr>
-				<td class="caption">Limit</td>
-				<td class="caption">Min</td>
-				<td class="caption">Max</td>
-				<td class="caption">Requirement</td>
+				<td>Limit</td>
+				<td>Min</td>
+				<td>Max</td>
+				<td>Requirement</td>
 			</tr>
 		</thead>
-		<tbody>
-		
-		<?php		
-			$reportCount = mysql_result(mysql_query("select count(*) from reports"), 0);
-			$sqlresult = mysql_query("select COLUMN_NAME as name, (select feature from limitrequirements where limitname = name) as requirement from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')") or die(mysql_error());  	
-			$columns = array();
-			while($row = mysql_fetch_row($sqlresult))
-			{
-				$sql = "select min(`".$row[0]."`) as lower, max(`".$row[0]."`) from devicelimits dl where ";
-				// Apply limit requirement if prsent
-				if ($row[1] != null) {
-					$sql .= " dl.reportid in (select distinct(reportid) from devicefeatures df where df.".$row[1]." = 1) and";
+		<tbody>		
+			<?php	
+				DB::connect();
+				try {
+					$res =DB::$connection->prepare("select count(*) from reports"); 
+					$res->execute(); 
+					$reportCount = $res->fetchColumn(); 
+
+					$sql = "select COLUMN_NAME as name, (select feature from limitrequirements where limitname = name) as requirement from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')";
+					$limits = DB::$connection->prepare($sql);
+					$limits->execute();
+
+					if ($limits->rowCount() > 0) { 
+						while ($limit = $limits->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
+							$sql = "select min(`".$limit[0]."`) as lower, max(`".$limit[0]."`) from devicelimits dl where ";
+							// Apply limit requirement if present
+							if ($row[1] != null) {
+								$sql .= " dl.reportid in (select distinct(reportid) from devicefeatures df where df.".$limit[1]." = 1) and";
+							}
+							// Fix for invalid reports reporting a supported feature as zero				
+							$sql .= " `".$limit[0]."` <> 0";
+
+							$stmnt = DB::$connection->prepare($sql);
+							$stmnt->execute();
+							$range = $stmnt->fetch(PDO::FETCH_NUM);
+
+							echo "<tr>";
+							echo "<td><a href='listreports.php?limit=".$limit[0]."'>".$limit[0]."</a></td>";		
+							echo "<td class='unsupported'>".round($range[0], 3)."</td>";
+							echo "<td class='supported'>".round($range[1], 3)."</td>";
+							echo "<td>".$limit[1]."</td>";
+							echo "</tr>";
+						}
+					}
+
+				} catch (PDOException $e) {
+					echo "<b>Error while fetcthing data!</b><br>";
 				}
-				$sql .= " `".$row[0]."` <> 0";
-				// Fix for invalid reports reporting a supported feature as zero				
-				$range = mysql_fetch_row(mysql_query($sql));
-				echo "<tr>";
-				echo "<td><a href='listreports.php?limit=".$row[0]."'>".$row[0]."</a></td>";		
-				echo "<td class='unsupported'>".round($range[0], 3)."</td>";
-				echo "<td class='supported'>".round($range[1], 3)."</td>";
-				echo "<td>".$row[1]."</td>";
-				echo "</tr>";
-			}
-						
-			dbDisconnect();	
-		?>   
-		
+				DB::disconnect();
+			?>   	
 		</tbody>
 	</table>  
 
-	<script>
-		$(document).ready(function() {
-
-			var table = $('#features').DataTable({
-				"pageLength" : -1,
-				"paging" : false,
-				"stateSave": false, 
-				"searchHighlight" : true,
-				"bInfo": false,				
-				"sDom": 'flipt',				
-			});
-
-			$("#searchbox").on("keyup search input paste cut", function() {
-				table.search(this.value).draw();
-			});  
-
-		} );	
-	</script>
-
 	</div>
-	
-	<?php include './footer.inc'; ?>
-	
-	</center>
+	</div>
+
+<?php include './footer.inc'; ?>
+
+</center>
 </body>
 </html>
