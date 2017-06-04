@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2015 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -21,60 +21,76 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
-	
-	dbConnect();	
-	
-	$sqlResult = mysql_query("SELECT count(*) FROM VkFormat");
-	$sqlCount = mysql_result($sqlResult, 0);
-	echo "<div class='header'>";
-		echo "<h4 style='margin-left:10px;'>Listing all available image formats ($sqlCount)</h4>";
-	echo "</div>";				
 ?>
-
-<center>	
-	<div class="tablediv">
-	<table id="formats" class="table table-striped table-bordered table-hover reporttable responsive" style="width:100%;" >
-		<?php		
-			$reportCount = mysql_result(mysql_query("select count(*) from reports"), 0);	
-		
-            $sqlstr = "select * from viewFormats";                
-			$sqlresult = mysql_query($sqlstr) or die(mysql_error());  
-			
-			echo "<thead><tr>";  
-			
-			echo "<td class='caption'>Format</td>";		   
-			echo "<td class='caption'>Linear</td>";		   
-			echo "<td class='caption'>Optimal</td>";		   
-			echo "<td class='caption'>Buffer</td>";		   
-			echo "</tr>";
-			echo "</thead><tbody>";
-
-			while ($row = mysql_fetch_row($sqlresult))
-            {
-				echo "<tr>";						
-				echo "<td class='value'>".$row[0]."</td>";
-				echo "<td class='value' align=center><a href='listreports.php?linearformat=".$row[0]."'>".round(($row[1]/$reportCount*100.0), 2)."%</a></td>";
-				echo "<td class='value' align=center><a href='listreports.php?optimalformat=".$row[0]."'>".round(($row[2]/$reportCount*100.0), 2)."%</a></td>";
-				echo "<td class='value' align=center><a href='listreports.php?bufferformat=".$row[0]."'>".round(($row[3]/$reportCount*100.0), 2)."%</a></td>";						
-				echo "</tr>";	    
-            }            			
-			dbDisconnect();	
-		?>   
-	</tbody>
-</table>  
 
 <script>
 	$(document).ready(function() {
-		$('#formats').DataTable({
+		var table = $('#formats').DataTable({
 			"pageLength" : -1,
 			"paging" : false,
 			"stateSave": false, 
-			"searchHighlight" : true,
+			"searchHighlight" : true,	
+			"dom": 'f',			
 			"bInfo": false,	
-			"sDom": 'flipt',	
+			"order": [[ 0, "asc" ]]	
 		});
+
+		$("#searchbox").on("keyup search input paste cut", function() {
+			table.search(this.value).draw();
+		});  		
+
 	} );	
 </script>
+
+<div class='header'>
+	<h4>Listing all available image and buffer formats</h4>
+</div>			
+
+<center>	
+	<div class='parentdiv'>
+	<div class='tablediv' style='width:auto; display: inline-block;'>
+
+	<table id="formats" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<thead>
+			<tr>			
+				<th>Format</th>
+				<th>Linear</th>
+				<th>Optimal</th>
+				<th>Buffer</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+				DB::connect();
+				try {
+					$res =DB::$connection->prepare("select count(*) from reports"); 
+					$res->execute(); 
+					$reportCount = $res->fetchColumn(); 
+
+					$formats = DB::$connection->prepare("select * from viewFormats");
+					$formats->execute($params);
+
+					if ($formats->rowCount() > 0) { 
+						while ($format = $formats->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
+							echo "<tr>";						
+							echo "<td class='value'>".$format[0]."</td>";
+							echo "<td class='value' align=center><a href='listreports.php?linearformat=".$format[0]."'>".round(($format[1]/$reportCount*100.0), 2)."%</a></td>";
+							echo "<td class='value' align=center><a href='listreports.php?optimalformat=".$format[0]."'>".round(($format[2]/$reportCount*100.0), 2)."%</a></td>";
+							echo "<td class='value' align=center><a href='listreports.php?bufferformat=".$format[0]."'>".round(($format[3]/$reportCount*100.0), 2)."%</a></td>";						
+							echo "</tr>";	    
+						}
+					}
+
+				} catch (PDOException $e) {
+					echo "<b>Error while fetcthing data!</b><br>";
+				}
+				DB::disconnect();
+			?>
+		</tbody>
+	</tbody>
+</table>  
+
+</div>
 </div>
 	<?php include './footer.inc'; ?>
 </center>
