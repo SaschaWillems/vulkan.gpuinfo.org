@@ -37,6 +37,7 @@
 		r.osarchitecture,
 		r.osversion,
 		r.description,
+		r.version as reportversion,
 		p.residencyAlignedMipSize, 
 		p.residencyNonResidentStrict, 
 		p.residencyStandard2DBlockShape, 
@@ -57,6 +58,9 @@
 			if ($fname == 'submitter') {
 				$value = '<a href="listreports.php?submitter='.$value.'">'.$value.'</a>';
 			}
+			if ($fname == 'devicename') {
+				$value = '<a href="listreports.php?devicename='.$value.'">'.$value.'</a>';			
+			}
 			if (strpos($fname, 'residency') !== false) {
 				$class = ($value == 1) ? "supported" : "unsupported";
 				$support = ($value == 1) ? "true" : "false";
@@ -69,7 +73,7 @@
 				$fname = 'driverversion';
 				$value = getDriverVerson($value, $row[2], $row[5]);
 			}
-			if ($fname == 'pipelineCacheUUID') {
+			if (($fname == 'pipelineCacheUUID') && (!is_null($value))) {
 				$arr = unserialize($value);
 				foreach ($arr as &$val) 
 					$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
