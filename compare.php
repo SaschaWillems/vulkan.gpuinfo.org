@@ -126,6 +126,7 @@
 			echo "	<li><a data-toggle='tab' href='#tab-formats'>Formats</a></li>";
 			echo "	<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>";
 			echo "	<li><a data-toggle='tab' href='#tab-memory'>Memory</a></li>";
+			echo "	<li><a data-toggle='tab' href='#tab-surface'>Surface</a></li>";
 			echo "</ul>";				
 			
 			echo "<div class='tablediv tab-content' style='width:75%;'>";			
@@ -183,6 +184,11 @@
 			include 'compare_memory.php';					
 			echo "</div>";
 
+			// Surface
+			echo "<div id='tab-surface' class='tab-pane fade reportdiv'>";
+			include 'compare_surface.php';					
+			echo "</div>";
+
 			if ($extDiffOnly) 
 			{
 				?>
@@ -208,7 +214,7 @@
 	<script>
 		$(document).ready(function() {
 		
-			var tableNames = ['devices', 'features', 'limits', 'extensions', 'formats-0', 'formats-1', 'formats-2'];
+			var tableNames = ['devices', 'features', 'limits', 'extensions', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(
@@ -226,5 +232,8 @@
 	</script>
 		
 	</div>
+
+	<?php include './footer.inc'; ?>
+
 </body>
 </html>
