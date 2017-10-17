@@ -147,6 +147,12 @@
         }
 	}    
 
+    $orderBy = "order by ".$orderByColumn." ".$orderByDir;
+
+    if ($orderByColumn == "api") {
+        $orderBy = "order by length(".$orderByColumn.") ".$orderByDir.", ".$orderByColumn." ".$orderByDir;
+    }
+
     $sql = "select 
         r.id,
         p.devicename as device,
@@ -165,8 +171,8 @@
         left join
         deviceproperties p on (p.reportid = r.id)
         ".$whereClause."        
-        ".$searchClause."        
-        order by ".$orderByColumn." ".$orderByDir;
+        ".$searchClause."
+        ".$orderBy;
 
     $devices = DB::$connection->prepare($sql." ".$paging);
     $devices->execute($params);
