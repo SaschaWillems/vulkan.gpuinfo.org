@@ -102,7 +102,7 @@
 	$optimalformatfeature = $_REQUEST['filter']['optimalformat'];
 	$bufferformatfeature = $_REQUEST['filter']['bufferformat'];	
 	if ($linearformatfeature != '') {
-		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_linearformatfeature and df.lineartilingfeatures > 0)";
+		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_linearformatfeature and df.lineartilingfeatures > 0)";
         $params['filter_linearformatfeature'] = $linearformatfeature;
 	}	
 	if ($optimalformatfeature != '') {
@@ -110,7 +110,7 @@
         $params['filter_optimalformatfeature'] = $optimalformatfeature;
 	}	
 	if ($bufferformatfeature != '') {
-		$whereClause = "where id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformatfeature and df.bufferfeatures > 0)";
+		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformatfeature and df.bufferfeatures > 0)";
         $params['filter_bufferformatfeature'] = $bufferformatfeature;
 	}    
 	// Surface format	
