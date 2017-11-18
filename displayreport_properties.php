@@ -24,6 +24,7 @@
 	
 	$sqlresult = mysql_query("select 
 		p.devicename,
+		r.displayname,
 		p.driverversionraw,
 		p.driverversion,
 		p.devicetype,
@@ -53,6 +54,7 @@
 	{
 		for($i = 0; $i < count($row); $i++)
 		{
+			if ($row[$i] == "") { continue; }
 			$fname = mysql_field_name($sqlresult, $i);		  			
 			$value = $row[$i];
 			if ($fname == 'submitter') {
@@ -60,6 +62,9 @@
 			}
 			if ($fname == 'devicename') {
 				$value = '<a href="listreports.php?devicename='.$value.'">'.$value.'</a>';			
+			}
+			if ($fname == 'displayname') {
+				$value = '<a href="listreports.php?displayname='.$value.'">'.$value.'</a>';			
 			}
 			if (strpos($fname, 'residency') !== false) {
 				$class = ($value == 1) ? "supported" : "unsupported";

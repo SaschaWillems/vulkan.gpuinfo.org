@@ -124,10 +124,17 @@
 		$headerClass = "header-blue";
 		$caption = "Reports for <b>".$devicename."</b>";		
 	}		
+	// Display name (Android devices)
+	$displayname = $_GET['displayname'];
+	if ($displayname != '') {
+		$defaultHeader = false;
+		$headerClass = "header-blue";
+		$caption = "Reports for <b>".$displayname."</b>";		
+	}		
 
 	if ($defaultHeader) {
 		echo "<div class='header'>";	
-		echo "	<h4>Reports</h4>";
+		echo "	<h4>Listing reports</h4>";
 		echo "</div>";		
 	}	
 ?>
@@ -156,17 +163,17 @@
 					<th><input type='submit' name='compare' value='compare' class='button'></th>
 				</tr>
 				<tr>
-					<td>id</td>
-					<?php if (isset($_GET["limit"])) echo "<td>Limit</td>" ?>
-					<td>Device</td>
-					<td>Driver</td>
-					<td>Api</td>
-					<td>Vendor</td>
-					<td>Type</td>
-					<td>OS</tdth>
-					<td>Version</td>
-					<td>Platform</td>
-					<td></td>
+					<th>id</th>
+					<?php if (isset($_GET["limit"])) echo "<th>Limit</th>" ?>
+					<th>Device</th>
+					<th>Driver</th>
+					<th>Api</th>
+					<th>Vendor</th>
+					<th>Type</th>
+					<th>OS</th>
+					<th>Version</th>
+					<th>Platform</th>
+					<th></th>
 				</tr>
 			</thead>		
 		</table>
@@ -208,6 +215,7 @@
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
 						'devicename' : '<?php echo $_GET["devicename"] ?>',
+						'displayname' : '<?php echo $_GET["displayname"] ?>',												
 					}
 				},
 				error: function (xhr, error, thrown) {

@@ -146,6 +146,14 @@
             $params['filter_devicename'] = $devicename;            
         }
 	}    
+    // Displayname (Android devices)
+    if (isset($_REQUEST['filter']['displayname'])) {
+	    $displayname = $_REQUEST['filter']['displayname'];
+        if ($displayname != '') {
+            $whereClause = "where r.displayname = :filter_displayname";
+            $params['filter_displayname'] = $displayname;            
+        }
+	}    
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 
