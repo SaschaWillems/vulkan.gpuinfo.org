@@ -58,40 +58,69 @@
 		<ul class='nav nav-tabs'>
 			<li class='active'><a data-toggle='tab' href='#windows'>Windows</a></li>
 			<li><a data-toggle='tab' href='#linux'>Linux</a></li>
-			<li><a data-toggle='tab' href='#android'>Android</a></li>
+			<li><a data-toggle='tab' href='#android_devices'>Android (devices)</a></li>
+			<li><a data-toggle='tab' href='#android_gpus'>Android (GPUs)</a></li>
 		</ul>
 	</div>
 
-	<div class='tablediv tab-content' style='width:50%;'>
+	<div class='tablediv tab-content' style='width:50%; text-align:left;'>
 
 		<?php		
 			DB::connect();
 
-			$targets = ["windows", "linux", "android"];
-			$osfilter = ["and osname = 'windows'", "and osname not in ('windows', 'android')", "and osname = 'android'"];
+			$targets = ["windows", "linux", "android_devices", "android_gpus"];
+			$osfilter = ["and osname = 'windows'", "and osname not in ('windows', 'android')", "and osname = 'android'", "and osname = 'android'"];
 			for ($i = 0; $i < sizeof($targets); $i++) {
 				echo "<div id='".$targets[$i]."' class='tab-pane fade ".(($i == 0) ? "in active" : "")." reportdiv'>";
-				$sql = "select dp.devicename, max(apiversionraw) as apiversion, vi.name as vendor
+				$sql = "select dp.devicename, r.displayname, max(apiversionraw) as apiversion, vi.name as vendor
 					from deviceproperties dp
 					join vendorids vi on dp.vendorid = vi.id					
 					join reports r on r.id = dp.reportid
 					where not exists (select * from blacklist bl where bl.devicename = dp.devicename)
-					".$osfilter[$i]."					
-					group by devicename
-					order by VendorId(vendorid) asc, devicename asc";
-
+					".$osfilter[$i];
+				if ($i != 2) {					
+					$sql .= " group by devicename ";
+					$sql .= " order by VendorId(vendorid) asc, devicename asc";
+				} else {
+					$sql .= " group by displayname ";					
+					$sql .= " order by displayname asc";
+				}
+				
 				$devices = DB::$connection->prepare($sql);
 				$devices->execute();
 
 				$lastVendor = '';
-
-				foreach ($devices as $device) {
-					if ($device["vendor"] != $lastVendor) {
-						$lastVendor = $device["vendor"];
-						echo "<h3>".$device["vendor"]."</h3>";
+			
+				if ($i != 2) {
+					foreach ($devices as $device) {
+						if ($device["vendor"] != $lastVendor) {
+							if ($lastVendor != "") {
+								echo "</div>";
+							}
+							$lastVendor = $device["vendor"];
+							echo "<div class='list-group'>";
+							echo "<li class='list-group-item active'>".$lastVendor."</li>";
+						}
+						echo "<a class='list-group-item' href='listreports.php?devicename=".urlencode($device["devicename"])."'>".$device["devicename"]."<span class='badge'>".versionToString($device["apiversion"])."</span></a>";					
+					}			
+					echo "</div>";									
+				} else {
+					foreach ($devices as $device) {
+						$arr = explode(' ',trim($device["displayname"]));
+						$vendor = $arr[0];
+						if ($vendor != $lastVendor) {
+							if ($lastVendor != "") {
+								echo "</div>";
+							}
+							$lastVendor = $vendor;
+							echo "<div class='list-group'>";
+							echo "<li class='list-group-item active'>".$lastVendor."</li>";
+						}
+						if (trim($device["displayname"]) == "") { continue; }
+						echo "<a class='list-group-item' href='listreports.php?displayname=".urlencode($device["displayname"])."'>".$device["displayname"]."<span class='badge'>".versionToString($device["apiversion"])."</span></a>";
 					}
-					echo "<a href='listreports.php?devicename=".urlencode($device["devicename"])."'>".$device["devicename"]."</a> <span style='color:#ABABAB;'>(".versionToString($device["apiversion"]).")</span><br>";
-				}					
+					echo "</div>";				
+				}
 
 				echo "</div>";				
 			}
