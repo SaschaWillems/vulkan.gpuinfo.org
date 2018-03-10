@@ -126,6 +126,53 @@ function getSampleCountFlags($flag)
 	return getFlags($flags, $flag);
 }
 
+function listSubgroupFeatureFlags($flag)
+{
+	$flags = array(
+		0x0001 => "BASIC",
+		0x0FFF => "VOTE", 
+		0x0004 => "ARITHMETIC",
+		0x0008 => "BALLOT",
+		0x0010 => "SHUFFLE",
+		0x0020 => "SHUFFLE (RELATIVE)",
+		0x0040 => "CLUSTERED",
+		0x0080 => "QUAD",
+	);
+
+	$res = null;	
+	$arr_values = array_values($flags);		
+	$index = 0;
+	foreach ($flags as $i => $value) {
+		$class = ($flag & $i) ? "supported" : "unsupported";
+		$res .= "<span class='".$class."'>".strtolower($arr_values[$index])."</span><br>";
+		$index++;
+	}
+	return $res;
+}
+
+function listSubgroupStageFlags($flag)
+{
+	$flags = array(
+		0x0001 => "VERTEX",
+		0x0002 => "TESSELLATION CONTROL",
+		0x0004 => "TESSELLATION EVALUATION",
+		0x0008 => "GEOMETRY",
+		0x0010 => "FRAGMENT",
+		0x0020 => "COMPUTE",
+		0x001F => "ALL_GRAPHICS",
+	);
+
+	$res = null;
+	$arr_values = array_values($flags);			
+	$index = 0;
+	foreach ($flags as $i => $value) {
+		$class = ($flag & $i) ? "supported" : "unsupported";
+		$res .= "<span class='".$class."'>".strtolower($arr_values[$index])."</span><br>";
+		$index++;
+	}
+	return $res;		
+}
+
 // Generate a simple ul/li list for the flags
 function listFlags($flags)
 {

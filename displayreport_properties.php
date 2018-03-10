@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -19,8 +19,17 @@
 		*
 	*/
 	
-	echo "<table id='deviceproperties' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
-	echo "<thead><tr><td class='caption'>Property</td><td class='caption'>Value</td></tr></thead><tbody>";
+?>
+	<table id='deviceproperties' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
+		<thead>
+			<tr>
+				<td class='caption'>Property</td>
+				<td class='caption'>Value</td>
+				<td class='caption'>Group</td>
+			</tr>
+		</thead>
+	<tbody>
+<?php
 	
 	$sqlresult = mysql_query("select 
 		p.devicename,
@@ -39,12 +48,16 @@
 		r.osversion,
 		r.description,
 		r.version as reportversion,
-		p.residencyAlignedMipSize, 
+		p.pipelineCacheUUID,
+		p.residencyAlignedMipSize,
 		p.residencyNonResidentStrict, 
 		p.residencyStandard2DBlockShape, 
 		p.residencyStandard2DMultisampleBlockShape, 
 		p.residencyStandard3DBlockShape,
-		p.pipelineCacheUUID	
+		p.`subgroupProperties.subgroupSize`,
+		p.`subgroupProperties.supportedStages`,
+		p.`subgroupProperties.supportedOperations`,
+		p.`subgroupProperties.quadOperationsInAllStages`
 	from reports r
 	left join
 	deviceproperties p on (p.reportid = r.id)
@@ -57,6 +70,7 @@
 			if ($row[$i] == "") { continue; }
 			$fname = mysql_field_name($sqlresult, $i);		  			
 			$value = $row[$i];
+			$group = 'Device';
 			if ($fname == 'submitter') {
 				$value = '<a href="listreports.php?submitter='.$value.'">'.$value.'</a>';
 			}
@@ -70,6 +84,7 @@
 				$class = ($value == 1) ? "supported" : "unsupported";
 				$support = ($value == 1) ? "true" : "false";
 				$value = "<span class='".$class."'>".$support."</span>";
+				$group = "Sparse residency";
 			}
 			if (($fname == 'driverversion') | ($fname == 'vendorid')) {
 				continue;
@@ -84,7 +99,28 @@
 					$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
 				$value = implode($arr);
 			}
-			echo "<tr><td class='key'>".$fname."</td><td>".$value."</td></tr>\n";
+			if (strpos($fname, 'subgroupProperties') !== false) {
+				$group = "Subgroup operations";					
+				$fname = str_replace('subgroupProperties.', '', $fname);
+				if (strcasecmp($fname, 'quadOperationsInAllStages') == 0) {
+					$class = ($value == 1) ? "supported" : "unsupported";
+					$support = ($value == 1) ? "true" : "false";
+					$value = "<span class='".$class."'>".$support."</span>";						
+				}
+				if (strcasecmp($fname, 'supportedStages') == 0) {
+					echo "<tr><td class='subkey'>".$fname."</td>";
+					echo "<td>".listSubgroupStageFlags($value)."</td>";					
+					echo "<td>".$group."</td></tr>\n";
+					continue;
+				}
+				if (strcasecmp($fname, 'supportedOperations') == 0) {
+					echo "<tr><td class='subkey'>".$fname."</td>";
+					echo "<td>".listSubgroupFeatureFlags($value)."</td>";					
+					echo "<td>".$group."</td></tr>\n";
+					continue;
+				}				
+			}
+			echo "<tr><td class='subkey'>".$fname."</td><td>".$value."</td><td>".$group."</td></tr>\n";
 		}				
 	}
 

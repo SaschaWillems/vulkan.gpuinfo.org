@@ -4,7 +4,7 @@
 				*
 				* Vulkan hardware capability database server implementation
 				*	
-				* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
+				* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
 				*	
 				* This code is free software, you can redistribute it and/or
 				* modify it under the terms of the GNU Affero General Public
@@ -234,7 +234,6 @@
 		$(document).ready(
 		function() {
 			var tableNames = [ 
-				'deviceproperties',
 				'devicefeatures', 
 				'devicelimits', 
 				'deviceextensions', 
@@ -245,8 +244,8 @@
 				'devicelayerextensions', 
 				'devicememoryheaps', 
 				'devicememorytypes', 
-				'devicesurfaceproperties'
-				];
+				'devicesurfaceproperties',
+			];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(
@@ -264,7 +263,7 @@
 			}
 
 			// Device properties table with grouping
-			$('#extended_features').dataTable(
+			$('#deviceproperties').dataTable(
 				{
 					"pageLength" : -1,
 					"paging" : false,
@@ -294,6 +293,36 @@
 			);			
 
 			// Extended features table with grouping
+			$('#extended_features').dataTable(
+				{
+					"pageLength" : -1,
+					"paging" : false,
+					"order": [], 
+					"columnDefs": [
+						{ "visible": false, "targets": 2 }
+					],				
+					"searchHighlight": true,
+					"bAutoWidth": false,
+					"sDom": 'flpt',
+					"deferRender": true,
+					"processing": true,
+					"drawCallback": function (settings) {
+						var api = this.api();
+						var rows = api.rows( {page:'current'} ).nodes();
+						var last = null;
+						api.column(2, {page:'current'} ).data().each( function ( group, i ) {
+							if ( last !== group ) {
+								$(rows).eq( i ).before(
+									'<tr><td colspan="2" class="group">'+group+'</td></tr>'
+								);
+								last = group;
+							}
+						});
+					}
+				}
+			);			
+
+			// Extended properties table with grouping
 			$('#extended_properties').dataTable(
 				{
 					"pageLength" : -1,
@@ -321,7 +350,7 @@
 						});
 					}
 				}
-			);					
+			);							
 					
 			// Collapsible format flags
 			var table = $('#deviceformats').DataTable();
