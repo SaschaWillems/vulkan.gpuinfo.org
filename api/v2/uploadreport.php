@@ -185,7 +185,11 @@
 				residencyStandard2DMultisampleBlockShape,
 				residencyStandard3DBlockShape,
 				headerversion,
-				pipelineCacheUUID
+				pipelineCacheUUID,
+				`subgroupProperties.subgroupSize`,
+				`subgroupProperties.supportedStages`,
+				`subgroupProperties.supportedOperations`,
+				`subgroupProperties.quadOperationsInAllStages`				
 			)
 			VALUES
 			(
@@ -204,7 +208,11 @@
 				:residencyStandard2DMultisampleBlockShape,
 				:residencyStandard3DBlockShape,
 				:headerversion,
-				:pipelineCacheUUID
+				:pipelineCacheUUID,
+				:subgroupProperties_subgroupSize,
+				:subgroupProperties_supportedStages,
+				:subgroupProperties_supportedOperations,
+				:subgroupProperties_quadOperationsInAllStages
 			)";
 
 		$values = array(
@@ -223,10 +231,20 @@
 			":residencyNonResidentStrict" => $jsonnode['sparseProperties']['residencyNonResidentStrict'],
 			":residencyStandard2DBlockShape" => $jsonnode['sparseProperties']['residencyStandard2DBlockShape'],
 			":residencyStandard2DMultisampleBlockShape" => $jsonnode['sparseProperties']['residencyStandard2DMultisampleBlockShape'],
-			":residencyStandard3DBlockShape" => $jsonnode['sparseProperties']['residencyStandard3DBlockShape'],
-			//"productModel," => $jsonnode['devicename'],
-			//"productManufacturer," => $jsonnode['devicename'],
+			":residencyStandard3DBlockShape" => $jsonnode['sparseProperties']['residencyStandard3DBlockShape']
 		);
+
+		if (array_key_exists('subgroupProperties', $jsonnode)) {
+			$values[":subgroupProperties_subgroupSize"] = $jsonnode['subgroupProperties']["subgroupSize"];
+			$values[":subgroupProperties_supportedStages"] = $jsonnode['subgroupProperties']["supportedStages"];
+			$values[":subgroupProperties_supportedOperations"] = $jsonnode['subgroupProperties']["supportedOperations"];
+			$values[":subgroupProperties_quadOperationsInAllStages"] = $jsonnode['subgroupProperties']["quadOperationsInAllStages"];
+		} else {
+			$values[":subgroupProperties_subgroupSize"] = null;
+			$values[":subgroupProperties_supportedStages"] = null;
+			$values[":subgroupProperties_supportedOperations"] = null;
+			$values[":subgroupProperties_quadOperationsInAllStages"] = null;
+		}
 
 		try {
 			$stmnt = DB::$connection->prepare($sql);
