@@ -224,9 +224,15 @@ h4 {
 	font-weight:bold;
 }
 
+.group
+{
+	color:#a31d21;
+	background-color: #f4f4f4 !important;	
+}
+
 .fieldcaption
 {
-	font-weight:normale;
+	font-weight:normal;
 	color:#000000;
 	padding-left: 10px;
 	padding-right : 5px;
@@ -237,11 +243,18 @@ h4 {
 
 .key
 {
-	width:25%;
-	#color:#a31d21;	
-#	padding-left:50px;
-#	text-align:right;
-#	font-weight:bold;
+	width:1px;
+	/*width:25%;*/
+	/*color:#a31d21;	
+	padding-left:50px;
+	text-align:right;
+	font-weight:bold;*/
+}
+
+.subkey
+{
+	width:1px;
+	padding-left:25px !important;
 }
 
 .value

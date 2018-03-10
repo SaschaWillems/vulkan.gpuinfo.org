@@ -1,10 +1,10 @@
-		<?php
+<?php
 			include './header.inc';			
 			/* 		
 				*
 				* Vulkan hardware capability database server implementation
 				*	
-				* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+				* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
 				*	
 				* This code is free software, you can redistribute it and/or
 				* modify it under the terms of the GNU Affero General Public
@@ -51,7 +51,8 @@
 				VendorId(p.vendorid) as 'vendor',
 				r.osname,
 				r.osarchitecture,
-				r.osversion
+				r.osversion,
+				r.version as reportversion
 			from reports r
 			left join
 			deviceproperties p on (p.reportid = r.id)
@@ -59,6 +60,8 @@
 			$row = mysql_fetch_assoc($sqlresult);
 			$present = (mysql_num_rows($sqlresult) > 0);
 			$devicedescription = $row['vendor']." ".$row['devicename'];
+			$devicename = $row['devicename'];
+			$reportversion = $row['reportversion'];
 			
 			if (!$present) 
 			{
@@ -90,7 +93,10 @@
 			echo "<div class='header'>";
 			if ($reportDisplay == 'reportonly')
 				echo "<img src='./images/vulkan48.png' width='175px' style='padding-top:10px';><br>";				
-			echo "Device report for $devicedescription";
+			echo "<h4>Device report for $devicedescription</h4>";
+			if ($reportversion >= '1.4') {
+				echo "<a href=\"api/v2/devsim/getreport.php?id=".$reportID."\" class=\"btn btn-default\" title=\"Download a Vulkan device simulation layer compatible JSON file\"><span class=\"glyphicon glyphicon-floppy-save\"></span> JSON</a>";
+			}
 			echo "</div>";			
 		
 			// Nav ========================================================================================
@@ -227,7 +233,20 @@
 	<script>
 		$(document).ready(
 		function() {
-			var tableNames = ['deviceproperties', 'devicefeatures', 'devicelimits', 'deviceextensions', 'deviceformats', 'devicelayers', 'devicequeues', 'devicememory', 'devicelayerextensions', 'devicememoryheaps', 'devicememorytypes', 'devicesurfaceproperties'];
+			var tableNames = [ 
+				'deviceproperties',
+				'devicefeatures', 
+				'devicelimits', 
+				'deviceextensions', 
+				'deviceformats', 
+				'devicelayers', 
+				'devicequeues', 
+				'devicememory', 
+				'devicelayerextensions', 
+				'devicememoryheaps', 
+				'devicememorytypes', 
+				'devicesurfaceproperties'
+				];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(
@@ -239,17 +258,77 @@
 							"bAutoWidth": false,
 							"sDom": 'flpt',
 							"deferRender": true,
-							"processing": true,
+							"processing": true			
 						}
 					);
-			}	
+			}
+
+			// Device properties table with grouping
+			$('#extended_features').dataTable(
+				{
+					"pageLength" : -1,
+					"paging" : false,
+					"order": [], 
+					"columnDefs": [
+						{ "visible": false, "targets": 2 }
+					],				
+					"searchHighlight": true,
+					"bAutoWidth": false,
+					"sDom": 'flpt',
+					"deferRender": true,
+					"processing": true,
+					"drawCallback": function (settings) {
+						var api = this.api();
+						var rows = api.rows( {page:'current'} ).nodes();
+						var last = null;
+						api.column(2, {page:'current'} ).data().each( function ( group, i ) {
+							if ( last !== group ) {
+								$(rows).eq( i ).before(
+									'<tr><td colspan="2" class="group">'+group+'</td></tr>'
+								);
+								last = group;
+							}
+						});
+					}
+				}
+			);			
+
+			// Extended features table with grouping
+			$('#extended_properties').dataTable(
+				{
+					"pageLength" : -1,
+					"paging" : false,
+					"order": [], 
+					"columnDefs": [
+						{ "visible": false, "targets": 2 }
+					],				
+					"searchHighlight": true,
+					"bAutoWidth": false,
+					"sDom": 'flpt',
+					"deferRender": true,
+					"processing": true,
+					"drawCallback": function (settings) {
+						var api = this.api();
+						var rows = api.rows( {page:'current'} ).nodes();
+						var last = null;
+						api.column(2, {page:'current'} ).data().each( function ( group, i ) {
+							if ( last !== group ) {
+								$(rows).eq( i ).before(
+									'<tr><td class="group" colspan="2">'+group+'</td></tr>'
+								);
+								last = group;
+							}
+						});
+					}
+				}
+			);					
 					
 			// Collapsible format flags
 			var table = $('#deviceformats').DataTable();
 			table.columns(5).visible(false);
 			table.columns(6).visible(false);
 			table.columns(7).visible(false);
-    		
+	
 			$('#deviceformats tbody').on('click', 'td.details-control', function () 
 			{
 				var tr = $(this).closest('tr');
@@ -291,7 +370,6 @@
 					tr.addClass('shown');
 				}
 			} );						
-					
 					
 		} );	
 		
