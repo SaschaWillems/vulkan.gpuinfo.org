@@ -121,6 +121,19 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 	$index = 1;  
 	for ($i = 0, $arrsize = sizeof($column[0]); $i < $arrsize; ++$i) 
 	{ 	  	
+		if (strcasecmp($captions[$i], "displayname") == 0) {
+			$empty = true;
+			for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) {
+				if ($column[$j][$i] !== null) {
+					$empty = false;
+					break;
+				}
+			}
+			if ($empty) {
+				continue;
+			}
+		}
+
 		// Get min and max for this capability
 		if (is_numeric($column[0][$i])) {
 			
@@ -143,13 +156,13 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 		// Report header
 		$className = "";
 		$fontStyle = "";
-		if (strpos($captions[$i], 'residency') !== false) 
+		if (in_array($groups[$i], ["Sparse residency", "Subgroup operations"])) 
 		{
 			$className = ($minval < $maxval) ? "" : "class='sameCaps'";
 			$fontStyle = ($minval < $maxval) ? "style='color:red;'" : "";					
 		} 
 
-		echo "<tr style='$className'>\n";
+		echo "<tr ".$className.">\n";
 		echo "<td class='subkey' $fontStyle>". $captions[$i] ."</td>\n";									
 		echo "<td>".$groups[$i]."</td>";
 		
