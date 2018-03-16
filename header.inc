@@ -1,12 +1,13 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset="ISO-8859-1">
-	<title>Vulkan Hardware Database - � 2016 by Sascha Willems</title>	
+	<meta http-equiv="Content-Type" content="text/html" charset="ISO-8859-1">
+	<title>Vulkan Hardware Database - &copy; 2016-2017 by Sascha Willems</title>	
 	
 	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/dataTables.bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/responsive.bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="external/bootstrap-toggle.min.css" rel="stylesheet">
 
 	<link rel="stylesheet" type="text/css" href="style.css">
 
@@ -14,15 +15,36 @@
 	<script type="text/javascript" src="external/bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="external/dataTables.bootstrap.min.js"></script>
+	<script type="text/javascript" src="external/bootstrap-toggle.min.js"></script>	
 	<script type="text/javascript" src="external/dataTables.fixedHeader.min.js"></script>
+
 <!--	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script> -->
 	<script type="text/javascript" src="external/responsive.bootstrap.min.js"></script>
+	
+	<script>
+		$(document).ready(function () {
+				$.each($('#navbar').find('li'), function() {
+						$(this).toggleClass('active',
+								'/' + $(this).find('a').attr('href') == window.location.pathname);
+				});
+		});	
+	</script>
+
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:site" content="gpuinfo.org" />
+	<meta name="twitter:creator" content="Sascha Willems" />    
+
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:site" content="@SaschaWillems2" />
+	<meta name="twitter:title" content="Vulkan on gpuinfo.org" />
+	<meta name="twitter:description" content="Vulkan hardware capability database." />
+	<meta name="twitter:image" content="https://vulkan.gpuinfo.org/images/vulkanlogoscene.png" />	
 
 </head>
 
 <body>
 <!-- Bootstrap nav bar -->
-	<nav class="navbar navbar-default navbar-fixed-top">
+	<nav class="navbar navbar-default navbar-fixed-top" id="navbar">
 	  <div class="container-fluid">
 		<div class="navbar-header">
 		  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -51,8 +73,10 @@
 				</ul>
 			</li>
 
+			<li><a href="vulkansupport.php">Devices</a></li>
+
 			<li><a href="download.php">Download</a></li> 
-			<li><a href="about.php">About</a></li> 
+			<li><a href="about.php">About</a></li> 			
 		  </ul>
 		  <ul class="nav navbar-nav navbar-right">
 			  <li class="dropdown">
@@ -62,7 +86,9 @@
 					<li><a href="http://opengl.gpuinfo.org">OpenGL</a></li>
 					<li><a href="http://opengles.gpuinfo.org">OpenGL ES</a></li>
 					<li><a href="http://vulkan.gpuinfo.org">Vulkan</a></li> 
-                    <li role="separator" class="divider"></li>
+          <li role="separator" class="divider"></li>
+					<li><a href="http://android.gpuinfo.org">Android</a></li> 
+          <li role="separator" class="divider"></li>					
 					<li><a href="http://www.gpuinfo.org">Launchpad</a></li> 
 				  </ul>
 			  </li>

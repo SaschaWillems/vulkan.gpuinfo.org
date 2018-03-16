@@ -1,18 +1,10 @@
-	<script>
-		function showDiffOnly() {
-			$('.same').toggle()
-		}
-		function toggleDiffCaps() {
-			$('.sameCaps').toggle()
-		}	
-	</script>
-	<div>
+<div>
 		<?php
 	/* 		
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -33,7 +25,7 @@
 	include './functions.php';	
 
 	dbConnect();
-				
+
 			$extDiffOnly = false;
 			if (isset($_GET['extDiffOnly'])) 
 			{
@@ -75,11 +67,15 @@
 					break; 
 				}
 			}   
-							
-			echo "<div class='header'>";
-				echo "<h4 style='margin-left:10px;'>Comparing ".count($reportids)." reports</h4>";
-			echo "</div>";					
-			
+
+?>
+	<div class='header'>
+		<h4 style='margin-left:10px;'>Comparing <?php count($reportids) ?> reports</h4>
+		<label id="toggle-label" class="checkbox-inline" style="display:none;">
+			<input id="toggle-event" type="checkbox" data-toggle="toggle" data-size="small" data-onstyle="success"> Display only different values
+		</label>
+	</div>
+<?php						
 			if ($reportlimit) {echo "<b>Note : </b>You selected more than 8 reports to compare, only displaying the first 8 selected reports.\n"; }	
 			
 			echo "<center><div id='reportdiv'>";			
@@ -116,79 +112,74 @@
 													
 			// Header
 			$colspan = count($reportids) + 1;	
+?>			
 							
-			echo "<div id='tabs'>";
-			echo "<ul class='nav nav-tabs'>";
-			echo "	<li class='active'><a data-toggle='tab' href='#tab-devices'>Devices</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tab-features'>Features</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tab-limits'>Limits</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tab-extensions'>Extensions</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tab-formats'>Formats</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tab-memory'>Memory</a></li>";
-			echo "	<li><a data-toggle='tab' href='#tab-surface'>Surface</a></li>";
-			echo "</ul>";				
+			<div id='tabs'>
+			<ul class='nav nav-tabs'>
+				<li class='active'><a data-toggle='tab' href='#tab-devices'>Devices</a></li>
+				<li><a data-toggle='tab' href='#tab-features'>Features</a></li>
+				<li><a data-toggle='tab' href='#tab-limits'>Limits</a></li>
+				<li><a data-toggle='tab' href='#tab-extensions'>Extensions</a></li>
+				<li><a data-toggle='tab' href='#tab-formats'>Formats</a></li>
+				<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>
+				<li><a data-toggle='tab' href='#tab-memory'>Memory</a></li>
+				<li><a data-toggle='tab' href='#tab-surface'>Surface</a></li>
+			</ul>		
 			
-			echo "<div class='tablediv tab-content' style='width:75%;'>";			
+			<div class='tablediv tab-content' style='width:75%;'>		
 
-			// Devices
-			echo "<div id='tab-devices' class='tab-pane fade in active reportdiv'>";
-			echo "<button onclick='toggleDiffCaps();' class='btn btn-default'>Toggle all / diff only</button>";				
-			echo "<table id='devices' width='100%' class='table table-striped table-bordered table-hover'>";
-			
-			include 'compare_devices.php';				
-			
-			echo "</tbody></table></div>";	
+			<div id='tab-devices' class='tab-pane fade in active reportdiv'>
+
+			<!-- Devices -->		
+			<div id="overlay_devices"><center><h4>Fetching data...</h4><img src="./images/loading.gif"></center></div>
+				<table id='devices' width='100%' class='table table-striped table-bordered table-hover' style='display:none'>
+					<?php include 'compare_devices.php'; ?>
+				</tbody></table>
+			</div>
 		
 			
-			// Features
-			echo "<div id='tab-features' class='tab-pane fade reportdiv'>";
-			echo "<button onclick='toggleDiffCaps();' class='btn btn-default'>Toggle all / diff only</button>";				
-			echo "<table id='features' width='100%' class='table table-striped table-bordered table-hover'>";
+			<!-- Features -->
+			<div id='tab-features' class='tab-pane fade reportdiv'>
+				<table id='features' width='100%' class='table table-striped table-bordered table-hover'>			
+					<?php include 'compare_features.php'; ?>
+				</tbody></table>
+			</div>
 			
-			include 'compare_features.php';				
+			<!-- Limits  -->
+			<div id='tab-limits' class='tab-pane fade reportdiv'>
+				<table id='limits' width='100%' class='table table-striped table-bordered table-hover'>			
+					<?php include 'compare_limits.php'; ?>
+				</tbody></table>
+			</div>
 			
-			echo "</tbody></table></div>";	
+			<!-- Extensions -->
+			<div id='tab-extensions' class='tab-pane fade reportdiv'>
+				<table id='extensions' width='100%' class='table table-striped table-bordered table-hover'>
+					<?php include 'compare_extensions.php'; ?>
+				</tbody></table>
+			</div>
 			
-			// Limits 
-			echo "<div id='tab-limits' class='tab-pane fade reportdiv'>";
-			echo "<button onclick='toggleDiffCaps();' class='btn btn-default'>Toggle all / diff only</button>";				
-			echo "<table id='limits' width='100%' class='table table-striped table-bordered table-hover'>";
-			
-			include 'compare_limits.php';				
-			
-			echo "</tbody></table></div>";			
-			
-			// Extensions
-			echo "<div id='tab-extensions' class='tab-pane fade reportdiv'>";
-			echo "<button onclick='showDiffOnly();' class='btn btn-default'>Toggle all / diff only</button>";			
-			echo "<table id='extensions' width='100%' class='table table-striped table-bordered table-hover'>";
-			
-			include 'compare_extensions.php';					
-			
-			echo "</tbody></table></div>";			
-			
-			// Formats
-			echo "<div id='tab-formats' class='tab-pane fade reportdiv'>";
-			echo "<button onclick='showDiffOnly();' class='btn btn-default'>Toggle all / diff only</button>";						
-			include 'compare_formats.php';		
-			echo "</div>";
+			<!-- Formats -->
+			<div id='tab-formats' class='tab-pane fade reportdiv'>
+				<?php include 'compare_formats.php'; ?>
+			</div>
 
-			// Queues
-			echo "<div id='tab-queues' class='tab-pane fade reportdiv'>";
-			include 'compare_queues.php';					
-			echo "</div>";
+			<!-- Queues -->
+			<div id='tab-queues' class='tab-pane fade reportdiv'>
+				<?php include 'compare_queues.php'; ?>
+			</div>
 			
-			// Memory
-			echo "<div id='tab-memory' class='tab-pane fade reportdiv'>";
-			include 'compare_memory.php';					
-			echo "</div>";
+			<!-- Memory -->
+			<div id='tab-memory' class='tab-pane fade reportdiv'>
+				<?php include 'compare_memory.php'; ?>
+			</div>
 
-			// Surface
-			echo "<div id='tab-surface' class='tab-pane fade reportdiv'>";
-			include 'compare_surface.php';					
-			echo "</div>";
+			<!-- Surface -->
+			<div id='tab-surface' class='tab-pane fade reportdiv'>
+				<?php include 'compare_surface.php'; ?>
+			</div>
 
+<?php 			
 			if ($extDiffOnly) 
 			{
 				?>
@@ -214,7 +205,7 @@
 	<script>
 		$(document).ready(function() {
 		
-			var tableNames = ['devices', 'features', 'limits', 'extensions', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
+			var tableNames = ['features', 'limits', 'extensions', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(
@@ -228,7 +219,51 @@
 						}
 					);
 			}		
+
+			// Device properties table with grouping
+			$('#devices').dataTable(
+				{
+					"pageLength" : -1,
+					"paging" : false,
+					"order": [], 
+					"columnDefs": [
+						{ "visible": false, "targets": 1 }
+					],				
+					"searchHighlight": true,
+					"bAutoWidth": false,
+					"sDom": 'flpt',
+					"deferRender": true,
+					"processing": true,
+					"drawCallback": function (settings) {
+						var api = this.api();
+						var rows = api.rows( {page:'current'} ).nodes();
+						var last = null;
+						api.column(1, {page:'current'} ).data().each( function ( group, i ) {
+							if ( last !== group ) {
+								$(rows).eq( i ).before(
+									'<tr><td colspan="'+api.columns().header().length+'" class="group">'+group+'</td></tr>'
+								);
+								last = group;
+							}
+						});
+					}
+				}
+			);	
+
+			$('#devices').show();
+			$("#overlay_devices").hide();
+			$("#toggle-label").show();
 		} );	
+
+		$('#toggle-event').change(function() {
+			if ($(this).prop('checked')) {
+				$('.same').hide();
+				$('.sameCaps').hide();
+			} else {
+				$('.same').show();				
+				$('.sameCaps').show();
+			}
+		} );
 	</script>
 		
 	</div>

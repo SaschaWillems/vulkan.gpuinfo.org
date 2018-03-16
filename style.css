@@ -380,3 +380,6 @@ a:hover {  text-decoration:none !important; }
 	border-radius: 4px;
 	color: #000;
 }
+#overlay_devices {
+    background-color: rgba(255, 255, 255, 1.0);
+}
