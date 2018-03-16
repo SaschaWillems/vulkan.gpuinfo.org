@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -19,17 +19,12 @@
 		*
 	*/
 	
-	// Table header
-	echo "<thead><tr><td class='caption'>Key</td>";
-	foreach ($reportids as $reportId) {
-		echo "<td class='caption'>Report $reportId</td>";
-	}
-	echo "</tr></thead><tbody>";
-	
+
 	$repids = implode(",", $reportids);   
 	
 	$sqlresult = mysql_query("select 
 			p.devicename,
+			r.displayname,
 			p.driverversion,
 			p.devicetype,
 			p.apiversion,
@@ -41,12 +36,16 @@
 			r.osarchitecture,
 			r.osversion,
 			r.description,
+			p.pipelineCacheUUID,
 			p.residencyAlignedMipSize, 
 			p.residencyNonResidentStrict, 
 			p.residencyStandard2DBlockShape, 
 			p.residencyStandard2DMultisampleBlockShape, 
 			p.residencyStandard3DBlockShape,
-			p.pipelineCacheUUID
+			p.`subgroupProperties.subgroupSize`,
+			p.`subgroupProperties.supportedStages`,
+			p.`subgroupProperties.supportedOperations`,
+			p.`subgroupProperties.quadOperationsInAllStages`			
 		from reports r
 		left join
 		deviceproperties p on (p.reportid = r.id)				
@@ -54,31 +53,45 @@
 	
 	$reportindex = 0;
 	
-	// Gather data into array
-	$column    = array();
-	$captions  = array();
+	// Gather data into arrays
+	$column = array();
+	$captions = array();
+	$groups = array();
 	
 	while($row = mysql_fetch_row($sqlresult)) 
 	{
 		$colindex = 0;
 		$reportdata = array();		
 		
-		foreach ($row as $data) 
+		foreach ($row as $data)
 		{
 			$caption = mysql_field_name($sqlresult, $colindex);		  
+			$group = "Device";
 			
-			if ($caption == 'pipelineCacheUUID') {
+			if (($caption == 'pipelineCacheUUID') && (!is_null($data))) {
 				$arr = unserialize($data);
 				foreach ($arr as &$val) 
 					$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
 				$reportdata[] = implode($arr);
+				$captions[] = $caption;
+				$groups[] = $group;
 				$colindex++;
 				continue;
 			}
 
+			if (strpos($caption, 'residency') !== false) {
+				$group = "Sparse residency";
+			}			
+
+			if (strpos($caption, 'subgroupProperties') !== false) {
+				$group = "Subgroup operations";	
+				$caption = str_replace('subgroupProperties.', '', $caption);				
+			}			
+
 			if ($caption != "reportid") {
-				$reportdata[] = $data;	  
-				$captions[]   = $caption;
+				$reportdata[] = $data;
+				$captions[] = $caption;
+				$groups[] = $group;
 			}									
 			
 			$colindex++;
@@ -88,8 +101,23 @@
 		
 		$reportindex++;
 	}   
+
+	// Platform details (when available)
+	//todo:
+	/*
+select distinct name from deviceplatformdetails 
+left join platformdetails on platformdetails.id = deviceplatformdetails.platformdetailid 
+where deviceplatformdetails.ReportID in (".$repids.");"	
+	*/
 	
 	// Generate table from selected reports
+
+	echo "<thead><tr><td class='caption'>Key</td><td>Group</td>";
+	foreach ($reportids as $reportId) {
+		echo "<td class='caption'>Report $reportId</td>";
+	}
+	echo "</tr></thead><tbody>";
+
 	$index = 1;  
 	for ($i = 0, $arrsize = sizeof($column[0]); $i < $arrsize; ++$i) 
 	{ 	  	
@@ -122,11 +150,32 @@
 		} 
 
 		echo "<tr style='$className'>\n";
-		echo "<td class='firstrow' $fontStyle>". $captions[$i] ."</td>\n";									
+		echo "<td class='subkey' $fontStyle>". $captions[$i] ."</td>\n";									
+		echo "<td>".$groups[$i]."</td>";
 		
 		// Values
 		for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) 
 		{	 
+			if (strcasecmp($groups[$i], 'Subgroup operations') == 0) {
+				if ($column[$j][$i] == null) {
+					echo "<td class='na' title='Only available with Vulkan 1.1 and up and report version 1.5 and up'>n/a</td>";
+					continue;
+				}
+				if (strcasecmp($captions[$i], 'quadOperationsInAllStages') == 0) {
+					$class = ($column[$j][$i] == 1) ? "supported" : "unsupported";
+					$support = ($column[$j][$i] == 1) ? "true" : "false";
+					$column[$j][$i] = "<span class='".$class."'>".$support."</span>";						
+				}
+				if (strcasecmp($captions[$i], 'supportedStages') == 0) {
+					echo "<td>".listSubgroupStageFlags($column[$j][$i])."</td>";					
+					continue;
+				}
+				if (strcasecmp($captions[$i], 'supportedOperations') == 0) {
+					echo "<td>".listSubgroupFeatureFlags($column[$j][$i])."</td>";					
+					continue;
+				}
+			}
+
 			echo "<td>";
 			if (strpos($captions[$i], 'residency') === false) 
 			{
