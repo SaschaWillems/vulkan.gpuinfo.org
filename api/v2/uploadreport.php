@@ -67,8 +67,18 @@
 		echo "This version of the Vulkan Hardware Capability is no longer supported!\nPlease download a recent version from http://www.gpuinfo.org";
 		DB::disconnect();
 		exit();	  
-	}			
-
+	}		
+	
+	// VK 1.1 only with 1.5 or up
+	$reportapiversion = $json['properties']['apiVersion'];
+	$vkmajor = ($reportapiversion >> 22);
+	$vkminor = (($reportapiversion >> 12) & 0x3ff);
+	
+	if (($vkmajor >= 1) && ($vkminor >= 1) && ($reportversion < 1.5)) {
+		echo "Vulkan 1.1 reports require at least Version 1.5 (or newer) of the Vulkan Hardware Capability.\nPlease download a recent version from http://www.gpuinfo.org";
+		exit();	  
+	}
+	
 	// Check if device is blacklisted
 	try {
 		$sql = "select * from blacklist where devicename = :devicename";
