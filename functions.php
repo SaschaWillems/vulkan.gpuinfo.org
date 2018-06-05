@@ -240,7 +240,7 @@ function reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, $cou
 }
 
 // Convert vendor specific driver version string
-function getDriverVerson($versionraw, $versiontext, $vendorid)
+function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 {
 	if ($versionraw != '')
 	{
@@ -252,6 +252,13 @@ function getDriverVerson($versionraw, $versiontext, $vendorid)
 				($versionraw >> 14) & 0x0ff,
 				($versionraw >> 6) & 0x0ff,
 				($versionraw) & 0x003f
+				);
+		}
+		if ($vendorid == 8086 && $osname == 'windows')
+		{
+			return sprintf("%d.%d",
+				($versionraw >> 14),
+				($versionraw) & 0x3fff
 				);
 		}
 		// Use Vulkan version conventions if vendor mapping is not available
