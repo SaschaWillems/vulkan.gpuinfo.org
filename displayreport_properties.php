@@ -91,7 +91,7 @@
 			}
 			if ($fname == 'driverversionraw') {
 				$fname = 'driverversion';
-				$value = getDriverVerson($value, $row[2], $row[6]);
+				$value = getDriverVerson($value, $row[2], $row[6], $row[11])
 			}
 			if (($fname == 'pipelineCacheUUID') && (!is_null($value))) {
 				$arr = unserialize($value);
