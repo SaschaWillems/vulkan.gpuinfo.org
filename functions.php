@@ -254,7 +254,7 @@ function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 				($versionraw) & 0x003f
 				);
 		}
-		if ($vendorid == 8086 && $osname == 'windows')
+		if ($vendorid == 0x8086 && $osname == 'windows')
 		{
 			return sprintf("%d.%d",
 				($versionraw >> 14),

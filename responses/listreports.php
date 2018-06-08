@@ -186,12 +186,12 @@
     $devices->execute($params);
     if ($devices->rowCount() > 0) { 
         foreach ($devices as $device) {
-            $driver = getDriverVerson($device["driver"], "", $device["vendorid"], $device["osname"]);
+            $driver = getDriverVerson($device["driver"], "", $device["vendorid"], $device["osname"]);            
             $data[] = array(
                 'id' => $device["id"], 
                 'devicelimit' => ($limit != '') ? $device["devicelimit"] : null,
                 'device' => '<a href="displayreport.php?id='.$device["id"].'">'.$device["device"].'</a>', 
-                'driver' => $device["driverversion"], 
+                'driver' => $driver, 
                 'api' => $device["api"], 
                 'vendor' => $device["vendor"],
 				'devicetype' => strtolower(str_replace('_GPU', '', $device["devicetype"])),
