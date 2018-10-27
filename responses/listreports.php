@@ -50,7 +50,7 @@
         array_push($searchColumns, 'devicelimit');
 	}    
 
-    array_push($searchColumns, 'p.devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
+    array_push($searchColumns, 'devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
 
     // Per-column, filtering
     $filters = array();
@@ -142,7 +142,7 @@
     if (isset($_REQUEST['filter']['devicename'])) {
 	    $devicename = $_REQUEST['filter']['devicename'];
         if ($devicename != '') {
-            $whereClause = "where r.devicename = :filter_devicename";
+            $whereClause = "where r.devicename = :filter_devicename or r.displayname = :filter_devicename";
             $params['filter_devicename'] = $devicename;            
         }
 	}    
@@ -163,7 +163,7 @@
 
     $sql = "select 
         r.id,
-        p.devicename as device,
+        ifnull(r.displayname, r.devicename) as devicename,
         ifnull(p.driverversionraw, p.driverversion) as driver,
         p.driverversion,
         p.vendorid,
@@ -190,7 +190,7 @@
             $data[] = array(
                 'id' => $device["id"], 
                 'devicelimit' => ($limit != '') ? $device["devicelimit"] : null,
-                'device' => '<a href="displayreport.php?id='.$device["id"].'">'.$device["device"].'</a>', 
+                'device' => '<a href="displayreport.php?id='.$device["id"].'">'.$device["devicename"].'</a>', 
                 'driver' => $driver, 
                 'api' => $device["api"], 
                 'vendor' => $device["vendor"],
