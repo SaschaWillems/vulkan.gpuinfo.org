@@ -44,12 +44,16 @@
     // Filtering
     $searchColumns = ['device', 'api', 'driverversion', 'reportversion', 'reportcount'];
 
-    // Per-column, filtering
+    // Per-column filtering
     $filters = array();
     for ($i = 0; $i < count($_REQUEST['columns']); $i++) {
         $column = $_REQUEST['columns'][$i];
         if (($column['searchable'] == 'true') && ($column['search']['value'] != '')) {
-            $filters[] = $searchColumns[$i].' like :filter_'.$i;
+            if ($searchColumns[$i] == 'api') {
+                $filters[] = 'VkVersion(api) like :filter_'.$i;               
+            } else {
+                $filters[] = $searchColumns[$i].' like :filter_'.$i;
+            }
             $params['filter_'.$i] = '%'.$column['search']['value'].'%';
         }
     }
@@ -149,10 +153,6 @@
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 
-    // if ($orderByColumn == "api") {
-    //     $orderBy = "order by length(".$orderByColumn.") ".$orderByDir.", ".$orderByColumn." ".$orderByDir;
-    // }
-
     if (isset($_REQUEST["platform"])) {
         $platform = $_REQUEST["platform"];
         if ($platform !== "all") {
@@ -199,10 +199,23 @@
         }        
     }
 
+    $sql_count = "SELECT 
+        r.id,
+        ifnull(r.displayname, dp.devicename) as device, 
+        max(dp.apiversionraw) as api,
+        max(dp.driverversion) as driverversion,
+        count(distinct r.id) as reportcount,
+        max(r.version) as reportversion,
+        max(r.submissiondate) as submissiondate
+        from deviceproperties dp
+        join reports r on r.id = dp.reportid
+        $whereClause
+        group by device";
+
     $filteredCount = 0;
-    $stmnt = DB::$connection->prepare($sql);
+    $stmnt = DB::$connection->prepare($sql_count);
     $stmnt->execute($params);
-    $totalCount = $stmnt->fetchColumn(); 
+    $totalCount = $stmnt->rowCount(); 
 
     $filteredCount = $totalCount;
     if (($searchClause != '') or ($whereClause != ''))  {
