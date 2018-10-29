@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database back-end
 		*	
-		* Copyright (C) 2011-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2011-2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -18,6 +18,9 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
+
+	include "./../../functions.php";
+	include './../../dbconfig.php';	
 	
 	// Check for valid file
 	$path='./';
@@ -26,7 +29,7 @@
 	$MAX_FILESIZE = 512 * 1024;
 	
 	$file = $_FILES['data']['name'];
-	
+
 	// Check filesize
 	if ($_FILES['data']['size'] > $MAX_FILESIZE)  {
 		echo "File exceeds size limitation of 512 KByte!";    
@@ -36,7 +39,7 @@
 	// Check file extension 
 	$ext = pathinfo($_FILES['data']['name'], PATHINFO_EXTENSION); 
 	if ($ext != 'json') {
-		echo "Report '$file' is not of file type json!";    
+		echo "Report '$file' is not of file type json!";
 		exit();  
 	} 
 	
@@ -52,9 +55,6 @@
 		}
 	}
 
-	// Connect to DB 
-	include './../../dbconfig.php';
-	
 	DB::connect();
 	
 	$jsonFile = file_get_contents($file);	
@@ -64,18 +64,18 @@
 	$reportversion = floatval($json['environment']['reportversion']);
 	if ($reportversion < 1.2)
 	{
-		echo "This version of the Vulkan Hardware Capability is no longer supported!\nPlease download a recent version from http://www.gpuinfo.org";
+		echo "This version of the Vulkan Hardware Capability is no longer supported!\nPlease download a recent version from https://www.gpuinfo.org";
 		DB::disconnect();
 		exit();	  
 	}		
 	
-	// VK 1.1 only with 1.5 or up
+	// VK 1.1 only with 1.9 or up
 	$reportapiversion = $json['properties']['apiVersion'];
 	$vkmajor = ($reportapiversion >> 22);
 	$vkminor = (($reportapiversion >> 12) & 0x3ff);
 	
-	if (($vkmajor >= 1) && ($vkminor >= 1) && ($reportversion < 1.5)) {
-		echo "Vulkan 1.1 reports require at least Version 1.5 (or newer) of the Vulkan Hardware Capability.\nPlease download a recent version from http://www.gpuinfo.org";
+	if (($vkmajor >= 1) && ($vkminor >= 1) && ($reportversion < 1.9)) {
+		echo "This version of the Vulkan Hardware Capability is outdated.\nPlease download a recent version from https://www.gpuinfo.org";
 		exit();	  
 	}
 	
