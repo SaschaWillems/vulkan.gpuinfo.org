@@ -86,6 +86,7 @@
 			$layercount = mysql_result(mysql_query("select count(*) from devicelayers where reportid = $reportID"), 0);			
 			$hassurfacecaps = (mysql_result(mysql_query("select count(*) from devicesurfacecapabilities where reportid = $reportID"), 0)) > 0;
 			$hasextended =  (mysql_result(mysql_query("select (select count(*) from devicefeatures2 where reportid = $reportID) + (select count(*) from deviceproperties2 where reportid = $reportID)"), 0)) > 0;
+			$hasinstance =  (mysql_result(mysql_query("select (select count(*) from deviceinstanceextensions where reportid = $reportID) + (select count(*) from deviceinstancelayers where reportid = $reportID)"), 0)) > 0;
 		
 			echo "<center>";				
 		
@@ -100,27 +101,26 @@
 			echo "</div>";			
 		
 			// Nav ========================================================================================
-			echo "<div>";
-			echo "<ul class='nav nav-tabs'>";
-			echo "	<li class='active'><a data-toggle='tab' href='#device'>Device</a></li>";
-			echo "	<li><a data-toggle='tab' href='#features'>Features</a></li>";
-			echo "	<li><a data-toggle='tab' href='#limits'>Limits</a></li>";
-			if ($hasextended) {
-				echo "	<li><a data-toggle='tab' href='#extended'>Extended</a></a></li>";
-			}
-			echo "	<li><a data-toggle='tab' href='#extensions'>Extensions <span class='badge'>$extcount</span></a></li>";
-			echo "	<li><a data-toggle='tab' href='#formats'>Formats <span class='badge'>$formatcount</span></a></a></li>";
-			echo "	<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'>$queuecount</span></a></li>";
-			echo "	<li><a data-toggle='tab' href='#memory'>Memory <span class='badge'>$memtypecount</span></a></a></li>";
-			if ($hassurfacecaps) {
-				echo "	<li><a data-toggle='tab' href='#surface'>Surface</a></a></li>";
-			}
-			// echo "	<li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>";
-			echo "</ul>";
-			echo "</div>";
+?>			
+			<div>
+				<ul class='nav nav-tabs'>
+					<li class='active'><a data-toggle='tab' href='#device'>Device</a></li>
+					<li><a data-toggle='tab' href='#features'>Features</a></li>
+					<li><a data-toggle='tab' href='#limits'>Limits</a></li>
+					<?php if ($hasextended) { echo "<li><a data-toggle='tab' href='#extended'>Extended</a></a></li>"; } ?>
+					<li><a data-toggle='tab' href='#extensions'>Extensions <span class='badge'><?php echo $extcount ?></span></a></li>
+					<li><a data-toggle='tab' href='#formats'>Formats <span class='badge'><?php echo $formatcount ?></span></a></a></li>
+					<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'><?php echo $queuecount ?></span></a></li>
+					<li><a data-toggle='tab' href='#memory'>Memory <span class='badge'><?php echo $memtypecount ?></span></a></a></li>
+					<?php if ($hassurfacecaps) { echo "<li><a data-toggle='tab' href='#surface'>Surface</a></a></li>"; } ?>
+					<!-- <li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>"; -->
+					<?php if ($hasinstance) { echo "<li><a data-toggle='tab' href='#instance'>Instance</a></li>"; } ?>
+				</ul>
+			</div>
 			
-			echo "<div class='tablediv tab-content' style='width:75%;'>";
-					
+			<div class='tablediv tab-content' style='width:75%;'>
+
+<?php					
 			// Device properites ============================================================================
 			echo "<div id='device' class='tab-pane fade in active reportdiv'>";
 			include './displayreport_properties.php';									
@@ -222,12 +222,17 @@
 			}
 
 			// Layers ========================================================================================
-			/*
-			echo "<div id='layers' class='tab-pane fade reportdiv'>";
-			include './displayreport_layers.php';
-			echo "</div>";					
-			*/					
-			
+			// echo "<div id='layers' class='tab-pane fade reportdiv'>";
+			// include './displayreport_layers.php';
+			// echo "</div>";					
+
+			// Instance ======================================================================================
+			if ($hasinstance) {
+				echo "<div id='instance' class='tab-pane fade reportdiv'>";
+				include 'displayreport_instance.php';
+				echo "</div>";	
+			}						
+
 ?>
 
 	<script>
@@ -417,7 +422,9 @@
 				"DEPTH_STENCIL_ATTACHMENT_BIT" : 0x0200,
 				"BLIT_SRC_BIT" : 0x0400,
 				"BLIT_DST_BIT" : 0x0800,
-				"SAMPLED_IMAGE_FILTER_LINEAR_BIT" : 0x1000
+				"SAMPLED_IMAGE_FILTER_LINEAR_BIT" : 0x1000,
+				"TRANSFER_SRC_BIT" : 0x4000,
+				"TRANSFER_DST_BIT" : 0x8000,
 			};
 			
 			if (flags == 0)
