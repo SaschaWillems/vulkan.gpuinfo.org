@@ -687,6 +687,85 @@
 			}		
 		}		
 	}
+
+	/*
+		Instance
+	*/
+	$instancenode = $json['instance']; 
+	// Extensions
+	if ($instancenode) {		
+		$jsonnode = $instancenode['extensions']; 
+		foreach ($jsonnode as $ext) {
+			// Add to global mapping table (if not already present)
+			$sql = "INSERT IGNORE INTO instanceextensions (name) VALUES (:name)";
+			$stmnt = DB::$connection->prepare($sql);
+			$stmnt->execute(array(":name" => $ext['extensionName']));	
+			// Get extension id
+			$sql = "SELECT id FROM instanceextensions WHERE name = :name";
+			$stmnt = DB::$connection->prepare($sql);
+			$stmnt->execute(array(":name" => $ext['extensionName']));
+			$extensionid = $stmnt->fetchColumn();
+			// Insert
+			$sql = "INSERT INTO deviceinstanceextensions (reportid, extensionid, specversion) VALUES (:reportid, :extensionid, :specversion)";
+			try {
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute(array(":reportid" => $reportid, ":extensionid" => $extensionid, ":specversion" => $ext['specVersion']));
+			} catch (Exception $e) {
+				mailError("Error at instance extensions: ".$e->getMessage(), $jsonFile);
+				die('Error while trying to upload report (error at instance extensions)');
+			}															
+		}	
+		// Layers
+		{		
+			$jsonnode = $json['layers']; 
+			$index = 0;
+			foreach ($jsonnode as $layer) {
+				try {
+					// Add to global mapping table (if not already present)
+					$sql = "INSERT IGNORE INTO instancelayers (name) VALUES (:name)";
+					$stmnt = DB::$connection->prepare($sql);
+					$stmnt->execute(array(":name" => $layer['layerName']));				
+					// Get layer id
+					$sql = "SELECT id FROM instancelayers WHERE name = :name";
+					$stmnt = DB::$connection->prepare($sql);
+					$stmnt->execute(array(":name" => $layer['layerName']));
+					$layerid = $stmnt->fetchColumn();			
+					// Insert
+					$sql = "INSERT INTO deviceinstancelayers 
+								(reportid, layerid, implversion, specversion) 
+							VALUES 
+								(:reportid, :layerid, :implversion, :specversion)";
+					$stmnt = DB::$connection->prepare($sql);
+					$stmnt->execute(array(
+						":reportid" => $reportid, 
+						":layerid" => $layerid, 
+						":implversion" => $layer['implementationVersion'], 
+						":specversion" => $layer['specVersion']));		
+				} catch (Exception $e) {
+					die('Error while trying to upload report (error at instance layer)');
+				}												
+				
+				// Layer extensions
+				$layerextnode = $layer['extensions']; 
+				foreach ($layerextnode as $layerext) {
+					$sql = "INSERT INTO deviceinstancelayerextensions 
+								(reportid, devicelayerid, name, specversion) 
+							VALUES 
+								(:reportid, :devicelayerid, :name, :specversion)";
+					try {
+						$stmnt = DB::$connection->prepare($sql);
+						$stmnt->execute(array(
+							":reportid" => $reportid, 
+							":devicelayerid" => $layerid, 
+							":name" => $layerext['extname'], 
+							":specversion" => $layerext['specVersion']));				
+					} catch (Exception $e) {
+						die('Error while trying to upload report (error at instance layer extension)');
+					}																
+				}
+			}
+		}			
+	}	
 	
 	DB::$connection->commit();
 		
