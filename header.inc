@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="ISO-8859-1">
-	<title>Vulkan Hardware Database - &copy; 2016-2017 by Sascha Willems</title>	
+	<title>Vulkan Hardware Database - &copy; 2016-2018 by Sascha Willems</title>	
 	
 	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/dataTables.bootstrap.min.css"/>
@@ -72,6 +72,15 @@
 				<li><a href="listsurfacepresentmodes.php">Present modes</a></li>
 				</ul>
 			</li>
+
+		  <li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#">Instance
+				<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+				<li><a href="listinstanceextensions.php">Extensions</a></li>
+				<li><a href="listinstancelayers.php">Layers</a></li>
+				</ul>
+			</li>			
 
 			<li><a href="vulkansupport.php">Devices</a></li>
 
