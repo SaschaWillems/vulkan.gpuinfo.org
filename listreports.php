@@ -131,6 +131,22 @@
 		$headerClass = "header-blue";
 		$caption = "Reports for <b>".$displayname."</b>";		
 	}		
+	// Instance extension
+	$instanceextension = $_GET['instanceextension'];
+	if ($instanceextension != '') {
+		$defaultHeader = false;
+		$headerClass = $negate ? "header-red" : "header-green";			
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting instance extension <b>".$instanceextension."</b>";	
+		$caption .= " (<a href='listreports.php?instanceextension=".$instanceextension.($negate ? "" : "&option=not")."'>toggle</a>)";
+	}
+	// Instance layer
+	$instancelayer = $_GET['instancelayer'];
+	if ($instancelayer != '') {
+		$defaultHeader = false;
+		$headerClass = $negate ? "header-red" : "header-green";			
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting instance layer <b>".$instancelayer."</b>";	
+		$caption .= " (<a href='listreports.php?instancelayer=".$instancelayer.($negate ? "" : "&option=not")."'>toggle</a>)";
+	}	
 
 	if ($defaultHeader) {
 		echo "<div class='header'>";	
@@ -215,7 +231,9 @@
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
 						'devicename' : '<?php echo $_GET["devicename"] ?>',
-						'displayname' : '<?php echo $_GET["displayname"] ?>',												
+						'displayname' : '<?php echo $_GET["displayname"] ?>',
+						'instanceextension': '<?php echo $_GET["instanceextension"] ?>',
+						'instancelayer': '<?php echo $_GET["instancelayer"] ?>'
 					}
 				},
 				error: function (xhr, error, thrown) {

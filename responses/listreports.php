@@ -153,7 +153,23 @@
             $whereClause = "where r.displayname = :filter_displayname";
             $params['filter_displayname'] = $displayname;            
         }
-	}    
+    }    
+	// Instance extension
+    if (isset($_REQUEST['filter']['instanceextension'])) {
+        $instanceextension = $_REQUEST['filter']['instanceextension'];
+        if ($instanceextension != '') {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select distinct(reportid) from deviceinstanceextensions de join instanceextensions ext on de.extensionid = ext.id where ext.name = :filter_instanceextension)";
+            $params['filter_instanceextension'] = $instanceextension;
+        }
+	}
+	// Instance layer
+    if (isset($_REQUEST['filter']['instancelayer'])) {
+        $instancelayer = $_REQUEST['filter']['instancelayer'];
+        if ($instancelayer != '') {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select distinct(reportid) from deviceinstancelayers de join instancelayers inst on de.layerid = inst.id where inst.name = :filter_instancelayer)";
+            $params['filter_instancelayer'] = $instancelayer;            
+        }
+	}	    
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 
