@@ -19,7 +19,6 @@
 		*
 	*/
 
-	DB::connect();
 	$extensions = DB::$connection->prepare("SELECT e.name as name, ie.specversion as specversion from deviceinstanceextensions ie join instanceextensions e on ie.extensionid = e.id where reportid = :reportid");
 	$extensions->execute([":reportid" => $reportID]);	
 	$extCount = $extensions->rowCount();
@@ -84,9 +83,4 @@
 			</table>
 		</div>
 
-	</diV>
-
-<?php
-	DB::disconnect();
-?>
-	
+	</diV>	

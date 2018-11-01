@@ -23,15 +23,11 @@
 			include './dbconfig.php';
 			include './functions.php';
 			
-			dbConnect();	
+			DB::connect();
 			
-			// TODO : Param to only dislay report (centered, logo) without menu
+			$reportID = $_GET['id']; 
 			
-			$reportID = mysql_real_escape_string($_GET['id']); 
-			$reportDisplay = mysql_real_escape_string($_GET['display']);
-			
-			if ($reportID == '')
-			{
+			if ($reportID == '') {
 				echo "<center>";
 				?>
 				<div class="alert alert-warning">
@@ -44,7 +40,7 @@
 			}
 						
 			// Descriptions 
-			$sqlresult = mysql_query("select 
+			$sql = "SELECT
 				p.devicename,
 				p.driverversion,
 				p.devicetype,
@@ -53,18 +49,24 @@
 				r.osarchitecture,
 				r.osversion,
 				r.version as reportversion
-			from reports r
-			left join
-			deviceproperties p on (p.reportid = r.id)
-			where r.id = $reportID") or die("Error: Could not get requested report!");			
-			$row = mysql_fetch_assoc($sqlresult);
-			$present = (mysql_num_rows($sqlresult) > 0);
-			$devicedescription = $row['vendor']." ".$row['devicename'];
-			$devicename = $row['devicename'];
-			$reportversion = $row['reportversion'];
-			
-			if (!$present) 
-			{
+				from reports r
+				left join
+				deviceproperties p on (p.reportid = r.id)
+				where r.id = :reportid";	
+
+			try {
+				$stmnt = DB::$connection->prepare($sql); 
+				$stmnt->execute([':reportid' => $reportID]); 
+				$present = $stmnt->rowCount() > 0;
+				$row = $stmnt->fetch(PDO::FETCH_ASSOC);
+				$devicedescription = $row['vendor']." ".$row['devicename'];
+				$devicename = $row['devicename'];
+				$reportversion = $row['reportversion'];
+			} catch (PDOException $e) {
+				echo "<b>Error while fetcthing report!</b><br>";
+			}
+		
+			if (!$present) {
 				echo "<center>";
 				?>
 				<div class="alert alert-danger error">
@@ -77,23 +79,25 @@
 				echo "</center>";
 				die();			
 			}
-			
+		
 			// Counters
-			$extcount = mysql_result(mysql_query("select count(*) from deviceextensions where reportid = $reportID"), 0);
-			$formatcount = mysql_result(mysql_query("select count(*) from deviceformats where reportid = $reportID and (lineartilingfeatures > 0 or optimaltilingfeatures > 0 or bufferfeatures > 0)"), 0);			
-			$queuecount = mysql_result(mysql_query("select count(*) from devicequeues where reportid = $reportID"), 0);			
-			$memtypecount = mysql_result(mysql_query("select count(*) from devicememorytypes where reportid = $reportID"), 0);			
-			$layercount = mysql_result(mysql_query("select count(*) from devicelayers where reportid = $reportID"), 0);			
-			$hassurfacecaps = (mysql_result(mysql_query("select count(*) from devicesurfacecapabilities where reportid = $reportID"), 0)) > 0;
-			$hasextended =  (mysql_result(mysql_query("select (select count(*) from devicefeatures2 where reportid = $reportID) + (select count(*) from deviceproperties2 where reportid = $reportID)"), 0)) > 0;
-			$hasinstance =  (mysql_result(mysql_query("select (select count(*) from deviceinstanceextensions where reportid = $reportID) + (select count(*) from deviceinstancelayers where reportid = $reportID)"), 0)) > 0;
+			$extcount = DB::getCount("SELECT count(*) from deviceextensions where reportid = :reportid", [':reportid' => $reportID]);
+			$formatcount = DB::getCount("SELECT count(*) from deviceformats where reportid = :reportid and (lineartilingfeatures > 0 or optimaltilingfeatures > 0 or bufferfeatures > 0)", [':reportid' => $reportID]);
+			$queuecount = DB::getCount("SELECT count(*) from devicequeues where reportid = :reportid", [':reportid' => $reportID]);
+			$memtypecount = DB::getCount("SELECT count(*) from devicememorytypes where reportid = :reportid", [':reportid' => $reportID]);
+			$memheapcount = DB::getCount("SELECT count(*) from devicememoryheaps where reportid = :reportid", ["reportid" => $reportID]);
+			$layercount = DB::getCount("SELECT count(*) from devicelayers where reportid = :reportid", [':reportid' => $reportID]);
+			$surfaceformatscount =  DB::getCount("SELECT count(*) from devicesurfaceformats where reportid = :reportid", [':reportid' => $reportID]);
+			$surfacepresentmodescount =  DB::getCount("SELECT count(*) from devicesurfacemodes where reportid = :reportid", [':reportid' => $reportID]);			
+		
+			$hassurfacecaps = DB::getCount("SELECT count(*) from devicesurfacecapabilities where reportid = :reportid", [':reportid' => $reportID]) > 0;
+			$hasextended =  DB::getCount("SELECT (select count(*) from devicefeatures2 where reportid = :reportid) + (select count(*) from deviceproperties2 where reportid = :reportid)", [':reportid' => $reportID]) > 0;
+			$hasinstance =  DB::getCount("SELECT (select count(*) from deviceinstanceextensions where reportid = :reportid) + (select count(*) from deviceinstancelayers where reportid = :reportid)", [':reportid' => $reportID]) > 0;
 		
 			echo "<center>";				
 		
 			// Header =====================================================================================
 			echo "<div class='header'>";
-			if ($reportDisplay == 'reportonly')
-				echo "<img src='./images/vulkan48.png' width='175px' style='padding-top:10px';><br>";				
 			echo "<h4>Device report for $devicedescription</h4>";
 			if ($reportversion >= '1.4') {
 				echo "<a href=\"api/v2/devsim/getreport.php?id=".$reportID."\" class=\"btn btn-default\" title=\"Download a Vulkan device simulation layer compatible JSON file\"><span class=\"glyphicon glyphicon-floppy-save\"></span> JSON</a>";
@@ -127,63 +131,14 @@
 			echo "</div>";
 			
 			// Device features ==============================================================================
+
 			echo "<div id='features' class='tab-pane fade reportdiv'>";
-			echo "<table id='devicefeatures' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
-			echo "<thead><tr><td class='caption'>Feature</td><td class='caption'>Value</td></tr></thead><tbody>";
-			// Basic
-			$sqlresult = mysql_query("select * from devicefeatures where reportid = $reportID") or die(mysql_error());
-			while($row = mysql_fetch_row($sqlresult))
-			{
-				for($i = 0; $i < count($row); $i++)
-				{
-					$fname = mysql_field_name($sqlresult, $i);		  			
-					if ($fname == 'reportid')
-						continue;					
-					$value = $row[$i];
-					echo "<tr><td class='key'>$fname</td><td>";					
-					echo ($value == 1) ? "<font color='green'>true</font>" : "<font color='red'>false</font>";
-					echo "</td></tr>\n";
-				}				
-			}
-			
-			echo "</tbody></table>";					
+			include 'displayreport_features.php';									
 			echo "</div>";			
 			
 			// Device limits ================================================================================
 			echo "<div id='limits' class='tab-pane fade reportdiv'>";
-			echo "<table id='devicelimits' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
-			echo "<thead><tr><td class='caption'>Limit</td><td class='caption'>Value</td></tr></thead><tbody>";
-			
-			$sqlresult = mysql_query("select * from devicelimits where reportid = $reportID") or die(mysql_error());
-			while($row = mysql_fetch_row($sqlresult))
-			{
-				for($i = 0; $i < count($row); $i++)
-				{
-					$fname = mysql_field_name($sqlresult, $i);		  			
-					if ($fname == 'reportid')
-						continue;
-					echo "<tr><td class='key'>$fname</td>";
-					if (strpos($fname, 'SampleCounts'))
-					{
-						$sampleCountflags = getSampleCountFlags($row[$i]);						
-						if (count($sampleCountflags) > 0)
-						{
-							echo "<td>".implode(",", $sampleCountflags)."</td>";
-						}
-						else
-						{
-							echo "<td><font color='red'>none</font></td>";
-						}
-					}
-					else
-					{
-						echo "<td>".$row[$i]."</td>";
-					}
-					echo "</td></tr>\n";
-				}				
-			}
-
-			echo "</tbody></table>";					
+			include 'displayreport_limits.php';
 			echo "</div>";		
 
 			// Extended features and properites =============================================================
@@ -233,6 +188,7 @@
 				echo "</div>";	
 			}						
 
+			DB::disconnect();
 ?>
 
 	<script>

@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2016 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -18,51 +18,58 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-	echo "<table id='deviceformats' class='table table-striped table-bordered table-hover reporttable'>";
-	echo "<thead><tr>";			
-	echo "<td></td>";
-	echo "<td class='caption'>Format</td>";
-	echo "<td class='caption'>Linear</td>";
-	echo "<td class='caption'>Optimal</td>";
-	echo "<td class='caption'>Buffer</td>";
-	echo "<td class='caption'>flags</td>";
-	echo "<td class='caption'>flags</td>";
-	echo "<td class='caption'>flags</td>";
-	echo "</tr></thead><tbody>";
-	
-	$sqlresult = mysql_query("select VkFormat(formatid) as format, deviceformats.* from deviceformats where reportid = $reportID") or die(mysql_error());
-	while($row = mysql_fetch_assoc($sqlresult))
-	{
-		$supported = ($row["supported"] == 1);
-		$class = $supported ? 'default' : 'unsupported';
-		echo "<tr class='$class'>";
-		
-		echo "<td class='details-control'></td>";
-		
-		echo "<td>".$row["format"]."</td>";
-		
-		// Linear tiling
-		$class = ($row["lineartilingfeatures"] != 0) ? 'supported' : 'unsupported';
-		$supported = ($row["lineartilingfeatures"] != 0) ? 'true' : 'false';
-		echo "<td class='$class'>".$supported."</td>";
-		
-		// Optimal tiling
-		$class = ($row["optimaltilingfeatures"] != 0) ? 'supported' : 'unsupported';
-		$supported = ($row["optimaltilingfeatures"] != 0) ? 'true' : 'false';
-		echo "<td class='$class'>".$supported."</td>";
-		
-		// Buffer features
-		$class = ($row["bufferfeatures"] != 0) ? 'supported' : 'unsupported';
-		$supported = ($row["bufferfeatures"] != 0) ? 'true' : 'false';
-		echo "<td class='$class'>".$supported."</td>";
-		
-		// Invisible columns containing flags
-		echo "<td>".$row["lineartilingfeatures"]."</td>";
-		echo "<td>".$row["optimaltilingfeatures"]."</td>";
-		echo "<td>".$row["bufferfeatures"]."</td>";
-		
-		echo "</td></tr>\n";
+?>	
+<table id='deviceformats' class='table table-striped table-bordered table-hover reporttable'>
+	<thead>
+		<tr>
+			<td></td>
+			<td class='caption'>Format</td>
+			<td class='caption'>Linear</td>
+			<td class='caption'>Optimal</td>
+			<td class='caption'>Buffer</td>
+			<td class='caption'>flags</td>
+			<td class='caption'>flags</td>
+			<td class='caption'>flags</td>
+		</tr>
+	</thead>
+	<tbody>
+<?php	
+	try {
+		$stmnt = DB::$connection->prepare("SELECT VkFormat(formatid) as format, deviceformats.* from deviceformats where reportid = :reportid");
+		$stmnt->execute(array(":reportid" => $reportID));
+		while($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+			$supported = ($row["supported"] == 1);
+			$class = $supported ? 'default' : 'unsupported';
+			echo "<tr class='$class'>";			
+			echo "<td class='details-control'></td>";			
+			echo "<td>".$row["format"]."</td>";
+			
+			// Linear tiling
+			$class = ($row["lineartilingfeatures"] != 0) ? 'supported' : 'unsupported';
+			$supported = ($row["lineartilingfeatures"] != 0) ? 'true' : 'false';
+			echo "<td class='$class'>".$supported."</td>";
+			
+			// Optimal tiling
+			$class = ($row["optimaltilingfeatures"] != 0) ? 'supported' : 'unsupported';
+			$supported = ($row["optimaltilingfeatures"] != 0) ? 'true' : 'false';
+			echo "<td class='$class'>".$supported."</td>";
+			
+			// Buffer features
+			$class = ($row["bufferfeatures"] != 0) ? 'supported' : 'unsupported';
+			$supported = ($row["bufferfeatures"] != 0) ? 'true' : 'false';
+			echo "<td class='$class'>".$supported."</td>";
+			
+			// Invisible columns containing flags
+			echo "<td>".$row["lineartilingfeatures"]."</td>";
+			echo "<td>".$row["optimaltilingfeatures"]."</td>";
+			echo "<td>".$row["bufferfeatures"]."</td>";
+			
+			echo "</td></tr>\n";
+		}
+	} catch (Exception $e) {
+		die('Error while fetching report features');
+		DB::disconnect();
 	}
-	
-	echo "</tbody></table>";		
 ?>
+	</tbody>
+</table>

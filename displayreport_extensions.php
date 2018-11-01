@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -18,17 +18,29 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-	
-	echo "<table id='deviceextensions' class='table table-striped table-bordered table-hover reporttable'>";
-	echo "<thead><tr><td class='caption'>Extension</td><td class='caption'>Version</td></tr></thead><tbody>";
-	
-	$sqlresult = mysql_query("select e.name as name, de.specversion as specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = $reportID") or die(mysql_error());
-	while($row = mysql_fetch_row($sqlresult))
-	{
-		echo "<tr><td class='key'><a href='listreports.php?extension=".$row[0]."'>".$row[0]."</a></td>";
-		echo "<td>".versionToString($row[1])."</td>";
-		echo "</tr>\n";
+?>	
+<table id='deviceextensions' class='table table-striped table-bordered table-hover reporttable'>
+	<thead>
+		<tr>
+			<td class='caption'>Extension</td>
+			<td class='caption'>Version</td>
+		</tr>
+	</thead>
+	<tbody>
+<?php	
+	try {
+		$stmnt = DB::$connection->prepare("SELECT e.name as name, de.specversion as specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
+		$stmnt->execute(array(":reportid" => $reportID));
+		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
+			echo "<tr><td class='key'><a href='listreports.php?extension=".$row[0]."'>".$row[0]."</a></td>";
+			echo "<td>".versionToString($row[1])."</td>";
+			echo "</tr>\n";		
+			echo "</td></tr>\n";
+		}
+	} catch (Exception $e) {
+		die('Error while fetching report features');
+		DB::disconnect();
 	}
-	
-	echo "</tbody></table>";	
 ?>
+	</tbody>
+</table>

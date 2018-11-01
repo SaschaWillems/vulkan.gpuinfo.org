@@ -19,41 +19,37 @@
 		*
 	*/
 	
+?>
+	<table id='devicefeatures' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
+		<thead>
+			<tr>
+				<td class='caption'>Feature</td>
+				<td class='caption'>Value</td>
+			</tr>
+		</thead>
+	<tbody>
+<?php	
 	try {
-		$stmnt = DB::$connection->prepare("SELECT * from devicequeues where reportid = :reportid");
+		$stmnt = DB::$connection->prepare("SELECT * from devicefeatures where reportid = :reportid");
 		$stmnt->execute(array(":reportid" => $reportID));
 		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-			echo "<table id='devicequeues-$index' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
-			echo "<thead>";
-			echo "<tr><td colspan=2 class=tablehead>Queue family $index</td></tr>";
-			echo "<tr>";
-			echo "</thead><tbody>";
-			for($i = 0; $i < count($row); $i++)
-			{
+			for($i = 0; $i < count($row); $i++) {
+				if ($row[$i] == "") { continue; }
 				$meta = $stmnt->getColumnMeta($i);
-				$fname = $meta["name"];			
-				if (in_array($fname, array('id', 'reportid')))
+				$fname = $meta["name"];
+				if ($fname == 'reportid') {
 					continue;
+				}
 				$value = $row[$i];
-				if ($fname == 'count') {
-					$fname = 'queueCount';
-				}
-				if ($fname == 'flags') {
-					echo "<tr><td width='25%'>$fname</td>";
-					echo "<td>";
-					$flags = getQueueFlags($value);
-					listFlags($flags);
-					echo "</td>";
-				} else {
-					echo "<tr><td width='25%'>$fname</td><td>$value</td></tr>\n";
-				}
+				echo "<tr><td class='key'>$fname</td><td>";					
+				echo ($value == 1) ? "<font color='green'>true</font>" : "<font color='red'>false</font>";
+				echo "</td></tr>\n";
 			}				
-	
-			echo "</tbody></table>";								
-			$index++;			
 		}
 	} catch (Exception $e) {
 		die('Error while fetching report features');
 		DB::disconnect();
-	}		
+	}
 ?>
+	</tbody>
+</table>
