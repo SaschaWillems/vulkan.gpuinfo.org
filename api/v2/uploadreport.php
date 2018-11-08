@@ -128,7 +128,7 @@
 			exit();	  
 		}	
 	}
-	
+
 	DB::$connection->beginTransaction();
 	
 	// Report meta data	
@@ -717,7 +717,7 @@
 		}	
 		// Layers
 		{		
-			$jsonnode = $json['layers']; 
+			$jsonnode = $instancenode['layers']; 
 			$index = 0;
 			foreach ($jsonnode as $layer) {
 				try {
