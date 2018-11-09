@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -17,39 +17,44 @@
 		* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
-	*/
-	
+	*/	
 
 	$repids = implode(",", $reportids);   
 	
-	$sqlresult = mysql_query("select 
-			p.devicename,
-			r.displayname,
-			p.driverversion,
-			p.devicetype,
-			p.apiversion,
-			VendorId(p.vendorid) as 'vendor',
-			concat('0x', hex(cast(p.deviceid as UNSIGNED))) as 'deviceid',
-			r.submitter,
-			r.submissiondate,
-			r.osname,
-			r.osarchitecture,
-			r.osversion,
-			r.description,
-			p.pipelineCacheUUID,
-			p.residencyAlignedMipSize, 
-			p.residencyNonResidentStrict, 
-			p.residencyStandard2DBlockShape, 
-			p.residencyStandard2DMultisampleBlockShape, 
-			p.residencyStandard3DBlockShape,
-			p.`subgroupProperties.subgroupSize`,
-			p.`subgroupProperties.supportedStages`,
-			p.`subgroupProperties.supportedOperations`,
-			p.`subgroupProperties.quadOperationsInAllStages`			
-		from reports r
-		left join
-		deviceproperties p on (p.reportid = r.id)				
-		where r.id in (" . $repids . ")") or die(mysql_error());				
+	try {
+		$stmnt = DB::$connection->prepare(
+			"SELECT 
+				p.devicename,
+				r.displayname,
+				p.driverversion,
+				p.devicetype,
+				p.apiversion,
+				VendorId(p.vendorid) as 'vendor',
+				concat('0x', hex(cast(p.deviceid as UNSIGNED))) as 'deviceid',
+				r.submitter,
+				r.submissiondate,
+				r.osname,
+				r.osarchitecture,
+				r.osversion,
+				r.description,
+				p.pipelineCacheUUID,
+				p.residencyAlignedMipSize, 
+				p.residencyNonResidentStrict, 
+				p.residencyStandard2DBlockShape, 
+				p.residencyStandard2DMultisampleBlockShape, 
+				p.residencyStandard3DBlockShape,
+				p.`subgroupProperties.subgroupSize`,
+				p.`subgroupProperties.supportedStages`,
+				p.`subgroupProperties.supportedOperations`,
+				p.`subgroupProperties.quadOperationsInAllStages`			
+			from reports r
+			left join
+			deviceproperties p on (p.reportid = r.id)				
+		where r.id in (" . $repids . ")");
+		$stmnt->execute();
+	} catch (PDOException $e) {
+		die("Could not fetch device properties!");
+	}
 	
 	$reportindex = 0;
 	
@@ -58,14 +63,12 @@
 	$captions = array();
 	$groups = array();
 	
-	while($row = mysql_fetch_row($sqlresult)) 
-	{
+	while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
 		$colindex = 0;
-		$reportdata = array();		
-		
-		foreach ($row as $data)
-		{
-			$caption = mysql_field_name($sqlresult, $colindex);		  
+		$reportdata = array();				
+		foreach ($row as $data) {
+			$meta = $stmnt->getColumnMeta($colindex);
+			$caption = $meta["name"];			
 			$group = "Device";
 			
 			if (($caption == 'pipelineCacheUUID') && (!is_null($data))) {
@@ -119,8 +122,7 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 	echo "</tr></thead><tbody>";
 
 	$index = 1;  
-	for ($i = 0, $arrsize = sizeof($column[0]); $i < $arrsize; ++$i) 
-	{ 	  	
+	for ($i = 0, $arrsize = sizeof($column[0]); $i < $arrsize; ++$i) { 	  	
 		if (strcasecmp($captions[$i], "displayname") == 0) {
 			$empty = true;
 			for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) {
@@ -156,8 +158,7 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 		// Report header
 		$className = "";
 		$fontStyle = "";
-		if (in_array($groups[$i], ["Sparse residency", "Subgroup operations"])) 
-		{
+		if (in_array($groups[$i], ["Sparse residency", "Subgroup operations"])) {
 			$className = ($minval < $maxval) ? "" : "class='sameCaps'";
 			$fontStyle = ($minval < $maxval) ? "style='color:red;'" : "";					
 		} 
@@ -167,8 +168,7 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 		echo "<td>".$groups[$i]."</td>";
 		
 		// Values
-		for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) 
-		{	 
+		for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) {	 
 			if (strcasecmp($groups[$i], 'Subgroup operations') == 0) {
 				if ($column[$j][$i] == null) {
 					echo "<td class='na' title='Only available with Vulkan 1.1 and up and report version 1.5 and up'>n/a</td>";
@@ -190,12 +190,9 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 			}
 
 			echo "<td>";
-			if (strpos($captions[$i], 'residency') === false) 
-			{
+			if (strpos($captions[$i], 'residency') === false) {
 				echo $column[$j][$i];				
-			}
-			else
-			{
+			} else {
 				// Features are bool only
 				echo ($column[$j][$i] == 1) ? "<span class='supported'>true</font>" : "<span class='unsupported'>false</font>";
 			}
@@ -204,6 +201,4 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 		echo "</tr>\n";
 		$index++;
 	}   
-
-
 ?>

@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 		*
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -48,15 +48,18 @@
 	$maxMemoryCount = 0;
 
 	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		$str = "select propertyflags,heapindex from devicememorytypes where reportid = $repid";
+	foreach ($reportids as $repid) {
+		$str = "$repid";
+		try {
+			$stmnt = DB::$connection->prepare("SELECT propertyflags,heapindex from devicememorytypes where reportid = :reportid");
+			$stmnt->execute(["reportid" => $repid]);
+		} catch (PDOException $e) {
+			die("Could not fetch device memory!");
+		}			
 
-		$sqlresult = mysql_query($str);
 		$subarray = array();
 		$memoryCounts[$reportIndex] = 0;
-		while($row = mysql_fetch_row($sqlresult))
-		{
+		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
 			$memoryFlags[$reportIndex][] = $row[0];
 			$memoryHeapIndices[$reportIndex][] = $row[1];
 			$memoryCounts[$reportIndex]++;
@@ -66,10 +69,8 @@
 	}
 
 	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		if ($memoryCounts[$reportIndex] > $maxMemoryCount)
-		{
+	foreach ($reportids as $repid) {
+		if ($memoryCounts[$reportIndex] > $maxMemoryCount) {
 			$maxMemoryCount = $memoryCounts[$reportIndex];
 		}
 		$reportIndex++;
@@ -82,55 +83,40 @@
 
 	// Memory type counts
 	echo "<tr class='firstrow'><td class='firstrow'>Memory type count</td>";
-	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i)
-	{
+	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i) {
 		echo "<td>".$memoryCounts[$i]."</td>";
 	}
 	echo "</tr>";
 
-	for ($i = 0; $i < $maxMemoryCount; ++$i)
-	{
+	for ($i = 0; $i < $maxMemoryCount; ++$i) {
 		echo "<tr><td class='caption' colspan=".$colspan.">Memory type ".$i."</td></tr>";
 		// Heap index
-		echo "<tr><td class='key'>Heapindex</td>";
+		echo "<tr><td class='subkey'>Heapindex</td>";
 		$index = 0;
-		foreach ($reportids as $repid)
-		{
-			if ($i < $memoryCounts[$index])
-			{
+		foreach ($reportids as $repid) {
+			if ($i < $memoryCounts[$index]) {
 				echo "<td>".$memoryHeapIndices[$index][$i]."</td>";
-			}
-			else
-			{
+			} else {
 				echo "<td><font color=#BABABA>n/a</font></td>";
 			}
 			$index++;
 		}
 		echo "</tr>";
  		// Flags
-		echo "<tr><td class='key'>Flags</td>";
+		echo "<tr><td class='subkey'>Flags</td>";
 		$index = 0;
-		foreach ($reportids as $repid)
-		{
+		foreach ($reportids as $repid) {
 			echo "<td>";
-
-			if ($i < $memoryCounts[$index])
-			{
+			if ($i < $memoryCounts[$index]) {
 				$flags = getMemoryTypeFlags($memoryFlags[$index][$i]);
-				if (sizeof($flags) > 0)
-				{
-					foreach ($flags as $flag)
-					{
+				if (sizeof($flags) > 0) {
+					foreach ($flags as $flag) {
 						echo $flag."<br>";
 					}
-				}
-				else
-				{
+				} else {
 					echo "none";
 				}
-			}
-			else
-			{
+			} else {
 				echo "<font color=#BABABA>n/a</font>";
 			}
 
@@ -149,7 +135,7 @@
 	<div class="alert alert-warning" role="alert">
 		<b>Note:</b> Listing may contain memory heaps with host sizes!
 	</div>
-	<?
+<?php
 
 	echo "<table id='memory-heaps' width='100%' class='table table-striped table-bordered'>";
 	echo "<thead><tr><td class='caption'>Property</td>";
@@ -166,15 +152,16 @@
 	$maxMemoryHeapCount = 0;
 
 	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		$str = "select size,flags from devicememoryheaps where reportid = $repid";
-
-		$sqlresult = mysql_query($str);
+	foreach ($reportids as $repid) {
+		try {
+			$stmnt = DB::$connection->prepare("SELECT size,flags from devicememoryheaps where reportid = :reportid");
+			$stmnt->execute(["reportid" => $repid]);
+		} catch (PDOException $e) {
+			die("Could not fetch device memory!");
+		}					
 		$subarray = array();
 		$memoryHeapCounts[$reportIndex] = 0;
-		while($row = mysql_fetch_row($sqlresult))
-		{
+		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
 			$memoryHeapSizes[$reportIndex][] = $row[0];
 			$memoryHeapFlags[$reportIndex][] = $row[1];
 			$memoryHeapCounts[$reportIndex]++;
@@ -184,10 +171,8 @@
 	}
 
 	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		if ($memoryHeapCounts[$reportIndex] > $maxMemoryHeapCount)
-		{
+	foreach ($reportids as $repid) {
+		if ($memoryHeapCounts[$reportIndex] > $maxMemoryHeapCount) {
 			$maxMemoryHeapCount = $memoryHeapCounts[$reportIndex];
 		}
 		$reportIndex++;
@@ -200,55 +185,40 @@
 
 	// Memory type counts
 	echo "<tr class='firstrow'><td class='firstrow'>Memory heap count</td>";
-	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i)
-	{
+	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i) {
 		echo "<td>".$memoryHeapCounts[$i]."</td>";
 	}
 	echo "</tr>";
 
-	for ($i = 0; $i < $maxMemoryHeapCount; ++$i)
-	{
+	for ($i = 0; $i < $maxMemoryHeapCount; ++$i) {
 		echo "<tr><td class='caption' colspan=".$colspan.">Memory heap ".$i."</td></tr>";
 		// Heap index
-		echo "<tr><td class='key'>Size</td>";
+		echo "<tr><td class='subkey'>Size</td>";
 		$index = 0;
-		foreach ($reportids as $repid)
-		{
-			if ($i < $memoryHeapCounts[$index])
-			{
+		foreach ($reportids as $repid) {
+			if ($i < $memoryHeapCounts[$index]) {
 				echo "<td>".number_format($memoryHeapSizes[$index][$i])."</td>";
-			}
-			else
-			{
+			} else {
 				echo "<td><font color=#BABABA>n/a</font></td>";
 			}
 			$index++;
 		}
 		echo "</tr>";
  		// Flags
-		echo "<tr><td class='key'>Flags</td>";
+		echo "<tr><td class='subkey'>Flags</td>";
 		$index = 0;
-		foreach ($reportids as $repid)
-		{
+		foreach ($reportids as $repid) {
 			echo "<td>";
-
-			if ($i < $memoryHeapCounts[$index])
-			{
+			if ($i < $memoryHeapCounts[$index]) {
 				$flags = getMemoryHeapFlags($memoryHeapFlags[$index][$i]);
-				if (sizeof($flags) > 0)
-				{
-					foreach ($flags as $flag)
-					{
+				if (sizeof($flags) > 0) {
+					foreach ($flags as $flag) {
 						echo $flag."<br>";
 					}
-				}
-				else
-				{
+				} else {
 					echo "none";
 				}
-			}
-			else
-			{
+			} else {
 				echo "<font color=#BABABA>n/a</font>";
 			}
 
@@ -260,6 +230,5 @@
 	}
 
 	echo "</tbody></table></div>";
-
 	echo "</div>";
 ?>

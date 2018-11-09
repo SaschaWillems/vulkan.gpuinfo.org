@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 		*
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -21,8 +21,7 @@
 
 	echo "<table id='memory-types' width='100%' class='table table-striped table-bordered'>";
 	echo "<thead><tr><td class='caption'>Property</td>";
-	foreach ($reportids as $reportId)
-	{
+	foreach ($reportids as $reportId) {
 		echo "<td class='caption'>Report $reportId</td>";
 	}
 	echo "</tr></thead><tbody>";
@@ -38,15 +37,17 @@
 	$maxQueueCount = 0;
 
 	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		$str = "select count, flags, timestampValidBits, `minImageTransferGranularity.width`, `minImageTransferGranularity.height`, `minImageTransferGranularity.depth` from devicequeues where reportid = $repid";
-
-		$sqlresult = mysql_query($str);
+	foreach ($reportids as $repid) {
+		$str = "$repid";
+		try {
+			$stmnt = DB::$connection->prepare("SELECT count, flags, timestampValidBits, `minImageTransferGranularity.width`, `minImageTransferGranularity.height`, `minImageTransferGranularity.depth` from devicequeues where reportid = :reportid");
+			$stmnt->execute(["reportid" => $repid]);
+		} catch (PDOException $e) {
+			die("Could not fetch device queue!");
+		}			
 		$subarray = array();
 		$queueCounts[$reportIndex] = 0;
-		while($row = mysql_fetch_row($sqlresult))
-		{
+		while ($row =  $stmnt->fetch(PDO::FETCH_NUM)) {
 			$qCount[$reportIndex][] = $row[0];
 			$qFlags[$reportIndex][] = $row[1];
 			$qTimestampBits[$reportIndex][] = $row[2];
@@ -60,10 +61,8 @@
 
 	// Get max number
 	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		if ($queueCounts[$reportIndex] > $maxQueueCount)
-		{
+	foreach ($reportids as $repid){
+		if ($queueCounts[$reportIndex] > $maxQueueCount) {
 			$maxQueueCount = $queueCounts[$reportIndex];
 		}
 		$reportIndex++;
@@ -76,55 +75,40 @@
 
 	// Memory type counts
 	echo "<tr class='firstrow'><td class='firstrow'>Queue count</td>";
-	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i)
-	{
+	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i) {
 		echo "<td>".$queueCounts[$i]."</td>";
 	}
 	echo "</tr>";
 
-	for ($i = 0; $i < $maxQueueCount; ++$i)
-	{
+	for ($i = 0; $i < $maxQueueCount; ++$i) {
 		echo "<tr><td class='caption' colspan=".$colspan.">Queue ".$i."</td></tr>";
 		// Count
-		echo "<tr><td class='key'>queueCount</td>";
+		echo "<tr><td class='subkey'>queueCount</td>";
 		$index = 0;
-		foreach ($reportids as $repid)
-		{
-			if ($i < $queueCounts[$index])
-			{
+		foreach ($reportids as $repid) {
+			if ($i < $queueCounts[$index]) {
 				echo "<td>".$qCount[$index][$i]."</td>";
-			}
-			else
-			{
+			} else {
 				echo "<td><font color=#BABABA>n/a</font></td>";
 			}
 			$index++;
 		}
 		echo "</tr>";
  		// Flags
-		echo "<tr><td class='key'>Flags</td>";
+		echo "<tr><td class='subkey'>Flags</td>";
 		$index = 0;
-		foreach ($reportids as $repid)
-		{
+		foreach ($reportids as $repid) {
 			echo "<td>";
-
-			if ($i < $queueCounts[$index])
-			{
+			if ($i < $queueCounts[$index]) {
 				$flags = getQueueFlags($qFlags[$index][$i]);
-				if (sizeof($flags) > 0)
-				{
-					foreach ($flags as $flag)
-					{
+				if (sizeof($flags) > 0) {
+					foreach ($flags as $flag) {
 						echo $flag."<br>";
 					}
-				}
-				else
-				{
+				} else {
 					echo "none";
 				}
-			}
-			else
-			{
+			} else {
 				echo "<font color=#BABABA>n/a</font>";
 			}
 
@@ -133,38 +117,33 @@
 		}
 		echo "</tr>";
 
-		for ($j = 0; $j < 4; ++$j)
-		{
+		for ($j = 0; $j < 4; ++$j) {
 			$arr = array();
 			switch ($j)
 			{
 				case 0:
-					echo "<tr><td class='key'>timestampValidBits</td>";
+					echo "<tr><td class='subkey'>timestampValidBits</td>";
 					$arr = $qTimestampBits;
 					break;
 				case 1:
-					echo "<tr><td class='key'>minImageTransferGranularity.width</td>";
+					echo "<tr><td class='subkey'>minImageTransferGranularity.width</td>";
 					$arr = $qTransferW;
 					break;
 				case 2:
-					echo "<tr><td class='key'>minImageTransferGranularity.height</td>";
+					echo "<tr><td class='subkey'>minImageTransferGranularity.height</td>";
 					$arr = $qTransferH;
 					break;
 				case 3:
-					echo "<tr><td class='key'>minImageTransferGranularity.depth</td>";
+					echo "<tr><td class='subkey'>minImageTransferGranularity.depth</td>";
 					$arr = $qTransferD;
 					break;
 			}
 
 			$index = 0;
-			foreach ($reportids as $repid)
-			{
-				if ($i < $queueCounts[$index])
-				{
+			foreach ($reportids as $repid) {
+				if ($i < $queueCounts[$index]) {
 					echo "<td>".$arr[$index][$i]."</td>";
-				}
-				else
-				{
+				} else {
 					echo "<td><font color=#BABABA>n/a</font></td>";
 				}
 				$index++;

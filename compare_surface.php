@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 		*
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -37,10 +37,16 @@
 
 	echo "<div id='surface-tabs-1' class='tab-pane fade in active reportdiv'>";
 
-	$res = mysql_query("SELECT count(*) from devicesurfacecapabilities WHERE reportid in (".implode(',', $reportids).")");
-	$resCount = mysql_result($res, 0);
+	$rowCount = 0;
+	try {
+		$stmnt = DB::$connection->prepare("SELECT count(*) from devicesurfacecapabilities WHERE reportid in (".implode(',', $reportids).")");
+		$stmnt->execute();
+		$rowCount = $stmnt->rowCount();
+	} catch (PDOException $e) {
+		die("Could not fetch device surface!");
+	}		
 
-	if ($resCount > 0 ) {
+	if ($rowCount > 0) {
 		$reportIndex = 0;
 
 		echo "<table id='surface-caps' width='100%' class='table table-striped table-bordered'>";
@@ -54,9 +60,16 @@
 
 		$props = null;
 
-		$query = mysql_query("SELECT * from devicesurfacecapabilities where reportid in (".implode(',', $reportids).")");
+		try {
+			$stmnt = DB::$connection->prepare("SELECT *from devicesurfacecapabilities WHERE reportid in (".implode(',', $reportids).")");
+			$stmnt->execute();
+			$rowCount = $stmnt->rowCount();
+		} catch (PDOException $e) {
+			die("Could not fetch device surface!");
+		}		
+	
 		$idx = 0;
-		while ($row = mysql_fetch_assoc($query)) {
+		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
 			foreach($row as $key => $value) {
 				if ($key == "reportid") {
 					continue;
@@ -111,10 +124,15 @@
 
 	echo "<div id='surface-tabs-2' class='tab-pane fade in reportdiv'>";
 
-	$res = mysql_query("SELECT count(*) FROM devicesurfaceformats WHERE reportid IN (".implode(',', $reportids).")");
-	$resCount = mysql_result($res, 0);
-
-	if ($resCount > 0 ) {
+	$rowCount = 0;
+	try {
+		$stmnt = DB::$connection->prepare("SELECT *from devicesurfaceformats WHERE reportid in (".implode(',', $reportids).")");
+		$stmnt->execute();
+		$rowCount = $stmnt->rowCount();
+	} catch (PDOException $e) {
+		die("Could not fetch device surface formats!");
+	}		
+	if ($rowCount > 0 ) {
 		$reportIndex = 0;
 
 		echo "<table id='surface-formats' width='100%' class='table table-striped table-bordered'>";
@@ -125,12 +143,16 @@
 		echo "</tr></thead><tbody>";
 
 		reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
-
-		$formats = array();
-
-		$query = mysql_query("SELECT dsf.reportid AS reportid, vf.name as name FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (".implode(',', $reportids).")");
+		
+		try {
+			$stmnt = DB::$connection->prepare("SELECT dsf.reportid AS reportid, vf.name as name FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (".implode(',', $reportids).")");
+			$stmnt->execute();
+			$rowCount = $stmnt->rowCount();
+		} catch (PDOException $e) {
+			die("Could not fetch device surface formats!");
+		}
 		$idx = 0;
-		while ($row = mysql_fetch_assoc($query)) {
+		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
 			foreach($row as $key => $value) {
 				if ($key == "reportid") {
 					continue;
@@ -158,223 +180,6 @@
 	}
 
 	echo "</div>";
-
-
-	/*
-
-	// Get memory types for each selected report into an array
-	$memoryFlags = array();
-	$memoryHeapIndices = array();
-	$memoryCounts = array();
-	$maxMemoryCount = 0;
-
-	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		$str = "select propertyflags,heapindex from devicememorytypes where reportid = $repid";
-
-		$sqlresult = mysql_query($str);
-		$subarray = array();
-		$memoryCounts[$reportIndex] = 0;
-		while($row = mysql_fetch_row($sqlresult))
-		{
-			$memoryFlags[$reportIndex][] = $row[0];
-			$memoryHeapIndices[$reportIndex][] = $row[1];
-			$memoryCounts[$reportIndex]++;
-		}
-		//$extarray[] = $subarray;
-		$reportIndex++;
-	}
-
-	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		if ($memoryCounts[$reportIndex] > $maxMemoryCount)
-		{
-			$maxMemoryCount = $memoryCounts[$reportIndex];
-		}
-		$reportIndex++;
-	}
-
-	// Generate table
-	$colspan = count($reportids) + 1;
-
-	reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
-
-	echo "<tr class='firstrow'><td class='firstrow'>Memory type count</td>";
-	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i)
-	{
-		echo "<td>".$memoryCounts[$i]."</td>";
-	}
-	echo "</tr>";
-
-	for ($i = 0; $i < $maxMemoryCount; ++$i)
-	{
-		echo "<tr><td class='caption' colspan=".$colspan.">Memory type ".$i."</td></tr>";
-		// Heap index
-		echo "<tr><td class='key'>Heapindex</td>";
-		$index = 0;
-		foreach ($reportids as $repid)
-		{
-			if ($i < $memoryCounts[$index])
-			{
-				echo "<td>".$memoryHeapIndices[$index][$i]."</td>";
-			}
-			else
-			{
-				echo "<td><font color=#BABABA>n/a</font></td>";
-			}
-			$index++;
-		}
-		echo "</tr>";
- 		// Flags
-		echo "<tr><td class='key'>Flags</td>";
-		$index = 0;
-		foreach ($reportids as $repid)
-		{
-			echo "<td>";
-
-			if ($i < $memoryCounts[$index])
-			{
-				$flags = getMemoryTypeFlags($memoryFlags[$index][$i]);
-				if (sizeof($flags) > 0)
-				{
-					foreach ($flags as $flag)
-					{
-						echo $flag."<br>";
-					}
-				}
-				else
-				{
-					echo "none";
-				}
-			}
-			else
-			{
-				echo "<font color=#BABABA>n/a</font>";
-			}
-
-			echo "</td>";
-			$index++;
-		}
-		echo "</tr>";
- 		// Flags
-	}
-	echo "</tbody></table></div>";
-
-	// Surface formats
-	echo "<div id='surface-tabs-2' class='tab-pane fade reportdiv'>";
-
-	echo "<table id='surface-formats' width='100%' class='table table-striped table-bordered'>";
-	echo "<thead><tr><td class='caption'>Property</td>";
-	foreach ($reportids as $reportId)
-	{
-		echo "<td class='caption'>Report $reportId</td>";
-	}
-	echo "</tr></thead><tbody>";
-
-	// Get memory types for each selected report into an array
-	$memoryHeapSizes = array();
-	$memoryHeapFlags = array();
-	$memoryHeapCounts = array();
-	$maxMemoryHeapCount = 0;
-
-	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		$str = "select size,flags from devicememoryheaps where reportid = $repid";
-
-		$sqlresult = mysql_query($str);
-		$subarray = array();
-		$memoryHeapCounts[$reportIndex] = 0;
-		while($row = mysql_fetch_row($sqlresult))
-		{
-			$memoryHeapSizes[$reportIndex][] = $row[0];
-			$memoryHeapFlags[$reportIndex][] = $row[1];
-			$memoryHeapCounts[$reportIndex]++;
-		}
-		//$extarray[] = $subarray;
-		$reportIndex++;
-	}
-
-	$reportIndex = 0;
-	foreach ($reportids as $repid)
-	{
-		if ($memoryHeapCounts[$reportIndex] > $maxMemoryHeapCount)
-		{
-			$maxMemoryHeapCount = $memoryHeapCounts[$reportIndex];
-		}
-		$reportIndex++;
-	}
-
-	// Generate table
-	$colspan = count($reportids) + 1;
-
-	reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
-
-	// Memory type counts
-	echo "<tr class='firstrow'><td class='firstrow'>Memory heap count</td>";
-	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i)
-	{
-		echo "<td>".$memoryHeapCounts[$i]."</td>";
-	}
-	echo "</tr>";
-
-	for ($i = 0; $i < $maxMemoryHeapCount; ++$i)
-	{
-		echo "<tr><td class='caption' colspan=".$colspan.">Memory heap ".$i."</td></tr>";
-		// Heap index
-		echo "<tr><td class='key'>Size</td>";
-		$index = 0;
-		foreach ($reportids as $repid)
-		{
-			if ($i < $memoryHeapCounts[$index])
-			{
-				echo "<td>".number_format($memoryHeapSizes[$index][$i])."</td>";
-			}
-			else
-			{
-				echo "<td><font color=#BABABA>n/a</font></td>";
-			}
-			$index++;
-		}
-		echo "</tr>";
- 		// Flags
-		echo "<tr><td class='key'>Flags</td>";
-		$index = 0;
-		foreach ($reportids as $repid)
-		{
-			echo "<td>";
-
-			if ($i < $memoryHeapCounts[$index])
-			{
-				$flags = getMemoryHeapFlags($memoryHeapFlags[$index][$i]);
-				if (sizeof($flags) > 0)
-				{
-					foreach ($flags as $flag)
-					{
-						echo $flag."<br>";
-					}
-				}
-				else
-				{
-					echo "none";
-				}
-			}
-			else
-			{
-				echo "<font color=#BABABA>n/a</font>";
-			}
-
-			echo "</td>";
-			$index++;
-		}
-		echo "</tr>";
- 		// Flags
-	}
-
-	echo "</tbody></table></div>";
-	*/
-
+	
 	echo "</div>";
 ?>
