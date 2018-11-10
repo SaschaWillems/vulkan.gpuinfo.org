@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database server implementation
 	*	
-	* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -21,35 +21,49 @@
 
 	include './../dbconfig.php';
 	
-	dbConnect();	
-			
-	$devicename = mysql_real_escape_string($_GET['devicename']);	
-	$driverversion = mysql_real_escape_string($_GET['driverversion']);	
-	$osname = mysql_real_escape_string($_GET['osname']);	
-	$osversion = mysql_real_escape_string($_GET['osversion']);	
-	$osarchitecture = mysql_real_escape_string($_GET['osarchitecture']);
-	
-	$deviceselector = "
-		devicename = '$devicename' and 
-		driverversion = '$driverversion' and
-		osname = '$osname' and
-		osversion = '$osversion' and
-		osarchitecture = '$osarchitecture'";	
+	header("Connection: keep-alive");
+
+	DB::connect();	
+
+	$params = [
+		"devicename" => $_GET['devicename'],
+		"driverversion" => $_GET['driverversion'],
+		"osname" => $_GET['osname'],
+		"osversion" => $_GET['osversion'],
+		"osarchitecture" => $_GET['osarchitecture'],
+	];
+
+	$sql = "SELECT id from reports where
+		devicename = :devicename and 
+		driverversion = :driverversion and
+		osname = :osname and
+		osversion = :osversion and
+		osarchitecture = :osarchitecture";	
 	if (isset($_GET['apiversion'])) {
-		$deviceselector .= " and apiversion = '".mysql_real_escape_string($_GET['apiversion'])."'"; 
+		$sql .= " and apiversion = :apiversion"; 
+		$params["apiversion"] = $_GET['apiversion'];
 	}
-	$sqlstr = "select id from reports where $deviceselector";
-	$sqlresult = mysql_query($sqlstr) or die(mysql_error());
-	$sqlcount = mysql_num_rows($sqlresult);   
-	$sqlrow = mysql_fetch_row($sqlresult);
-	
-	if ($sqlcount > 0) {
-		header('HTTP/ 200 report_present '.$sqlrow[0].'');
-		echo "$sqlrow[0]";
-	} else {
-		header('HTTP/ 200 report_new');
-		echo "-1";
+	if (isset($_GET['reportversion'])) {
+		$sql .= " and version = :reportversion"; 
+		$params["reportversion"] = $_GET['reportversion'];
 	}
 
-	dbDisconnect();	
+	try {
+		$stmnt = DB::$connection->prepare($sql);
+		$stmnt->execute($params);
+		$row = $stmnt->fetch(PDO::FETCH_NUM);
+		$reportid = $row[0];
+		if ($stmnt->rowCount() > 0) {
+			header('HTTP/ 200 report_present '.$reportid.'');
+			echo $reportid;
+		} else {
+			header('HTTP/ 200 report_new');
+			echo "-1";
+		}	
+	} catch (PDOException $e) {
+		header('HTTP/ 500 error');
+		header("Connection: keep-alive");
+	}
+			
+	DB::disconnect();	
 ?>

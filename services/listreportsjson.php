@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database server implementation
 	*	
-	* Copyright (C) 2011-2015 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2011-2018 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -77,46 +77,43 @@
 		return $result; 
 	}
 	
-	dbConnect();	
-			
-	$reportid = mysql_real_escape_string($_GET['id']);	
+	DB::connect();	
 	
-	$sqlresult = mysql_query("
-		select 
-			concat('0x', hex(cast(dp.vendorid as unsigned))) as vendorid,
-			concat('0x', hex(cast(dp.deviceid as unsigned))) as deviceid,
-			VendorID(dp.vendorid) as vendorname,
-			dp.devicename,
-			dp.devicetype,
-			dp.apiversion,
-			dp.driverversionraw,
-			dp.driverversion,
-			r.osname,
-			r.osversion,
-			r.osarchitecture,
-			concat('http://vulkan.gpuinfo.org/services/getreportjson.php?id=', dp.reportid) as url
-		from deviceproperties dp
-		join reports r on r.id = dp.reportid
-		order by vendorid"
-	) or die(mysql_error());
-	$sqlcount = mysql_num_rows($sqlresult);   
+	try {
+		$stmnt = DB::$connection->prepare(
+			"SELECT 
+				concat('0x', hex(cast(dp.vendorid as unsigned))) as vendorid,
+				concat('0x', hex(cast(dp.deviceid as unsigned))) as deviceid,
+				VendorID(dp.vendorid) as vendorname,
+				dp.devicename,
+				dp.devicetype,
+				dp.apiversion,
+				dp.driverversionraw,
+				dp.driverversion,
+				r.osname,
+				r.osversion,
+				r.osarchitecture,
+				concat('http://vulkan.gpuinfo.org/services/getreportjson.php?id=', dp.reportid) as url
+			from deviceproperties dp
+			join reports r on r.id = dp.reportid
+			order by vendorid");			
+		$stmnt->execute();
+		if ($stmnt->rowCount() > 0) {
+			header('Content-Type: application/json');		
+			$rows = array();
+			while($r = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+				$rows[] = $r;
+			}
+			echo _format_json(json_encode($rows), false);			
+		} 
+		else {
+			header('HTTP/ 404 empty_response');
+			echo "no reports on list";
+		}	
+	} catch (PDOException $e) {
+		header('HTTP/ 500 error');
+		die("Could not get report listing!");
+	}	
 	
-	if ($sqlcount > 0) 
-	{
-		header('Content-Type: application/json');
-		
-		$rows = array();
-		while($r = mysql_fetch_assoc($sqlresult)) 
-		{
-			$rows[] = $r;
-		}
-		echo _format_json(json_encode($rows), false);			
-	} 
-	else 
-	{
-		header('HTTP/ 404 empty_response');
-		echo "no reports on list";
-	}
-
-	dbDisconnect();	
+	DB::disconnect();	
 ?>

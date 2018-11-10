@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database server implementation
 	*	
-	* Copyright (C) 2011-2015 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2011-2018 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -76,25 +76,28 @@
 		} 
 		return $result; 
 	}
-	
-	dbConnect();	
-			
-	$reportid = mysql_real_escape_string($_GET['id']);	
-	
-	$sqlresult = mysql_query("select reportid, json from reportsjson where reportid = ".$reportid) or die(mysql_error());
-	$sqlcount = mysql_num_rows($sqlresult);   
-	$sqlrow = mysql_fetch_row($sqlresult);
-	
-	if ($sqlcount > 0) 
-	{
-		header('Content-Type: application/json');
-		echo _format_json($sqlrow[1], false);
-	} 
-	else 
-	{
-		header('HTTP/ 404 report_not_present');
-		echo "report not present";
-	}
 
-	dbDisconnect();	
+	DB::connect();	
+	
+	$reportid = (int)($_GET['id']);	
+
+	try {
+		$stmnt = DB::$connection->prepare("SELECT reportid, json from reportsjson where reportid = :reportid");
+		$stmnt->execute(["reportid" => $reportid]);
+		if ($stmnt->rowCount() > 0) {
+			header('Content-Type: application/json');		
+			$rows = array();
+			$r = $stmnt->fetch(PDO::FETCH_NUM);
+			echo _format_json($r[1], false);
+		} 
+		else {
+			header('HTTP/ 404 report_not_present');
+			echo "report not present";
+		}	
+	} catch (PDOException $e) {
+		header('HTTP/ 500 error');
+		die("Could not get report!");
+	}	
+	
+	DB::disconnect();		
 ?>
