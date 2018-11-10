@@ -39,6 +39,8 @@ function getFormatFlags($flag)
 		0x0400 => "BLIT_SRC_BIT",
 		0x0800 => "BLIT_DST_BIT",
 		0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+		0x4000 => "TRANSFER_SRC_BIT",
+		0x8000 => "TRANSFER_DST_BIT",
 	);
 	return getFlags($flags, $flag);
 }
@@ -126,17 +128,32 @@ function getSampleCountFlags($flag)
 	return getFlags($flags, $flag);
 }
 
+function getStageFlags($flag)
+{
+	$flags = array(
+		0x0001 => "VERTEX",
+		0x0002 => "TESSELLATION_CONTROL",
+		0x0004 => "TESSELLATION_EVALUATION",
+		0x0008 => "GEOMETRY",
+		0x0010 => "FRAGMENT",
+		0x0020 => "COMPUTE",
+		0x001F => "ALL_GRAPHICS",
+	);
+	return getFlags($flags, $flag);
+}
+
 function listSubgroupFeatureFlags($flag)
 {
 	$flags = array(
 		0x0001 => "BASIC",
-		0x0FFF => "VOTE", 
+		0x0002 => "VOTE", 
 		0x0004 => "ARITHMETIC",
 		0x0008 => "BALLOT",
 		0x0010 => "SHUFFLE",
 		0x0020 => "SHUFFLE (RELATIVE)",
 		0x0040 => "CLUSTERED",
-		0x0080 => "QUAD",
+		0x0080 => "QUAD"
+		//0x0100 => "PARTITIONED_BIT_NV"
 	);
 
 	$res = null;	
@@ -159,14 +176,18 @@ function listSubgroupStageFlags($flag)
 		0x0008 => "GEOMETRY",
 		0x0010 => "FRAGMENT",
 		0x0020 => "COMPUTE",
-		0x001F => "ALL_GRAPHICS",
+		0x001F => "ALL GRAPHICS",
 	);
 
 	$res = null;
 	$arr_values = array_values($flags);			
 	$index = 0;
 	foreach ($flags as $i => $value) {
-		$class = ($flag & $i) ? "supported" : "unsupported";
+		if ($i == 0x001F) {
+			$class = (($flag & $i) == $i) ? "supported" : "unsupported";
+		} else {
+			$class = ($flag & $i) ? "supported" : "unsupported";
+		}
 		$res .= "<span class='".$class."'>".strtolower($arr_values[$index])."</span><br>";
 		$index++;
 	}
@@ -227,12 +248,10 @@ function getColorSpace($value)
 // Generate device info table part for report compare pages
 function reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, $count)
 {
-	for ($i = 0; $i < sizeof($deviceinfo_data[0]); ++$i) 
-	{
+	for ($i = 0; $i < sizeof($deviceinfo_data[0]); ++$i) {
 		echo "<tr>";
 		echo "<td>".$deviceinfo_captions[$i]."</td>";
-		for ($j = 0, $arrsize = $count; $j < $arrsize; ++$j) 				
-		{
+		for ($j = 0, $arrsize = $count; $j < $arrsize; ++$j) {
 			echo "<td class='deviceinfo'>".$deviceinfo_data[$j][$i]."</td>";
 		}
 		echo "</tr>";
@@ -265,12 +284,21 @@ function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 		return sprintf("%d.%d.%d", 
 			($versionraw >> 22),
 			($versionraw >> 12) & 0x3ff,
-			($versionraw) & 0xfff,
+			$versionraw & 0xfff,
 			"<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true' title='The version number conversion scheme for this vendor is not yet available'></span>"
 			);
 	}
 	
 	return $versiontext;	
+}
+
+function mailError($error, $content) {
+	$msgtitle = "Vulkan database upload error";
+	$msg = "Error:\n";
+	$msg .= $error;
+	$msg .= "\n\nContent:\n";
+	$msg .= $content;
+	mail('webmaster@saschawillems.de', $msgtitle, $msg);
 }
 
 ?>
