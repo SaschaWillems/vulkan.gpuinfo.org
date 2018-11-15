@@ -84,10 +84,11 @@
 	}	
 	// List (and order) by limit
 	$limit = $_GET['limit'];
+	$limitvalue = null;
 	if ($limit != '') {
 		$defaultHeader = false;
 		$headerClass = "header-green";
-		$caption = "Listing limits for <b>".$limit."</b>";		
+		$caption = "Listing limits for <b>".$limit."</b>";
 		// Check if a limit requirement rule has to be applied (see Table 36. of the specs)
 		DB::connect();	
 		$sql = "select feature from limitrequirements where limitname = :limit";  
@@ -96,6 +97,12 @@
 		if ($reqs->rowCount() > 0) {
 			$req = $reqs->fetch();
 			$caption .= "<br>(Feature requirement ".$req["feature"]." is applied)";
+		}
+		if (isset($_GET['value'])) {
+			$limitvalue = $_GET['value'];
+			$link = "displaydevicelimit.php?name=".$limit;
+			$caption = "Reports with <a href=".$link.">".$limit."</a> = ".$limitvalue;	
+
 		}
 		DB::disconnect();
 	}	
@@ -227,6 +234,7 @@
 						'optimalformat' : '<?php echo $_GET["optimalformat"] ?>',
 						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
 						'devicelimit' : '<?php echo $_GET["limit"] ?>',
+						<?php if ($limitvalue) { echo "'devicelimitvalue' : '".$limitvalue."' ,"; } ?>
 						'option' : '<?php echo $_GET["option"] ?>',
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',

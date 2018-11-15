@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -62,7 +62,7 @@
 					$res->execute(); 
 					$reportCount = $res->fetchColumn(); 
 
-					$sql = "select COLUMN_NAME as name, (select feature from limitrequirements where limitname = name) as requirement from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')";
+					$sql = "SELECT COLUMN_NAME as name, (SELECT feature from limitrequirements where limitname = name) as requirement from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')";
 					$limits = DB::$connection->prepare($sql);
 					$limits->execute();
 
@@ -81,7 +81,7 @@
 							$range = $stmnt->fetch(PDO::FETCH_NUM);
 
 							echo "<tr>";
-							echo "<td><a href='listreports.php?limit=".$limit[0]."'>".$limit[0]."</a></td>";		
+							echo "<td><a href='displaydevicelimit.php?name=".$limit[0]."'>".$limit[0]."</a></td>";		
 							echo "<td class='unsupported'>".round($range[0], 3)."</td>";
 							echo "<td class='supported'>".round($range[1], 3)."</td>";
 							echo "<td>".$limit[1]."</td>";
