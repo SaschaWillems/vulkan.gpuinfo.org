@@ -30,7 +30,7 @@
     // Ordering
     $orderByColumn = '';
     $orderByDir = '';
-    if (isset($_REQUEST['order']) && count($_REQUEST['order'] > 0)) {
+    if (isset($_REQUEST['order'])) {
         $orderByColumn = $_REQUEST['order'][0]['column'];
         $orderByDir = $_REQUEST['order'][0]['dir'];
     }
