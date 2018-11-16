@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -165,14 +165,28 @@
 		$stmnt = DB::$connection->prepare("SELECT extension from deviceproperties2 where name = :name");
 		$stmnt->execute([":name" => $extensionproperty]);
 		$extname = $stmnt->fetchColumn();	
+		DB::disconnect();
 		$extensionpropertyvalue = $_GET['value'];
 		$defaultHeader = false;
 		$headerClass = "header-green";
 		$extensionpropertyvalue = $_GET['value'];
 		$link = "displayextensionproperty.php?name=".$extensionproperty;
 		$caption = "Reports with <a href=".$link.">".$extensionproperty."</a> (".$extname.") = ".$extensionpropertyvalue;	
-		DB::disconnect();
 	}		
+	// Extension feature
+	$extensionfeature = null;
+	if (isset($_GET['extensionfeature']) && ($_GET['extensionfeature'] != '')) {
+		$extensionfeature = $_GET['extensionfeature'];
+		DB::connect();	
+		$stmnt = DB::$connection->prepare("SELECT extension from devicefeatures2 where name = :name");
+		$stmnt->execute([":name" => $extensionfeature]);
+		$extname = $stmnt->fetchColumn();	
+		DB::disconnect();
+		$defaultHeader = false;
+		$headerClass = $negate ? "header-red" : "header-green";			
+		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting extension feature <b>".$extensionfeature."</b> ($extname)";
+		$caption .= " (<a href='listreports.php?extensionfeature=".$extensionfeature.($negate ? "" : "&option=not")."'>toggle</a>)";
+	}	
 
 	if ($defaultHeader) {
 		echo "<div class='header'>";	
@@ -256,6 +270,7 @@
 						<?php if ($limitvalue) { echo "'devicelimitvalue' : '".$limitvalue."' ,"; } ?>
 						<?php if ($extensionproperty) { echo "'extensionproperty' : '".$extensionproperty."' ,"; } ?>
 						<?php if ($extensionpropertyvalue) { echo "'extensionpropertyvalue' : '".$extensionpropertyvalue."' ,"; } ?>
+						<?php if ($extensionfeature) { echo "'extensionfeature' : '".$extensionfeature."' ,"; } ?>
 						'option' : '<?php echo $_GET["option"] ?>',
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',

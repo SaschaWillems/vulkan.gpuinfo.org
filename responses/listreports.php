@@ -179,6 +179,12 @@
         $whereClause = "where r.id in (select reportid from deviceproperties2 where name = :filter_extensionpropertyname and cast(value as char) = '".$extensionpropertyvalue."')";
         $params['filter_extensionpropertyname'] = $extensionproperty;            
     }
+    // Extension feature    
+    if (isset($_REQUEST['filter']['extensionfeature']) && ($_REQUEST['filter']['extensionfeature'] != '')) {
+        $extensionfeature = $_REQUEST['filter']['extensionfeature'];
+        $whereClause = "where r.id ".($negate ? "not" : "")." in (select reportid from devicefeatures2 where name = :filter_extensionfeaturename)";
+        $params['filter_extensionfeaturename'] = $extensionfeature;            
+    }    
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 
