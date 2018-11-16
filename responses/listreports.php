@@ -171,7 +171,14 @@
             $whereClause = "where r.id ".($negate ? "not" : "")." in (select distinct(reportid) from deviceinstancelayers de join instancelayers inst on de.layerid = inst.id where inst.name = :filter_instancelayer)";
             $params['filter_instancelayer'] = $instancelayer;            
         }
-	}	    
+    }	    
+    // Extension property    
+    if (isset($_REQUEST['filter']['devicelimit'])) {
+        $extensionproperty = $_REQUEST['filter']['extensionproperty'];
+        $extensionpropertyvalue =  $_REQUEST['filter']['extensionpropertyvalue'];
+        $whereClause = "where r.id in (select reportid from deviceproperties2 where name = :filter_extensionpropertyname and cast(value as char) = '".$extensionpropertyvalue."')";
+        $params['filter_extensionpropertyname'] = $extensionproperty;            
+    }
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 

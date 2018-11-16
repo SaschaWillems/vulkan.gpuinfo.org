@@ -154,6 +154,25 @@
 		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting instance layer <b>".$instancelayer."</b>";	
 		$caption .= " (<a href='listreports.php?instancelayer=".$instancelayer.($negate ? "" : "&option=not")."'>toggle</a>)";
 	}	
+	// Extension property value
+	$extensionproperty = $_GET['extensionproperty'];
+	$extensionpropertyvalue = null;
+	if ($extensionproperty != '') {
+		if (!isset($_GET['value'])) { 
+			die('No value specified!');
+		}
+		DB::connect();	
+		$stmnt = DB::$connection->prepare("SELECT extension from deviceproperties2 where name = :name");
+		$stmnt->execute([":name" => $extensionproperty]);
+		$extname = $stmnt->fetchColumn();	
+		$extensionpropertyvalue = $_GET['value'];
+		$defaultHeader = false;
+		$headerClass = "header-green";
+		$extensionpropertyvalue = $_GET['value'];
+		$link = "displayextensionproperty.php?name=".$extensionproperty;
+		$caption = "Reports with <a href=".$link.">".$extensionproperty."</a> (".$extname.") = ".$extensionpropertyvalue;	
+		DB::disconnect();
+	}		
 
 	if ($defaultHeader) {
 		echo "<div class='header'>";	
@@ -235,6 +254,8 @@
 						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
 						'devicelimit' : '<?php echo $_GET["limit"] ?>',
 						<?php if ($limitvalue) { echo "'devicelimitvalue' : '".$limitvalue."' ,"; } ?>
+						<?php if ($extensionproperty) { echo "'extensionproperty' : '".$extensionproperty."' ,"; } ?>
+						<?php if ($extensionpropertyvalue) { echo "'extensionpropertyvalue' : '".$extensionpropertyvalue."' ,"; } ?>
 						'option' : '<?php echo $_GET["option"] ?>',
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
