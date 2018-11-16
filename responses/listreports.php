@@ -173,7 +173,7 @@
         }
     }	    
     // Extension property    
-    if (isset($_REQUEST['filter']['devicelimit'])) {
+    if (isset($_REQUEST['filter']['extensionproperty']) && ($_REQUEST['filter']['extensionproperty'] != '')) {
         $extensionproperty = $_REQUEST['filter']['extensionproperty'];
         $extensionpropertyvalue =  $_REQUEST['filter']['extensionpropertyvalue'];
         $whereClause = "where r.id in (select reportid from deviceproperties2 where name = :filter_extensionpropertyname and cast(value as char) = '".$extensionpropertyvalue."')";
