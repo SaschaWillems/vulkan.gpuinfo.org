@@ -61,7 +61,17 @@
 			<li><a href="listreports.php">Reports</a></li>
 			<li><a href="listfeatures.php">Features</a></li> 
 			<li><a href="listlimits.php">Limits</a></li> 
-			<li><a href="listextensions.php">Extensions</a></li> 
+
+		  <li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#">Extensions
+				<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+				<li><a href="listextensions.php">List</a></li>
+				<li><a href="listextensionproperties.php">Properties</a></li>
+				<li><a href="listextensionfeatures.php">Features</a></li>
+				</ul>
+			</li>
+
 			<li><a href="listformats.php">Formats</a></li>
 
 		  <li class="dropdown">
@@ -92,13 +102,13 @@
 				  <a class="dropdown-toggle" data-toggle="dropdown" href="#">gpuinfo.org
 				  <span class="caret"></span></a>
 				  <ul class="dropdown-menu">
-					<li><a href="http://opengl.gpuinfo.org">OpenGL</a></li>
-					<li><a href="http://opengles.gpuinfo.org">OpenGL ES</a></li>
-					<li><a href="http://vulkan.gpuinfo.org">Vulkan</a></li> 
+					<li><a href="https://opengl.gpuinfo.org">OpenGL</a></li>
+					<li><a href="https://opengles.gpuinfo.org">OpenGL ES</a></li>
+					<li><a href="https://vulkan.gpuinfo.org">Vulkan</a></li> 
           <li role="separator" class="divider"></li>
-					<li><a href="http://android.gpuinfo.org">Android</a></li> 
+					<li><a href="https://android.gpuinfo.org">Android</a></li> 
           <li role="separator" class="divider"></li>					
-					<li><a href="http://www.gpuinfo.org">Launchpad</a></li> 
+					<li><a href="https://www.gpuinfo.org">Launchpad</a></li> 
 				  </ul>
 			  </li>
 		  </ul>			  
