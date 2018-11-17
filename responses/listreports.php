@@ -182,7 +182,7 @@
     // Extension feature    
     if (isset($_REQUEST['filter']['extensionfeature']) && ($_REQUEST['filter']['extensionfeature'] != '')) {
         $extensionfeature = $_REQUEST['filter']['extensionfeature'];
-        $whereClause = "where r.id ".($negate ? "not" : "")." in (select reportid from devicefeatures2 where name = :filter_extensionfeaturename)";
+        $whereClause = "where r.id ".($negate ? "not" : "")." in (select reportid from devicefeatures2 where name = :filter_extensionfeaturename and supported = 1)";
         $params['filter_extensionfeaturename'] = $extensionfeature;            
     }    
 
