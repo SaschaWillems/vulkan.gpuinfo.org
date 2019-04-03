@@ -267,9 +267,9 @@
 						'optimalformat' : '<?php echo $_GET["optimalformat"] ?>',
 						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
 						'devicelimit' : '<?php echo $_GET["limit"] ?>',
-						<?php if ($limitvalue) { echo "'devicelimitvalue' : '".$limitvalue."' ,"; } ?>
+						<?php if (!is_null($limitvalue)) { echo "'devicelimitvalue' : '".$limitvalue."' ,"; } ?>
 						<?php if ($extensionproperty) { echo "'extensionproperty' : '".$extensionproperty."' ,"; } ?>
-						<?php if ($extensionpropertyvalue) { echo "'extensionpropertyvalue' : '".$extensionpropertyvalue."' ,"; } ?>
+						<?php if (!is_null($extensionpropertyvalue)) { echo "'extensionpropertyvalue' : '".$extensionpropertyvalue."' ,"; } ?>
 						<?php if ($extensionfeature) { echo "'extensionfeature' : '".$extensionfeature."' ,"; } ?>
 						'option' : '<?php echo $_GET["option"] ?>',
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
