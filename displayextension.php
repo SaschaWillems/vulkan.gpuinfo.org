@@ -81,20 +81,25 @@
 		from deviceproperties dp
 		join reports r on r.id = dp.reportid
 	where
-		r.id in (select reportid from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :name)
-		group by device");
+		r.id in (select reportid from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :name)");
 	$result->execute([":name" => $name]);
 	$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
-		switch($row["osname"]) {
+		switch(strtolower($row["osname"])) {
 			case "windows":
-				$devicesWindows[] = $row["device"];
+				if (!in_array($row["device"], $devicesWindows)) {
+					$devicesWindows[] = $row["device"];
+				}
 				break;
 			case "android":
-				$devicesAndroid[] = $row["device"];
+				if (!in_array($row["device"], $devicesAndroid)) {
+					$devicesAndroid[] = $row["device"];
+				}
 				break;
 			default:
-				$devicesLinux[] = $row["device"];
+				if (!in_array($row["device"], $devicesLinux)) {
+					$devicesLinux[] = $row["device"];
+				}
 				break;
 		}   
 	}     
@@ -124,13 +129,12 @@
 		} );	
 	</script>
 
-	<div class='header'>
-		<h4 class='headercaption'>Device support for <?php echo $name ?></h4>
-	</div>
-
 	<center>	
 		<div class='parentdiv'>
-			<div id="chart"></div>
+
+			<h1>Device coverage for <?php echo $name ?></h1>
+
+			<div id="chart" style="padding-bottom:10px;"></div>
 			<div>
 				<ul class='nav nav-tabs'>
 					<li class="active"> <a data-toggle='tab' href='#windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
@@ -203,26 +207,20 @@
 
 <?php
 	DB::connect();			
-	// @todo: if OS specified, only for that os!
-	// @todo: indices!
 	// Count devices supporting this extension
 	// Windows
 	$totalCountWindows = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on r.id = dp.reportid where osname = 'windows'", []);
-	$supportedCountWindows = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from deviceproperties dp join reports r on r.id = dp.reportid where
-		r.id in (select reportid from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :name)
-		and osname = 'windows'", [":name" => $name]);
+	$supportedCountWindows = count($devicesWindows);
 	// Linux
 	$totalCountLinux = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on r.id = dp.reportid where osname not in ('windows', 'android', 'ios', 'osx')", []);
-	$supportedCountLinux = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from deviceproperties dp join reports r on r.id = dp.reportid where
-		r.id in (select reportid from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :name)
-		and osname not in ('windows', 'android', 'ios', 'osx')", [":name" => $name]);
+	$supportedCountLinux = count($devicesLinux);
 	// Android	
 	$totalCountAndroid = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on r.id = dp.reportid where osname = 'android'", []);
-	$supportedCountAndroid = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from deviceproperties dp join reports r on r.id = dp.reportid where
-		r.id in (select reportid from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :name)
-		and osname = 'android'", [":name" => $name]);
+	$supportedCountAndroid = count($devicesAndroid);
 	DB::disconnect();			
 ?>
+
+<?php echo count($devicesWindows) ?>
 	
 	<script type="text/javascript">
 		google.charts.load('current', {'packages':['corechart']});
@@ -238,8 +236,8 @@
       ]);
 
       var options = {
-        width: 600,
-        height: 400,
+        width: 540,
+        height: 300,
         legend: { position: 'bottom' },
         bar: { groupWidth: '75%' },
         isStacked: 'percent',
@@ -247,7 +245,11 @@
 				hAxis: {
           minValue: 0,
           ticks: [0, .25, .5, .75, 1]
-        }				
+        },
+				chartArea:{
+						width: '80%',
+						height: '220',
+				}				
       };			
 			
 			// Bar Chart
