@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -28,14 +28,31 @@
 		$platform = $_GET['platform'];
 		// TODO: Check valid platforms
 	}
+
+	$caption = null;
+	$showTabs = empty($_GET);
+
+	if (isset($_GET['platform'])) {
+		$caption = "Listing all <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform)." devices";
+	}
+	if (isset($_GET["extension"])) {
+		$caption .= " supporting ".$_GET["extension"];
+	}
 ?>
 
 <center>
 
-	<div class='header'>
-		<h4>Listing available devices</h4>
+	<div class='header'>	
+		<h4>
+		<?php		
+			echo $caption ? $caption : "Listing available devices";
+		?>
+		</h4>
 	</div>
 
+<?php	
+	if ($showTabs) {
+?>		
 	<div>
 		<ul class='nav nav-tabs'>
 			<li <?php if ($platform == "all") 	  { echo "class='active'"; } ?>> <a href='listdevices.php?platform=all'>All platforms</a> </li>
@@ -44,6 +61,9 @@
 			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listdevices.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
 		</ul>
 	</div>
+<?php	
+	}	
+?>
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 

@@ -110,8 +110,6 @@
 </div>			
 
 <center>
-	<div class='parentdiv'>
-
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 
 	<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -141,7 +139,8 @@
 					if ($extensions->rowCount() > 0) { 
 						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
 							echo "<tr>";						
-							echo "<td>".$extension[0]."</a></td>";
+							echo "<td>".$extension[0]."</td>";
+							// echo "<td><a href=\"displayextension.php?name=".$extension[0]."\">".$extension[0]."</a></td>";
 							echo "<td>".round($extension[1]/count($devicesWindows)*100,2)."</td>";
 							echo "<td>".round($extension[2]/count($devicesLinux)*100,2)."</td>";
 							echo "<td>".round($extension[3]/count($devicesAndroid)*100,2)."</td>";
@@ -157,7 +156,6 @@
 		</tbody>
 	</table>  
 
-</div>
 </div>
 
 <?php include './footer.inc'; ?>
