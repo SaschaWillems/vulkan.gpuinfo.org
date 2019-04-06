@@ -30,13 +30,14 @@
 	}
 
 	$caption = null;
-	$showTabs = empty($_GET);
+	$showTabs = true;
 
 	if (isset($_GET['platform'])) {
 		$caption = "Listing all <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform)." devices";
 	}
 	if (isset($_GET["extension"])) {
 		$caption .= " supporting ".$_GET["extension"];
+		$showTabs = false;
 	}
 ?>
 
