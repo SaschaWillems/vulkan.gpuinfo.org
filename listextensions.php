@@ -21,6 +21,43 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
+
+	$devicesWindows = [];
+	$devicesAndroid = [];
+	$devicesLinux = [];	
+
+	DB::connect();			
+	$result = DB::$connection->prepare("SELECT 
+		r.id,
+		ifnull(r.displayname, dp.devicename) as device, 
+		r.osname
+		from deviceproperties dp
+		join reports r on r.id = dp.reportid");
+	$result->execute();
+	$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($rows as $row) {
+		if (in_array(strtolower($row["osname"]), ['osx', 'macos', 'unknown'])) {
+			continue;
+		}
+		switch(strtolower($row["osname"])) {
+			case "windows":
+				if (!in_array($row["device"], $devicesWindows)) {
+					$devicesWindows[] = $row["device"];
+				}
+				break;
+			case "android":
+				if (!in_array($row["device"], $devicesAndroid)) {
+					$devicesAndroid[] = $row["device"];
+				}
+				break;
+			default:
+				if (!in_array($row["device"], $devicesLinux)) {
+					$devicesLinux[] = $row["device"];
+				}
+				break;
+		}   
+	}     
+	DB::disconnect();     	
 ?>
 
 <script>
@@ -32,29 +69,62 @@
 			"searchHighlight" : true,	
 			"dom": 'f',			
 			"bInfo": false,	
-			"order": [[ 0, "asc" ]]	
+			"order": [[ 0, "asc" ]],
+			"columnDefs": [{
+      			"targets": [ 1, 2, 3 ],
+      			"render": $.fn.dataTable.render.percentBar('round', '#000', '#eaeaea', '#14963c', '#fff', 2, 'solid')
+			}]
 		});
 
 		$("#searchbox").on("keyup search input paste cut", function() {
 			table.search(this.value).draw();
-		});  		
+		});
+
+		$('#extensions tbody td').click( function () {
+			var data = table.row( $(this).parents('tr') ).data();
+			var index = table.cell( this ).index().columnVisible;
+			var platform = null;
+			switch(index) {
+				case 1:
+					platform = 'windows';
+					break;
+				case 2:
+					platform = 'linux';
+					break;
+				case 3:
+					platform = 'android';
+					break;
+			}
+			if (index > 0) {
+				window.open('listdevices.php?platform='+platform+'&extension='+data[0]);
+			}
+		} );
 
 	} );	
 </script>
+
+<!-- #dc3c14 -->
 
 <div class='header'>
 	<h4>Listing all available extensions</h4>
 </div>			
 
-<center>	
+<center>
 	<div class='parentdiv'>
+
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 
 	<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 		<thead>
 			<tr>			
+				<th></th>
+				<th colspan=3 style="text-align: center;">Device coverage</th>
+			</tr>
+			<tr>			
 				<th>Extensions</th>
-				<th>Supported</th>
+				<th style="text-align: center; width:90px;">Windows</th>
+				<th style="text-align: center; width:90px;">Linux</th>
+				<th style="text-align: center; width:90px;">Android</th>
 			</tr>
 		</thead>
 		<tbody>		
@@ -65,14 +135,16 @@
 					$res->execute(); 
 					$reportCount = $res->fetchColumn(); 
 
-					$extensions = DB::$connection->prepare("select name, coverage from viewExtensions");
+					$extensions = DB::$connection->prepare("select name, windows, linux, android from viewExtensionsPlatforms");
 					$extensions->execute($params);
 
 					if ($extensions->rowCount() > 0) { 
 						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
 							echo "<tr>";						
-							echo "<td class='value'><a href='listreports.php?extension=".$extension[0]."'>".$extension[0]."</a> (<a href='listreports.php?extension=".$extension[0]."&option=not'>not</a>)</td>";
-							echo "<td class='value'>".round(($extension[1]/$reportCount*100), 2)."%</td>";
+							echo "<td>".$extension[0]."</a></td>";
+							echo "<td>".round($extension[1]/count($devicesWindows)*100,2)."</td>";
+							echo "<td>".round($extension[2]/count($devicesLinux)*100,2)."</td>";
+							echo "<td>".round($extension[3]/count($devicesAndroid)*100,2)."</td>";
 							echo "</tr>";	       
 						}
 					}
