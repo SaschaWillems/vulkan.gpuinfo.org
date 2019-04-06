@@ -71,7 +71,7 @@
 			"bInfo": false,	
 			"order": [[ 0, "asc" ]],
 			"columnDefs": [{
-      			"targets": [ 1, 2, 3 ],
+      			"targets": [ 2, 3, 4 ],
       			"render": $.fn.dataTable.render.percentBar('round', '#000', '#eaeaea', '#14963c', '#fff', 2, 'solid')
 			}]
 		});
@@ -85,17 +85,17 @@
 			var index = table.cell( this ).index().columnVisible;
 			var platform = null;
 			switch(index) {
-				case 1:
+				case 2:
 					platform = 'windows';
 					break;
-				case 2:
+				case 3:
 					platform = 'linux';
 					break;
-				case 3:
+				case 4:
 					platform = 'android';
 					break;
 			}
-			if (index > 0) {
+			if (index > 1) {
 				window.open('listdevices.php?platform='+platform+'&extension='+data[0]);
 			}
 		} );
@@ -119,6 +119,7 @@
 				<th colspan=3 style="text-align: center;">Device coverage</th>
 			</tr>
 			<tr>			
+				<th style="display:none;">Extensions</th>
 				<th>Extensions</th>
 				<th style="text-align: center; width:90px;">Windows</th>
 				<th style="text-align: center; width:90px;">Linux</th>
@@ -133,14 +134,15 @@
 					$res->execute(); 
 					$reportCount = $res->fetchColumn(); 
 
-					$extensions = DB::$connection->prepare("select name, windows, linux, android from viewExtensionsPlatforms");
-					$extensions->execute($params);
+					$extensions = DB::$connection->prepare("SELECT name, windows, linux, android, features2, properties2 from viewExtensionsPlatforms");
+					$extensions->execute();
 
 					if ($extensions->rowCount() > 0) { 
 						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
+							$link = ($extension[4] > 0 || $extension[5] > 0);
 							echo "<tr>";						
-							echo "<td>".$extension[0]."</td>";
-							// echo "<td><a href=\"displayextension.php?name=".$extension[0]."\">".$extension[0]."</a></td>";
+							echo "<td style=\"display:none;\">".$extension[0]."</td>";
+							echo $link ? "<td><a href=\"displayextension.php?name=".$extension[0]."\">".$extension[0]."</a></td>" : "<td>".$extension[0]."</td>";
 							echo "<td>".round($extension[1]/count($devicesWindows)*100,2)."</td>";
 							echo "<td>".round($extension[2]/count($devicesLinux)*100,2)."</td>";
 							echo "<td>".round($extension[3]/count($devicesAndroid)*100,2)."</td>";
