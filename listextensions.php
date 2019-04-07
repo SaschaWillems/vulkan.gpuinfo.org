@@ -66,11 +66,8 @@
 	} );	
 </script>
 
-<!-- #dc3c14 -->
-
 <div class='header'>
 	<h4>Listing all available extensions</h4>
-	<?php echo count($devicesWindows) . ' / ' . count($devicesLinux) . ' / ' . count($devicesAndroid); ?>
 </div>			
 
 <center>
