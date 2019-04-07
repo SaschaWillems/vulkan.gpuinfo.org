@@ -168,19 +168,18 @@
 
 <?php
 	DB::connect();			
-	// Count devices supporting this extension
+	$viewDeviceCount =DB::$connection->prepare("SELECT * from viewDeviceCount");
+	$viewDeviceCount->execute(); 
+	$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);					
+	$totalCountWindows = $deviceCounts["windows"];
+	$totalCountLinux = $deviceCounts["linux"];
+	$totalCountAndroid = $deviceCounts["android"];
 	$extension = DB::$connection->prepare("SELECT windows, linux, android, features2, properties2 from viewExtensionsPlatforms where name = :name");
 	$extension->execute(["name" => $name]);
-	$row = $extension->fetch(PDO::FETCH_ASSOC);
-	// Windows
-	$totalCountWindows = count($devicesWindows);
-	$supportedCountWindows = $row["windows"];
-	// Linux
-	$totalCountLinux = count($devicesLinux);
-	$supportedCountLinux = $row["linux"];
-	// Android	
-	$totalCountAndroid = count($devicesAndroid);
-	$supportedCountAndroid = $row["android"];
+	$extension = $extension->fetch(PDO::FETCH_ASSOC);
+	$supportedCountWindows = $extension["windows"];
+	$supportedCountLinux = $extension["linux"];
+	$supportedCountAndroid = $extension["android"];
 	DB::disconnect();			
 ?>
 

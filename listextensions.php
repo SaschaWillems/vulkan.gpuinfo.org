@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -21,43 +21,6 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
-
-	$devicesWindows = [];
-	$devicesAndroid = [];
-	$devicesLinux = [];	
-
-	DB::connect();			
-	$result = DB::$connection->prepare("SELECT 
-		r.id,
-		ifnull(r.displayname, dp.devicename) as device, 
-		r.osname
-		from deviceproperties dp
-		join reports r on r.id = dp.reportid");
-	$result->execute();
-	$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-	foreach ($rows as $row) {
-		if (in_array(strtolower($row["osname"]), ['osx', 'macos', 'unknown'])) {
-			continue;
-		}
-		switch(strtolower($row["osname"])) {
-			case "windows":
-				if (!in_array($row["device"], $devicesWindows)) {
-					$devicesWindows[] = $row["device"];
-				}
-				break;
-			case "android":
-				if (!in_array($row["device"], $devicesAndroid)) {
-					$devicesAndroid[] = $row["device"];
-				}
-				break;
-			default:
-				if (!in_array($row["device"], $devicesLinux)) {
-					$devicesLinux[] = $row["device"];
-				}
-				break;
-		}   
-	}     
-	DB::disconnect();     	
 ?>
 
 <script>
@@ -107,6 +70,7 @@
 
 <div class='header'>
 	<h4>Listing all available extensions</h4>
+	<?php echo count($devicesWindows) . ' / ' . count($devicesLinux) . ' / ' . count($devicesAndroid); ?>
 </div>			
 
 <center>
@@ -130,9 +94,9 @@
 			<?php		
 				DB::connect();
 				try {
-					$res =DB::$connection->prepare("select count(*) from reports"); 
-					$res->execute(); 
-					$reportCount = $res->fetchColumn(); 
+					$viewDeviceCount =DB::$connection->prepare("SELECT * from viewDeviceCount");
+					$viewDeviceCount->execute(); 
+					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);					
 
 					$extensions = DB::$connection->prepare("SELECT name, windows, linux, android, features2, properties2 from viewExtensionsPlatforms");
 					$extensions->execute();
@@ -143,9 +107,9 @@
 							echo "<tr>";						
 							echo "<td style=\"display:none;\">".$extension[0]."</td>";
 							echo $link ? "<td><a href=\"displayextension.php?name=".$extension[0]."\">".$extension[0]."</a></td>" : "<td>".$extension[0]."</td>";
-							echo "<td>".round($extension[1]/count($devicesWindows)*100,2)."</td>";
-							echo "<td>".round($extension[2]/count($devicesLinux)*100,2)."</td>";
-							echo "<td>".round($extension[3]/count($devicesAndroid)*100,2)."</td>";
+							echo "<td>".round($extension[1]/$deviceCounts["windows"]*100,2)."</td>";
+							echo "<td>".round($extension[2]/$deviceCounts["linux"]*100,2)."</td>";
+							echo "<td>".round($extension[3]/$deviceCounts["android"]*100,2)."</td>";
 							echo "</tr>";	       
 						}
 					}
