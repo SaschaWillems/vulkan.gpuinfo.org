@@ -71,7 +71,7 @@
 	// Fetch devices
 	$devicesWindows = [];
 	$devicesAndroid = [];
-	$devicesLinux = [];
+	$devicesLinux = [];	
 
 	DB::connect();			
 	$result = DB::$connection->prepare("SELECT 
@@ -79,12 +79,13 @@
 		ifnull(r.displayname, dp.devicename) as device, 
 		r.osname
 		from deviceproperties dp
-		join reports r on r.id = dp.reportid
-	where
-		r.id in (select reportid from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :name)");
-	$result->execute([":name" => $name]);
+		join reports r on r.id = dp.reportid");
+	$result->execute();
 	$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 	foreach ($rows as $row) {
+		if (in_array(strtolower($row["osname"]), ['osx', 'macos', 'unknown'])) {
+			continue;
+		}
 		switch(strtolower($row["osname"])) {
 			case "windows":
 				if (!in_array($row["device"], $devicesWindows)) {
@@ -103,125 +104,86 @@
 				break;
 		}   
 	}     
-	DB::disconnect();       			
+	DB::disconnect();      			
 ?>
 
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>	
-	<script>
-		$(document).ready(function() {
-			var tableNames = [ 
-				'devices_windows', 
-				'devices_linux', 
-				'devices_android'
-			];
-			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
-				$('#'+tableNames[i]).DataTable({
-					"pageLength" : 25,
-					"lengthChange": false,
-					"paging" : false,
-					"stateSave": false, 
-					"searchHighlight" : true,	
-					"dom": 'flrtip',			
-					"bInfo": false,	
-					"order": [[ 0, "asc" ]]	
-				});
-			}
-		} );	
-	</script>
+
+	<div class='header'>
+				<h4>Details for <?php echo $name ?></h4>
+	</div>			
 
 	<center>	
-		<div class='parentdiv'>
+		<div class='tablediv' style='width:auto; display: inline-block;'>
 
-			<h1>Device coverage for <?php echo $name ?></h1>
+			<div id="chart" style="padding-bottom:10px; display: hidden;"></div>
 
-			<div id="chart" style="padding-bottom:10px;"></div>
-			<div>
-				<ul class='nav nav-tabs'>
-					<li class="active"> <a data-toggle='tab' href='#windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-					<li> <a data-toggle='tab' href='#linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-					<li> <a data-toggle='tab' href='#android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
-				</ul>
-			</div>
+			<!-- Related features -->
 
-			<div class='tab-content'>
-				<!-- Windows -->
-				<div id='windows' class='tab-pane fade in active'>
-					<div class='tablediv' style='width:auto; display: inline-block;'>	
-						<table id="devices_windows" class="table table-striped table-bordered table-hover" >
-							<thead>
-								<tr>				
-									<th>Device</th>
-								</tr>
-							</thead>
-							<tbody>				
-								<?php		
-									foreach ($devicesWindows as $device) {
-										echo "<tr><td><a href='listreports.php?devicename=".$device."'>".$device."</a></td></tr>";
+			<?php
+				DB::connect();			
+				$result = DB::$connection->prepare("SELECT distinct(name) from devicefeatures2 where extension = :name");
+				$result->execute([":name" => $name]);
+				$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+			?>
+					<div style="text-align:left;">
+						<ul class="list-group">
+							<li class="list-group-item disabled">Related features</li>
+							<?php		
+								if (count($rows) > 0) {
+									foreach ($rows as $row) {
+										echo "<li class=\"list-group-item\"><a href='listreports.php?extensionfeature=".$row["name"]."'>".$row["name"]."</a></li>";
 									}     
-								?>   					
-							</tbody>
-						</table>
+								} else {
+									echo "<li class=\"list-group-item\">none</li>";
+								}
+							?>   					
+						</ul>
 					</div>
-				</div>
-				<!-- Linux -->
-				<div id='linux' class='tab-pane fade in'>
-					<div class='tablediv' style='width:auto; display: inline-block;'>	
-						<table id="devices_linux" class="table table-striped table-bordered table-hover" >
-							<thead>
-								<tr>				
-									<th>Device</th>
-								</tr>
-							</thead>
-							<tbody>				
-								<?php		
-									foreach ($devicesLinux as $device) {
-										echo "<tr><td><a href='listreports.php?devicename=".$device."'>".$device."</a></td></tr>";
-									}     
-								?>   					
-							</tbody>
-						</table>
+
+			<!-- Related properties -->
+
+			<?php
+				DB::connect();			
+				$result = DB::$connection->prepare("SELECT distinct(name) from deviceproperties2 where extension = :name");
+				$result->execute([":name" => $name]);
+				$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+			?>
+					<div style="text-align:left;">	
+						<ul class="list-group">
+							<li class="list-group-item disabled">Related properties</li>
+							<?php		
+								if (count($rows) > 0) {
+										foreach ($rows as $row) {
+										echo "<li class=\"list-group-item\"><a href='displayextensionproperty.php?name=".$row["name"]."'>".$row["name"]."</a></li>";
+									}								
+								} else {
+									echo "<li class=\"list-group-item\">none</li>";
+								}
+							?>   					
+						</ul>
 					</div>
-				</div>
-				<!-- Android -->
-				<div id='android' class='tab-pane fade in'>
-					<div class='tablediv' style='width:auto; display: inline-block;'>	
-						<table id="devices_android" class="table table-striped table-bordered table-hover" >
-							<thead>
-								<tr>				
-									<th>Device</th>
-								</tr>
-							</thead>
-							<tbody>				
-								<?php		
-									foreach ($devicesAndroid as $device) {
-										echo "<tr><td><a href='listreports.php?devicename=".$device."'>".$device."</a></td></tr>";
-									}     
-								?>   					
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
 
 	</center>
 
 <?php
 	DB::connect();			
 	// Count devices supporting this extension
+	$extension = DB::$connection->prepare("SELECT windows, linux, android, features2, properties2 from viewExtensionsPlatforms where name = :name");
+	$extension->execute(["name" => $name]);
+	$row = $extension->fetch(PDO::FETCH_ASSOC);
 	// Windows
-	$totalCountWindows = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on r.id = dp.reportid where osname = 'windows'", []);
-	$supportedCountWindows = count($devicesWindows);
+	$totalCountWindows = count($devicesWindows);
+	$supportedCountWindows = $row["windows"];
 	// Linux
-	$totalCountLinux = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on r.id = dp.reportid where osname not in ('windows', 'android', 'ios', 'osx')", []);
-	$supportedCountLinux = count($devicesLinux);
+	$totalCountLinux = count($devicesLinux);
+	$supportedCountLinux = $row["linux"];
 	// Android	
-	$totalCountAndroid = DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on r.id = dp.reportid where osname = 'android'", []);
-	$supportedCountAndroid = count($devicesAndroid);
+	$totalCountAndroid = count($devicesAndroid);
+	$supportedCountAndroid = $row["android"];
 	DB::disconnect();			
 ?>
 
-<?php echo count($devicesWindows) ?>
-	
 	<script type="text/javascript">
 		google.charts.load('current', {'packages':['corechart']});
 		google.charts.setOnLoadCallback(drawChart);
