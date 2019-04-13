@@ -54,20 +54,21 @@
 	}
 			
 	// Compare from report list
+	if (isset($_REQUEST['id'])) {
 	foreach ($_REQUEST['id'] as $k => $v) {
-		$reportids[] = $k;	
-		// Limit to 8 reports
-		if (count($reportids) > 7) 
-		{
-			$reportlimit = true;	 
-			break; 
-		}
-	}   
+			$reportids[] = $k;	
+			// Limit to 8 reports
+			if (count($reportids) > 7) {
+				$reportlimit = true;	 
+				break; 
+			}
+		}   
+	}
 
 	// Compare from device list
 	if (isset($_REQUEST['devices'])) {
 		$devices = $_REQUEST["devices"];
-		if (empty(devices)) {
+		if (empty($devices)) {
 			die();
 		}
 		for ($i = 0; $i < count($devices); $i++) {
@@ -93,6 +94,13 @@
 			if ($row) {
 				$reportids[] = $row['id'];
 			}
+
+			// Limit to 8 reports
+			if (count($reportids) > 7) {
+				$reportlimit = true;	 
+				break; 
+			}
+
 		}
 	}
 
