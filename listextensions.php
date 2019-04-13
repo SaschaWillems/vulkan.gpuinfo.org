@@ -59,7 +59,7 @@
 					break;
 			}
 			if (index > 1) {
-				window.open('listdevices.php?platform='+platform+'&extension='+data[0]);
+				window.location.href = 'listdevices.php?platform='+platform+'&extension='+data[0];
 			}
 		} );
 
