@@ -116,7 +116,7 @@
 			"lengthChange": false,
 			"dom": 'lrtip',	
 			"pageLength" : 25,		
-			"order": [[ 4, 'desc' ]],
+			"order": [[ 3, 'desc' ]],
 			"ajax": {
 				url :"responses/devices.php?platform=<?php echo $platform ?>",
 				data: {
