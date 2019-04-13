@@ -40,8 +40,8 @@
 	
 	$reportids = array();
 	$reportlimit = false;
-	
-	if ($_REQUEST['id']  == '') {
+
+	if ((!isset($_REQUEST['id'])) && (!isset($_REQUEST['devices']))) {
 		echo "<center>";
 		?>
 		<div class="alert alert-warning">
@@ -51,8 +51,9 @@
 		include './footer.inc';
 		echo "</center>";
 		die();
-	}						
+	}
 			
+	// Compare from report list
 	foreach ($_REQUEST['id'] as $k => $v) {
 		$reportids[] = $k;	
 		// Limit to 8 reports
@@ -62,6 +63,38 @@
 			break; 
 		}
 	}   
+
+	// Compare from device list
+	if (isset($_REQUEST['devices'])) {
+		$devices = $_REQUEST["devices"];
+		if (empty(devices)) {
+			die();
+		}
+		for ($i = 0; $i < count($devices); $i++) {
+			$device = explode('&os=', $devices[$i]);
+	
+			$oswhere = '';
+			switch($device[1]) {
+				case 'windows':
+					$oswhere = ' and ostype = 0';
+					break;
+				case 'linux':
+					$oswhere = ' and ostype = 1';
+					break;
+				case 'android':
+					$oswhere = ' and ostype = 2';
+					break;
+			}
+
+			$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $oswhere order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
+			$result->execute([":device" => $device[0]]);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+
+			if ($row) {
+				$reportids[] = $row['id'];
+			}
+		}
+	}
 
 ?>
 	<div class='header'>
