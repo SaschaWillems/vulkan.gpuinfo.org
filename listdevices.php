@@ -39,6 +39,10 @@
 		$caption .= " supporting ".$_GET["extension"];
 		$showTabs = false;
 	}
+	if (isset($_GET["submitter"])) {
+		$caption .= "Devices submitted by ".$_GET["submitter"];
+		$showTabs = false;
+	}
 ?>
 
 <center>
@@ -69,27 +73,31 @@
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 
 	<div id='devices_div' class='tab-pane <?php if ($i == 0) { echo "fade in active"; } ?>'>
+		<form method="get" action="compare.php">
 		<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 			<thead>
 				<tr>
 					<th>device</th>
 					<th>api</th>
 					<th>driver</th>
-					<th>version</th>
+					<!-- <th>version</th> -->
 					<th>submission</th>
 					<th>reports</th>
+					<th><input type='submit' class='button' value='compare'></th>
 				</tr>
 				<tr>
 					<th>Device</th>
 					<th>Max. API version</th>
 					<th>Latest Driver version</th>
-					<th>Report version</th>
+					<!-- <th>Report version</th> -->
 					<th>Last submission</th>
 					<th>Submissions</th>
+					<th></th>
 				</tr>
 			</thead>		
 		</table>
 		<div id="errordiv" style="color:#D8000C;"></div>		
+		</form>
 
 	</div>
 </center>
@@ -132,9 +140,10 @@
 				{ data: 'device' },
 				{ data: 'api' },
 				{ data: 'driver' },
-				{ data: 'reportversion' },
+				// { data: 'reportversion' },
 				{ data: 'submissiondate' },
 				{ data: 'reportcount' },
+				{ data: 'compare' }
 			],
 			// Pass order by column information to server side script
 			fnServerParams: function(data) {
