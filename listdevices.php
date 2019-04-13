@@ -103,6 +103,10 @@
 </center>
 
 <script>
+	$(document).on("keypress", "form", function(event) { 
+    	return event.keyCode != 13;
+	});	
+		
 	$( document ).ready(function() {
 		var table = $('#devices').DataTable({
 			"processing": true,
