@@ -153,6 +153,7 @@
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 
+    // TODO: Change to ostype
     if (isset($_REQUEST["platform"])) {
         $platform = $_REQUEST["platform"];
         if ($platform !== "all") {
@@ -161,11 +162,18 @@
             } else {
                 $whereClause = ' where ';
             }
-            if ($platform == 'linux') {
-                $whereClause .= "r.osname not in ('windows', 'android', 'ios', 'osx')";
-            } else {
-                $whereClause .= "r.osname = '".$platform."'";
+            switch($platform) {
+                case 'windows':
+                    $ostype = 0;
+                    break;
+                case 'linux':
+                    $ostype = 1;
+                    break;
+                case 'android':
+                    $ostype = 2;
+                    break;
             }
+            $whereClause .= "r.ostype = '".$ostype."'";
         }
     }
 
@@ -194,7 +202,8 @@
                 'driver' => $device["driverversion"], 
 				'reportcount' => $device["reportcount"],
                 'reportversion' => $device["reportversion"],
-                'submissiondate' => $device["submissiondate"]
+                'submissiondate' => $device["submissiondate"],
+                'compare' => '<center><input type="checkbox" name="devices[]" value="'.$device["device"].'&os='.$platform.'"></center>'
             );
         }        
     }
