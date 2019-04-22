@@ -114,6 +114,7 @@ function getQueueFlags($flag)
 		0x0002 => "COMPUTE_BIT" ,
 		0x0004 => "TRANSFER_BIT" ,
 		0x0008 => "SPARSE_BINDING_BIT" ,
+		0x0010 => "PROTECTED_BIT",
 	);		
 	return getFlags($flags, $flag);
 }
