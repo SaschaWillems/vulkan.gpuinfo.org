@@ -219,7 +219,8 @@
         from deviceproperties dp
         join reports r on r.id = dp.reportid
         $whereClause
-        group by device";
+        group by device
+        ".$searchClause;
 
     $filteredCount = 0;
     $stmnt = DB::$connection->prepare($sql_count);
