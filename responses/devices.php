@@ -33,6 +33,9 @@
     if (isset($_REQUEST['order'])) {
         $orderByColumn = $_REQUEST['order'][0]['column'];
         $orderByDir = $_REQUEST['order'][0]['dir'];
+        if (strcasecmp($orderByColumn, 'driver') == 0) {
+            $orderByColumn = 'driverversionraw';
+        }
     }
 
     // Paging
@@ -149,7 +152,12 @@
             $whereClause = "where r.displayname = :filter_displayname";
             $params['filter_displayname'] = $displayname;            
         }
-	}    
+    }
+    
+    $minversion = false;
+    if (isset($_REQUEST['minversion'])) {
+        $minversion = true;
+    }
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 
@@ -177,21 +185,40 @@
         }
     }
 
-    $sql = "SELECT 
-        r.id,
-        ifnull(r.displayname, dp.devicename) as device, 
-        max(dp.apiversionraw) as api,
-        max(dp.driverversion) as driverversion,
-        count(distinct r.id) as reportcount,
-        max(r.version) as reportversion,
-        max(r.submissiondate) as submissiondate
-        from deviceproperties dp
-        join reports r on r.id = dp.reportid
-        $whereClause
-        group by device
-        ".$searchClause."
-        ".$orderBy;
-
+    if ($minversion) {
+        $sql = 
+            "SELECT 
+                ifnull(r.displayname, dp.devicename) as device, 
+                min(dp.apiversionraw) as api,
+                min(dp.driverversion) as driverversion,
+                min(dp.driverversionraw) as driverversionraw, 
+                0 as reportversion,
+                0 as reportcount,
+                min(submissiondate) as submissiondate,
+                date(min(submissiondate)) as submissiondate 
+                from reports r
+                join deviceproperties dp on r.id = dp.reportid
+                $whereClause
+                group by r.devicename
+                ".$searchClause."
+                ".$orderBy;
+    } else {
+        $sql = 
+            "SELECT 
+                r.id,
+                ifnull(r.displayname, dp.devicename) as device, 
+                max(dp.apiversionraw) as api,
+                max(dp.driverversion) as driverversion,
+                count(distinct r.id) as reportcount,
+                max(r.version) as reportversion,
+                max(r.submissiondate) as submissiondate
+                from deviceproperties dp
+                join reports r on r.id = dp.reportid
+                $whereClause
+                group by device
+                ".$searchClause."
+                ".$orderBy;
+    }
     $devices = DB::$connection->prepare($sql." ".$paging);
     $devices->execute($params);
     if ($devices->rowCount() > 0) { 
