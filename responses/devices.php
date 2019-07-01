@@ -47,6 +47,12 @@
     // Filtering
     $searchColumns = ['device', 'api', 'driverversion', 'reportversion', 'reportcount'];
 
+    $minversion = false;
+    if (isset($_REQUEST['minversion'])) {
+        $minversion = true;
+        $searchColumns = ['device', 'vendor', 'driverversion'];
+    }
+
     // Per-column filtering
     $filters = array();
     for ($i = 0; $i < count($_REQUEST['columns']); $i++) {
@@ -154,11 +160,6 @@
         }
     }
     
-    $minversion = false;
-    if (isset($_REQUEST['minversion'])) {
-        $minversion = true;
-    }
-
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 
     // TODO: Change to ostype
@@ -195,11 +196,13 @@
                 0 as reportversion,
                 0 as reportcount,
                 min(submissiondate) as submissiondate,
-                date(min(submissiondate)) as submissiondate 
+                VendorId(dp.vendorid) as vendor,
+                date(min(submissiondate)) as submissiondate,
+                r.osname as osname
                 from reports r
                 join deviceproperties dp on r.id = dp.reportid
                 $whereClause
-                group by r.devicename
+                group by device
                 ".$searchClause."
                 ".$orderBy;
     } else {
@@ -209,16 +212,20 @@
                 ifnull(r.displayname, dp.devicename) as device, 
                 max(dp.apiversionraw) as api,
                 max(dp.driverversion) as driverversion,
+                max(dp.driverversionraw) as driverversionraw, 
                 count(distinct r.id) as reportcount,
                 max(r.version) as reportversion,
-                max(r.submissiondate) as submissiondate
+                VendorId(dp.vendorid) as vendor,
+                max(r.submissiondate) as submissiondate,
+                r.osname as osname
                 from deviceproperties dp
                 join reports r on r.id = dp.reportid
                 $whereClause
                 group by device
                 ".$searchClause."
-                ".$orderBy;
+                ".$orderBy;          
     }
+
     $devices = DB::$connection->prepare($sql." ".$paging);
     $devices->execute($params);
     if ($devices->rowCount() > 0) { 
@@ -226,31 +233,18 @@
             $data[] = array(
                 'device' => '<a href="listreports.php?devicename='.$device["device"].'">'.$device["device"].'</a>', 
                 'api' => versionToString($device["api"]), 
-                'driver' => $device["driverversion"], 
+                'driver' =>  getDriverVerson($device["driverversionraw"], "", $device["vendor"], $device["osname"]), 
 				'reportcount' => $device["reportcount"],
                 'reportversion' => $device["reportversion"],
                 'submissiondate' => $device["submissiondate"],
+                'vendor' => $device["vendor"],
                 'compare' => '<center><input type="checkbox" name="devices[]" value="'.$device["device"].'&os='.$platform.'"></center>'
             );
         }        
     }
 
-    $sql_count = "SELECT 
-        r.id,
-        ifnull(r.displayname, dp.devicename) as device, 
-        max(dp.apiversionraw) as api,
-        max(dp.driverversion) as driverversion,
-        count(distinct r.id) as reportcount,
-        max(r.version) as reportversion,
-        max(r.submissiondate) as submissiondate
-        from deviceproperties dp
-        join reports r on r.id = dp.reportid
-        $whereClause
-        group by device
-        ".$searchClause;
-
     $filteredCount = 0;
-    $stmnt = DB::$connection->prepare($sql_count);
+    $stmnt = DB::$connection->prepare($sql);
     $stmnt->execute($params);
     $totalCount = $stmnt->rowCount(); 
 
