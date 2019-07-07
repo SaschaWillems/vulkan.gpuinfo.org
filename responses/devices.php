@@ -197,6 +197,7 @@
                 0 as reportcount,
                 min(submissiondate) as submissiondate,
                 VendorId(dp.vendorid) as vendor,
+                dp.vendorid as vendorid,
                 date(min(submissiondate)) as submissiondate,
                 r.osname as osname
                 from reports r
@@ -216,6 +217,7 @@
                 count(distinct r.id) as reportcount,
                 max(r.version) as reportversion,
                 VendorId(dp.vendorid) as vendor,
+                dp.vendorid as vendorid,
                 max(r.submissiondate) as submissiondate,
                 r.osname as osname
                 from deviceproperties dp
@@ -233,7 +235,7 @@
             $data[] = array(
                 'device' => '<a href="listreports.php?devicename='.$device["device"].'">'.$device["device"].'</a>', 
                 'api' => versionToString($device["api"]), 
-                'driver' =>  getDriverVerson($device["driverversionraw"], "", $device["vendor"], $device["osname"]), 
+                'driver' =>  getDriverVerson($device["driverversionraw"], "", $device["vendorid"], $device["osname"]), 
 				'reportcount' => $device["reportcount"],
                 'reportversion' => $device["reportversion"],
                 'submissiondate' => $device["submissiondate"],
