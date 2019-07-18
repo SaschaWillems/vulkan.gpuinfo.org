@@ -731,7 +731,7 @@
 					$stmnt->execute(array(":name" => $layer['layerName']));
 					$layerid = $stmnt->fetchColumn();			
 					// Insert
-					$sql = "INSERT INTO deviceinstancelayers 
+					$sql = "INSERT IGNORE INTO deviceinstancelayers 
 								(reportid, layerid, implversion, specversion) 
 							VALUES 
 								(:reportid, :layerid, :implversion, :specversion)";
