@@ -34,34 +34,13 @@
 			"bInfo": false,	
 			"order": [[ 0, "asc" ]],
 			"columnDefs": [{
-      			"targets": [ 2, 3, 4 ],
-      			"render": $.fn.dataTable.render.percentBar('round', '#000', '#eaeaea', '#14963c', '#fff', 2, 'solid')
+      			"targets": [ 1, 2, 3 ],
 			}]
 		});
 
 		$("#searchbox").on("keyup search input paste cut", function() {
 			table.search(this.value).draw();
 		});
-
-		$('#extensions tbody td').click( function () {
-			var data = table.row( $(this).parents('tr') ).data();
-			var index = table.cell( this ).index().columnVisible;
-			var platform = null;
-			switch(index) {
-				case 2:
-					platform = 'windows';
-					break;
-				case 3:
-					platform = 'linux';
-					break;
-				case 4:
-					platform = 'android';
-					break;
-			}
-			if (index > 1) {
-				window.location.href = 'listdevices.php?platform='+platform+'&extension='+data[0];
-			}
-		} );
 
 	} );	
 </script>
@@ -80,7 +59,6 @@
 				<th colspan=3 style="text-align: center;">Device coverage</th>
 			</tr>
 			<tr>			
-				<th style="display:none;">Extensions</th>
 				<th>Extensions</th>
 				<th style="text-align: center; width:90px;">Windows</th>
 				<th style="text-align: center; width:90px;">Linux</th>
@@ -100,13 +78,12 @@
 
 					if ($extensions->rowCount() > 0) { 
 						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
-							$link = ($extension[4] > 0 || $extension[5] > 0);
+							$link = ($extension[4] > 0 || $extension[5] > 0) ? " <a href=\"displayextension.php?name=".$extension[0]."\" title=\"Show additional features and properties for this extensions\">[?]</a>" : "";
 							echo "<tr>";						
-							echo "<td style=\"display:none;\">".$extension[0]."</td>";
-							echo $link ? "<td><a href=\"displayextension.php?name=".$extension[0]."\">".$extension[0]."</a></td>" : "<td>".$extension[0]."</td>";
-							echo "<td>".round($extension[1]/$deviceCounts["windows"]*100,2)."</td>";
-							echo "<td>".round($extension[2]/$deviceCounts["linux"]*100,2)."</td>";
-							echo "<td>".round($extension[3]/$deviceCounts["android"]*100,2)."</td>";
+							echo "<td>".$extension[0].$link."</td>";
+							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=windows&extension=$extension[0]\">".round($extension[1]/$deviceCounts["windows"]*100, 2)."%</a></td>";
+							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&extension=$extension[0]\">".round($extension[2]/$deviceCounts["linux"]*100, 2)."%</a></td>";
+							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&extension=$extension[0]\">".round($extension[3]/$deviceCounts["android"]*100, 2)."%</a></td>";
 							echo "</tr>";	       
 						}
 					}
@@ -118,7 +95,6 @@
 			?>   
 		</tbody>
 	</table>  
-
 </div>
 
 <?php include './footer.inc'; ?>
