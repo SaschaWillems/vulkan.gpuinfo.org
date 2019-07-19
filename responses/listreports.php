@@ -144,7 +144,7 @@
     if (isset($_REQUEST['filter']['devicename'])) {
 	    $devicename = $_REQUEST['filter']['devicename'];
         if ($devicename != '') {
-            $whereClause = "where r.devicename = :filter_devicename or r.displayname = :filter_devicename";
+            $whereClause = "where (r.devicename = :filter_devicename or r.displayname = :filter_devicename)";
             $params['filter_devicename'] = $devicename;            
         }
 	}    
@@ -185,6 +185,23 @@
         $whereClause = "where r.id ".($negate ? "not" : "")." in (select reportid from devicefeatures2 where name = :filter_extensionfeaturename and supported = 1)";
         $params['filter_extensionfeaturename'] = $extensionfeature;            
     }    
+    // Platform (os)
+    if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
+        $platform = $_REQUEST['filter']['platform'];
+        switch($platform) {
+            case 'windows':
+                $ostype = 0;
+                break;
+            case 'linux':
+                $ostype = 1;
+                break;
+            case 'android':
+                $ostype = 2;
+                break;
+        }
+        $whereClause .= (($whereClause != '') ? ' and ' : ' where ') . 'r.ostype = :ostype';
+        $params['ostype'] = $ostype;
+    }
 
     $orderBy = "order by ".$orderByColumn." ".$orderByDir;
 

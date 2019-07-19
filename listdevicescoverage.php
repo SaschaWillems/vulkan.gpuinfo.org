@@ -32,16 +32,17 @@
 	$caption = null;
 
 	if (isset($_GET["extension"])) {
-		$caption = "Listing first known driver version support for ".$_GET["extension"];
+		$caption = "Listing first known driver version support for <b>".$_GET["extension"]."</b>";
 	}
 
 	if (isset($_GET["feature"])) {
-		$caption = "Listing first known driver version support for ".$_GET["feature"];
+		$caption = "Listing first known driver version support for <b>".$_GET["feature"]."</b>";
 	}
 
 	if (isset($_GET['platform'])) {
 		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
 	}
+
 	if (isset($_GET["submitter"])) {
 		$caption .= "<br/>Devices submitted by ".$_GET["submitter"];
 	}
@@ -73,7 +74,7 @@
 				<tr>
 					<th>Device</th>
 					<th>Vendor</th>
-					<th>Driver version</th>
+					<th>Driver <span title="First known driver version supporting this extension/feature" class="hint">[?]</span></th>
 					<th>Date</th>
 					<th></th>
 				</tr>
@@ -99,10 +100,9 @@
 			"lengthChange": true,
 			"lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
 			"dom": 'lrtip',	
-			"pageLength" : 25,		
-			// "searchDelay": 2500,
+			"pageLength" : 50,		
 			"order": [[ 0, 'asc' ]],
-			"columnDefs": [{ "orderable": false, "targets": [ 3 ] }],
+			"columnDefs": [{ "orderable": false, "targets": [ 4 ] }],
 			"ajax": {
 				url :"responses/devices.php?platform=<?php echo $platform ?>&minversion=true",
 				data: {

@@ -187,23 +187,33 @@
 		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting extension feature <b>".$extensionfeature."</b> ($extname)";
 		$caption .= " (<a href='listreports.php?extensionfeature=".$extensionfeature.($negate ? "" : "&option=not")."'>toggle</a>)";
 	}	
+	// Platform (os)
+	$platform = null;
+	if (isset($_GET['platform']) && ($_GET['platform'] !== 'all')) {
+		$platform = $_GET['platform'];	
+		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+	}
 
 	if ($defaultHeader) {
 		echo "<div class='header'>";	
 		echo "	<h4>Listing reports</h4>";
-		echo "</div>";		
+		echo "</div>";
 	}	
+?>
+
+<?php
+	if (!$defaultHeader) {
+		// echo "<caption class='".$headerClass." header-span'>".$caption."</caption>";
+		echo "<div class='header'><h4>";
+		echo $caption ? $caption : "Listing available devices";
+		echo "</h4></div>";
+	}
 ?>
 
 	<div class="tablediv">	
 
 		<form method="get" action="compare.php?compare">	
 		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
-			<?php
-				if (!$defaultHeader) {
-					echo "<caption class='".$headerClass." header-span'>".$caption."</caption>";
-				}
-			?>
 			<thead>
 				<tr>
 					<th></th>
@@ -281,7 +291,8 @@
 						'devicename' : '<?php echo $_GET["devicename"] ?>',
 						'displayname' : '<?php echo $_GET["displayname"] ?>',
 						'instanceextension': '<?php echo $_GET["instanceextension"] ?>',
-						'instancelayer': '<?php echo $_GET["instancelayer"] ?>'
+						'instancelayer': '<?php echo $_GET["instancelayer"] ?>',
+						'platform': '<?php echo $_GET["platform"] ?>',
 					}
 				},
 				error: function (xhr, error, thrown) {

@@ -444,3 +444,7 @@ h1 {
 	margin: 0 !important;
 	line-height: inherit;
 }
+
+.hint {
+	color: #acacac;
+}

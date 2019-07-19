@@ -232,8 +232,12 @@
     $devices->execute($params);
     if ($devices->rowCount() > 0) { 
         foreach ($devices as $device) {
+            $url = 'listreports.php?devicename='.$device["device"];
+            if ($platform !== 'all') {
+                $url .= '&platform='.$platform;
+            }
             $data[] = array(
-                'device' => '<a href="listreports.php?devicename='.$device["device"].'">'.$device["device"].'</a>', 
+                'device' => '<a href="'.$url.'">'.$device["device"].'</a>',
                 'api' => versionToString($device["api"]), 
                 'driver' =>  getDriverVerson($device["driverversionraw"], "", $device["vendorid"], $device["osname"]), 
 				'reportcount' => $device["reportcount"],
