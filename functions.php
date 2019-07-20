@@ -249,10 +249,12 @@ function getColorSpace($value)
 // Generate device info table part for report compare pages
 function reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, $count)
 {
-	for ($i = 0; $i < sizeof($deviceinfo_data[0]); ++$i) {
+	for ($i = 0; $i < sizeof($deviceinfo_data[0]); ++$i) 
+	{
 		echo "<tr>";
 		echo "<td>".$deviceinfo_captions[$i]."</td>";
-		for ($j = 0, $arrsize = $count; $j < $arrsize; ++$j) {
+		for ($j = 0, $arrsize = $count; $j < $arrsize; ++$j) 				
+		{
 			echo "<td class='deviceinfo'>".$deviceinfo_data[$j][$i]."</td>";
 		}
 		echo "</tr>";
@@ -300,6 +302,78 @@ function mailError($error, $content) {
 	$msg .= "\n\nContent:\n";
 	$msg .= $content;
 	mail('webmaster@saschawillems.de', $msgtitle, $msg);
+}
+
+/**
+ * Return database os type from platform name
+ * 
+ * @param string $platform Human readable platform name (Windows, Linux, Android)
+ * @return int|null Database mapped os type or null if unknown
+ */
+function ostype($platform) {
+	switch($platform) {
+		case 'windows':
+			return 0;
+		case 'linux':
+			return 1;
+		case 'android':
+			return 2;
+	}
+	return null;
+}
+
+/**
+ * Formats a JSON string for pretty printing
+ *
+ * @param string $json The JSON to make pretty
+ * @param bool $html Insert nonbreaking spaces and <br />s for tabs and linebreaks
+ * @return string The prettified output
+ * @author Jay Roberts (https://github.com/GloryFish)
+ */
+function _format_json($json, $html = false) {
+	$tabcount = 0; 
+	$result = ''; 
+	$inquote = false; 
+	$ignorenext = false; 
+	if ($html) { 
+		$tab = "&nbsp;&nbsp;&nbsp;"; 
+		$newline = "<br/>"; 
+	} else { 
+		$tab = "\t"; 
+		$newline = "\n"; 
+	} 
+	for($i = 0; $i < strlen($json); $i++) { 
+		$char = $json[$i]; 
+		if ($ignorenext) { 
+			$result .= $char; 
+			$ignorenext = false; 
+		} else { 
+			switch($char) { 
+				case '{': 
+					$tabcount++; 
+					$result .= $char . $newline . str_repeat($tab, $tabcount); 
+					break; 
+				case '}': 
+					$tabcount--; 
+					$result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char; 
+					break; 
+				case ',': 
+					$result .= $char . $newline . str_repeat($tab, $tabcount); 
+					break; 
+				case '"': 
+					$inquote = !$inquote; 
+					$result .= $char; 
+					break; 
+				case '\\': 
+					if ($inquote) $ignorenext = true; 
+					$result .= $char; 
+					break; 
+				default: 
+					$result .= $char; 
+			} 
+		} 
+	} 
+	return $result; 
 }
 
 ?>
