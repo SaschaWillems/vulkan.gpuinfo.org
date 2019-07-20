@@ -1,16 +1,16 @@
 <?php
 function versionToString($version)
 {
-    $versionStr = ($version >> 22).".".(($version >> 12) & 0x3ff).".".($version & 0xfff);
-    return $versionStr;
+	$versionStr = ($version >> 22).".".(($version >> 12) & 0x3ff).".".($version & 0xfff);
+	return $versionStr;
 }
 
 function getFlags($flagList, $flag)
 {
 	$flags = array();
-	
+
 	$arrVals = array_values($flagList);
-			
+
 	$index = 0;
 	foreach ($flagList as $i => $value)
 	{
@@ -19,8 +19,8 @@ function getFlags($flagList, $flag)
 			$flags[] = $arrVals[$index];
 		}
 		$index++;
-	}			
-	return $flags;		
+	}
+	return $flags;
 }
 
 function getFormatFlags($flag)
@@ -73,7 +73,7 @@ function getSurfaceTransformFlags($flag)
 		0x0080 => "HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR",
 		0x0100 => "INHERIT_BIT_KHR",
 	);
-	return getFlags($flags, $flag);	
+	return getFlags($flags, $flag);
 }
 
 function getCompositeAlphaFlags($flag)
@@ -84,45 +84,45 @@ function getCompositeAlphaFlags($flag)
 		0x0004 => "POST_MULTIPLIED_BIT_KHR",
 		0x0008 => "INHERIT_BIT_KHR",
 	);
-	return getFlags($flags, $flag);	
+	return getFlags($flags, $flag);
 }
 
 function getMemoryTypeFlags($flag)
 {
 	$flags = array(
-		0x0001 => "DEVICE_LOCAL_BIT" ,
+		0x0001 => "DEVICE_LOCAL_BIT",
 		0x0002 => "HOST_VISIBLE_BIT",
 		0x0004 => "HOST_COHERENT_BIT",
 		0x0008 => "HOST_CACHED_BIT",
-		0x0010 => "LAZILY_ALLOCATED_BIT",	
-	);		
+		0x0010 => "LAZILY_ALLOCATED_BIT",
+	);
 	return getFlags($flags, $flag);
 }
 
 function getMemoryHeapFlags($flag)
 {
 	$flags = array(
-		0x0001 => "DEVICE_LOCAL_BIT" ,
-	);		
+		0x0001 => "DEVICE_LOCAL_BIT",
+	);
 	return getFlags($flags, $flag);
 }
 
 function getQueueFlags($flag)
 {
 	$flags = array(
-		0x0001 => "GRAPHICS_BIT" ,
-		0x0002 => "COMPUTE_BIT" ,
-		0x0004 => "TRANSFER_BIT" ,
-		0x0008 => "SPARSE_BINDING_BIT" ,
+		0x0001 => "GRAPHICS_BIT",
+		0x0002 => "COMPUTE_BIT",
+		0x0004 => "TRANSFER_BIT",
+		0x0008 => "SPARSE_BINDING_BIT",
 		0x0010 => "PROTECTED_BIT",
-	);		
+	);
 	return getFlags($flags, $flag);
 }
 
 function getSampleCountFlags($flag)
 {
 	$flags = array();
-	for ($i = 0; $i < 7; ++$i) 
+	for ($i = 0; $i < 7; ++$i)
 	{
 		$flags[pow(2, $i)] = pow(2, $i);
 	}
@@ -147,7 +147,7 @@ function listSubgroupFeatureFlags($flag)
 {
 	$flags = array(
 		0x0001 => "BASIC",
-		0x0002 => "VOTE", 
+		0x0002 => "VOTE",
 		0x0004 => "ARITHMETIC",
 		0x0008 => "BALLOT",
 		0x0010 => "SHUFFLE",
@@ -157,8 +157,8 @@ function listSubgroupFeatureFlags($flag)
 		//0x0100 => "PARTITIONED_BIT_NV"
 	);
 
-	$res = null;	
-	$arr_values = array_values($flags);		
+	$res = null;
+	$arr_values = array_values($flags);
 	$index = 0;
 	foreach ($flags as $i => $value) {
 		$class = ($flag & $i) ? "supported" : "unsupported";
@@ -181,7 +181,7 @@ function listSubgroupStageFlags($flag)
 	);
 
 	$res = null;
-	$arr_values = array_values($flags);			
+	$arr_values = array_values($flags);
 	$index = 0;
 	foreach ($flags as $i => $value) {
 		if ($i == 0x001F) {
@@ -192,7 +192,7 @@ function listSubgroupStageFlags($flag)
 		$res .= "<span class='".$class."'>".strtolower($arr_values[$index])."</span><br>";
 		$index++;
 	}
-	return $res;		
+	return $res;
 }
 
 // Generate a simple ul/li list for the flags
@@ -218,6 +218,8 @@ function getPresentMode($value)
 		"MAILBOX_KHR" => 1,
 		"FIFO_KHR" => 2,
 		"FIFO_RELAXED_KHR" => 3,
+		"SHARED_DEMAND_REFRESH_KHR" => 1000111000,
+		"SHARED_CONTINUOUS_REFRESH_KHR" => 1000111001,
 	);
 	if (in_array($value, $modes))
 	{
@@ -267,9 +269,9 @@ function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 	if ($versionraw != '')
 	{
 		// NVIDIA
-		if ($vendorid == 4318)	
-		{		
-			return sprintf("%d.%d.%d.%d", 
+		if ($vendorid == 4318)
+		{
+			return sprintf("%d.%d.%d.%d",
 				($versionraw >> 22) & 0x3ff,
 				($versionraw >> 14) & 0x0ff,
 				($versionraw >> 6) & 0x0ff,
@@ -284,7 +286,7 @@ function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 				);
 		}
 		// Use Vulkan version conventions if vendor mapping is not available
-		return sprintf("%d.%d.%d", 
+		return sprintf("%d.%d.%d",
 			($versionraw >> 22),
 			($versionraw >> 12) & 0x3ff,
 			$versionraw & 0xfff,
@@ -292,7 +294,7 @@ function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 			);
 	}
 	
-	return $versiontext;	
+	return $versiontext;
 }
 
 function mailError($error, $content) {
