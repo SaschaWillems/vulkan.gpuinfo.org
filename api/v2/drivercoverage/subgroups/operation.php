@@ -21,13 +21,13 @@
 
 	include './../../../../dbconfig.php';
 	include './../../../../functions.php';
+	include './../apiendpoint.php';
 
 	header('Content-Type: application/json');
 
 	$enum = $_GET["operation"];
 	if(!$enum) {
-		echo json_encode(["error" => "No subgroup operation specified"]);
-		die();
+		exit(json_encode(["error" => "No subgroup operation specified"]));
 	}
 
 	function enumToValue(string $enum)
@@ -56,54 +56,15 @@
 	if ($enumValue === null) {
 		die(json_encode(["error" => "Unknown subgroup operation"]));
 	}
-
-	$ostype = null;
-	if (isset($_GET["platform"])) {
-		$ostype = ostype($_GET["platform"]);
-		if ($ostype === null) {
-			die(json_encode(["error" => "Unknown platform type"]));
-		}
-	}
 	$params["operation"] = $enumValue;
 
-	// Surface info is stored starting with report version 1.2, so ignore older reports
 	$whereClause = "WHERE (`subgroupProperties.supportedOperations` & :operation) > 0";
-	if ($ostype !== null) {
-		$whereClause .= " AND r.ostype = :ostype";
-	 	$params["ostype"]  = $ostype;
-	}
-	
-	try {
-		$sql = 
-		"SELECT 
-			ifnull(r.displayname, dp.devicename) as device, 
-			min(dp.apiversionraw) as api,
-			min(dp.driverversion) as driverversion,
-			min(dp.driverversionraw) as driverversionraw, 
-			min(submissiondate) as submissiondate,
-			VendorId(dp.vendorid) as vendor,
-			date(min(submissiondate)) as submissiondate,
-			r.osname as platform
-			FROM reports r
-			JOIN deviceproperties dp on r.id = dp.reportid
-			$whereClause
-			GROUP BY device
-			ORDER by platform, device";
 
-		$stmnt = DB::$connection->prepare($sql);
-		$stmnt->execute($params);
-	
-		if ($stmnt->rowCount() > 0) {		
-			$rows = array();
-			while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-				$rows[] = $row;
-			}
-			echo _format_json(json_encode($rows), false);			
-		} 
-		else {
-			echo json_encode(["error" => "Request did not yield any result"]);
-		}
-	} catch (Exception $e) {
+	try {
+		$endpoint = new apiendpoint();
+		$endpoint->setWhereClause($whereClause);
+		$endpoint->execute($params, ["operation" => $enumValue]);
+	} catch (Throwable $e) {
 		echo json_encode(["error" => "Server error while fetching report list"]);
 	}
 
