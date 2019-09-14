@@ -26,17 +26,26 @@
 	$platform = "all";
 	if (isset($_GET['platform'])) {
 		$platform = $_GET['platform'];
-		// TODO: Check valid platforms
+	}
+	$negate = false;
+	if (isset($_GET['option'])) {
+		$negate = $_GET['option'] == 'not';
 	}
 
 	$caption = null;
 
 	if (isset($_GET["extension"])) {
-		$caption = "Listing first known driver version support for <b>".$_GET["extension"]."</b>";
+		$caption = $negate ? 
+			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET["extension"]."</b>" 
+			: 
+			"Listing first known driver version support for <b>".$_GET["extension"]."</b>";
 	}
 
 	if (isset($_GET["feature"])) {
-		$caption = "Listing first known driver version support for <b>".$_GET["feature"]."</b>";
+		$caption = $negate ? 
+			"Listing devices <span style='color:red;'>not</span> supporting for <b>".$_GET["feature"]."</b>" 
+			: 
+			"Listing first known driver version support for <b>".$_GET["feature"]."</b>";
 	}
 
 	if (isset($_GET['platform'])) {
