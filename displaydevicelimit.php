@@ -41,7 +41,29 @@
 				$filter = "where reportid in (select id from reports where osname not in ('windows', 'android', 'ios', 'osx'))";
 			}
 		}
-	}					
+	}
+
+	$caption = "Value distribution for $name";
+
+	$platform = null;
+	if (isset($_GET['platform'])) {
+        $platform = $_GET["platform"];
+        if ($platform !== "all") {
+            switch($platform) {
+                case 'windows':
+                    $ostype = 0;
+                    break;
+                case 'linux':
+                    $ostype = 1;
+                    break;
+                case 'android':
+                    $ostype = 2;
+                    break;
+            }
+			$filter .= "where reportid in (select id from reports where ostype = '".$ostype."')";
+			$caption .= "on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+        }
+	}
 
 	// Check if capability as valid and part of the selected table
 	DB::connect();
@@ -78,7 +100,7 @@
 	</script>
 
 	<div class='header'>
-		<h4 class='headercaption'>Value distribution for <?php echo $name ?></h4>
+		<h4 class='headercaption'><?php echo $caption; ?></h4>
 	</div>
 
 	<center>	
@@ -99,7 +121,7 @@
 							$result->execute();
 							$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 							foreach ($rows as $cap) {
-								$link ="listreports.php?limit=$name&value=".$cap["value"];
+								$link ="listreports.php?limit=$name&value=".$cap["value"].($platform ? "&platform=$platform" : "");
 								echo "<tr>";						
 								echo "<td>".$cap["value"]."</td>";
 								echo "<td><a href='$link'>".$cap["reports"]."</a></td>";
