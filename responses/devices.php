@@ -83,7 +83,11 @@
 	if (isset($_REQUEST['filter']['extension'])) {
 	    $extension = $_REQUEST['filter']['extension'];
         if ($extension != '') {
-            $whereClause = "where r.id ".($negate ? "not" : "")." in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
+            if ($negate) {
+                $whereClause = "where r.devicename not in (select r.devicename from reports r join deviceextensions de on de.reportid = r.id join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
+            } else {               
+                $whereClause = "where r.id in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
+            }
             $params['filter_extension'] = $extension;
         }
 	}
