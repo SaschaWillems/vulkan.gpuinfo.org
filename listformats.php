@@ -21,6 +21,13 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
+	include './functions.php';
+
+	$platform = "windows";
+	if (isset($_GET['platform'])) {
+		$platform = $_GET['platform'];
+	}
+
 ?>
 
 <script>
@@ -43,10 +50,20 @@
 </script>
 
 <div class='header'>
-	<h4>Listing all available image and buffer formats</h4>
+	<?php
+		echo "<h4>Image and buffer format support on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+	?>
 </div>			
 
 <center>	
+	<div>
+		<ul class='nav nav-tabs'>
+			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listformats.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
+			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listformats.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
+			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listformats.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+		</ul>
+	</div>
+
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 
 	<table id="formats" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -80,9 +97,10 @@
 						sum(if(optimaltilingfeatures > 0, 1, 0)) as optimal, 
 						sum(if(bufferfeatures > 0, 1, 0)) as buffer,
 						count(reportid) as reportcount
-						from deviceformats df join VkFormat vkf on df.formatid = vkf.value
+						from deviceformats df join VkFormat vkf on df.formatid = vkf.value join reports r on r.id = df.reportid
+						where r.ostype = :ostype
 						group by vkf.name");
-					$formats->execute($params);
+					$formats->execute(['ostype' => ostype($platform)]);
 
 					if ($formats->rowCount() > 0) { 
 						while ($format = $formats->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {						
