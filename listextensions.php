@@ -81,9 +81,9 @@
 							$link = ($extension[4] > 0 || $extension[5] > 0) ? " <a href=\"displayextension.php?name=".$extension[0]."\" title=\"Show additional features and properties for this extensions\">[?]</a>" : "";
 							echo "<tr>";						
 							echo "<td>".$extension[0].$link."</td>";
-							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=windows&extension=$extension[0]\">".round($extension[1]/$deviceCounts["windows"]*100, 2)."%</a></td>";
-							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&extension=$extension[0]\">".round($extension[2]/$deviceCounts["linux"]*100, 2)."%</a></td>";
-							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&extension=$extension[0]\">".round($extension[3]/$deviceCounts["android"]*100, 2)."%</a></td>";
+							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=windows&extension=$extension[0]\">".round($extension[1]/$deviceCounts["windows"]*100, 1)."%</a></td>";
+							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&extension=$extension[0]\">".round($extension[2]/$deviceCounts["linux"]*100, 1)."%</a></td>";
+							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&extension=$extension[0]\">".round($extension[3]/$deviceCounts["android"]*100, 1)."%</a></td>";
 							echo "</tr>";	       
 						}
 					}

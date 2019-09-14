@@ -106,9 +106,9 @@
 					foreach($features as $feature) {
 						echo "<tr>";
 						echo "<td>".$feature."</td>";
-						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=windows&feature=$feature\">".round($supportedCounts[0][$feature]/$deviceCounts["windows"]*100, 2)."%</a></td>";
-						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&feature=$feature\">".round($supportedCounts[1][$feature]/$deviceCounts["linux"]*100, 2)."%</a></td>";
-						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&feature=$feature\">".round($supportedCounts[2][$feature]/$deviceCounts["android"]*100, 2)."%</a></td>";
+						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=windows&feature=$feature\">".round($supportedCounts[0][$feature]/$deviceCounts["windows"]*100, 1)."%</a></td>";
+						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&feature=$feature\">".round($supportedCounts[1][$feature]/$deviceCounts["linux"]*100, 1)."%</a></td>";
+						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&feature=$feature\">".round($supportedCounts[2][$feature]/$deviceCounts["android"]*100, 1)."%</a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
