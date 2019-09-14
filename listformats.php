@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -47,36 +47,52 @@
 </div>			
 
 <center>	
-	<div class='parentdiv'>
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 
 	<table id="formats" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 		<thead>
 			<tr>			
-				<th>Format</th>
-				<th>Linear</th>
-				<th>Optimal</th>
-				<th>Buffer</th>
+				<th></th>
+				<th colspan=7 style="text-align: center;">Device coverage</th>
 			</tr>
+			<tr>			
+				<th></th>
+				<th colspan=2 style="text-align: center;">Linear</th>
+				<th colspan=2 style="text-align: center;">Optimal</th>
+				<th colspan=2 style="text-align: center;">Buffer</th>
+			</tr>
+			<th>Format</th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+			</tr>			
 		</thead>
 		<tbody>
 			<?php
 				DB::connect();
 				try {
-					$res =DB::$connection->prepare("select count(*) from reports"); 
-					$res->execute(); 
-					$reportCount = $res->fetchColumn(); 
-
-					$formats = DB::$connection->prepare("select * from viewFormats");
+					$formats = DB::$connection->prepare("SELECT
+						vkf.name,
+						sum(if(lineartilingfeatures > 0, 1, 0)) as `linear`, 
+						sum(if(optimaltilingfeatures > 0, 1, 0)) as optimal, 
+						sum(if(bufferfeatures > 0, 1, 0)) as buffer,
+						count(reportid) as reportcount
+						from deviceformats df join VkFormat vkf on df.formatid = vkf.value
+						group by vkf.name");
 					$formats->execute($params);
 
 					if ($formats->rowCount() > 0) { 
-						while ($format = $formats->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
+						while ($format = $formats->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {						
 							echo "<tr>";						
-							echo "<td class='value'>".$format[0]."</td>";
-							echo "<td class='value' align=center><a href='listreports.php?linearformat=".$format[0]."'>".round(($format[1]/$reportCount*100.0), 2)."%</a></td>";
-							echo "<td class='value' align=center><a href='listreports.php?optimalformat=".$format[0]."'>".round(($format[2]/$reportCount*100.0), 2)."%</a></td>";
-							echo "<td class='value' align=center><a href='listreports.php?bufferformat=".$format[0]."'>".round(($format[3]/$reportCount*100.0), 2)."%</a></td>";						
+							echo "<td class='value'>".$format['name']."</td>";
+							foreach(['linear', 'optimal', 'buffer'] as $type) {
+								$coverage = $format[$type] / $format['reportcount'] * 100.0;
+								echo "<td class='value' align=center><a class='supported' href='listreports.php?".$type."format=".$format['name']."'>".round($coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+								echo "<td class='value' align=center><a class='na' href='listreports.php?".$type."format=".$format['name']."&option=not'>".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+							}
 							echo "</tr>";	    
 						}
 					}
