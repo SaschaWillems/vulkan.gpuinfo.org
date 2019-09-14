@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -21,6 +21,12 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
+	include './functions.php';	
+	
+	$platform = "windows";
+	if (isset($_GET['platform'])) {
+		$platform = $_GET['platform'];
+	}		
 ?>
 
 <script>
@@ -36,22 +42,28 @@
 		});
 	} );	
 </script>
-	
+
 <div class='header'>
-	<h4 style='margin-left:10px;'>Listing device limits</h4>
-</div>
+	<?php echo "<h4>Device limits for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
+</div>		
 
 <center>	
-	<div class='parentdiv'>
+	<div>
+		<ul class='nav nav-tabs'>
+			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listlimits.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
+			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listlimits.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
+			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listlimits.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+		</ul>
+	</div>
+
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 	
 	<table id="limits" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 		<thead>
 			<tr>
-				<td>Limit</td>
-				<td>Min</td>
-				<td>Max</td>
-				<td>Requirement</td>
+				<th>Limit</th>
+				<th style="text-align: center;">Min</th>
+				<th style="text-align: center;">Max</th>
 			</tr>
 		</thead>
 		<tbody>		
@@ -68,23 +80,24 @@
 
 					if ($limits->rowCount() > 0) { 
 						while ($limit = $limits->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
-							$sql = "select min(`".$limit[0]."`) as lower, max(`".$limit[0]."`) from devicelimits dl where ";
+							$sql = "SELECT min(`".$limit[0]."`) as lower, max(`".$limit[0]."`) from devicelimits dl join reports r on r.id = dl.reportid where ";
 							// Apply limit requirement if present
 							if ($row[1] != null) {
 								$sql .= " dl.reportid in (select distinct(reportid) from devicefeatures df where df.".$limit[1]." = 1) and";
 							}
 							// Fix for invalid reports reporting a supported feature as zero				
 							$sql .= " `".$limit[0]."` <> 0";
+							$sql .= " and r.ostype = :ostype";
 
 							$stmnt = DB::$connection->prepare($sql);
-							$stmnt->execute();
+							$stmnt->execute(['ostype' => ostype($platform)]);
 							$range = $stmnt->fetch(PDO::FETCH_NUM);
 
+							$limitInfo = ($limit[1] != null) ? " <span title=\"Requires feature $limit[1]\">[?]</span>" : "";
 							echo "<tr>";
-							echo "<td><a href='displaydevicelimit.php?name=".$limit[0]."'>".$limit[0]."</a></td>";		
+							echo "<td><a href='displaydevicelimit.php?name=".$limit[0]."'>".$limit[0]."</a>$limitInfo</td>";
 							echo "<td class='unsupported'>".round($range[0], 3)."</td>";
 							echo "<td class='supported'>".round($range[1], 3)."</td>";
-							echo "<td>".$limit[1]."</td>";
 							echo "</tr>";
 						}
 					}
