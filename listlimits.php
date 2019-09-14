@@ -95,7 +95,7 @@
 
 							$limitInfo = ($limit[1] != null) ? " <span title=\"Requires feature $limit[1]\">[?]</span>" : "";
 							echo "<tr>";
-							echo "<td><a href='displaydevicelimit.php?name=".$limit[0]."'>".$limit[0]."</a>$limitInfo</td>";
+							echo "<td><a href='displaydevicelimit.php?name=".$limit[0]."&platform=$platform'>".$limit[0]."</a>$limitInfo</td>";
 							echo "<td class='unsupported'>".round($range[0], 3)."</td>";
 							echo "<td class='supported'>".round($range[1], 3)."</td>";
 							echo "</tr>";
