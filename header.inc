@@ -53,22 +53,19 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span> 
 		  </button>
-		  <a href="./listreports.php">
+		  <a href="./listdevices.php">
 			<img src="./images/vulkan48.png" class="vulkanlogo">
 		  </a>
 		</div>
 		<div class="collapse navbar-collapse" id="myNavbar">
 		  <ul class="nav navbar-nav">
-			<li><a href="listreports.php">Reports</a></li>
 			<li><a href="listdevices.php">Devices</a></li>
+			<li><a href="listreports.php">Reports</a></li>
 			<li><a href="listextensions.php">Extensions</a></li>
-
 			<li><a href="listfeatures.php">Features</a></li> 
 			<li><a href="listlimits.php">Limits</a></li> 
-
 			<li><a href="listformats.php">Formats</a></li>
-
-		  <li class="dropdown">
+		  	<li class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="#">Surface
 				<span class="caret"></span></a>
 				<ul class="dropdown-menu">
@@ -76,18 +73,15 @@
 				<li><a href="listsurfacepresentmodes.php">Present modes</a></li>
 				</ul>
 			</li>
-
-		  <li class="dropdown">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="#">Instance
-				<span class="caret"></span></a>
-				<ul class="dropdown-menu">
-				<li><a href="listinstanceextensions.php">Extensions</a></li>
-				<li><a href="listinstancelayers.php">Layers</a></li>
-				</ul>
-			</li>			
-
+			<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">Instance
+					<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+					<li><a href="listinstanceextensions.php">Extensions</a></li>
+					<li><a href="listinstancelayers.php">Layers</a></li>
+					</ul>
+				</li>			
 			<!-- <li><a href="vulkansupport.php">Devices</a></li> -->
-
 			<li><a href="download.php">Download</a></li> 
 			<li><a href="about.php">About</a></li> 			
 		  </ul>

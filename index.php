@@ -1,1 +1,1 @@
-<?php include("listreports.php"); ?>
+<?php include("listdevices.php"); ?>
