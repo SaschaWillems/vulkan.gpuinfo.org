@@ -117,6 +117,12 @@
 			"dom": 'lrtip',	
 			"pageLength" : 25,		
 			"order": [[ 3, 'desc' ]],
+			"columnDefs": [
+				{ 
+					"searchable": false, "targets": [ 4, 5 ] ,
+					"orderable": false, "targets": [ 5 ]			
+			    }
+			],			
 			"ajax": {
 				url :"responses/devices.php?platform=<?php echo $platform ?>",
 				data: {
