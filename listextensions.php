@@ -56,13 +56,22 @@
 		<thead>
 			<tr>			
 				<th></th>
-				<th colspan=3 style="text-align: center;">Device coverage</th>
+				<th colspan=7 style="text-align: center;">Device coverage</th>
 			</tr>
 			<tr>			
-				<th>Extensions</th>
-				<th style="text-align: center; width:90px;">Windows</th>
-				<th style="text-align: center; width:90px;">Linux</th>
-				<th style="text-align: center; width:90px;">Android</th>
+				<th></th>
+				<th style="text-align: center; width:90px;" colspan=2>Windows</th>
+				<th style="text-align: center; width:90px;" colspan=2>Linux</th>
+				<th style="text-align: center; width:90px;" colspan=2>Android</th>
+			</tr>
+			<tr>
+			<th>Extension</th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
 			</tr>
 		</thead>
 		<tbody>		
@@ -77,14 +86,17 @@
 					$extensions->execute();
 
 					if ($extensions->rowCount() > 0) { 
-						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
-							$link = ($extension[4] > 0 || $extension[5] > 0) ? " <a href=\"displayextension.php?name=".$extension[0]."\" title=\"Show additional features and properties for this extensions\">[?]</a>" : "";
-							echo "<tr>";						
-							echo "<td>".$extension[0].$link."</td>";
-							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=windows&extension=$extension[0]\">".round($extension[1]/$deviceCounts["windows"]*100, 1)."%</a></td>";
-							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&extension=$extension[0]\">".round($extension[2]/$deviceCounts["linux"]*100, 1)."%</a></td>";
-							echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&extension=$extension[0]\">".round($extension[3]/$deviceCounts["android"]*100, 1)."%</a></td>";
-							echo "</tr>";	       
+						while ($extension = $extensions->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {								
+							$link = ($extension['features2'] > 0 || $extension['properties2'] > 0) ? " <a href=\"displayextension.php?name=".$extension['name']."\" title=\"Show additional features and properties for this extensions\">[?]</a>" : "";
+							echo "<tr>";
+							echo "<td>".$extension['name'].$link."</td>";
+							foreach(['windows', 'linux', 'android'] as $index => $platform) {
+								$coverageLink = "listdevicescoverage.php?extension=".$extension['name']."&platform=$platform";
+								$coverage = round($extension[$platform]/$deviceCounts[$platform]*100, 1);
+								echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+								echo "<td class='text-center'><a class='na' href=\"$coverageLink&not=1\">".(100 - $coverage)."<span style='font-size:10px;'>%</span></a></td>";
+							}
+							echo "</tr>";
 						}
 					}
 
