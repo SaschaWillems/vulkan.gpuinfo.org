@@ -95,7 +95,7 @@
 	if (isset($_REQUEST['filter']['feature'])) {
 	    $feature = $_REQUEST['filter']['feature'];
         if ($feature != '') {
-            $whereClause = "where r.id in (select distinct(reportid) from devicefeatures df where df.".$feature." = ".($negate ? "0" : "1").")";
+            $whereClause = "where r.devicename ".($negate ? "not" : "")." in (select r.devicename from reports r join devicefeatures df on df.reportid = r.id where df.$feature = 1)";
         }    
     }
     // Submitter
