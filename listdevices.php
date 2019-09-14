@@ -29,7 +29,7 @@
 		// TODO: Check valid platforms
 	}
 
-	$caption = null;
+	$caption = 'Listing all devices';
 	$showTabs = true;
 
 	if (isset($_GET['platform'])) {
@@ -50,7 +50,7 @@
 	<div class='header'>	
 		<h4>
 		<?php		
-			echo $caption ? $caption : "Listing available devices";
+			echo $caption;
 		?>
 		</h4>
 	</div>
@@ -60,7 +60,7 @@
 ?>		
 	<div>
 		<ul class='nav nav-tabs'>
-			<li <?php if ($platform == "all") 	  { echo "class='active'"; } ?>> <a href='listdevices.php?platform=all'>All platforms</a> </li>
+			<li <?php if ($platform == "all") 	  { echo "class='active'"; } ?>> <a href='listdevices.php'>All platforms</a> </li>
 			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listdevices.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
 			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listdevices.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
 			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listdevices.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
