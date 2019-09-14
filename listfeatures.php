@@ -21,6 +21,12 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
+	include './functions.php';	
+	
+	$platform = "windows";
+	if (isset($_GET['platform'])) {
+		$platform = $_GET['platform'];
+	}	
 ?>
 	
 <script>
@@ -34,17 +40,24 @@
 			"bInfo": false,	
 			"order": [[ 0, "asc" ]],
 			"columnDefs": [{
-      			"targets": [ 1, 2, 3 ]
+      			"targets": [ 1, 2 ]
 			}]			
 		});
 	} );	
 </script>
 
 <div class='header'>
-	<h4 style='margin-left:10px;'>Listing device features</h4>
-</div>
+	<?php echo "<h4>Device feature coverage for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
+</div>			
 
-<center>	
+<center>
+	<div>
+		<ul class='nav nav-tabs'>
+			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listfeatures.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
+			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listfeatures.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
+			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listfeatures.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+		</ul>
+	</div>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 
@@ -52,19 +65,9 @@
 		<thead>
 			<tr>			
 				<th></th>
-				<th colspan=7 style="text-align: center;">Device coverage</th>
+				<th colspan=3 style="text-align: center;">Device coverage</th>
 			</tr>
-			<tr>				
-				<td></td>
-				<th style="text-align: center; width:90px;" colspan=2>Windows</th>
-				<th style="text-align: center; width:90px;" colspan=2>Linux</th>
-				<th style="text-align: center; width:90px;" colspan=2>Android</th>
-			</tr>
-			<th>Feature</th>
-				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
-				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
-				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
-				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th>Feature</th>
 				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
 				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
 			</tr>			
@@ -73,10 +76,6 @@
 			<?php	
 				DB::connect();
 				try {
-					$res =DB::$connection->prepare("SELECT count(*) from reports"); 
-					$res->execute(); 
-					$reportCount = $res->fetchColumn(); 
-
 					$viewDeviceCount =DB::$connection->prepare("SELECT * from viewDeviceCount");
 					$viewDeviceCount->execute(); 
 					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);
@@ -93,36 +92,28 @@
 						$sqlColumns .= "max(".$row[0].") as $row[0],";
 					}
 
-					// Get supported counts per platform
-					$supportedCounts[0] = array();
-					$supportedCounts[1] = array();
-					$supportedCounts[2] = array();
-					for ($i = 0; $i < 3; $i++) {
-						$stmnt = DB::$connection->prepare(
-							"SELECT ifnull(r.displayname, dp.devicename) as device, "
-							.substr($sqlColumns, 0, -1).
-							" FROM devicefeatures df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = ".(integer)$i." group by device");
-						$stmnt->execute();
-						while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-							foreach($row as $key => $value) {
-								if (strcasecmp($key, 'device') != 0) {
-									$supportedCounts[$i][$key] += $value;
-								}
+					$supportedCounts = [];
+					$stmnt = DB::$connection->prepare(
+						"SELECT ifnull(r.displayname, dp.devicename) as device, "
+						.substr($sqlColumns, 0, -1).
+						" FROM devicefeatures df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = ".ostype($platform)." group by device");
+					$stmnt->execute();
+					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+						foreach($row as $key => $value) {
+							if (strcasecmp($key, 'device') != 0) {
+								$supportedCounts[$key] += $value;
 							}
 						}
 					}
+
 					foreach($features as $feature) {
+						$coverageLink = "listdevicescoverage.php?feature=".$feature."&platform=$platform";
+						$coverage = round($supportedCounts[$feature]/$deviceCounts[$platform]*100, 1);
 						echo "<tr>";
 						echo "<td>".$feature."</td>";
-						foreach(['windows', 'linux', 'android'] as $index => $platform) {
-							$coverageLink = "listdevicescoverage.php?feature=".$feature."&platform=$platform";
-							$coverage = round($supportedCounts[$index][$feature]/$deviceCounts[$platform]*100, 1);
-							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
-						}
+						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
-						// echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&feature=$feature\">".round($supportedCounts[1][$feature]/$deviceCounts["linux"]*100, 1)."%</a></td>";
-						// echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&feature=$feature\">".round($supportedCounts[2][$feature]/$deviceCounts["android"]*100, 1)."%</a></td>";
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";
