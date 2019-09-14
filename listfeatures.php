@@ -52,14 +52,22 @@
 		<thead>
 			<tr>			
 				<th></th>
-				<th colspan=3 style="text-align: center;">Device coverage</th>
+				<th colspan=7 style="text-align: center;">Device coverage</th>
 			</tr>
 			<tr>				
-				<td>Feature</td>
-				<th style="text-align: center; width:90px;">Windows</th>
-				<th style="text-align: center; width:90px;">Linux</th>
-				<th style="text-align: center; width:90px;">Android</th>
+				<td></td>
+				<th style="text-align: center; width:90px;" colspan=2>Windows</th>
+				<th style="text-align: center; width:90px;" colspan=2>Linux</th>
+				<th style="text-align: center; width:90px;" colspan=2>Android</th>
 			</tr>
+			<th>Feature</th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+			</tr>			
 		</thead>
 		<tbody>		
 			<?php	
@@ -106,10 +114,15 @@
 					foreach($features as $feature) {
 						echo "<tr>";
 						echo "<td>".$feature."</td>";
-						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=windows&feature=$feature\">".round($supportedCounts[0][$feature]/$deviceCounts["windows"]*100, 1)."%</a></td>";
-						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&feature=$feature\">".round($supportedCounts[1][$feature]/$deviceCounts["linux"]*100, 1)."%</a></td>";
-						echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&feature=$feature\">".round($supportedCounts[2][$feature]/$deviceCounts["android"]*100, 1)."%</a></td>";
+						foreach(['windows', 'linux', 'android'] as $index => $platform) {
+							$coverageLink = "listdevicescoverage.php?feature=".$feature."&platform=$platform";
+							$coverage = round($supportedCounts[$index][$feature]/$deviceCounts[$platform]*100, 1);
+							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
+						}
 						echo "</tr>";
+						// echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=linux&feature=$feature\">".round($supportedCounts[1][$feature]/$deviceCounts["linux"]*100, 1)."%</a></td>";
+						// echo "<td class='text-center'><a href=\"listdevicescoverage.php?platform=android&feature=$feature\">".round($supportedCounts[2][$feature]/$deviceCounts["android"]*100, 1)."%</a></td>";
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";
