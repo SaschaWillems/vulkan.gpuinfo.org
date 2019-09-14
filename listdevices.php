@@ -81,8 +81,8 @@
 					<th>api</th>
 					<th>driver</th>
 					<!-- <th>version</th> -->
-					<th>submission</th>
-					<th>reports</th>
+					<th></th>
+					<th></th>
 					<th><input type='submit' class='button' value='compare'></th>
 				</tr>
 				<tr>
@@ -91,7 +91,7 @@
 					<th>Latest Driver version</th>
 					<!-- <th>Report version</th> -->
 					<th>Last submission</th>
-					<th>Submissions</th>
+					<th>Count</th>
 					<th></th>
 				</tr>
 			</thead>		
@@ -119,7 +119,7 @@
 			"order": [[ 3, 'desc' ]],
 			"columnDefs": [
 				{ 
-					"searchable": false, "targets": [ 4, 5 ] ,
+					"searchable": false, "targets": [ 3, 4, 5 ] ,
 					"orderable": false, "targets": [ 5 ]			
 			    }
 			],			
