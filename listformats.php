@@ -105,9 +105,10 @@
 							echo "<tr>";						
 							echo "<td class='value'>".$format['name']."</td>";
 							foreach(['linear', 'optimal', 'buffer'] as $type) {
+								$coverageLink = "listdevicescoverage.php?".$type."format=".$format['name']."&platform=$platform";
 								$coverage = $format[$type] / $format['reportcount'] * 100.0;
-								echo "<td class='value' align=center><a class='supported' href='listreports.php?".$type."format=".$format['name']."'>".round($coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
-								echo "<td class='value' align=center><a class='na' href='listreports.php?".$type."format=".$format['name']."&option=not'>".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+								echo "<td class='value' align=center><a class='supported' href='$coverageLink'>".round($coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+								echo "<td class='value' align=center><a class='na' href='$coverageLink&option=not'>".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
 							}
 							echo "</tr>";	    
 						}

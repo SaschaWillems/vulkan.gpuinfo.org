@@ -48,6 +48,25 @@
 			"Listing first known driver version support for <b>".$_GET["feature"]."</b>";
 	}
 
+	if (isset($_GET['linearformat'])) {
+		$caption = $negate ?
+			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['linearformat']."</b> for <b>linear tiling</b>"
+			:
+			"Listing first known driver version support for <b>".$_GET['linearformat']."</b> for <b>linear tiling</b>";
+	}	
+	if (isset($_GET['optimalformat'])) {
+		$caption = $negate ?
+			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['optimalformat']."</b> for <b>optimal tiling</b>"
+			:
+			"Listing first known driver version support for <b>".$_GET['optimalformat']."</b> for <b>optimal tiling</b>";
+	}
+	if (isset($_GET['bufferformat'])) {
+		$caption = $negate ?
+			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>"
+			:
+			"Listing first known driver version support for <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>";
+	}	
+
 	if (isset($_GET['platform'])) {
 		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
 	}
