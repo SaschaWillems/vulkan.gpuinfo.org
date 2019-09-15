@@ -68,7 +68,11 @@
 		<tbody>
 			<?php
 				try {
-					$sql = "select formatname, coverage, format from viewSurfaceFormats";                
+					$sql = "SELECT
+						VkFormat(dsf.format) as formatname,
+						count(distinct(reportid)) as coverage
+						from devicesurfaceformats dsf
+						group by formatname";
 					$modes = DB::$connection->prepare($sql);
 					$modes->execute($params);
 					if ($modes->rowCount() > 0) { 		
