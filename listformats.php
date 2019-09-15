@@ -87,37 +87,43 @@
 		</thead>
 		<tbody>
 			<?php
-				DB::connect();
+				$formats = [];
 				try {
-					$formats = DB::$connection->prepare("SELECT
-						vkf.name,
-						sum(if(lineartilingfeatures > 0, 1, 0)) as `linear`, 
-						sum(if(optimaltilingfeatures > 0, 1, 0)) as optimal, 
-						sum(if(bufferfeatures > 0, 1, 0)) as buffer,
-						count(reportid) as reportcount
-						from deviceformats df join VkFormat vkf on df.formatid = vkf.value join reports r on r.id = df.reportid
-						where r.ostype = :ostype
-						group by vkf.name");
-					$formats->execute(['ostype' => ostype($platform)]);
-
-					if ($formats->rowCount() > 0) { 
-						while ($format = $formats->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {						
-							echo "<tr>";						
-							echo "<td class='value'>".$format['name']."</td>";
-							foreach(['linear', 'optimal', 'buffer'] as $type) {
-								$coverageLink = "listdevicescoverage.php?".$type."format=".$format['name']."&platform=$platform";
-								$coverage = $format[$type] / $format['reportcount'] * 100.0;
-								echo "<td class='value' align=center><a class='supported' href='$coverageLink'>".round($coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
-								echo "<td class='value' align=center><a class='na' href='$coverageLink&option=not'>".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
-							}
-							echo "</tr>";	    
+					DB::connect();
+					$deviceCount = getDeviceCount($platform);
+					// Fetch formats into array as a base for creating the table
+					foreach(['lineartilingfeatures', 'optimaltilingfeatures', 'bufferfeatures'] as $target) {
+						$sql = "SELECT vkf.name as name, count(distinct(r.devicename)) as coverage
+							from reports r
+							join deviceformats df on df.reportid = r.id and df.$target > 0
+							join VkFormat vkf on vkf.value = df.formatid
+							where r.ostype = :ostype
+							group by name";
+						$stmnt = DB::$connection->prepare($sql);
+						$stmnt->execute(['ostype' => ostype($platform)]);
+						$result = $stmnt->fetchAll(PDO::FETCH_NUM);
+						foreach($result as $row) {
+							$formats[$row[0]][$target] = $row[1];
 						}
 					}
-
 				} catch (PDOException $e) {
 					echo "<b>Error while fetcthing data!</b><br>";
 				}
 				DB::disconnect();
+
+				// Build table
+				foreach($formats as $key => $format) {
+					echo "<tr>";			
+					echo "<td class='value'>".$key."</td>";
+					$names = ['linearformat', 'optimalformat', 'bufferformat'];
+					foreach(['lineartilingfeatures', 'optimaltilingfeatures', 'bufferfeatures'] as $index => $target) {
+						$coverageLink = "listdevicescoverage.php?$names[$index]=$key&platform=$platform";
+						$coverage = $format[$target] / $deviceCount * 100.0;
+						echo "<td class='value' align=center><a class='supported' href='$coverageLink'>".round($coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value' align=center><a class='na' href='$coverageLink&option=not'>".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+					}
+					echo "</tr>";
+				}
 			?>
 		</tbody>
 	</tbody>
