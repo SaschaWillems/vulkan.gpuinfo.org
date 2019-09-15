@@ -21,15 +21,13 @@
 	
 	include './dbconfig.php';
 	include './header.inc';	
-	
-	DB::connect();				
-?>
+	include './functions.php';
 
-<style>
-	.dataTables_filter {
-		display: none;
-	}
-</style>
+	$platform = "windows";
+	if (isset($_GET['platform'])) {
+		$platform = $_GET['platform'];
+	}	
+?>
 
 <script>
 	$(document).ready(function() {
@@ -38,6 +36,7 @@
 			"paging" : false,
 			"stateSave": false, 
 			"searchHighlight" : true,	
+			"dom": 'f',
 			"bInfo": false,	
 			"order": [[ 1, "desc" ]]	
 		});
@@ -49,14 +48,23 @@
 	} );	
 </script>
 
-<center>	
-	<div class="tablediv">
-
+<div class='header'>
 	<div class='alert alert-warning' role='alert' style='width:auto;'>
 		<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)
 	</div>
+	<?php echo "<h4>Surface format support on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>
+</div>		
 
-	<?php include ("filter.php"); ?>
+<center>	
+	<div>
+		<ul class='nav nav-tabs'>
+			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listsurfaceformats.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
+			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listsurfaceformats.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
+			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listsurfaceformats.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+		</ul>
+	</div>
+
+	<div class='tablediv' style='width:auto; display: inline-block;'>
 
 	<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
 		<thead>
@@ -68,13 +76,16 @@
 		<tbody>
 			<?php
 				try {
+					DB::connect();				
 					$sql = "SELECT
 						VkFormat(dsf.format) as formatname,
 						count(distinct(reportid)) as coverage
 						from devicesurfaceformats dsf
+						join reports r on r.id = dsf.reportid
+						where ostype = :ostype
 						group by formatname";
 					$modes = DB::$connection->prepare($sql);
-					$modes->execute($params);
+					$modes->execute(['ostype' => ostype($platform)]);
 					if ($modes->rowCount() > 0) { 		
 						foreach ($modes as $mode) {
 							echo "<tr>";						
