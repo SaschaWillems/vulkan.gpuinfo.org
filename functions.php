@@ -378,8 +378,8 @@ function _format_json($json, $html = false) {
 	return $result; 
 }
 
-function getDeviceCount($platform) {
-	return DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype", ['ostype' => ostype($platform)]);
+function getDeviceCount($platform, $andWhere = null) {
+	return DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype $andWhere", ['ostype' => ostype($platform)]);
 }
 
 ?>

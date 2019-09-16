@@ -69,28 +69,37 @@
 	<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
 		<thead>
 			<tr>			
-				<td>Format</td>
-				<td>Reports</td>
+				<th></th>
+				<th colspan=2 style="text-align: center;">Device coverage</th>
 			</tr>
+				<th>Format</th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+			</th>
 		</thead>
 		<tbody>
 			<?php
 				try {
 					DB::connect();				
+					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
 					$sql = "SELECT
-						VkFormat(dsf.format) as formatname,
-						count(distinct(reportid)) as coverage
-						from devicesurfaceformats dsf
-						join reports r on r.id = dsf.reportid
+						VkFormat(dsf.format) as format,
+						count(distinct(r.devicename)) as coverage
+						from reports r
+						join devicesurfaceformats dsf on dsf.reportid = r.id
 						where ostype = :ostype
-						group by formatname";
+						group by format";
 					$modes = DB::$connection->prepare($sql);
 					$modes->execute(['ostype' => ostype($platform)]);
 					if ($modes->rowCount() > 0) { 		
 						foreach ($modes as $mode) {
+							$coverageLink = "listdevicescoverage.php?".$type."surfaceformat=".$format['name']."&platform=$platform";
+							$coverage = $mode['coverage'] / $deviceCount * 100.0;
 							echo "<tr>";						
-							echo "<td class='value'><a href='listreports.php?surfaceformat=".$mode['formatname']."'>".$mode['formatname']."</a> (<a href='listreports.php?surfaceformat=".$mode['formatname']."&option=not'>not</a>)</td>";
-							echo "<td class='value'>".$mode['coverage']."</td>";
+							// echo "<td class='value'><a href='listreports.php?surfaceformat=".$mode['format']."'>".$mode['format']."</a> (<a href='listreports.php?surfaceformat=".$mode['format']."&option=not'>not</a>)</td>";
+							echo "<td class='value'>".$mode['format']."</td>";
+							echo "<td class='value'><a class='supported' href='$coverageLink'>".round($coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='value'><a class='na' href='$coverageLink&option=not'>".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
 							echo "</tr>";	    
 						}
 					}
