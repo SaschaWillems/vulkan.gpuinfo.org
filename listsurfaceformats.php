@@ -84,9 +84,10 @@
 					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
 					$sql = "SELECT
 						VkFormat(dsf.format) as format,
-						count(distinct(r.devicename)) as coverage
+						count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
 						from reports r
 						join devicesurfaceformats dsf on dsf.reportid = r.id
+						join deviceproperties dp on dp.reportid = r.id
 						where ostype = :ostype
 						group by format";
 					$result = DB::$connection->prepare($sql);

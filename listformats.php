@@ -93,10 +93,13 @@
 					$deviceCount = getDeviceCount($platform);
 					// Fetch formats into array as a base for creating the table
 					foreach(['lineartilingfeatures', 'optimaltilingfeatures', 'bufferfeatures'] as $target) {
-						$sql = "SELECT vkf.name as name, count(distinct(r.devicename)) as coverage
+						$sql = "SELECT 
+							vkf.name as name, 
+							count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
 							from reports r
 							join deviceformats df on df.reportid = r.id and df.$target > 0
 							join VkFormat vkf on vkf.value = df.formatid
+							join deviceproperties dp on dp.reportid = r.id
 							where r.ostype = :ostype
 							group by name";
 						$stmnt = DB::$connection->prepare($sql);
