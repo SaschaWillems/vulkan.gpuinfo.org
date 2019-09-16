@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database server implementation
 	 *
-	 * Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) by Sascha Willems (www.saschawillems.de)
 	 *
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -23,67 +23,83 @@
 	include './header.inc';
 	include './functions.php';
 
-	DB::connect();
+	$platform = "windows";
+	if (isset($_GET['platform'])) {
+		$platform = $_GET['platform'];
+	}	
 ?>
-
-<style>
-	.dataTables_filter {
-		display: none;
-	}
-</style>
 
 <script>
 	$(document).ready(function() {
 		var table = $('#presentmodes').DataTable({
 			"pageLength" : -1,
 			"paging" : false,
-			"stateSave": false,
-			"searchHighlight" : true,
-			"bInfo": false,
-			"order": [[ 1, "desc" ]]
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"dom": 'f',
+			"bInfo": false,	
+			"order": [[ 1, "desc" ]]	
 		});
 
 		$("#searchbox").on("keyup search input paste cut", function() {
 			table.search(this.value).draw();
-		});
+		});  		
 
-	} );
+	} );	
 </script>
 
 <div class='header'>
-	<h4>Listing all available surface present modes</h4>
-</div>
-
-
-<center>
-	<div class="tablediv">
-
 	<div class='alert alert-warning' role='alert' style='width:auto;'>
 		<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)
 	</div>
+	<?php echo "<h4>Surface present mode support on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>
+</div>		
 
-	<!-- <?php include ("filter.php"); ?> -->
+<center>
+	<div>
+		<ul class='nav nav-tabs'>
+			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listsurfacepresentmodes.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
+			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listsurfacepresentmodes.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
+			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listsurfacepresentmodes.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+		</ul>
+	</div>
+
+	<div class='tablediv' style='width:auto; display: inline-block;'>
 
 	<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
 		<thead>
-			<tr>
-				<td>Mode</td>
-				<td>Reports</td>
+			<tr>			
+				<th></th>
+				<th colspan=2 style="text-align: center;">Device coverage</th>
 			</tr>
+				<th>Mode</th>
+				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
+				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+			</th>			
 		</thead>
 		<tbody>
 			<?php
 				try {
-					$sql = "select presentmode, coverage from viewSurfacePresentModes";
-					$modes = DB::$connection->prepare($sql);
-					$modes->execute($params);
-					if ($modes->rowCount() > 0) {
-						foreach ($modes as $mode) {
-							echo "<tr>";
-							echo "<td class='value'><a href='listreports.php?surfacepresentmode=".$mode['presentmode']."'>".getPresentMode($mode['presentmode'])."</a> (<a href='listreports.php?surfacepresentmode=".$mode['presentmode']."&option=not'>not</a>)</td>";
-							echo "<td class='value'>".$mode['coverage']."</td>";
-							echo "</tr>";
-						}
+					DB::connect();
+					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
+					$sql = "SELECT
+						vkpm.name as mode,
+						count(distinct(r.devicename)) as coverage
+						from devicesurfacemodes dsm
+						join reports r on r.id = dsm.reportid
+						join VkPresentMode vkpm on vkpm.value = dsm.presentmode
+						where ostype = :ostype
+						group by mode";
+					$result = DB::$connection->prepare($sql);
+					$result->execute(['ostype' => ostype($platform)]);
+					foreach ($result as $row) {
+						$coverageLink = "listdevicescoverage.php?".$type."surfacepresentmode=".$row['mode']."&platform=$platform";
+						$coverage = $row['coverage'] / $deviceCount * 100.0;
+						echo "<tr>";
+						echo "<td class='value'>".$row['mode']."</td>";
+						echo "<td class='value'><a class='supported' href='$coverageLink'>".round($coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "</tr>";
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetcthing data!</b><br>";
