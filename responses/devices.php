@@ -131,7 +131,7 @@
 	// Surface present mode	
 	$surfacepresentmode = $_REQUEST['filter']['surfacepresentmode'];
 	if ($surfacepresentmode != '') {
-		$whereClause = "where r.version >= '1.2' and id ".($negate ? "not" : "")." in (select reportid from devicesurfacemodes dsp where dsp.presentmode = :filter_surfacepresentmode)";
+		$whereClause = "where r.version >= '1.2' and id ".($negate ? "not" : "")." in (select reportid from devicesurfacemodes dsp join VkPresentMode vpm on vpm.value = dsp.presentmode where vpm.name = :filter_surfacepresentmode)";
         $params['filter_surfacepresentmode'] = $surfacepresentmode;        
 	}	    
 	// Limit

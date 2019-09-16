@@ -84,10 +84,11 @@
 					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
 					$sql = "SELECT
 						vkpm.name as mode,
-						count(distinct(r.devicename)) as coverage
+						count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
 						from devicesurfacemodes dsm
 						join reports r on r.id = dsm.reportid
 						join VkPresentMode vkpm on vkpm.value = dsm.presentmode
+						join deviceproperties dp on dp.reportid = r.id						
 						where ostype = :ostype
 						group by mode";
 					$result = DB::$connection->prepare($sql);
