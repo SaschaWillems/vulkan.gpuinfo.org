@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -89,19 +89,16 @@
 						join devicesurfaceformats dsf on dsf.reportid = r.id
 						where ostype = :ostype
 						group by format";
-					$modes = DB::$connection->prepare($sql);
-					$modes->execute(['ostype' => ostype($platform)]);
-					if ($modes->rowCount() > 0) { 		
-						foreach ($modes as $mode) {
-							$coverageLink = "listdevicescoverage.php?".$type."surfaceformat=".$format['name']."&platform=$platform";
-							$coverage = $mode['coverage'] / $deviceCount * 100.0;
-							echo "<tr>";						
-							// echo "<td class='value'><a href='listreports.php?surfaceformat=".$mode['format']."'>".$mode['format']."</a> (<a href='listreports.php?surfaceformat=".$mode['format']."&option=not'>not</a>)</td>";
-							echo "<td class='value'>".$mode['format']."</td>";
-							echo "<td class='value'><a class='supported' href='$coverageLink'>".round($coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='value'><a class='na' href='$coverageLink&option=not'>".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
-							echo "</tr>";	    
-						}
+					$result = DB::$connection->prepare($sql);
+					$result->execute(['ostype' => ostype($platform)]);
+					foreach ($result as $row) {
+						$coverageLink = "listdevicescoverage.php?".$type."surfaceformat=".$row['format']."&platform=$platform";
+						$coverage = $row['coverage'] / $deviceCount * 100.0;
+						echo "<tr>";						
+						echo "<td class='value'>".$row['format']."</td>";
+						echo "<td class='value'><a class='supported' href='$coverageLink'>".round($coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "</tr>";	    
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetcthing data!</b><br>";

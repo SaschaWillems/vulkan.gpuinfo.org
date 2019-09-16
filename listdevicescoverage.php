@@ -67,6 +67,13 @@
 			"Listing first known driver version support for <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>";
 	}	
 
+	if (isset($_GET['surfaceformat'])) {
+		$caption = $negate ?
+			"Listing devices <span style='color:red;'>not</span> supporting surface format <b>".$_GET['surfaceformat']."</b>"
+			:
+			"Listing first known driver version support for surface format <b>".$_GET['surfaceformat']."</b>";
+	}	
+
 	if (isset($_GET['platform'])) {
 		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
 	}
