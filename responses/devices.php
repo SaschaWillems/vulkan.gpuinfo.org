@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -26,7 +26,12 @@
 
     $data = array();
     $params = array();    
-             
+    $ostype = null;
+
+    if (isset($_REQUEST["platform"])) {
+        $ostype = ostype($_REQUEST["platform"]);
+    }
+    
     // Ordering
     $orderByColumn = '';
     $orderByDir = '';
@@ -124,15 +129,39 @@
 	}    
 	// Surface format	
 	$surfaceformat = $_REQUEST['filter']['surfaceformat'];
-	if ($surfaceformat != '') {
-		$whereClause = "where r.version >= '1.2' and id ".($negate ? "not" : "")." in (select reportid from devicesurfaceformats dsf join VkFormat f on dsf.format = f.value where f.name = :filter_surfaceformat)";
+	if ($surfaceformat != '') {        
+        $whereClause = 
+            "where ifnull(r.displayname, r.devicename) ".($negate ? "not" : "")." in
+            (
+                SELECT ifnull(r.displayname, r.devicename)
+                from reports r
+                join devicesurfaceformats dsf on dsf.reportid = r.id	
+                join VkFormat f on dsf.format = f.value 
+                where f.name = :filter_surfaceformat ".($ostype ? " and r.ostype = :ostype" : "")."
+            )
+            and r.version >= '1.2'";
         $params['filter_surfaceformat'] = $surfaceformat;        
+        if ($ostype) {
+            $params['ostype'] = $ostype;
+        }
 	}
 	// Surface present mode	
 	$surfacepresentmode = $_REQUEST['filter']['surfacepresentmode'];
 	if ($surfacepresentmode != '') {
-		$whereClause = "where r.version >= '1.2' and id ".($negate ? "not" : "")." in (select reportid from devicesurfacemodes dsp join VkPresentMode vpm on vpm.value = dsp.presentmode where vpm.name = :filter_surfacepresentmode)";
-        $params['filter_surfacepresentmode'] = $surfacepresentmode;        
+        $whereClause = 
+            "where ifnull(r.displayname, r.devicename) ".($negate ? "not" : "")." in
+            (
+                select ifnull(r.displayname, r.devicename)
+                from reports r
+                join devicesurfacemodes dsm on dsm.reportid = r.id	
+                join VkPresentMode m on dsm.presentmode = m.value 
+                where m.name = :filter_surfacepresentmode ".($ostype ? " and r.ostype = :ostype" : "")."
+            )
+            and r.version >= '1.2'";
+        $params['filter_surfacepresentmode'] = $surfacepresentmode;       
+        if ($ostype) {
+            $params['ostype'] = $ostype;
+        }
 	}	    
 	// Limit
 	$limit = $_REQUEST['filter']['devicelimit'];
