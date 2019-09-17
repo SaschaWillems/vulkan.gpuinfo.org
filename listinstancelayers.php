@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -64,15 +64,13 @@
 					$res->execute(); 
 					$reportCount = $res->fetchColumn(); 
 
-					$extensions = DB::$connection->prepare("SELECT name from instancelayers");
-					$extensions->execute($params);
+					$layers = DB::$connection->prepare("SELECT name from instancelayers");
+					$layers->execute($params);
 
-					if ($extensions->rowCount() > 0) { 
-						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
-							echo "<tr>";
-							echo "<td class='value'><a href='listreports.php?instancelayers=".$extension[0]."'>".$extension[0]."</a> (<a href='listreports.php?instancelayers=".$extension[0]."&option=not'>not</a>)</td>";
-							echo "</tr>";
-						}
+					while ($layer = $layers->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
+						echo "<tr>";
+						echo "<td class='value'><a href='listreports.php?instancelayer=".$layer[0]."'>".$layer[0]."</a> (<a href='listreports.php?instancelayer=".$layer[0]."&option=not'>not</a>)</td>";
+						echo "</tr>";
 					}
 
 				} catch (PDOException $e) {
