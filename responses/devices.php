@@ -114,19 +114,33 @@
 	// Format support
 	$linearformatfeature = $_REQUEST['filter']['linearformat'];
 	$optimalformatfeature = $_REQUEST['filter']['optimalformat'];
-	$bufferformatfeature = $_REQUEST['filter']['bufferformat'];	
-	if ($linearformatfeature != '') {
-		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_linearformatfeature and df.lineartilingfeatures > 0)";
-        $params['filter_linearformatfeature'] = $linearformatfeature;
-	}	
-	if ($optimalformatfeature != '') {
-		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_optimalformatfeature and df.optimaltilingfeatures > 0)";
-        $params['filter_optimalformatfeature'] = $optimalformatfeature;
-	}	
-	if ($bufferformatfeature != '') {
-		$whereClause = "where id ".($negate ? "not" : "")." in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformatfeature and df.bufferfeatures > 0)";
-        $params['filter_bufferformatfeature'] = $bufferformatfeature;
-	}    
+    $bufferformatfeature = $_REQUEST['filter']['bufferformat'];	
+    if ($linearformatfeature != '' || $optimalformatfeature != '' || $bufferformatfeature != '') {
+        $formatColumn = null;
+        if ($linearformatfeature != '') {
+            $formatColumn = 'lineartilingfeatures';
+            $params['filter_formatfeature'] = $linearformatfeature;
+        }	
+        if ($optimalformatfeature != '') {
+            $formatColumn = 'optimaltilingfeatures';
+            $params['filter_formatfeature'] = $optimalformatfeature;
+        }	
+        if ($bufferformatfeature != '') {
+            $formatColumn = 'bufferfeatures';
+            $params['filter_formatfeature'] = $bufferformatfeature;
+        }    
+        if ($formatColumn) {
+            $whereClause = "
+                where ifnull(r.displayname, r.devicename) ".($negate ? "not" : "")." in
+                (
+                    select ifnull(r.displayname, r.devicename)
+                    from reports r
+                    join deviceformats df on df.reportid = r.id
+                    join VkFormat vf on vf.value = df.formatid where 
+                    vf.name = :filter_formatfeature and df.$formatColumn > 0
+                )";
+        }
+    }
 	// Surface format	
 	$surfaceformat = $_REQUEST['filter']['surfaceformat'];
 	if ($surfaceformat != '') {        
