@@ -33,12 +33,35 @@
 	}
 
 	$caption = null;
+	$subcaption = null;
 
 	if (isset($_GET["extension"])) {
 		$caption = $negate ? 
 			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET["extension"]."</b>" 
 			: 
 			"Listing first known driver version support for <b>".$_GET["extension"]."</b>";
+		// Check if extension has features2 or properties2
+		$ext = $_GET["extension"];
+		DB::connect();
+		try {
+			$stmnt = DB::$connection->prepare("SELECT
+				(SELECT COUNT(DISTINCT df2.name) FROM devicefeatures2 df2 WHERE (df2.extension = ext.name)) AS features2,
+				(SELECT COUNT(DISTINCT dp2.name) FROM deviceproperties2 dp2 WHERE (dp2.extension = ext.name)) AS properties2
+				FROM extensions ext where ext.name = :extension");
+			$stmnt->execute(['extension' => $ext]);
+			$res = $stmnt->fetch(PDO::FETCH_ASSOC);
+			if ($res) {
+				if ($res['features2'] > 0 || $res['properties2'] > 0) {
+					$arr = [];
+					if ($res['features2'] > 0) { $arr[] = 'Features'; }
+					if ($res['properties2'] > 0) { $arr[] = 'properties'; }
+					$linkTitle = implode(' and ', $arr);
+					$subcaption = "<div style='margin-top: 10px;'>This extension has additional <a href='displayextension.php?name=$ext'>$linkTitle</a></div>";
+				}
+			}	
+		} catch(Throwable $e) {
+		}
+		DB::disconnect();
 	}
 
 	if (isset($_GET["feature"])) {
@@ -96,6 +119,7 @@
 		<h4>
 		<?php		
 			echo $caption ? $caption : "Listing available devices";
+			echo $subcaption ? "<br>$subcaption" : "";
 		?>
 		</h4>
 	</div>
