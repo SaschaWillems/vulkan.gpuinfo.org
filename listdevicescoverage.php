@@ -131,18 +131,18 @@
 		<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 			<thead>
 				<tr>
-					<th>device</th>
-					<th>vendor</th>
-					<th>driver</th>
-					<th>submission</th>
-					<th><input type='submit' class='button' value='compare'></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
 				</tr>
 				<tr>
 					<th>Device</th>
 					<th>Vendor</th>
 					<th>Driver <span title="First known driver version supporting this extension/feature" class="hint">[?]</span></th>
 					<th>Date</th>
-					<th></th>
+					<th><input type='submit' class='button' value='compare'></th>
 				</tr>
 			</thead>		
 		</table>
@@ -207,22 +207,24 @@
 			},
 		});
 
-		// Per-Column filter boxes
-		$('#devices thead th').each( function (j) {
-			var title = $('#devices thead th').eq( $(this).index() ).text();
-			if ((title !== 'id') && (title !== '')) {
-				var w = (title != 'device') ? 120 : 240;
-				$(this).html( '<input type="text" placeholder="'+title+'" data-index="'+j+'" style="width: '+w+'px;" class="filterinput" />' );
-			}
-		}); 
+        yadcf.init(table, [
+            {
+                column_number: 0,
+				filter_type: "text",
+                filter_delay: 500
+            },
+            {
+                 column_number: 1,
+                 filter_type: "text",
+                 filter_delay: 500
+            },
+            {
+                column_number: 2,
+				filter_type: "text",
+                filter_delay: 500
+            },
+        ], { filters_tr_index: 0});
 
-		// Filter on typing
-		$(table.table().container() ).on('keyup', 'thead input', function () {
-			table
-				.column($(this).data('index'))
-				.search(this.value)
-				.draw();
-		});		
 	});
 </script>
 
