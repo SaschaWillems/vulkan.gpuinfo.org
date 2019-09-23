@@ -383,6 +383,17 @@ a:hover {  text-decoration:none !important; }
 	font-weight: normal;
 }
 
+.yadcf-filter {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 3px;
+	font-weight: normal;
+}
+
+.yadcf-filter-reset-button {
+	display: none;
+}
+
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   color: #BCBCBC;
 }
