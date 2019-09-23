@@ -217,16 +217,16 @@
 			<thead>
 				<tr>
 					<th></th>
-					<?php if (isset($_GET["limit"])) echo "<th>limit</th>" ?>
-					<th>device</th>
-					<th>driver</th>
-					<th>api</th>
-					<th>vendor</th>
-					<th>type</th>
-					<th>os</thth>
-					<th>version</th>
-					<th>platform</th>
-					<th><input type='submit' name='compare' value='compare' class='button'></th>
+					<?php if (isset($_GET["limit"])) echo "<th></th>" ?>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
 				</tr>
 				<tr>
 					<th>id</th>
@@ -239,7 +239,7 @@
 					<th>OS</th>
 					<th>Version</th>
 					<th>Platform</th>
-					<th></th>
+					<th><input type='submit' name='compare' value='compare' class='button'></th>
 				</tr>
 			</thead>		
 		</table>
@@ -321,20 +321,46 @@
 			},
 		});   
 
-		// Per-Column filter boxes
-		$('#reports thead th').each( function (i) {
-			var title = $('#reports thead th').eq( $(this).index() ).text();
-			if ((title !== 'id') && (title !== '')) {
-				var w = (title != 'device') ? 120 : 240;
-				$(this).html( '<input type="text" placeholder="'+title+'" data-index="'+i+'" style="width: '+w+'px;" class="filterinput" />' );
-			}
-		}); 
-		$(table.table().container() ).on('keyup', 'thead input', function () {
-			table
-				.column($(this).data('index'))
-				.search(this.value)
-				.draw();
-		});		
+// yadcf-filter--reports-1
+
+        yadcf.init(table, [
+            {
+                 column_number: 1,
+                 filter_type: "text",
+				 filter_delay: 500,
+				 style_class: "filter-240"
+            },
+            {
+                column_number: 2,
+				filter_type: "text",
+                filter_delay: 500
+            },
+            {
+                column_number: 3,
+				filter_type: "text",
+                filter_delay: 500
+            },
+            {
+                column_number: 4,
+				filter_type: "text",
+                filter_delay: 500
+            },
+            {
+                column_number: 5,
+				filter_type: "text",
+                filter_delay: 500
+            },
+            {
+                column_number: 6,
+				filter_type: "text",
+                filter_delay: 500
+            },
+            {
+                column_number: 7,
+				filter_type: "text",
+                filter_delay: 500
+            },
+        ], { filters_tr_index: 0});
 
 	});
 </script>

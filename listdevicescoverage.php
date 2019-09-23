@@ -211,7 +211,8 @@
             {
                 column_number: 0,
 				filter_type: "text",
-                filter_delay: 500
+				filter_delay: 500,
+				style_class: "filter-240"
             },
             {
                  column_number: 1,
