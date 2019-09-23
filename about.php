@@ -44,10 +44,6 @@
 				All of my tools and the database itself are free-to-use, open source and hosted by me free of charge, feel free to donate ;)
 			</div>
 			<div>
-				<h3>Flattr</h3>
-				<script id='fbrtvnp'>(function(i){var f,s=document.getElementById(i);f=document.createElement('iframe');f.src='//api.flattr.com/button/view/?uid=swillems&button=compact&url='+encodeURIComponent(document.URL);f.title='Flattr';f.height=20;f.width=110;f.style.borderWidth=0;s.parentNode.insertBefore(f,s);})('fbrtvnp');</script>
-			</div>
-			<div>
 				<h3>PayPal</h3>
 				<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=BHXPMV6ZKPH9E"><img alt="" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a>
 			</div>				
