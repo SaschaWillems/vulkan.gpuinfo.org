@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -31,12 +31,18 @@
 	// Header
 	$defaultHeader = true;
 	$alertText = null;	
-    $negate = false;
+	$negate = false;
+	$showTabs = true;
 	if (isset($_GET['option'])) {
 		if ($_GET['option'] == 'not') {
 			$negate = true;
 		}
-    }	
+	}	
+	$platform = "all";
+	if (isset($_GET['platform'])) {
+		$platform = $_GET['platform'];
+	}
+	
 	// Extension
 	$extension = $_GET['extension'];
 	if ($extension != '') {
@@ -188,10 +194,9 @@
 		$caption .= " (<a href='listreports.php?extensionfeature=".$extensionfeature.($negate ? "" : "&option=not")."'>toggle</a>)";
 	}	
 	// Platform (os)
-	$platform = null;
-	if (isset($_GET['platform']) && ($_GET['platform'] !== 'all')) {
-		$platform = $_GET['platform'];	
-		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+	if ($platform && $platform !== 'all') {
+		$caption = "Listing reports on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+		$defaultHeader = false;
 	}
 
 	if ($defaultHeader) {
@@ -208,9 +213,21 @@
 		echo $caption ? $caption : "Listing available devices";
 		echo "</h4></div>";
 	}
-?>
 
-	<div class="tablediv">	
+	if ($showTabs) {
+?>		
+	<div>
+		<ul class='nav nav-tabs'>
+			<li <?php if ($platform == "all") 	  { echo "class='active'"; } ?>> <a href='listreports.php'>All platforms</a> </li>
+			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listreports.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
+			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listreports.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
+			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listreports.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+		</ul>
+	</div>
+<?php	
+	}	
+?>
+		<div class='tablediv tab-content' style='display: inline-flex;'>
 
 		<form method="get" action="compare.php?compare">	
 		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
