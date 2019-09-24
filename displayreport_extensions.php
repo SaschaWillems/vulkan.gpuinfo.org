@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -29,12 +29,16 @@
 	<tbody>
 <?php	
 	try {
+		if ($platform) {
+			$linkplatform .= "&platform=$platform";
+		}
 		$stmnt = DB::$connection->prepare("SELECT e.name as name, de.specversion as specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
 		$stmnt->execute(array(":reportid" => $reportID));
 		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td class='key'><a href='listreports.php?extension=".$row[0]."'>".$row[0]."</a></td>";
+			$link = "listdevicescoverage.php?extension=$row[0]$linkplatform";
+			echo "<tr><td class='key'><a href='$link'>".$row[0]."</a></td>";
 			echo "<td>".versionToString($row[1])."</td>";
-			echo "</tr>\n";		
+			echo "</tr>\n";
 			echo "</td></tr>\n";
 		}
 	} catch (Exception $e) {
