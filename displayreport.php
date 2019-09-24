@@ -48,7 +48,8 @@
 				r.osname,
 				r.osarchitecture,
 				r.osversion,
-				r.version as reportversion
+				r.version as reportversion,
+				r.ostype
 				from reports r
 				left join
 				deviceproperties p on (p.reportid = r.id)
@@ -62,6 +63,8 @@
 				$devicedescription = $row['vendor']." ".$row['devicename'];
 				$devicename = $row['devicename'];
 				$reportversion = $row['reportversion'];
+				$ostype = $row['ostype'];
+				$platform = platformname($ostype);
 			} catch (PDOException $e) {
 				echo "<b>Error while fetcthing report!</b><br>";
 			}
@@ -97,8 +100,12 @@
 			echo "<center>";				
 		
 			// Header =====================================================================================
+			$header = "Device report for $devicedescription";
+			if ($platform !== null) {
+				$header .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+			}
 			echo "<div class='header'>";
-			echo "<h4>Device report for $devicedescription</h4>";
+			echo "<h4>$header</h4>";
 			if ($reportversion >= '1.4') {
 				echo "<a href=\"api/v2/devsim/getreport.php?id=".$reportID."\" class=\"btn btn-default\" title=\"Download a Vulkan device simulation layer compatible JSON file\"><span class=\"glyphicon glyphicon-floppy-save\"></span> JSON</a>";
 			}

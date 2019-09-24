@@ -325,6 +325,24 @@ function ostype($platform) {
 }
 
 /**
+ * Return platform name from database os type
+ * 
+ * @param integer $ostype Database os type
+ * @return int|null Numan readable platform name or null if unknown
+ */
+function platformname($ostype) {
+	switch($ostype) {
+		case 0:
+			return 'windows';
+		case 1:
+			return 'linux';
+		case 2:
+			return 'android';
+	}
+	return null;
+}
+
+/**
  * Formats a JSON string for pretty printing
  *
  * @param string $json The JSON to make pretty
