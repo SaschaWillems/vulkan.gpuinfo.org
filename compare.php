@@ -152,14 +152,18 @@
 											
 	// Header
 	$colspan = count($reportids) + 1;	
+
+	$repids = implode(",", $reportids);   
 ?>			
 							
 		<div id='tabs'>
 		<ul class='nav nav-tabs'>
-			<li class='active'><a data-toggle='tab' href='#tab-devices'>Devices</a></li>
+			<li><a data-toggle='tab' href='#tab-devices'>Devices</a></li>
 			<li><a data-toggle='tab' href='#tab-features'>Features</a></li>
 			<li><a data-toggle='tab' href='#tab-limits'>Limits</a></li>
 			<li><a data-toggle='tab' href='#tab-extensions'>Extensions</a></li>
+			<li><a data-toggle='tab' href='#tab-extended-features'>Ext.Features</a></li>
+			<li class='active'><a data-toggle='tab' href='#tab-extended-properties'>Ext.Props.</a></li>
 			<li><a data-toggle='tab' href='#tab-formats'>Formats</a></li>
 			<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>
 			<li><a data-toggle='tab' href='#tab-memory'>Memory</a></li>
@@ -168,7 +172,7 @@
 		
 		<div class='tablediv tab-content' style='width:75%;'>		
 
-		<div id='tab-devices' class='tab-pane fade in active reportdiv'>
+		<div id='tab-devices' class='tab-pane fade reportdiv'>
 
 		<!-- Devices -->		
 		<div id="overlay_devices"><center><h4>Fetching data...</h4><img src="./images/loading.gif"></center></div>
@@ -199,7 +203,21 @@
 				<?php include 'compare_extensions.php'; ?>
 			</tbody></table>
 		</div>
-		
+
+		<!-- Extended features -->
+		<div id='tab-extended-features' class='tab-pane fade reportdiv'>
+			<table id='extended-features' width='100%' class='table table-striped table-bordered table-hover'>
+				<?php include 'compare_extended_features.php'; ?>
+			</tbody></table>
+		</div>	
+
+		<!-- Extended Properties -->
+		<div id='tab-extended-properties' class='tab-pane fade in active reportdiv'>
+			<table id='extended-properties' width='100%' class='table table-striped table-bordered table-hover'>
+				<?php include 'compare_extended_properties.php'; ?>
+			</tbody></table>
+		</div>	
+
 		<!-- Formats -->
 		<div id='tab-formats' class='tab-pane fade reportdiv'>
 			<?php include 'compare_formats.php'; ?>
@@ -243,7 +261,7 @@
 	<script>
 		$(document).ready(function() {
 		
-			var tableNames = ['features', 'limits', 'extensions', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
+			var tableNames = ['features', 'limits', 'extensions', 'extended-features', 'extended-properties', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(

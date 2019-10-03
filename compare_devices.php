@@ -19,8 +19,6 @@
 		*
 	*/	
 
-	$repids = implode(",", $reportids);   
-	
 	try {
 		$stmnt = DB::$connection->prepare(
 			"SELECT 
