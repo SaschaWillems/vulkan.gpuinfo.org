@@ -158,12 +158,12 @@
 							
 		<div id='tabs'>
 		<ul class='nav nav-tabs'>
-			<li><a data-toggle='tab' href='#tab-devices'>Devices</a></li>
+			<li class='active'><a data-toggle='tab' href='#tab-devices'>Devices</a></li>
 			<li><a data-toggle='tab' href='#tab-features'>Features</a></li>
 			<li><a data-toggle='tab' href='#tab-limits'>Limits</a></li>
 			<li><a data-toggle='tab' href='#tab-extensions'>Extensions</a></li>
 			<li><a data-toggle='tab' href='#tab-extended-features'>Ext.Features</a></li>
-			<li class='active'><a data-toggle='tab' href='#tab-extended-properties'>Ext.Props.</a></li>
+			<li><a data-toggle='tab' href='#tab-extended-properties'>Ext.Props.</a></li>
 			<li><a data-toggle='tab' href='#tab-formats'>Formats</a></li>
 			<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>
 			<li><a data-toggle='tab' href='#tab-memory'>Memory</a></li>
@@ -172,7 +172,7 @@
 		
 		<div class='tablediv tab-content' style='width:75%;'>		
 
-		<div id='tab-devices' class='tab-pane fade reportdiv'>
+		<div id='tab-devices' class='tab-pane fade in active reportdiv'>
 
 		<!-- Devices -->		
 		<div id="overlay_devices"><center><h4>Fetching data...</h4><img src="./images/loading.gif"></center></div>
@@ -212,7 +212,7 @@
 		</div>	
 
 		<!-- Extended Properties -->
-		<div id='tab-extended-properties' class='tab-pane fade in active reportdiv'>
+		<div id='tab-extended-properties' class='tab-pane fade reportdiv'>
 			<table id='extended-properties' width='100%' class='table table-striped table-bordered table-hover'>
 				<?php include 'compare_extended_properties.php'; ?>
 			</tbody></table>
