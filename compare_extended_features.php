@@ -53,16 +53,17 @@
 	
 	// Generate table
 	foreach ($extended_features as $extension => $features) {
-		echo "<tr class='same'><td class='group' style='border-right:0px'>$extension</td>\n";
+		echo "<tr><td class='group' style='border-right:0px'>$extension</td>\n";
 		foreach ($reportids as $repid) {
 			echo "<td class='group' style='border-right:0px'></td>";
 		}  
 		echo "</tr>"; 
 		// Feature support
 		foreach ($features as $feature) {
-			echo "<tr class='$className'><td class='firstrow' style='padding-left:25px'>".$feature['name']."</td>\n";
-			$index = 0;			
-			foreach ($extended_features_reports as $extended_features_report) {
+			$html = '';
+			$diff = false;
+			$last_val = null;
+			foreach ($extended_features_reports as $index => $extended_features_report) {
 				$ext_present = array_key_exists($extension, $extended_features_report);
 				if ($ext_present) {
 					$supported = false;
@@ -73,13 +74,18 @@
 							}
 						}
 					}
-					echo "<td><span class=".($supported ? "supported" : "unsupported").">".($supported ? "true" : "false")."</span></td>";
+					if ($index > 0 && $supported != $last_val) {
+						$diff = true;
+					}
+					$last_val = $supported;
+					$html .= "<td><span class=".($supported ? "supported" : "unsupported").">".($supported ? "true" : "false")."</span></td>";
 				} else {
-					echo "<td class='na'>n.a.</td>";
+					$html .= "<td class='na'>n.a.</td>";
+					$diff = true;
 				}
-				$index++;
 			}
-			echo "</tr>"; 
+			$html = "<tr class='".($diff ? "diff" : "same")."'><td class='firstrow' style='padding-left:25px'>".$feature['name']."</td>".$html."</tr>";
+			echo $html;
 		}
 	}	  
 ?>
