@@ -674,11 +674,16 @@
 						VALUES
 							(:reportid, :name, :extension, :value)";
 				try {
+					if (is_array($property['value'])) {
+						$value = serialize($property['value']);
+					} else {
+						$value = $property['value'];
+					}
 					$values = array(
 						":reportid" => $reportid, 
 						":name" => $property['name'], 
 						":extension" => $property['extension'], 
-						":value" => $property['value']);
+						":value" => $value);
 					$stmnt = DB::$connection->prepare($sql);
 					$stmnt->execute($values);
 				} catch (Exception $e) {
