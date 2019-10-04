@@ -70,12 +70,16 @@
 					foreach ($ext as $ext_f) {
 						if ($ext_f['name'] == $feature['name']) {
 							$value = $ext_f['value'];
+							if (is_string($value) && substr($value, 0, 2) == "a:") {
+								$arr = unserialize($value);
+								$value = "[".implode(',', $arr)."]";
+							}							
 						}
 					}
 					if ($index > 0 && $value != $last_val) {
 						$diff = true;
 					}
-					$last_val = $value;					
+					$last_val = $value;
 					if (in_array($value, ["true", "false"])) {
 						$html .= "<td><span class=".($value == "true" ? "supported" : "unsupported").">$value</span></td>";
 					} else {

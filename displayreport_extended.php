@@ -62,8 +62,13 @@
                     $stmnt = DB::$connection->prepare("SELECT name, value, extension from deviceproperties2 where reportid = :reportid");
                     $stmnt->execute(array(":reportid" => $reportID));
                     while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
+                        $value = $row[1];
+                        if (is_string($value) && substr($value, 0, 2) == "a:") {
+                            $arr = unserialize($value);
+                            $value = "[".implode(',', $arr)."]";
+                        }
                         echo "<tr><td class='subkey'>".$row[0]."</td><td>";					
-                        echo $row[1];
+                        echo $value;
                         echo "<td>".$row[2]."</td>";
                         echo "</td></tr>\n";
                         }
