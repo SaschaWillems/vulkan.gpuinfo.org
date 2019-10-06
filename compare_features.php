@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -19,14 +19,8 @@
 		*
 	*/
 	
-	// Table header
-	echo "<thead><tr><td class='caption'>Feature</td>";
-	foreach ($reportids as $reportId) {
-		echo "<td class='caption'>Report $reportId</td>";
-	}
-	echo "</tr></thead><tbody>";
-	
-	reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));	
+	ReportCompare::insertTableHeader("Feature", $deviceinfo_data, count($reportids));
+	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
 	
 	$repids = implode(",", $reportids);   
 	

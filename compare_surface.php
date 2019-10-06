@@ -18,18 +18,19 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.
 		*
 	*/
+?>
 
-	// Navigation
-	echo "<div>";
-	echo "<ul class='nav nav-tabs'>";
-	echo "	<li class='active'><a data-toggle='tab' href='#surface-tabs-1'>Surface properties</a></li>";
-	echo "	<li><a data-toggle='tab' href='#surface-tabs-2'>Surface formats</a></li>";
-	// echo "	<li><a data-toggle='tab' href='#surface-tabs-3'>Present modes</a></li>";
-	echo "</ul>";
-	echo "</div>";
+	<div>
+	<ul class='nav nav-tabs'>
+		<li class='active'><a data-toggle='tab' href='#surface-tabs-1'>Surface properties</a></li>
+		<li><a data-toggle='tab' href='#surface-tabs-2'>Surface formats</a></li>
+	<!-- <li><a data-toggle='tab' href='#surface-tabs-3'>Present modes</a></li> -->
+	</ul>
+	</div>
 
-	echo "<div class='tab-content'>";
+	<div class='tab-content'>
 
+<?php	
 	/* 
 		Surface properties
 	*/
@@ -50,13 +51,8 @@
 		$reportIndex = 0;
 
 		echo "<table id='surface-caps' width='100%' class='table table-striped table-bordered'>";
-		echo "<thead><tr><td class='caption'>Property</td>";
-		foreach ($reportids as $reportId) {
-			echo "<td class='caption'>Report $reportId</td>";
-		}
-		echo "</tr></thead><tbody>";
-
-		reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
+		ReportCompare::insertTableHeader("Surface property", $deviceinfo_data, count($reportids));
+		ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));		
 
 		$props = null;
 
@@ -136,14 +132,9 @@
 		$reportIndex = 0;
 
 		echo "<table id='surface-formats' width='100%' class='table table-striped table-bordered'>";
-		echo "<thead><tr><td class='caption'>Format</td>";
-		foreach ($reportids as $reportId) {
-			echo "<td class='caption'>Report $reportId</td>";
-		}
-		echo "</tr></thead><tbody>";
-
-		reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
-		
+		ReportCompare::insertTableHeader("Surface format", $deviceinfo_data, count($reportids));
+		ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));		
+	
 		try {
 			$stmnt = DB::$connection->prepare("SELECT dsf.reportid AS reportid, vf.name as name FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (".implode(',', $reportids).")");
 			$stmnt->execute();

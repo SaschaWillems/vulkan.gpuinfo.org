@@ -18,28 +18,24 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.
 		*
 	*/
+?>
 
-	// Navigation
-	echo "<div>";
-	echo "<ul class='nav nav-tabs'>";
-	echo "	<li class='active'><a data-toggle='tab' href='#memory-tabs-1'>Memory types</a></li>";
-	echo "	<li><a data-toggle='tab' href='#memory-tabs-2'>Memory heaps</a></li>";
-	echo "</ul>";
-	echo "</div>";
+	<div>
+	<ul class='nav nav-tabs'>
+		<li class='active'><a data-toggle='tab' href='#memory-tabs-1'>Memory types</a></li>
+		<li><a data-toggle='tab' href='#memory-tabs-2'>Memory heaps</a></li>
+	</ul>
+	</div>
+	<div class='tab-content'>
 
-	echo "<div class='tab-content'>";
-
+<?php
 	// Memory types
-
 	echo "<div id='memory-tabs-1' class='tab-pane fade in active reportdiv'>";
 
 	echo "<table id='memory-types' width='100%' class='table table-striped table-bordered'>";
-	echo "<thead><tr><td class='caption'>Property</td>";
-	foreach ($reportids as $reportId)
-	{
-		echo "<td class='caption'>Report $reportId</td>";
-	}
-	echo "</tr></thead><tbody>";
+
+	ReportCompare::insertTableHeader("Memory type", $deviceinfo_data, count($reportids));
+	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
 
 	// Get memory types for each selected report into an array
 	$memoryFlags = array();
@@ -78,8 +74,6 @@
 
 	// Generate table
 	$colspan = count($reportids) + 1;
-
-	reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
 
 	// Memory type counts
 	echo "<tr class='firstrow'><td class='firstrow'>Memory type count</td>";
@@ -138,12 +132,9 @@
 <?php
 
 	echo "<table id='memory-heaps' width='100%' class='table table-striped table-bordered'>";
-	echo "<thead><tr><td class='caption'>Property</td>";
-	foreach ($reportids as $reportId)
-	{
-		echo "<td class='caption'>Report $reportId</td>";
-	}
-	echo "</tr></thead><tbody>";
+
+	ReportCompare::insertTableHeader("Memory heap", $deviceinfo_data, count($reportids));
+	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
 
 	// Get memory types for each selected report into an array
 	$memoryHeapSizes = array();
@@ -181,9 +172,7 @@
 	// Generate table
 	$colspan = count($reportids) + 1;
 
-	reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
-
-	// Memory type counts
+	// Memory heap counts
 	echo "<tr class='firstrow'><td class='firstrow'>Memory heap count</td>";
 	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i) {
 		echo "<td>".$memoryHeapCounts[$i]."</td>";

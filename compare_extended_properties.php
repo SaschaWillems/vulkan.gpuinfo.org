@@ -19,13 +19,8 @@
 		*
 	*/
 	
-	// Table header
-	echo "<thead><tr><td class='caption'></td>";
-	foreach ($reportids as $reportid) {
-		echo "<td class='caption'>Report $reportid</td>";
-	}
-	echo "</tr></thead><tbody>";
-	reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
+	ReportCompare::insertTableHeader("Ext. Property", $deviceinfo_data, count($reportids));
+	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
 
 	// Gather all extended properties for reports to compare
 	$extended_properties = null;

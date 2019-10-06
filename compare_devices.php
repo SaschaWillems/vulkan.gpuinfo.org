@@ -113,9 +113,9 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 	
 	// Generate table from selected reports
 
-	echo "<thead><tr><td class='caption'>Key</td><td>Group</td>";
-	foreach ($reportids as $reportId) {
-		echo "<td class='caption'>Report $reportId</td>";
+	echo "<thead><tr><th>Key</th><th>Group</th>";
+	foreach ($reportids as $index => $reportId) {
+		echo "<th>".$deviceinfo_data[$index][0]."</th>";
 	}
 	echo "</tr></thead><tbody>";
 

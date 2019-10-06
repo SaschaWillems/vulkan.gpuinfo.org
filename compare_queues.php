@@ -19,12 +19,9 @@
 		*
 	*/
 
-	echo "<table id='memory-types' width='100%' class='table table-striped table-bordered'>";
-	echo "<thead><tr><td class='caption'>Property</td>";
-	foreach ($reportids as $reportId) {
-		echo "<td class='caption'>Report $reportId</td>";
-	}
-	echo "</tr></thead><tbody>";
+	echo "<table id='queue-families' width='100%' class='table table-striped table-bordered'>";
+	ReportCompare::insertTableHeader("Queue family", $deviceinfo_data, count($reportids));
+	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
 
 	// Get queues for each selected report into an array
 	$qCount = array();

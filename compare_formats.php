@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -18,17 +18,16 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-
-	// Navigation
-	echo "<div>";
-	echo "<ul class='nav nav-tabs'>";
-	echo "	<li class='active'><a data-toggle='tab' href='#format-tabs-1'>Linear tiling</a></li>";
-	echo "	<li><a data-toggle='tab' href='#format-tabs-2'>Optimal tiling</a></li>";
-	echo "	<li><a data-toggle='tab' href='#format-tabs-3'>Buffer</a></li>";
-	echo "</ul>";
-	echo "</div>";
-	
-	echo "<div class='tab-content'>";		
+?>
+	<div>
+	<ul class='nav nav-tabs'>
+		<li class='active'><a data-toggle='tab' href='#format-tabs-1'>Linear tiling</a></li>
+		<li><a data-toggle='tab' href='#format-tabs-2'>Optimal tiling</a></li>
+		<li><a data-toggle='tab' href='#format-tabs-3'>Buffer</a></li>
+	</ul>
+	</div>
+	<div class='tab-content'>
+<?php
 	
 	// Get format names
 	try {
@@ -79,15 +78,10 @@
 		}
 		echo "<table id='formats-".($i)."' width='100%' class='table table-striped table-bordered table-hover'>";	
 		
-		// Table header
-		echo "<thead><tr><td class='caption'>Format</td>";
-		foreach ($reportids as $reportId) {
-			echo "<td class='caption'>Report $reportId</td>";
-		}
-		echo "</tr></thead><tbody>";	
-
-		reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
-		
+		$captions = ['Linear image', 'Optimal image', 'Buffer'];
+		ReportCompare::insertTableHeader($captions[$i]." format", $deviceinfo_data, count($reportids));
+		ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+	
 		$rowindex = 0;
 		foreach ($formatnames as $extension) {
 			// Check format diffs
