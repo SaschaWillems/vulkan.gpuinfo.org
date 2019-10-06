@@ -263,6 +263,33 @@ function reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, $cou
 	}
 }
 
+class ReportCompare {
+
+	public static function insertTableHeader($caption, $deviceinfo_data, $count) {
+		echo "<thead><tr><th>$caption</th>";
+		for ($i = 0; $i < $count; $i++) {
+			echo "<td class='caption'>".$deviceinfo_data[$i][0]."</td>";
+		}
+		echo "</th></thead><tbody>";
+	}
+
+	public static function insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, $count)
+	{
+		for ($i = 0; $i < sizeof($deviceinfo_data[0]); ++$i) 
+		{
+			echo "<tr>";
+			echo "<td>".$deviceinfo_captions[$i]."</td>";
+			for ($j = 0, $arrsize = $count; $j < $arrsize; ++$j) 				
+			{
+				echo "<td class='deviceinfo'>".$deviceinfo_data[$j][$i]."</td>";
+			}
+			echo "</tr>";
+		}
+	}
+	
+}
+
+
 // Convert vendor specific driver version string
 function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 {
