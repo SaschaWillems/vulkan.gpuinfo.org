@@ -5,9 +5,9 @@
 	
 	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/dataTables.bootstrap.min.css"/>
-	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/responsive.bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/bootstrap-toggle.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet"/>
 
 	<link rel="stylesheet" type="text/css" href="style.css">
 
@@ -18,7 +18,6 @@
 	<script type="text/javascript" src="external/dataTables.bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/bootstrap-toggle.min.js"></script>	
 	<script type="text/javascript" src="external/dataTables.fixedHeader.min.js"></script>
-	<script type="text/javascript" src="external/percentageBars.js"></script>
 
 <!--	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script> -->
 	<script type="text/javascript" src="external/responsive.bootstrap.min.js"></script>

@@ -271,7 +271,11 @@
 							"order": [], 
 							"searchHighlight": true,
 							"sDom": 'flpt',
-							"deferRender": true						
+							"deferRender": true,
+							"fixedHeader": {
+								"header": true,
+								"headerOffset": 50
+							},
 						}
 					);
 			}		
@@ -290,6 +294,10 @@
 					"sDom": 'flpt',
 					"deferRender": true,
 					"processing": true,
+					"fixedHeader": {
+						"header": true,
+        				"headerOffset": 50
+    				},
 					"drawCallback": function (settings) {
 						var api = this.api();
 						var rows = api.rows( {page:'current'} ).nodes();
@@ -320,6 +328,11 @@
 				$('.sameCaps').show();
 			}
 		} );
+
+		$('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+        	$($.fn.dataTable.tables()).DataTable().fixedHeader.adjust();
+      	});
+
 	</script>
 		
 	</div>
