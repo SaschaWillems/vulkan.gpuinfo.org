@@ -275,7 +275,7 @@ class ReportCompare {
 
 	public static function insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, $count)
 	{
-		for ($i = 0; $i < sizeof($deviceinfo_data[0]); ++$i) 
+		for ($i = 1; $i < sizeof($deviceinfo_data[0]); ++$i) 
 		{
 			echo "<tr>";
 			echo "<td>".$deviceinfo_captions[$i]."</td>";
