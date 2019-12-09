@@ -280,7 +280,7 @@
 			"lengthChange": false,
 			"dom": 'lrtip',	
 			"pageLength" : 25,		
-			"order": [[ 0, 'desc' ]],
+			"order": [[ 2, 'desc' ]],
 			"columnDefs": [
 				{ 
 					"searchable": false, "targets": [ 0, <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>] ,

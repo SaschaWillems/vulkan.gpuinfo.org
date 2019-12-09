@@ -33,6 +33,9 @@
     if (isset($_REQUEST['order'])) {
         $orderByColumn = $_REQUEST['order'][0]['column'];
         $orderByDir = $_REQUEST['order'][0]['dir'];
+        if (strcasecmp($orderByColumn, 'driver') == 0) {
+            $orderByColumn = 'driverversionraw';
+        }
     }
 
     // Paging
