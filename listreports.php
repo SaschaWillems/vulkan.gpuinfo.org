@@ -195,7 +195,7 @@
 	}	
 	// Platform (os)
 	if ($platform && $platform !== 'all') {
-		$caption = "Listing reports on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+		$caption = "Listing ".($caption ? lcfirst($caption) : "reports")." on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
 		$defaultHeader = false;
 	}
 
