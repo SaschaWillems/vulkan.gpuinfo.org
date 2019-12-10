@@ -42,28 +42,20 @@
 	$column    = array();
 	$captions  = array();
 	
-	$reportindex = 0;
-	while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-		$colindex = 0;
-		$reportdata = array();				
-		foreach ($row as $data) {
-			$meta = $stmnt->getColumnMeta($colindex);
-			$caption = $meta["name"];			
-			if ($caption != "reportid") {
+	while($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+		$reportdata = array();
+		foreach ($row as $colname => $data) {
+			if ($colname != "reportid") {
 				$reportdata[] = $data;	  
-				$captions[]   = $caption;
+				$captions[]   = $colname;
 			}												
-			$colindex++;
 		} 		
 		$column[] = $reportdata; 		
-		$reportindex++;
 	}   
 	
 	// Generate table from selected reports
-	$index = 1;  
-	for ($i = 0, $arrsize = sizeof($column[0]); $i < $arrsize; ++$i) { 	  
+	for ($i = 0; $i < count($column[0]); $i++) { 	  
 		// Get min and max for this capability
-		// TODO: Flip for min values
 		if (is_numeric($column[0][$i])) {
 			$minval = $column[0][$i];
 			$maxval = $column[0][$i];			
@@ -76,39 +68,36 @@
 				}
 			}
 		}								
-		
-		// Report header
+
 		$fontStyle = ($minval < $maxval) ? "style='color:#FF0000;'" : "";					
 		$headerFields = array("device", "driverversion", "apiversion", "os");
+		$rowClass = "";
+		// Comparison for min values is flipped
+		$flipCompare = (stripos($captions[$i], 'min') !== false);		
 		if (!in_array($captions[$i], $headerFields)) {
-			$className = ($minval < $maxval) ? "" : "class='sameCaps'";
-		} else {
-			$className = "";
+			if ($flipCompare) {
+				$rowClass = ($maxval < $minval) ? "" : "class='sameCaps'";
+			} else {
+				$rowClass = ($minval < $maxval) ? "" : "class='sameCaps'";
+			}
 		}
-		echo "<tr $className>\n";
-		echo "<td class='firstrow' $fontStyle>". $captions[$i] ."</td>\n";					
+		echo "<tr $rowClass>\n";
+		echo "<td class='firstrow'>". $captions[$i] ."</td>\n";					
 
 		// Values
-		for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) {	 
-			$fontstyle = '';
-			if ($captions[$i] == 'GL_RENDERER') {
-				echo "<td class='valuezeroleftblack'><b>".$column[$j][$i] ."</b></td>";
+		for ($j = 0; $j < count($column); $j++) {
+			$fontClass = '';
+			if (is_numeric($column[$j][$i]) ) {									
+				if ($flipCompare) {
+					$fontClass = ($column[$j][$i] > $minval) ? "unsupported" : null;
 				} else {
-					if (is_numeric($column[$j][$i]) ) {					
-						if ($column[$j][$i] < $maxval) {
-							$fontstyle = "style='color:#FF0000;'";
-							}					
-						if ($captions[$i] == 'GL_SHADING_LANGUAGE_VERSION') {
-							echo "<td class='valuezeroleftdark'>".number_format($column[$j][$i], 2, '.', ',')."</td>";
-						} else {
-							echo "<td class='valuezeroleftdark' $fontstyle>".number_format($column[$j][$i], 0, '.', ',')."</td>";
-						}
-					} else {
-						echo "<td class='valuezeroleftdark'>".$column[$j][$i]."</td>";
-					}
+					$fontClass = ($column[$j][$i] < $maxval) ? "unsupported" : null;
 				}
+				echo "<td ".($fontClass ? ("class='$fontClass'") : "").">".number_format($column[$j][$i], 0, '.', ',')."</td>";
+			} else {
+				echo "<td>".$column[$j][$i]."</td>";
+			}
 		} 
 		echo "</tr>\n";
-		$index++;
 	} 
 ?>
