@@ -24,9 +24,11 @@
 			"SELECT 
 				p.devicename,
 				r.displayname,
+				p.driverversionraw,
 				p.driverversion,
 				p.devicetype,
 				p.apiversion,
+				p.vendorid,
 				VendorId(p.vendorid) as 'vendor',
 				concat('0x', hex(cast(p.deviceid as UNSIGNED))) as 'deviceid',
 				r.submitter,
@@ -48,7 +50,7 @@
 			from reports r
 			left join
 			deviceproperties p on (p.reportid = r.id)				
-		where r.id in (" . $repids . ")");
+			where r.id in (" . $repids . ")");
 		$stmnt->execute();
 	} catch (PDOException $e) {
 		die("Could not fetch device properties!");
@@ -61,12 +63,10 @@
 	$captions = array();
 	$groups = array();
 	
-	while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-		$colindex = 0;
+	while($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
 		$reportdata = array();				
-		foreach ($row as $data) {
-			$meta = $stmnt->getColumnMeta($colindex);
-			$caption = $meta["name"];			
+		foreach ($row as $colname => $data) {
+			$caption = $colname;
 			$group = "Device";
 			
 			if (($caption == 'pipelineCacheUUID') && (!is_null($data))) {
@@ -76,8 +76,6 @@
 				$reportdata[] = implode($arr);
 				$captions[] = $caption;
 				$groups[] = $group;
-				$colindex++;
-				continue;
 			}
 
 			if (strpos($caption, 'residency') !== false) {
@@ -89,13 +87,15 @@
 				$caption = str_replace('subgroupProperties.', '', $caption);				
 			}			
 
-			if ($caption != "reportid") {
+			if ($caption == 'driverversionraw') {
+				$caption = 'driverversion';
+				$data = getDriverVerson($data, $row['driverversion'], $row['vendorid'], $row['osname']);
+			}
+			if (!(in_array($colname, ['reportid', 'driverversion', 'pipelineCacheUUID']))) {
 				$reportdata[] = $data;
 				$captions[] = $caption;
 				$groups[] = $group;
-			}									
-			
-			$colindex++;
+			}
 		} 
 		
 		$column[] = $reportdata; 
@@ -103,24 +103,14 @@
 		$reportindex++;
 	}   
 
-	// Platform details (when available)
-	//todo:
-	/*
-select distinct name from deviceplatformdetails 
-left join platformdetails on platformdetails.id = deviceplatformdetails.platformdetailid 
-where deviceplatformdetails.ReportID in (".$repids.");"	
-	*/
-	
 	// Generate table from selected reports
-
-	echo "<thead><tr><th>Key</th><th>Group</th>";
+	echo "<thead><tr><th/><th>Group</th>";
 	foreach ($reportids as $index => $reportId) {
 		echo "<th>".$deviceinfo_data[$index][0]."</th>";
 	}
 	echo "</tr></thead><tbody>";
 
-	$index = 1;  
-	for ($i = 0, $arrsize = sizeof($column[0]); $i < $arrsize; ++$i) { 	  	
+	for ($i = 0; $i < count($column[0]); $i++) { 	  	
 		if (strcasecmp($captions[$i], "displayname") == 0) {
 			$empty = true;
 			for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) {
@@ -135,23 +125,18 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 		}
 
 		// Get min and max for this capability
-		if (is_numeric($column[0][$i])) {
-			
+		if (is_numeric($column[0][$i])) {			
 			$minval = $column[0][$i];
-			$maxval = $column[0][$i];
-			
-			for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) 
-			{	 			
-				if ($column[$j][$i] < $minval) 
-				{
+			$maxval = $column[0][$i];			
+			for ($j = 0; $subarrsize = $j < count($column); $j++) {	 			
+				if ($column[$j][$i] < $minval) {
 					$minval = $column[$j][$i];
 				}
-				if ($column[$j][$i] > $maxval) 
-				{
+				if ($column[$j][$i] > $maxval) {
 					$maxval = $column[$j][$i];
 				}
 			}
-		}								
+		}
 		
 		// Report header
 		$className = "";
@@ -197,6 +182,5 @@ where deviceplatformdetails.ReportID in (".$repids.");"
 			echo "</td>";			
 		} 
 		echo "</tr>\n";
-		$index++;
 	}   
 ?>
