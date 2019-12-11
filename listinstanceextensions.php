@@ -19,28 +19,11 @@
 		*
 	*/
 	
+	include 'page_generator.php';
 	include './dbconfig.php';
-	include './header.inc';	
+	
+	PageGenerator::header("Instance extensions");
 ?>
-
-<script>
-	$(document).ready(function() {
-		var table = $('#extensions').DataTable({
-			"pageLength" : -1,
-			"paging" : false,
-			"stateSave": false, 
-			"searchHighlight" : true,	
-			"dom": 'f',			
-			"bInfo": false,	
-			"order": [[ 0, "asc" ]]	
-		});
-
-		$("#searchbox").on("keyup search input paste cut", function() {
-			table.search(this.value).draw();
-		});  		
-
-	} );	
-</script>
 
 <div class='header'>
 	<h4>Listing all available instance extensions</h4>
@@ -86,7 +69,26 @@
 </div>
 </div>
 
-<?php include './footer.inc'; ?>
+<script>
+	$(document).ready(function() {
+		var table = $('#extensions').DataTable({
+			"pageLength" : -1,
+			"paging" : false,
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"dom": 'f',			
+			"bInfo": false,	
+			"order": [[ 0, "asc" ]]	
+		});
+
+		$("#searchbox").on("keyup search input paste cut", function() {
+			table.search(this.value).draw();
+		});  		
+
+	} );	
+</script>
+
+<?php PageGenerator::footer(); ?>
 
 </center>
 </body>

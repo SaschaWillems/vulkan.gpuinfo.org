@@ -19,34 +19,17 @@
 	 *
 	 */
 
+	include 'page_generator.php';
 	include './dbconfig.php';
-	include './header.inc';
 	include './functions.php';
 
 	$platform = "windows";
 	if (isset($_GET['platform'])) {
 		$platform = $_GET['platform'];
-	}	
+	}
+
+	PageGenerator::header("Surface present modes");
 ?>
-
-<script>
-	$(document).ready(function() {
-		var table = $('#presentmodes').DataTable({
-			"pageLength" : -1,
-			"paging" : false,
-			"stateSave": false, 
-			"searchHighlight" : true,	
-			"dom": 'f',
-			"bInfo": false,	
-			"order": [[ 1, "desc" ]]	
-		});
-
-		$("#searchbox").on("keyup search input paste cut", function() {
-			table.search(this.value).draw();
-		});  		
-
-	} );	
-</script>
 
 <div class='header'>
 	<div class='alert alert-warning' role='alert' style='width:auto;'>
@@ -112,7 +95,26 @@
 
 </div>
 
-<?php include './footer.inc'; ?>
+<script>
+	$(document).ready(function() {
+		var table = $('#presentmodes').DataTable({
+			"pageLength" : -1,
+			"paging" : false,
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"dom": 'f',
+			"bInfo": false,	
+			"order": [[ 1, "desc" ]]	
+		});
+
+		$("#searchbox").on("keyup search input paste cut", function() {
+			table.search(this.value).draw();
+		});  		
+
+	} );	
+</script>
+
+<?php PageGenerator::footer(); ?>
 
 </center>
 </body>

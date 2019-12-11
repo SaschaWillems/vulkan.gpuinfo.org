@@ -19,10 +19,11 @@
 		*
 	*/
 
-	include './header.inc';	
+	include 'page_generator.php';
 	include './functions.php';	
 	include './dbconfig.php';	
 
+	PageGenerator::header("Reports");
 ?>
 
 <center>
@@ -382,7 +383,7 @@
 	});
 </script>
 
-<?php include './footer.inc'; ?>
+<?php PageGenerator::footer(); ?>
 
 </body>
 </html>

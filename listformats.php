@@ -19,8 +19,8 @@
 		*
 	*/
 	
+	include 'page_generator.php';
 	include './dbconfig.php';
-	include './header.inc';	
 	include './functions.php';
 
 	$platform = "windows";
@@ -28,26 +28,8 @@
 		$platform = $_GET['platform'];
 	}
 
+	PageGenerator::header("Formats");
 ?>
-
-<script>
-	$(document).ready(function() {
-		var table = $('#formats').DataTable({
-			"pageLength" : -1,
-			"paging" : false,
-			"stateSave": false, 
-			"searchHighlight" : true,	
-			"dom": 'f',			
-			"bInfo": false,	
-			"order": [[ 0, "asc" ]]	
-		});
-
-		$("#searchbox").on("keyup search input paste cut", function() {
-			table.search(this.value).draw();
-		});  		
-
-	} );	
-</script>
 
 <div class='header'>
 	<?php echo "<h4>Image and buffer format support on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>
@@ -134,7 +116,27 @@
 
 </div>
 </div>
-	<?php include './footer.inc'; ?>
+
+<script>
+	$(document).ready(function() {
+		var table = $('#formats').DataTable({
+			"pageLength" : -1,
+			"paging" : false,
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"dom": 'f',			
+			"bInfo": false,	
+			"order": [[ 0, "asc" ]]	
+		});
+
+		$("#searchbox").on("keyup search input paste cut", function() {
+			table.search(this.value).draw();
+		});  		
+
+	} );	
+</script>
+
+<?php PageGenerator::footer(); ?>
 </center>
 </body>
 </html>

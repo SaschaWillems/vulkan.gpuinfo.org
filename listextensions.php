@@ -19,8 +19,8 @@
 		*
 	*/
 	
+	include 'page_generator.php';
 	include './dbconfig.php';
-	include './header.inc';	
 	include './functions.php';
 
 	$platform = "windows";
@@ -28,29 +28,8 @@
 		$platform = $_GET['platform'];
 	}
 
+	PageGenerator::header("Extensions");
 ?>
-
-<script>
-	$(document).ready(function() {
-		var table = $('#extensions').DataTable({
-			"pageLength" : -1,
-			"paging" : false,
-			"stateSave": false, 
-			"searchHighlight" : true,	
-			"dom": 'f',			
-			"bInfo": false,	
-			"order": [[ 0, "asc" ]],
-			"columnDefs": [{
-      			"targets": [ 1, 2 ],
-			}]
-		});
-
-		$("#searchbox").on("keyup search input paste cut", function() {
-			table.search(this.value).draw();
-		});
-
-	} );	
-</script>
 
 <div class='header'>
 	<?php echo "<h4>Extension coverage for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
@@ -117,7 +96,29 @@
 	</table>  
 </div>
 
-<?php include './footer.inc'; ?>
+<script>
+	$(document).ready(function() {
+		var table = $('#extensions').DataTable({
+			"pageLength" : -1,
+			"paging" : false,
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"dom": 'f',			
+			"bInfo": false,	
+			"order": [[ 0, "asc" ]],
+			"columnDefs": [{
+      			"targets": [ 1, 2 ],
+			}]
+		});
+
+		$("#searchbox").on("keyup search input paste cut", function() {
+			table.search(this.value).draw();
+		});
+
+	} );	
+</script>
+
+<?php PageGenerator::footer(); ?>
 
 </center>
 </body>

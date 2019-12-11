@@ -19,33 +19,18 @@
 		*
 	*/
 	
+	include 'page_generator.php';
 	include './dbconfig.php';
-	include './header.inc';	
 	include './functions.php';	
 	
 	$platform = "windows";
 	if (isset($_GET['platform'])) {
 		$platform = $_GET['platform'];
-	}	
+	}
+
+	PageGenerator::header("Features");
 ?>
 	
-<script>
-	$(document).ready(function() {
-		var table = $('#features').DataTable({
-			"pageLength" : -1,
-			"paging" : false,
-			"stateSave": false, 
-			"searchHighlight" : true,	
-			"dom": 'f',			
-			"bInfo": false,	
-			"order": [[ 0, "asc" ]],
-			"columnDefs": [{
-      			"targets": [ 1, 2 ]
-			}]			
-		});
-	} );	
-</script>
-
 <div class='header'>
 	<?php echo "<h4>Device feature coverage for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
 </div>			
@@ -124,8 +109,25 @@
 	</table>  
 
 	</div>
-	
-<?php include './footer.inc'; ?>
+
+<script>
+	$(document).ready(function() {
+		var table = $('#features').DataTable({
+			"pageLength" : -1,
+			"paging" : false,
+			"stateSave": false, 
+			"searchHighlight" : true,	
+			"dom": 'f',			
+			"bInfo": false,	
+			"order": [[ 0, "asc" ]],
+			"columnDefs": [{
+      			"targets": [ 1, 2 ]
+			}]			
+		});
+	} );	
+</script>
+
+<?php PageGenerator::footer(); ?>
 	
 </center>
 </body>
