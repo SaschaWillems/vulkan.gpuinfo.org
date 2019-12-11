@@ -427,4 +427,8 @@ function getDeviceCount($platform, $andWhere = null) {
 	return DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype $andWhere", ['ostype' => ostype($platform)]);
 }
 
+function setPageTitle(string $title) {
+	echo '<script language="javascript">document.title = "'.$title.' - Vulkan Hardware Database by Sascha Willems";</script>';
+}
+
 ?>

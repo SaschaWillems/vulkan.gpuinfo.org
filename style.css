@@ -464,3 +464,13 @@ h1 {
 .hint {
 	color: #acacac;
 }
+
+.div-h-center {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+}
+
+.div-alert {
+	display: inline-block;
+}
