@@ -19,7 +19,7 @@
 		*
 	*/
 
-	include 'header.inc';	
+	include 'page_generator.php';	
 	include 'dbconfig.php';	
 	
 	$name = null;
@@ -40,8 +40,9 @@
 			if (in_array($os, ['linux'])) {
 				$filter = "where reportid in (select id from reports where osname not in ('windows', 'android', 'ios', 'osx'))";
 			}
-		}
+		}		
 	}
+	PageGenerator::header($name);
 
 	$caption = "Value distribution for $name";
 
@@ -168,9 +169,7 @@
 	  }
 	</script>
 
-	<?php 
-		include "footer.inc";
-	?>
+<?php PageGenerator::footer(); ?>
 
 </body>
 </html>
