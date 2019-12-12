@@ -19,7 +19,7 @@
 		*
 	*/
 
-	include './header.inc';	
+	include 'page_generator.php';
 	include './functions.php';	
 	include './dbconfig.php';	
 
@@ -33,6 +33,7 @@
 	}
 
 	$caption = null;
+	$pageTitle = null;
 	$subcaption = null;
 
 	if (isset($_GET["extension"])) {
@@ -40,6 +41,7 @@
 			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET["extension"]."</b>" 
 			: 
 			"Listing first known driver version support for <b>".$_GET["extension"]."</b>";
+		$pageTitle = $_GET["extension"];
 		// Check if extension has features2 or properties2
 		$ext = $_GET["extension"];
 		DB::connect();
@@ -61,7 +63,7 @@
 			}	
 		} catch(Throwable $e) {
 		}
-		DB::disconnect();
+		DB::disconnect();		
 	}
 
 	if (isset($_GET["feature"])) {
@@ -69,6 +71,7 @@
 			"Listing devices <span style='color:red;'>not</span> supporting for <b>".$_GET["feature"]."</b>" 
 			: 
 			"Listing first known driver version support for <b>".$_GET["feature"]."</b>";
+		$pageTitle = $_GET["feature"];
 	}
 
 	if (isset($_GET['linearformat'])) {
@@ -110,12 +113,15 @@
 
 	if (isset($_GET["submitter"])) {
 		$caption .= "<br/>Devices submitted by ".$_GET["submitter"];
+		$pageTitle = "Devices by ".$_GET["submitter"];
 	}
+
+	PageGenerator::header($pageTitle);
 ?>
 
 <center>
 
-	<div class='header'>	
+	<div class='header'>
 		<h4>
 		<?php		
 			echo $caption ? $caption : "Listing available devices";
@@ -229,7 +235,7 @@
 	});
 </script>
 
-<?php include './footer.inc'; ?>
+<?php PageGenerator::footer(); ?>
 
 </body>
 </html>
