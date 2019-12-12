@@ -36,6 +36,9 @@
         if (strcasecmp($orderByColumn, 'driver') == 0) {
             $orderByColumn = 'driverversionraw';
         }
+        if (strcasecmp($orderByColumn, 'device') == 0) {
+            $orderByColumn = 'devicename';
+        }        
     }
 
     // Paging
