@@ -22,8 +22,6 @@
 	include 'page_generator.php';
 	include './functions.php';	
 	include './dbconfig.php';	
-
-	PageGenerator::header("Reports");
 ?>
 
 <center>
@@ -31,9 +29,10 @@
 <?php
 	// Header
 	$defaultHeader = true;
+	$pageTitle = null;
 	$alertText = null;	
 	$negate = false;
-	$showTabs = true;
+	$showTabs = true;	
 	if (isset($_GET['option'])) {
 		if ($_GET['option'] == 'not') {
 			$negate = true;
@@ -108,8 +107,8 @@
 		if (isset($_GET['value'])) {
 			$limitvalue = $_GET['value'];
 			$link = "displaydevicelimit.php?name=".$limit;
-			$caption = "Reports with <a href=".$link.">".$limit."</a> = ".$limitvalue;	
-
+			$caption = "Reports with <a href=".$link.">".$limit."</a> = ".$limitvalue;
+			$pageTitle = $limit. " = ".$limitvalue;
 		}
 		DB::disconnect();
 	}	
@@ -205,6 +204,8 @@
 		echo "	<h4>Listing reports</h4>";
 		echo "</div>";
 	}	
+
+	PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");	
 ?>
 
 <?php
@@ -339,42 +340,52 @@
 			},
 		});   
 
-// yadcf-filter--reports-1
-
         yadcf.init(table, [
+<?php
+		$coloffset = 0;
+		if (isset($_GET["limit"])) {
+			$coloffset = 1;
+			echo 
+				'{
+					column_number: 1,
+					filter_type: "text",
+					filter_delay: 500,
+		   		},';
+		}
+?>			
             {
-                 column_number: 1,
+                 column_number: <?php echo ($coloffset + 1) ?>,
                  filter_type: "text",
 				 filter_delay: 500,
 				 style_class: "filter-240"
             },
             {
-                column_number: 2,
+                column_number: <?php echo ($coloffset + 2) ?>,
 				filter_type: "text",
                 filter_delay: 500
             },
             {
-                column_number: 3,
+                column_number: <?php echo ($coloffset + 3) ?>,
 				filter_type: "text",
                 filter_delay: 500
             },
             {
-                column_number: 4,
+                column_number: <?php echo ($coloffset + 4) ?>,
 				filter_type: "text",
                 filter_delay: 500
             },
             {
-                column_number: 5,
+                column_number: <?php echo ($coloffset + 5) ?>,
 				filter_type: "text",
                 filter_delay: 500
             },
             {
-                column_number: 6,
+                column_number: <?php echo ($coloffset + 6) ?>,
 				filter_type: "text",
                 filter_delay: 500
             },
             {
-                column_number: 7,
+                column_number: <?php echo ($coloffset + 7) ?>,
 				filter_type: "text",
                 filter_delay: 500
             },
