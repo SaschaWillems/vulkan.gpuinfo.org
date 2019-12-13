@@ -151,6 +151,7 @@
 		$headerClass = $negate ? "header-red" : "header-green";			
 		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting instance extension <b>".$instanceextension."</b>";	
 		$caption .= " (<a href='listreports.php?instanceextension=".$instanceextension.($negate ? "" : "&option=not")."'>toggle</a>)";
+		$pageTitle = $instanceextension;
 	}
 	// Instance layer
 	$instancelayer = $_GET['instancelayer'];
@@ -159,6 +160,7 @@
 		$headerClass = $negate ? "header-red" : "header-green";			
 		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting instance layer <b>".$instancelayer."</b>";	
 		$caption .= " (<a href='listreports.php?instancelayer=".$instancelayer.($negate ? "" : "&option=not")."'>toggle</a>)";
+		$pageTitle = $instancelayer;
 	}	
 	// Extension property value
 	$extensionproperty = $_GET['extensionproperty'];
