@@ -79,18 +79,21 @@
 			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['linearformat']."</b> for <b>linear tiling</b>"
 			:
 			"Listing first known driver version support for <b>".$_GET['linearformat']."</b> for <b>linear tiling</b>";
+		$pageTitle = "Linear format ".$_GET["linearformat"];
 	}	
 	if (isset($_GET['optimalformat'])) {
 		$caption = $negate ?
 			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['optimalformat']."</b> for <b>optimal tiling</b>"
 			:
 			"Listing first known driver version support for <b>".$_GET['optimalformat']."</b> for <b>optimal tiling</b>";
+		$pageTitle = "Optimal format ".$_GET["optimalformat"];
 	}
 	if (isset($_GET['bufferformat'])) {
 		$caption = $negate ?
 			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>"
 			:
 			"Listing first known driver version support for <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>";
+		$pageTitle = "Buffer format ".$_GET["bufferformat"];
 	}	
 
 	if (isset($_GET['surfaceformat'])) {
@@ -98,6 +101,7 @@
 			"Listing devices <span style='color:red;'>not</span> supporting surface format <b>".$_GET['surfaceformat']."</b>"
 			:
 			"Listing first known driver version support for surface format <b>".$_GET['surfaceformat']."</b>";
+		$pageTitle = "Surface format ".$_GET["surfaceformat"];
 	}
 
 	if (isset($_GET['surfacepresentmode'])) {
@@ -105,15 +109,19 @@
 			"Listing devices <span style='color:red;'>not</span> supporting surface present mode <b>".$_GET['surfacepresentmode']."</b>"
 			:
 			"Listing first known driver version support for surface present mode <b>".$_GET['surfacepresentmode']."</b>";
-	}
-
-	if (isset($_GET['platform'])) {
-		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+		$pageTitle = "Surface present mode ".$_GET["surfacepresentmode"];
 	}
 
 	if (isset($_GET["submitter"])) {
 		$caption .= "<br/>Devices submitted by ".$_GET["submitter"];
 		$pageTitle = "Devices by ".$_GET["submitter"];
+	}
+
+	if (isset($_GET['platform'])) {
+		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+		if ($pageTitle) {
+			$pageTitle .= " on ".ucfirst($platform);
+		}
 	}
 
 	PageGenerator::header($pageTitle);
