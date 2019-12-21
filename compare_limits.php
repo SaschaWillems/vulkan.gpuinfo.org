@@ -93,7 +93,7 @@
 				} else {
 					$fontClass = ($column[$j][$i] < $maxval) ? "unsupported" : null;
 				}
-				echo "<td ".($fontClass ? ("class='$fontClass'") : "").">".number_format($column[$j][$i], 0, '.', ',')."</td>";
+				echo "<td ".($fontClass ? ("class='$fontClass'") : "").">".$column[$j][$i]."</td>";
 			} else {
 				echo "<td>".$column[$j][$i]."</td>";
 			}
