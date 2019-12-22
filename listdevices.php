@@ -20,6 +20,7 @@
 	*/
 
 	include 'page_generator.php';
+	include 'advancedsearch_generator.php';
 	include './functions.php';	
 	include './dbconfig.php';	
 
@@ -44,6 +45,15 @@
 	if (isset($_GET["submitter"])) {
 		$caption .= "Devices submitted by ".$_GET["submitter"];
 		$showTabs = false;
+	}
+
+	$asg = null;
+	if (isset($_GET["advancedsearch"])) {
+		if ($_GET["advancedsearch"] == 1) {
+			$caption = "Advanced search:  $caption";
+			$asg = new AvancedSearchGenerator($_REQUEST);
+			$caption .= " with ".$asg->getCaption($_REQUEST);
+		}
 	}
 ?>
 
@@ -102,6 +112,13 @@
 	</div>
 </center>
 
+<?php
+	$advanced_search_ajax = null;
+	if ($asg) {
+		$advanced_search_ajax = $asg->getAjaxFilter($_REQUEST);
+	}
+?>
+
 <script>
 	$(document).on("keypress", "form", function(event) { 
     	return event.keyCode != 13;
@@ -139,7 +156,8 @@
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
 						'devicename' : '<?php echo $_GET["devicename"] ?>',
 						'displayname' : '<?php echo $_GET["displayname"] ?>',												
-					}
+					},
+					<?php echo $advanced_search_ajax ?>
 				},
 				error: function (xhr, error, thrown) {
 					$('#errordiv').html('Could not fetch data (' + error + ')');

@@ -19,6 +19,7 @@
 		*
 	*/
 
+    include '../advancedsearch_generator.php';
     include '../dbconfig.php';
     include '../functions.php';
 
@@ -204,6 +205,18 @@
         if ($displayname != '') {
             $whereClause = "where r.displayname = :filter_displayname";
             $params['filter_displayname'] = $displayname;            
+        }
+    }
+
+    // Advanced search
+    // @todo: In progress
+    if (isset($_REQUEST['advanced'])) {
+        if ($_REQUEST['advanced']['enabled'] == 1) {
+            $asg = new AvancedSearchGenerator($_REQUEST);
+            $whereClause = "where ".$asg->getWhereClause($_REQUEST['advanced']['search']);
+            // $params[$asg->getParameterName($_REQUEST['advanced']['search'])] = [$_REQUEST['advanced']['value']];
+            $params = [];
+            $params[$asg->getParameterName($_REQUEST['advanced']['search'])] = $_REQUEST['advanced']['value'];
         }
     }
     
