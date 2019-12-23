@@ -22,9 +22,24 @@
     class AvancedSearchGenerator {
         public $active = false;
 
+        // @todo: Add mapping functions for captions
         private $availablefilters = [
-            "queuefamilyflags" => ["whereclause" => "r.id in (select reportid from devicequeues where flags & :queuefamilyflags)", "parameter" => "queuefamilyflags", "caption" => "queue family flags"],
-            "memorytypeflags" => ["whereclause" => "r.id in (select reportid from devicememorytypes where propertyflags & 16)", "parameter" => "propertyflags", "caption" => "memory type flags"]
+            "queuefamilyflags" => [
+                "whereclause" => "r.id in (select reportid from devicequeues where flags & :queuefamilyflags)", 
+                "parameter" => "queuefamilyflags", 
+                "caption" => "queue family flags"],
+            "memorytypeflags" => [
+                "whereclause" => "r.id in (select reportid from devicememorytypes where propertyflags & :propertyflags)", 
+                "parameter" => "propertyflags", 
+                "caption" => "memory type flags"],
+            "subgroup_supportedstages" => [
+                "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.supportedStages` & :supportedStages)", 
+                "parameter" => "supportedStages", 
+                "caption" => "supported subgroup stages"],
+            "subgroup_supportedoperations" => [
+                "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.supportedOperations` & :supportedOperations)", 
+                "parameter" => "supportedOperations", 
+                "caption" => "supported subgroup operations"]                
         ];
        
         /**
