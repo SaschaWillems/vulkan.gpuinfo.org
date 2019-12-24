@@ -211,12 +211,14 @@
     // Advanced search
     // @todo: In progress
     if (isset($_REQUEST['advanced'])) {
-        if ($_REQUEST['advanced']['enabled'] == 1) {
+        if ($_REQUEST['advanced']['enabled'] == true) {
             $asg = new AvancedSearchGenerator($_REQUEST);
-            $whereClause = "where ".$asg->getWhereClause($_REQUEST['advanced']['search']);
-            // $params[$asg->getParameterName($_REQUEST['advanced']['search'])] = [$_REQUEST['advanced']['value']];
+            // $whereClause = "where ".$asg->getWhereClause($_REQUEST['advanced']['search']);
+            // $whereClause = "where ".$asg->getWhereClause($_REQUEST['advanced']['search']);
             $params = [];
-            $params[$asg->getParameterName($_REQUEST['advanced']['search'])] = $_REQUEST['advanced']['value'];
+            $whereClause = "where ";
+            $asg->setupFilter($_REQUEST['advanced'], $whereClause, $params);
+//            $params[$asg->getParameterName($_REQUEST['advanced']['search'])] = $_REQUEST['advanced']['value'];
         }
     }
     

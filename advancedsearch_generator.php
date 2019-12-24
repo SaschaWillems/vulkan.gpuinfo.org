@@ -23,14 +23,18 @@
         public $active = false;
 
         // @todo: Add mapping functions for captions
+        // @todo: put into separate file
         private $availablefilters = [
             "queuefamilyflags" => [
                 "whereclause" => "r.id in (select reportid from devicequeues where flags & :queuefamilyflags)", 
                 "parameter" => "queuefamilyflags", 
                 "caption" => "queue family flags"],
             "memorytypeflags" => [
-                "whereclause" => "r.id in (select reportid from devicememorytypes where propertyflags & :propertyflags)", 
-                "parameter" => "propertyflags", 
+                "whereclause" => "r.id in (select reportid from devicememorytypes where %where_arguments%)", 
+                "column" => "propertyflags",
+                "comparer" => "&",
+                // "whereclause" => "r.id in (select reportid from devicememorytypes where propertyflags & :propertyflags)", 
+                //"parameter" => "propertyflags", 
                 "caption" => "memory type flags"],
             "subgroup_supportedstages" => [
                 "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.supportedStages` & :supportedStages)", 
@@ -39,7 +43,15 @@
             "subgroup_supportedoperations" => [
                 "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.supportedOperations` & :supportedOperations)", 
                 "parameter" => "supportedOperations", 
-                "caption" => "supported subgroup operations"]                
+                "caption" => "supported subgroup operations"],
+            "subgroup_size" => [
+                "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.subgroupSize` = :subgroupSize)", 
+                "parameter" => "subgroupSize", 
+                "caption" => "subgroup size"],
+            "subgroup_quadOperationsInAllStages" => [
+                "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.quadOperationsInAllStages` = :quadOperationsInAllStages)", 
+                "parameter" => "quadOperationsInAllStages", 
+                "caption" => "quad operations in all stages"]                
         ];
        
         /**
@@ -47,22 +59,25 @@
          */
         public function getAjaxFilter($request) {
             $search = null;
-            $search_value = null;
+            $search_values = [];
 
             foreach ($request as $key => $value) {
-            if (key_exists($key, $this->availablefilters) && $value != '') {
+                if (key_exists($key, $this->availablefilters) && $value != '') {
                     $search = $key;
-                    $search_value = $value;
-                    break;
+                    $search_values = $value;
                 }
             }
 
-            if (($search == null) || ($search_value == null)) {
+            if (($search == null) || (count($search_values) == 0)) {
                 return null;
             }
 
-            $ajax_filter = "'advanced': { 'enabled': '$this->active', 'search': '$search', 'value' : $value}";
-            return $ajax_filter;
+            $filter = [
+                'enabled' => $this->active,
+                'search' => $search,
+                'values' => $search_values
+            ];
+            return json_encode($filter);
         }
 
         /**
@@ -72,6 +87,18 @@
             if (key_exists($search_subject, $this->availablefilters)) {
                 return $this->availablefilters[$search_subject]['whereclause'];
             }
+        }
+
+        public function setupFilter($search, &$whereClause, &$parameters) {
+            $filter = $this->availablefilters[$search['search']];
+            assert($filter);
+            $where_arguments = [];
+            $parameters = [];
+            foreach($search['values'] as $index => $value) {
+                $where_arguments[] = $filter['column'].' '.$filter['comparer'].' :p'.$index;
+                $parameters['p'.$index] = (float)$value;
+            }
+            $whereClause .= str_replace('%where_arguments%', implode(' and ', $where_arguments), $filter['whereclause']);
         }
 
         /**
