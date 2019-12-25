@@ -116,7 +116,6 @@
 	$advanced_search_ajax = null;
 	if ($asg) {
 		$advanced_search_ajax = '"advanced":'.$asg->getAjaxFilter($_REQUEST);
-		echo "<pre>".$advanced_search_ajax."</pre>";
 	}
 ?>
 
