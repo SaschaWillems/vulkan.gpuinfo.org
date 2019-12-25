@@ -66,6 +66,18 @@
                 "comparer" => "&", 
                 "caption" => "linear image format feature flags"
             ],    
+            "format_features_optimal" => [
+                "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
+                "column" => "optimaltilingfeatures",
+                "comparer" => "&", 
+                "caption" => "optimal image format feature flags"
+            ],             
+            "format_features_buffer" => [
+                "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
+                "column" => "bufferfeatures",
+                "comparer" => "&", 
+                "caption" => "buffer format feature flags"
+            ],             
         ];
        
         /**
