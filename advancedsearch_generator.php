@@ -18,7 +18,7 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
     */
-    
+
     class AvancedSearchGenerator {
         public $active = false;
 
@@ -64,18 +64,21 @@
                 "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
                 "column" => "lineartilingfeatures",
                 "comparer" => "&", 
+                "translator" => "getFormatFlagName",
                 "caption" => "linear image format feature flags"
             ],    
             "format_features_optimal" => [
                 "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
                 "column" => "optimaltilingfeatures",
                 "comparer" => "&", 
+                "translator" => "getFormatFlagName",
                 "caption" => "optimal image format feature flags"
             ],             
             "format_features_buffer" => [
                 "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
                 "column" => "bufferfeatures",
                 "comparer" => "&", 
+                "translator" => "getFormatFlagName",
                 "caption" => "buffer format feature flags"
             ],             
         ];
@@ -111,15 +114,9 @@
             return json_encode($filter);
         }
 
-        /**
-         * Get where clause for the search subject
+        /** 
+         * Setup where clause and parameters for filtering for a given search subject
          */
-        public function getWhereClause($search_subject) {
-            if (key_exists($search_subject, $this->availablefilters)) {
-                return $this->availablefilters[$search_subject]['whereclause'];
-            }
-        }
-
         public function setupFilter($search, &$whereClause, &$parameters) {
             $filter = $this->availablefilters[$search['search']];
             assert($filter);
@@ -141,22 +138,33 @@
         }
 
         /**
-         * Get parameter name for the search subject
-         */
-        public function getParameterName($search_subject) {
-            if (key_exists($search_subject, $this->availablefilters)) {
-                return $this->availablefilters[$search_subject]['parameter'];
-            }
-        }
-
-        /**
          * Get the display caption for the search subject
          */
         public function getCaption($request) {
             foreach ($request as $key => $value) {
                 if (key_exists($key, $this->availablefilters) && $value != '') {
                     $filter = $this->availablefilters[$key];
-                    return $filter['caption']." = ".(is_array($value) ? implode(' & ', $value) : $value);
+                    $translator = $filter['translator'];
+                    $display_values = null;
+                    if (is_array($value)) {
+                        foreach ($value as $val) {
+                            $display_values[] = $translator ? $translator($val) : $val;
+                        }
+                    } else {
+                        $display_values[] = $translator ? $translator($value) : $value;
+                    }
+                    $caption = $filter['caption']." = ".implode(' & ', $display_values);
+                    if (isset($request['format'])) {
+                        DB::connect();
+                        $stmnt = DB::$connection->prepare('SELECT name from VkFormat where value = :id');
+                        $stmnt->execute(['id' => $request['format']]);
+                        $res = $stmnt->fetch();
+                        if ($res) {
+                            $caption .= " for format ".$res[0];
+                        }
+                        DB::disconnect();
+                    }
+                    return $caption;
                 }
             }
         }

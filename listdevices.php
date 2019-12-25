@@ -50,7 +50,7 @@
 	$asg = null;
 	if (isset($_GET["advancedsearch"])) {
 		if ($_GET["advancedsearch"] == 1) {
-			$caption = "Advanced search:  $caption";
+			$caption = "Advanced search:<br/>  $caption";
 			$asg = new AvancedSearchGenerator($_REQUEST);
 			$caption .= " with ".$asg->getCaption($_REQUEST);
 		}

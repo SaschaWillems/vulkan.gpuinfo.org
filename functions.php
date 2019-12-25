@@ -42,7 +42,29 @@ function getFormatFlags($flag)
 		0x4000 => "TRANSFER_SRC_BIT",
 		0x8000 => "TRANSFER_DST_BIT",
 	);
-	return getFlags($flags, $flag);
+	return getFlags($flags, $flag);	
+}
+
+function getFormatFlagName($flag)
+{
+	$flags = [
+		0x0001 => "SAMPLED_IMAGE_BIT",
+		0x0002 => "STORAGE_IMAGE_BIT",
+		0x0004 => "STORAGE_IMAGE_ATOMIC_BIT",
+		0x0008 => "UNIFORM_TEXEL_BUFFER_BIT",
+		0x0010 => "STORAGE_TEXEL_BUFFER_BIT",
+		0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+		0x0040 => "VERTEX_BUFFER_BIT",
+		0x0080 => "COLOR_ATTACHMENT_BIT",
+		0x0100 => "COLOR_ATTACHMENT_BLEND_BIT",
+		0x0200 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+		0x0400 => "BLIT_SRC_BIT",
+		0x0800 => "BLIT_DST_BIT",
+		0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+		0x4000 => "TRANSFER_SRC_BIT",
+		0x8000 => "TRANSFER_DST_BIT",
+	];
+	return array_key_exists($flag, $flags) ? $flags[$flag] : $flag;
 }
 
 function getImageUsageFlags($flag)
