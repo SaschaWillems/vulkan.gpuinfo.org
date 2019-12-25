@@ -43,7 +43,7 @@
       [
         'subject' => 'Supported flags', 
         'id' => 'queuefamilyflags', 
-        'type' => 'select', 
+        'type' => 'select_list', 
         'options' => [
           0x0001 => "GRAPHICS_BIT",
           0x0002 => "COMPUTE_BIT",
@@ -52,6 +52,78 @@
           0x0010 => "PROTECTED_BIT"]]
     ]
   ];
+
+  $search_groups["formats"] = [
+    "caption" => "Format feature flags ",
+    "subjects" => [
+      [
+        'subject' => ' Linear tiling', 
+        'id' => 'format_features_linear', 
+        'type' => 'select_list', 
+        'options' => [
+          0x0001 => "SAMPLED_IMAGE_BIT",
+          0x0002 => "STORAGE_IMAGE_BIT",
+          0x0004 => "STORAGE_IMAGE_ATOMIC_BIT",
+          0x0008 => "UNIFORM_TEXEL_BUFFER_BIT",
+          0x0010 => "STORAGE_TEXEL_BUFFER_BIT",
+          0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+          0x0040 => "VERTEX_BUFFER_BIT",
+          0x0080 => "COLOR_ATTACHMENT_BIT",
+          0x0100 => "COLOR_ATTACHMENT_BLEND_BIT",
+          0x0200 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+          0x0400 => "BLIT_SRC_BIT",
+          0x0800 => "BLIT_DST_BIT",
+          0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+          0x4000 => "TRANSFER_SRC_BIT",
+          0x8000 => "TRANSFER_DST_BIT"       
+        ]
+      ],
+      [
+        'subject' => ' Optimal tiling', 
+        'id' => 'format_features_optimal', 
+        'type' => 'select_list', 
+        'options' => [
+          0x0001 => "SAMPLED_IMAGE_BIT",
+          0x0002 => "STORAGE_IMAGE_BIT",
+          0x0004 => "STORAGE_IMAGE_ATOMIC_BIT",
+          0x0008 => "UNIFORM_TEXEL_BUFFER_BIT",
+          0x0010 => "STORAGE_TEXEL_BUFFER_BIT",
+          0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+          0x0040 => "VERTEX_BUFFER_BIT",
+          0x0080 => "COLOR_ATTACHMENT_BIT",
+          0x0100 => "COLOR_ATTACHMENT_BLEND_BIT",
+          0x0200 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+          0x0400 => "BLIT_SRC_BIT",
+          0x0800 => "BLIT_DST_BIT",
+          0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+          0x4000 => "TRANSFER_SRC_BIT",
+          0x8000 => "TRANSFER_DST_BIT"
+        ]
+      ],
+      [
+        'subject' => ' Buffer', 
+        'id' => 'format_features_buffer', 
+        'type' => 'select_list', 
+        'options' => [
+          0x0001 => "SAMPLED_IMAGE_BIT",
+          0x0002 => "STORAGE_IMAGE_BIT",
+          0x0004 => "STORAGE_IMAGE_ATOMIC_BIT",
+          0x0008 => "UNIFORM_TEXEL_BUFFER_BIT",
+          0x0010 => "STORAGE_TEXEL_BUFFER_BIT",
+          0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+          0x0040 => "VERTEX_BUFFER_BIT",
+          0x0080 => "COLOR_ATTACHMENT_BIT",
+          0x0100 => "COLOR_ATTACHMENT_BLEND_BIT",
+          0x0200 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+          0x0400 => "BLIT_SRC_BIT",
+          0x0800 => "BLIT_DST_BIT",
+          0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+          0x4000 => "TRANSFER_SRC_BIT",
+          0x8000 => "TRANSFER_DST_BIT"
+        ]
+      ]      
+    ]
+  ];  
 
   $search_groups["subgroup_operations"] = [
     "caption" => "Subgroup operations",
@@ -64,7 +136,7 @@
       [
         'subject' => 'Supported stages', 
         'id' => 'subgroup_supportedstages', 
-        'type' => 'select', 
+        'type' => 'select_list', 
         'options' => [
           0x0001 => "VERTEX",
           0x0002 => "TESSELLATION CONTROL",
@@ -77,7 +149,7 @@
       [
         'subject' => 'Supported operations', 
         'id' => 'subgroup_supportedoperations', 
-        'type' => 'select', 
+        'type' => 'select_list', 
         'options' => [
           0x0001 => "BASIC",
           0x0002 => "VOTE",

@@ -25,6 +25,19 @@
   include './dbconfig.php';
     
   PageGenerator::header("Advanced Search");
+
+  function generateFormatSelection() {
+    DB::connect();
+    $stmnt = DB::$connection->prepare("SELECT value as id, name from VkFormat where value != 0");
+    $stmnt->execute();
+    echo '<select class="form-control" id="format" name="format">';
+    echo '<option></option>';
+    foreach ($stmnt as $row) {
+      echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+    }
+    echo '</select>';
+    DB::disconnect();    
+  }
  
   function generateSearchGroup(string $name) {
     global $search_groups;
@@ -35,6 +48,18 @@
   ?>    
       <form class="form-horizontal" style="margin-bottom: 25px; padding-top: 25px;" method="get" action="./listdevices.php">
         <div class="form-group">
+
+        <?php
+          if (strpos($search['id'], 'format_') === 0) {
+            echo '<div class="col-sm-4" style="text-align:left;">';
+            echo '<label style="text-align:left;" for="'.$search['id'].'" class="control-label">'.$search['subject'].':</label>';
+            echo '</div>';
+            echo '<div class="col-sm-6">';
+            generateFormatSelection();
+            echo '</div>';
+          }
+        ?>
+
         <div class="col-sm-4" style="text-align:left;">
           <label style="text-align:left;" for="<?= $search['id'] ?>" class="control-label"><?= $search['subject'] ?>:</label>
         </div>
@@ -87,7 +112,7 @@
   </ul>
 </div>
 
-<div class='tablediv tab-content' style="max-width:720px; margin: auto;">
+<div class='tablediv tab-content' style="max-width:960px; margin: auto;">
 
 <div id='device' class='tab-pane fade in active'>
   <?php 
@@ -97,6 +122,7 @@
 
 <div id='formats' class='tab-pane fade'>
   <?php 
+    generateSearchGroup("formats");
   ?>
 </div>
 

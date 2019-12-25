@@ -28,30 +28,44 @@
             "queuefamilyflags" => [
                 "whereclause" => "r.id in (select reportid from devicequeues where flags & :queuefamilyflags)", 
                 "parameter" => "queuefamilyflags", 
-                "caption" => "queue family flags"],
+                "caption" => "queue family flags"
+            ],
             "memorytypeflags" => [
                 "whereclause" => "r.id in (select reportid from devicememorytypes where %where_arguments%)", 
                 "column" => "propertyflags",
                 "comparer" => "&",
                 // "whereclause" => "r.id in (select reportid from devicememorytypes where propertyflags & :propertyflags)", 
                 //"parameter" => "propertyflags", 
-                "caption" => "memory type flags"],
+                "caption" => "memory type flags"
+            ],
             "subgroup_supportedstages" => [
                 "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.supportedStages` & :supportedStages)", 
                 "parameter" => "supportedStages", 
-                "caption" => "supported subgroup stages"],
+                "caption" => "supported subgroup stages"
+            ],
             "subgroup_supportedoperations" => [
-                "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.supportedOperations` & :supportedOperations)", 
-                "parameter" => "supportedOperations", 
-                "caption" => "supported subgroup operations"],
+                "whereclause" => "r.id in (select reportid from deviceproperties where %where_arguments%)", 
+                "column" => "`subgroupProperties.supportedOperations`",
+                "comparer" => "&", 
+                "caption" => "supported subgroup operations"
+            ],
             "subgroup_size" => [
-                "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.subgroupSize` = :subgroupSize)", 
-                "parameter" => "subgroupSize", 
-                "caption" => "subgroup size"],
+                "whereclause" => "r.id in (select reportid from deviceproperties where %where_arguments%)",
+                "column" => "`subgroupProperties.subgroupSize`",
+                "comparer" => "=",
+                "caption" => "subgroup size"
+            ],
             "subgroup_quadOperationsInAllStages" => [
                 "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.quadOperationsInAllStages` = :quadOperationsInAllStages)", 
                 "parameter" => "quadOperationsInAllStages", 
-                "caption" => "quad operations in all stages"]                
+                "caption" => "quad operations in all stages"
+            ],
+            "format_features_linear" => [
+                "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
+                "column" => "lineartilingfeatures",
+                "comparer" => "&", 
+                "caption" => "linear image format feature flags"
+            ],    
         ];
        
         /**
@@ -77,6 +91,11 @@
                 'search' => $search,
                 'values' => $search_values
             ];
+
+            if (isset($request['format'])) {
+                $filter['format'] = $request['format'];
+            }
+
             return json_encode($filter);
         }
 
@@ -94,9 +113,17 @@
             assert($filter);
             $where_arguments = [];
             $parameters = [];
-            foreach($search['values'] as $index => $value) {
-                $where_arguments[] = $filter['column'].' '.$filter['comparer'].' :p'.$index;
-                $parameters['p'.$index] = (float)$value;
+            if (is_array($search['values'])) {
+                foreach($search['values'] as $index => $value) {
+                    $where_arguments[] = $filter['column'].' '.$filter['comparer'].' :p'.$index;
+                    $parameters['p'.$index] = (float)$value;
+                }
+            } else {
+                $where_arguments[] = $filter['column'].' '.$filter['comparer'].' :param';
+                $parameters['param'] = (float)$search['values'];
+            }
+            if (strpos($search['search'], 'format_') === 0) {
+                $parameters['format'] = $search['format'];
             }
             $whereClause .= str_replace('%where_arguments%', implode(' and ', $where_arguments), $filter['whereclause']);
         }
@@ -116,7 +143,8 @@
         public function getCaption($request) {
             foreach ($request as $key => $value) {
                 if (key_exists($key, $this->availablefilters) && $value != '') {
-                    return $this->availablefilters[$key]['caption']." = ".$value;
+                    $filter = $this->availablefilters[$key];
+                    return $filter['caption']." = ".(is_array($value) ? implode(' & ', $value) : $value);
                 }
             }
         }
