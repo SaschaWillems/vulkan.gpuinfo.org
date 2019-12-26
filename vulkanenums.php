@@ -1,0 +1,76 @@
+<?php
+	/* 		
+		*
+		* Vulkan hardware capability database server implementation
+		*	
+		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		*	
+		* This code is free software, you can redistribute it and/or
+		* modify it under the terms of the GNU Affero General Public
+		* License version 3 as published by the Free Software Foundation.
+		*	
+		* Please review the following information to ensure the GNU Lesser
+		* General Public License version 3 requirements will be met:
+		* http://www.gnu.org/licenses/agpl-3.0.de.html
+		*	
+		* The code is distributed WITHOUT ANY WARRANTY; without even the
+		* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
+		*
+    */
+
+    class VulkanEnums {
+
+        private static function flagName($flags, $flag) {
+            return array_key_exists($flag, $flags) ? $flags[$flag] : $flag;
+        }
+
+        public static function formatFlagName($flag)
+        {
+            $flags = [
+                0x0001 => "SAMPLED_IMAGE_BIT",
+                0x0002 => "STORAGE_IMAGE_BIT",
+                0x0004 => "STORAGE_IMAGE_ATOMIC_BIT",
+                0x0008 => "UNIFORM_TEXEL_BUFFER_BIT",
+                0x0010 => "STORAGE_TEXEL_BUFFER_BIT",
+                0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+                0x0040 => "VERTEX_BUFFER_BIT",
+                0x0080 => "COLOR_ATTACHMENT_BIT",
+                0x0100 => "COLOR_ATTACHMENT_BLEND_BIT",
+                0x0200 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+                0x0400 => "BLIT_SRC_BIT",
+                0x0800 => "BLIT_DST_BIT",
+                0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+                0x4000 => "TRANSFER_SRC_BIT",
+                0x8000 => "TRANSFER_DST_BIT",
+            ];
+            return VulkanEnums::flagName($flags, $flag);
+        }
+
+        public static function memoryTypeFlagName($flag)
+        {
+            $flags = [
+                0x0001 => "DEVICE_LOCAL_BIT",
+                0x0002 => "HOST_VISIBLE_BIT",
+                0x0004 => "HOST_COHERENT_BIT",
+                0x0008 => "HOST_CACHED_BIT",
+                0x0010 => "LAZILY_ALLOCATED_BIT",
+            ];
+            return VulkanEnums::flagName($flags, $flag);
+        }        
+
+        public static function queueFamilyFlagName($flag)
+        {
+            $flags = [
+                0x0001 => "GRAPHICS_BIT",
+                0x0002 => "COMPUTE_BIT",
+                0x0004 => "TRANSFER_BIT",
+                0x0008 => "SPARSE_BINDING_BIT",
+                0x0010 => "PROTECTED_BIT",
+            ];
+            return VulkanEnums::flagName($flags, $flag);
+        }        
+
+    }
+
+?>
