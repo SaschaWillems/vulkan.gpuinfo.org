@@ -19,6 +19,8 @@
 		*
     */
 
+    require_once('vulkanenums.php');
+
     class AvancedSearchGenerator {
         public $active = false;
 
@@ -26,16 +28,17 @@
         // @todo: put into separate file
         private $availablefilters = [
             "queuefamilyflags" => [
-                "whereclause" => "r.id in (select reportid from devicequeues where flags & :queuefamilyflags)", 
-                "parameter" => "queuefamilyflags", 
+                "whereclause" => "r.id in (select reportid from devicequeues where %where_arguments%)", 
+                "column" => "flags",
+                "comparer" => "&", 
+                "translator" => "VulkanEnums::queueFamilyFlagName",
                 "caption" => "queue family flags"
             ],
             "memorytypeflags" => [
                 "whereclause" => "r.id in (select reportid from devicememorytypes where %where_arguments%)", 
                 "column" => "propertyflags",
                 "comparer" => "&",
-                // "whereclause" => "r.id in (select reportid from devicememorytypes where propertyflags & :propertyflags)", 
-                //"parameter" => "propertyflags", 
+                "translator" => "VulkanEnums::memoryTypeFlagName",
                 "caption" => "memory type flags"
             ],
             "subgroup_supportedstages" => [
@@ -64,21 +67,21 @@
                 "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
                 "column" => "lineartilingfeatures",
                 "comparer" => "&", 
-                "translator" => "getFormatFlagName",
+                "translator" => "VulkanEnums::formatFlagName",
                 "caption" => "linear image format feature flags"
             ],    
             "format_features_optimal" => [
                 "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
                 "column" => "optimaltilingfeatures",
                 "comparer" => "&", 
-                "translator" => "getFormatFlagName",
+                "translator" => "VulkanEnums::formatFlagName",
                 "caption" => "optimal image format feature flags"
             ],             
             "format_features_buffer" => [
                 "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
                 "column" => "bufferfeatures",
                 "comparer" => "&", 
-                "translator" => "getFormatFlagName",
+                "translator" => "VulkanEnums::formatFlagName",
                 "caption" => "buffer format feature flags"
             ],             
         ];
