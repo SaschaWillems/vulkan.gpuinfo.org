@@ -17,7 +17,9 @@
 		* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
-	*/
+  */
+  
+  require_once('vulkanenums.php');
 
   $search_groups = [];
 
@@ -170,5 +172,44 @@
       ]       
     ]
   ];
+
+  $search_groups["surface"] = [
+    "caption" => "Surface",
+    "subjects" => [
+      [
+        'subject' => 'Supported usage flags', 
+        'id' => 'surface_usage_flags', 
+        'type' => 'select_list', 
+        'options' => VulkanEnums::$imageUsageFlags
+      ],      
+      [
+        'subject' => 'Supported transforms', 
+        'id' => 'surface_transforms', 
+        'type' => 'select_list', 
+        'options' => [
+          0x0001 => "IDENTITY_BIT_KHR",
+          0x0002 => "ROTATE_90_BIT_KHR",
+          0x0004 => "ROTATE_180_BIT_KHR",
+          0x0008 => "ROTATE_270_BIT_KHR",
+          0x0010 => "HORIZONTAL_MIRROR_BIT_KHR",
+          0x0020 => "HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR",
+          0x0040 => "HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR",
+          0x0080 => "HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR",
+          0x0100 => "INHERIT_BIT_KHR"      
+        ]
+      ],   
+      [
+        'subject' => 'Supported composite alpha', 
+        'id' => 'surface_composite_alpha', 
+        'type' => 'select_list', 
+        'options' => [
+          0x0001 => "OPAQUE_BIT_KHR",
+          0x0002 => "PRE_MULTIPLIED_BIT_KHR",
+          0x0004 => "POST_MULTIPLIED_BIT_KHR",
+          0x0008 => "INHERIT_BIT_KHR"   
+        ]
+      ], 
+    ]
+  ];  
  
 ?>

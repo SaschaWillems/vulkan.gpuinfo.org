@@ -145,6 +145,7 @@
 <div id='surface' class='tab-pane fade'>
   <div class="panel-group">
     <?php 
+      generateSearchGroup("surface");
     ?>
   </div>
 </div>

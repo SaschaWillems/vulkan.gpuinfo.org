@@ -84,6 +84,28 @@
                 "translator" => "VulkanEnums::formatFlagName",
                 "caption" => "buffer format feature flags"
             ],             
+            // Surface
+            "surface_usage_flags" => [
+                "whereclause" => "r.id in (select reportid from devicesurfacecapabilities where %where_arguments%)", 
+                "column" => "supportedUsageFlags",
+                "comparer" => "&", 
+                "translator" => "VulkanEnums::imageUsageFlagName",
+                "caption" => "supported surface usage flags"
+            ],            
+            "surface_transforms" => [
+                "whereclause" => "r.id in (select reportid from devicesurfacecapabilities where %where_arguments%)", 
+                "column" => "supportedTransforms",
+                "comparer" => "&", 
+                "translator" => "VulkanEnums::surfaceTransformFlagName",
+                "caption" => "supported surface transforms flags"
+            ],
+            "surface_composite_alpha" => [
+                "whereclause" => "r.id in (select reportid from devicesurfacecapabilities where %where_arguments%)", 
+                "column" => "supportedCompositeAlpha",
+                "comparer" => "&", 
+                "translator" => "VulkanEnums::surfaceCompositeAlphaFlagName",
+                "caption" => "supported surface composite alpha flags"
+            ],            
         ];
        
         /**

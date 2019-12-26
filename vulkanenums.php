@@ -25,6 +25,17 @@
             return array_key_exists($flag, $flags) ? $flags[$flag] : $flag;
         }
 
+        public static $imageUsageFlags = [
+            0x0001 => "TRANSFER_SRC_BIT",
+            0x0002 => "TRANSFER_DST_BIT",
+            0x0004 => "SAMPLED_BIT",
+            0x0008 => "STORAGE_BIT",
+            0x0010 => "COLOR_ATTACHMENT_BIT",
+            0x0020 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+            0x0040 => "TRANSIENT_ATTACHMENT_BIT",
+            0x0080 => "INPUT_ATTACHMENT_BIT",
+        ];
+
         public static function formatFlagName($flag)
         {
             $flags = [
@@ -46,6 +57,11 @@
             ];
             return VulkanEnums::flagName($flags, $flag);
         }
+
+        public static function imageUsageFlagName($flag)
+        {
+            return VulkanEnums::flagName(VulkanEnums::$imageUsageFlags, $flag);
+        }        
 
         public static function memoryTypeFlagName($flag)
         {
@@ -69,7 +85,34 @@
                 0x0010 => "PROTECTED_BIT",
             ];
             return VulkanEnums::flagName($flags, $flag);
+        }
+
+        public static function surfaceTransformFlagName($flag)
+        {
+            $flags = [
+                0x0001 => "IDENTITY_BIT_KHR",
+                0x0002 => "ROTATE_90_BIT_KHR",
+                0x0004 => "ROTATE_180_BIT_KHR",
+                0x0008 => "ROTATE_270_BIT_KHR",
+                0x0010 => "HORIZONTAL_MIRROR_BIT_KHR",
+                0x0020 => "HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR",
+                0x0040 => "HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR",
+                0x0080 => "HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR",
+                0x0100 => "INHERIT_BIT_KHR",
+            ];
+            return VulkanEnums::flagName($flags, $flag);
         }        
+
+        public static function surfaceCompositeAlphaFlagName($flag)
+        {
+            $flags = [
+                0x0001 => "OPAQUE_BIT_KHR",
+                0x0002 => "PRE_MULTIPLIED_BIT_KHR",
+                0x0004 => "POST_MULTIPLIED_BIT_KHR",
+                0x0008 => "INHERIT_BIT_KHR",
+            ];
+            return VulkanEnums::flagName($flags, $flag);
+        }
 
     }
 
