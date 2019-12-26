@@ -45,51 +45,47 @@
     assert($group);
     echo '<h3>'.$group['caption'].'</h3>';
     foreach ($group['subjects'] as $search) {
+      $format_selection = strpos($search['id'], 'format_') === 0;
   ?>    
-      <form class="form-horizontal" style="margin-bottom: 25px; padding-top: 25px;" method="get" action="./listdevices.php">
-        <div class="form-group">
+      <form class="form-horizontal" style="padding-top: 25px;" method="get" action="./listdevices.php">
+        <div class="form-group" style="margin: 0;">
 
-        <?php
-          if (strpos($search['id'], 'format_') === 0) {
-            echo '<div class="col-sm-4" style="text-align:left;">';
-            echo '<label style="text-align:left;" for="'.$search['id'].'" class="control-label">'.$search['subject'].':</label>';
-            echo '</div>';
-            echo '<div class="col-sm-6">';
-            generateFormatSelection();
-            echo '</div>';
-          }
-        ?>
+        <div class="panel panel-default">
+          <div class="panel-heading"><b><?= $search['subject'] ?></b></div>
+          <div class="panel-body">
+            <?php
+              if ($format_selection) {
+                echo "<div style='margin-bottom: 5px;'>Select format:</div>";
+                generateFormatSelection();
+                echo "<div style='margin-top:15px; margin-bottom: 5px;'>Select feature flags:</div>";
+              }
+              switch ($search['type']) {
+                case 'select':
+                  echo '<select class="form-control" id="'.$search['id'].'" name="'.$search['id'].'">';
+                  echo '<option></option>';
+                  foreach ($search['options'] as $value => $text) {
+                    echo '<option value="'.$value.'">'.$text.'</option>';
+                  }
+                  echo '</select>';
+                  break;
+                case 'select_list':
+                  echo '<select multiple class="form-control" id="'.$search['id'].'" name="'.$search['id'].'[]" size="'.count($search["options"]).'">';
+                  foreach ($search['options'] as $value => $text) {
+                    echo '<option value="'.$value.'">'.$text.'</option>';
+                  }
+                  echo '</select>';
+                  break;
+                case 'number':
+                  echo '<input class="form-control" id="'.$search['id'].'" name="'.$search['id'].'" type="number">';
+                  break;
+              }              
+            ?>
+          </div>
+          <div class="panel-footer text-right">
+            <button type="submit" name="advancedsearch" value="1" class="btn btn-primary">Search</button>
+          </div>
+        </div>        
 
-        <div class="col-sm-4" style="text-align:left;">
-          <label style="text-align:left;" for="<?= $search['id'] ?>" class="control-label"><?= $search['subject'] ?>:</label>
-        </div>
-        <div class="col-sm-6">
-  <?php
-        switch ($search['type']) {
-          case 'select':
-            echo '<select class="form-control" id="'.$search['id'].'" name="'.$search['id'].'">';
-            echo '<option></option>';
-            foreach ($search['options'] as $value => $text) {
-              echo '<option value="'.$value.'">'.$text.'</option>';
-            }
-            echo '</select>';
-            break;
-          case 'select_list':
-            echo '<select multiple class="form-control" id="'.$search['id'].'" name="'.$search['id'].'[]" size="'.count($search["options"]).'">';
-            foreach ($search['options'] as $value => $text) {
-              echo '<option value="'.$value.'">'.$text.'</option>';
-            }
-            echo '</select>';
-            break;
-          case 'number':
-            echo '<input class="form-control" id="'.$search['id'].'" name="'.$search['id'].'" type="number">';
-            break;
-        }
-  ?>
-        </div>
-        <div class="col-sm-2">
-        <button type="submit" name="advancedsearch" value="1" class="btn btn-block btn-primary">Search</button>
-        </div>
       </div>
      </form>
   <?php
@@ -115,32 +111,42 @@
 <div class='tablediv tab-content' style="max-width:960px; margin: auto;">
 
 <div id='device' class='tab-pane fade in active'>
-  <?php 
-    generateSearchGroup("subgroup_operations"); 
-  ?>
+  <div class="panel-group">
+    <?php 
+      generateSearchGroup("subgroup_operations"); 
+    ?>
+  </div>
 </div>
 
 <div id='formats' class='tab-pane fade'>
-  <?php 
-    generateSearchGroup("formats");
-  ?>
+  <div class="panel-group">
+    <?php 
+      generateSearchGroup("formats");
+    ?>
+  </div>
 </div>
 
 <div id='queuefamilies' class='tab-pane fade'>
-  <?php 
-    generateSearchGroup("queue_families"); 
-  ?>
+  <div class="panel-group">
+    <?php 
+      generateSearchGroup("queue_families"); 
+    ?>
+  </div>
 </div>
 
 <div id='memory' class='tab-pane fade'>
-  <?php 
-    generateSearchGroup("memory_types"); 
-  ?>
+  <div class="panel-group">
+    <?php 
+      generateSearchGroup("memory_types"); 
+    ?>
+  </div>
 </div>
 
 <div id='surface' class='tab-pane fade'>
-  <?php 
-  ?>
+  <div class="panel-group">
+    <?php 
+    ?>
+  </div>
 </div>
 
 </div>
