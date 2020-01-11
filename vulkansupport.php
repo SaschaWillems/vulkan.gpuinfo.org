@@ -20,9 +20,11 @@
 	*/
 	
 	include './dbconfig.php';
-	include './header.inc';	
+	include 'page_generator.php';
 	include './functions.php';	
 	
+	PageGenerator::header('Vulkan device support');
+
 	echo "<div class='header'>";
 		echo "<h4>Vulkan device support</h4>";
 	echo "</div>";				
@@ -142,7 +144,7 @@
 		});	
 	   </script>	
 
-<?php include './footer.inc'; ?>
+<?php PageGenerator::footer(); ?>
 
 </center>
 </body>

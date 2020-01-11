@@ -18,7 +18,8 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-	include './header.inc';	
+	include 'page_generator.php';
+	PageGenerator::header('Download');
 ?>
 
 <div id='reportdiv'>	   
@@ -97,7 +98,7 @@
 </div>
 
 <?php
-	include './footer.inc';
+	PageGenerator::footer();
 ?>
 
 </body>

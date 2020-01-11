@@ -20,7 +20,8 @@
 	*/
 	
 	include './dbconfig.php';
-	include './header.inc';	
+	include 'page_generator.php';
+	PageGenerator::header('Extension feature listing');
 ?>
 	
 <script>
@@ -95,7 +96,7 @@
 	</div>
 	</div>
 	
-<?php include './footer.inc'; ?>
+<?php PageGenerator::footer(); ?>
 	
 </center>
 </body>

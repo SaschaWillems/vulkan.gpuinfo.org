@@ -19,7 +19,7 @@
 		*
 	*/
 
-	include 'header.inc';	
+	include 'page_generator.php';	
 	include 'dbconfig.php';	
 	
 	$name = null;
@@ -42,6 +42,8 @@
 			}
 		}
 	}					
+
+	PageGenerator::header($name);
 
 	DB::connect();	
 	$result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name");
@@ -148,7 +150,7 @@
 	</script>
 
 	<?php 
-		include "footer.inc";
+		PageGenerator::footer();;
 	?>
 
 </body>
