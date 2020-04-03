@@ -62,7 +62,7 @@
                     break;
             }
 			$filter .= "where reportid in (select id from reports where ostype = '".$ostype."')";
-			$caption .= "on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+			$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
         }
 	}
 
