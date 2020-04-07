@@ -95,6 +95,9 @@ function getMemoryTypeFlags($flag)
 		0x0004 => "HOST_COHERENT_BIT",
 		0x0008 => "HOST_CACHED_BIT",
 		0x0010 => "LAZILY_ALLOCATED_BIT",
+		0x0020 => "PROTECTED_BIT",
+		0x0040 => "DEVICE_COHERENT_BIT_AMD",
+		0x0080 => "DEVICE_UNCACHED_BIT_AMD",
 	);
 	return getFlags($flags, $flag);
 }
