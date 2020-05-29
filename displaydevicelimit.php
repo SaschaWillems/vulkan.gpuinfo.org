@@ -44,7 +44,7 @@
 	}
 	PageGenerator::header($name);
 
-	$caption = "Value distribution for $name";
+	$caption = "Value distribution for <code>$name</code>";
 
 	$platform = null;
 	if (isset($_GET['platform'])) {
@@ -62,7 +62,7 @@
                     break;
             }
 			$filter .= "where reportid in (select id from reports where ostype = '".$ostype."')";
-			$caption .= "on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+			$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
         }
 	}
 
