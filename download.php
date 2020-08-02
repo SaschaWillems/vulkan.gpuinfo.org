@@ -57,10 +57,8 @@
 								<li>VK_EXT_shader_atomic_float</li>
 								<li>VK_EXT_extended_dynamic_state</li>
 								<li>VK_EXT_private_data</li>
-								<li>VK_EXT_fragment_density_map2</li>
 								<li>VK_EXT_image_robustness</li>
 							</ul>
-							<li>Several tweaks for formatting display values</li>
 						</li>
 					</ul>
 				<h4>2.1 - 2020-03-17</h4>
