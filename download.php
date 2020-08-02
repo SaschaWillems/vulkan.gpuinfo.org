@@ -32,18 +32,49 @@
 				The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">https://github.com/SaschaWillems/VulkanCapsViewer</a>.<br>
 			</div>
 			<div class="page-header">
-				<h3>Current stable release (2.03)</h3>
+				<h3>Current stable release 2.2</h3>
 				<ul>
-					<li><a href="downloads/vulkancapsviewer_2_03_win64.zip">Windows x86-64</a></li>
-					<li><a href="downloads/vulkancapsviewer_2_03_linux64.tar.gz">Linux x86-64</a> (AppImage)</li>
-					<li>Android (<a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer">Google Playstore</a>)
+					<li><a href="downloads/vulkancapsviewer_2_2_win64.zip">Windows x86-64 (zip)</a></li>
+					<li>Linux
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_2_03_arm.apk">Android arm-v8</a></li>
+						<li><a href="downloads/vulkancapsviewer_2_2_linux64.tar.gz">X11 x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_2_2_linux64_wayland.tar.gz">Wayland x86-64</a> (AppImage)</li>
+					</ul>
+					</li>
+					<li>Android
+					<ul>
+						<li><a href="downloads/vulkancapsviewer_2_2_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
 				</ul>
 			</div>			
 			<div class="page-header">
 				<h3>Release notes</h3>
+				<h4>2.2 - 2020-08-02</h4>
+					<ul>
+						<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2
+							<ul>
+								<li>VK_EXT_fragment_density_map2</li>
+								<li>VK_EXT_shader_atomic_float</li>
+								<li>VK_EXT_extended_dynamic_state</li>
+								<li>VK_EXT_private_data</li>
+								<li>VK_EXT_fragment_density_map2</li>
+								<li>VK_EXT_image_robustness</li>
+							</ul>
+							<li>Several tweaks for formatting display values</li>
+						</li>
+					</ul>
+				<h4>2.1 - 2020-03-17</h4>
+					<ul>
+						<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2
+							<ul>
+								<li>VK_KHR_ray_tracing</li>
+								<li>VK_EXT_pipeline_creation_cache_control</li>
+								<li>VK_NV_device_generated_commands</li>
+								<li>VK_NV_device_diagnostics_config</li>
+							</ul>
+							<li>Several tweaks for formatting display values</li>
+						</li>
+					</ul>
 				<h4>2.03 - 2019-12-02</h4>
 					<ul>
 						<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2
@@ -52,27 +83,6 @@
 							<li>VK_KHR_separate_depth_stencil_layouts</li>
 							<li>VK_KHR_buffer_device_address</li>
 						</ul>
-					</li>
-					</ul>
-			</div>
-			<div class="page-header">
-				<h3>Current beta release (2.1)</h3>
-				<ul>
-					<li><a href="downloads/vulkancapsviewer_2_1_beta_win64.zip">Windows x86-64</a></li>
-				</ul>
-			</div>			
-			<div class="page-header">
-				<h3>Release notes</h3>
-				<h4>2.1 - 2020-03-17</h4>
-					<ul>
-						<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2
-						<ul>
-							<li>VK_KHR_ray_tracing</li>
-							<li>VK_EXT_pipeline_creation_cache_control</li>
-							<li>VK_NV_device_generated_commands</li>
-							<li>VK_NV_device_diagnostics_config</li>
-						</ul>
-						<li>Several tweaks for formatting display values</li>
 					</li>
 					</ul>
 			</div>
