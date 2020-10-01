@@ -141,6 +141,23 @@
                 )";
         }
     }
+	// Memory type support
+	$memorytype = $_REQUEST['filter']['memorytype'];
+	if ($memorytype != '') {
+		$whereClause = 
+			"where ifnull(r.displayname, r.devicename) ".($negate ? "not" : "")." in
+			(
+				select ifnull(r.displayname, r.devicename)
+				from reports r
+				join devicememorytypes dmt on dmt.reportid = r.id
+				where dmt.propertyflags = :filter_memorytype ".($ostype ? " and r.ostype = :ostype" : "")."
+			)
+			and r.version >= '1.2'";
+		$params['filter_memorytype'] = $memorytype;
+		if ($ostype) {
+			$params['ostype'] = $ostype;
+		}
+	}
 	// Surface format	
 	$surfaceformat = $_REQUEST['filter']['surfaceformat'];
 	if ($surfaceformat != '') {        
