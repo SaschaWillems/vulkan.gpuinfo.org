@@ -80,7 +80,15 @@
 		if (!checkExtensionsPresent($report, $extension)) {
 			exitScript("Report does not support $extension");
 		}
+
+		$filename = $report['VkPhysicalDeviceProperties']['deviceName']."_VK_KHR_portability";
+		$filename = preg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
+		$filename = preg_replace("([\.]{2,})", '', $filename);	
+		$filename .= ".json";
+
+
 		header('Content-Type: application/json');
+		header("Content-Disposition: attachment; filename=".strtolower($filename));
 	 
 		$report_output['$schema'] = 'https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#';
 
