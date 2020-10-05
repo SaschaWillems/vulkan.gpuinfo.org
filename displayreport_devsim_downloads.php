@@ -20,7 +20,9 @@
     */
 		
 	if ($reportversion >= '1.4') {
-		echo "<tr><td class='subkey'>Device simulation layer JSON</td><td>";
+		echo "<tr><td class='subkey'>";
+		echo "Device simulation layer JSON <span title=\"JSON files that can be used with LunarG's Vulkan device simulation layer\" class=\"hint\">[?]</span>";
+		echo "</td><td>";
 		echo "<a href=\"api/v2/devsim/getreport.php?id=".$reportID."\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Full JSON file</a>";
 		$portability_ext_present = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $reportID, ':extension' => 'VK_KHR_portability_subset']);
 		if ($portability_ext_present > 0) {			
