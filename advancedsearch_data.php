@@ -133,7 +133,8 @@
       [
         'subject' => 'Subgroup size', 
         'id' => 'subgroup_size', 
-        'type' => 'number'
+        'type' => 'select_database',
+        'options_statement' => 'select `subgroupProperties.subgroupSize` as `values` from deviceproperties where `subgroupProperties.subgroupSize` > 0 group by `values` order by `values` asc'
       ],
       [
         'subject' => 'Supported stages', 

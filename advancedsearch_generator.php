@@ -41,9 +41,12 @@
                 "translator" => "VulkanEnums::memoryTypeFlagName",
                 "caption" => "memory type flags"
             ],
+
+            // Sub groups
             "subgroup_supportedstages" => [
-                "whereclause" => "r.id in (select reportid from deviceproperties where `subgroupProperties.supportedStages` & :supportedStages)", 
-                "parameter" => "supportedStages", 
+                "whereclause" => "r.id in (select reportid from deviceproperties where %where_arguments%)", 
+                "column" => "`subgroupProperties.supportedStages`",
+                "comparer" => "&", 
                 "caption" => "supported subgroup stages"
             ],
             "subgroup_supportedoperations" => [
@@ -63,6 +66,8 @@
                 "parameter" => "quadOperationsInAllStages", 
                 "caption" => "quad operations in all stages"
             ],
+
+            // Formats
             "format_features_linear" => [
                 "whereclause" => "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
                 "column" => "lineartilingfeatures",
@@ -83,7 +88,8 @@
                 "comparer" => "&", 
                 "translator" => "VulkanEnums::formatFlagName",
                 "caption" => "buffer format feature flags"
-            ],             
+            ],           
+
             // Surface
             "surface_usage_flags" => [
                 "whereclause" => "r.id in (select reportid from devicesurfacecapabilities where %where_arguments%)", 
@@ -118,7 +124,7 @@
             foreach ($request as $key => $value) {
                 if (key_exists($key, $this->availablefilters) && $value != '') {
                     $search = $key;
-                    $search_values = $value;
+                    $search_values[] = $value;
                 }
             }
 

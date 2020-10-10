@@ -68,6 +68,22 @@
                   }
                   echo '</select>';
                   break;
+                case 'select_database':
+                  DB::connect();
+                  try {
+                    $stmnt = DB::$connection->prepare($search['options_statement']);
+                    $stmnt->execute();
+                    echo '<select class="form-control" id="'.$search['id'].'" name="'.$search['id'].'">';
+                    echo '<option></option>';
+                    foreach ($stmnt as $row) {
+                      echo '<option value="'.$row[0].'">'.$row[0].'</option>';
+                    }
+                    echo '</select>';
+                  } catch (Throwable $e) {
+                    echo "<span style='color:red;'>Error: Could not retrieve values from database!</span>";
+                  }
+                  DB::disconnect();
+                  break;
                 case 'select_list':
                   echo '<select multiple class="form-control" id="'.$search['id'].'" name="'.$search['id'].'[]" size="'.count($search["options"]).'">';
                   foreach ($search['options'] as $value => $text) {
