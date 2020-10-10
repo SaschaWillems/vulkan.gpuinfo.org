@@ -80,6 +80,9 @@
 				if ($fname == 'devicename') {
 					$value = '<a href="listreports.php?devicename='.$value.'">'.$value.'</a>';			
 				}
+				if (($fname == 'displayname') && ($value == $row[0])) {
+					continue;
+				}
 				if ($fname == 'displayname') {
 					$value = '<a href="listreports.php?displayname='.$value.'">'.$value.'</a>';			
 				}
@@ -124,9 +127,13 @@
 					}				
 				}
 				echo "<tr><td class='subkey'>".$fname."</td><td>".$value."</td><td>".$group."</td></tr>\n";
+				// Device simulation JSON schema downloads
+				if ($fname == "pipelineCacheUUID") {
+					include './displayreport_devsim_downloads.php';
+				}								
 			}				
 		}
-
+	
 		// Platform details (if available)
 		$stmnt = DB::$connection->prepare("SELECT name, value from deviceplatformdetails dpfd join platformdetails pfd on dpfd.platformdetailid = pfd.id where dpfd.reportid = :reportid order by name asc");
 		$stmnt->execute(array(":reportid" => $reportID));

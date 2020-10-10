@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -114,9 +114,6 @@
 	}
 	echo "<div class='header'>";
 	echo "<h4>$header</h4>";
-	if ($reportversion >= '1.4') {
-		echo "<a href=\"api/v2/devsim/getreport.php?id=".$reportID."\" class=\"btn btn-default\" title=\"Download a Vulkan device simulation layer compatible JSON file\"><span class=\"glyphicon glyphicon-floppy-save\"></span> JSON</a>";
-	}
 	echo "</div>";			
 
 	// Nav ========================================================================================

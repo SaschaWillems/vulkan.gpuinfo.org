@@ -1,27 +1,27 @@
 <?php
-	/* 		
-		*
-		* Vulkan hardware capability database server implementation
-		*	
-		* Copyright (C) Sascha Willems (www.saschawillems.de)
-		*	
-		* This code is free software, you can redistribute it and/or
-		* modify it under the terms of the GNU Affero General Public
-		* License version 3 as published by the Free Software Foundation.
-		*	
-		* Please review the following information to ensure the GNU Lesser
-		* General Public License version 3 requirements will be met:
-		* http://www.gnu.org/licenses/agpl-3.0.de.html
-		*	
-		* The code is distributed WITHOUT ANY WARRANTY; without even the
-		* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
-		*
-	*/
+	/*
+	 *
+	 * Vulkan hardware capability database server implementation
+	 *	
+	 * Copyright (C) Sascha Willems (www.saschawillems.de)
+	 *	
+	 * This code is free software, you can redistribute it and/or
+	 * modify it under the terms of the GNU Affero General Public
+	 * License version 3 as published by the Free Software Foundation.
+	 *	
+	 * Please review the following information to ensure the GNU Lesser
+	 * General Public License version 3 requirements will be met:
+	 * http://www.gnu.org/licenses/agpl-3.0.de.html
+	 *
+	 * The code is distributed WITHOUT ANY WARRANTY; without even the
+	 * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+	 * PURPOSE.  See the GNU AGPL 3.0 for more details.
+	 *
+	 */
 
 	include 'page_generator.php';
-	include './functions.php';	
-	include './dbconfig.php';	
+	include './functions.php';
+	include './dbconfig.php';
 
 	$platform = "all";
 	if (isset($_GET['platform'])) {
@@ -38,8 +38,8 @@
 
 	if (isset($_GET["extension"])) {
 		$caption = $negate ? 
-			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET["extension"]."</b>" 
-			: 
+			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET["extension"]."</b>"
+			:
 			"Listing first known driver version support for <b>".$_GET["extension"]."</b>";
 		$pageTitle = $_GET["extension"];
 		// Check if extension has features2 or properties2
@@ -60,16 +60,16 @@
 					$linkTitle = implode(' and ', $arr);
 					$subcaption = "<div style='margin-top: 10px;'>This extension has additional <a href='displayextension.php?name=$ext'>$linkTitle</a></div>";
 				}
-			}	
+			}
 		} catch(Throwable $e) {
 		}
-		DB::disconnect();		
+		DB::disconnect();
 	}
 
 	if (isset($_GET["feature"])) {
 		$caption = $negate ? 
-			"Listing devices <span style='color:red;'>not</span> supporting for <b>".$_GET["feature"]."</b>" 
-			: 
+			"Listing devices <span style='color:red;'>not</span> supporting for <b>".$_GET["feature"]."</b>"
+			:
 			"Listing first known driver version support for <b>".$_GET["feature"]."</b>";
 		$pageTitle = $_GET["feature"];
 	}
@@ -80,7 +80,7 @@
 			:
 			"Listing first known driver version support for <b>".$_GET['linearformat']."</b> for <b>linear tiling</b>";
 		$pageTitle = "Linear format ".$_GET["linearformat"];
-	}	
+	}
 	if (isset($_GET['optimalformat'])) {
 		$caption = $negate ?
 			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['optimalformat']."</b> for <b>optimal tiling</b>"
@@ -94,7 +94,18 @@
 			:
 			"Listing first known driver version support for <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>";
 		$pageTitle = "Buffer format ".$_GET["bufferformat"];
-	}	
+	}
+
+	if (isset($_GET['memorytype'])) {
+		$memoryFlags = join(" | ", getMemoryTypeFlags($_GET['memorytype']));
+		if ($memoryFlags == "") $memoryFlags = "0";
+
+		$caption = $negate ?
+			"Listing devices <span style='color:red;'>not</span> supporting memory type <b>".$memoryFlags."</b>"
+			:
+			"Listing first known driver version support for memory type <b>".$memoryFlags."</b>";
+		$pageTitle = "Memory type ".$memoryFlags;
+	}
 
 	if (isset($_GET['surfaceformat'])) {
 		$caption = $negate ?
@@ -131,7 +142,7 @@
 
 	<div class='header'>
 		<h4>
-		<?php		
+		<?php
 			echo $caption ? $caption : "Listing available devices";
 			echo $subcaption ? "<br>$subcaption" : "";
 		?>
@@ -158,29 +169,29 @@
 					<th>Date</th>
 					<th><input type='submit' class='button' value='compare'></th>
 				</tr>
-			</thead>		
+			</thead>
 		</table>
-		<div id="errordiv" style="color:#D8000C;"></div>		
+		<div id="errordiv" style="color:#D8000C;"></div>
 		</form>
 
 	</div>
 </center>
 
 <script>
-	$(document).on("keypress", "form", function(event) { 
-    	return event.keyCode != 13;
-	});	
-		
+	$(document).on("keypress", "form", function(event) {
+		return event.keyCode != 13;
+	});
+
 	$( document ).ready(function() {
 		var table = $('#devices').DataTable({
 			"processing": true,
 			"serverSide": true,
-			"paging" : true,		
-			"searching": true,	
+			"paging" : true,
+			"searching": true,
 			"lengthChange": true,
 			"lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
-			"dom": 'lrtip',	
-			"pageLength" : 50,		
+			"dom": 'lrtip',
+			"pageLength" : 50,
 			"order": [[ 0, 'asc' ]],
 			"columnDefs": [{ "orderable": false, "targets": [ 4 ] }],
 			"ajax": {
@@ -194,6 +205,7 @@
 						'optimalformat' : '<?php echo $_GET["optimalformat"] ?>',
 						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
 						'devicelimit' : '<?php echo $_GET["limit"] ?>',
+						'memorytype' : '<?php echo $_GET["memorytype"] ?>',
 						'option' : '<?php echo $_GET["option"] ?>',
 						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
@@ -204,7 +216,7 @@
 				error: function (xhr, error, thrown) {
 					$('#errordiv').html('Could not fetch data (' + error + ')');
 					$('#devices_processing').hide();
-				}				
+				}
 			},
 			"columns": [
 				{ data: 'device' },
@@ -221,24 +233,24 @@
 			},
 		});
 
-        yadcf.init(table, [
-            {
-                column_number: 0,
+		yadcf.init(table, [
+			{
+				column_number: 0,
 				filter_type: "text",
 				filter_delay: 500,
 				style_class: "filter-240"
-            },
-            {
-                 column_number: 1,
-                 filter_type: "text",
-                 filter_delay: 500
-            },
-            {
-                column_number: 2,
+			},
+			{
+				column_number: 1,
 				filter_type: "text",
-                filter_delay: 500
-            },
-        ], { filters_tr_index: 0});
+				filter_delay: 500
+			},
+			{
+				column_number: 2,
+				filter_type: "text",
+				filter_delay: 500
+			},
+		], { filters_tr_index: 0});
 
 	});
 </script>

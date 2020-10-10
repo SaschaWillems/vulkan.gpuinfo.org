@@ -36,6 +36,7 @@
 		exitScript("No extension schema selected");
 	}
 
+	$reportid = $_GET['id'];
 	$extension = $_GET['extension'];
 
 	// Check if requested extension has a JSON schema
@@ -74,12 +75,20 @@
 		return null;
 	}
 
-	function VK_KHR_portability_subset($report) {
+	function VK_KHR_portability_subset($report, $reportid) {
 		$extension = 'VK_KHR_portability_subset';
 		if (!checkExtensionsPresent($report, $extension)) {
 			exitScript("Report does not support $extension");
 		}
+
+		$filename = $report['VkPhysicalDeviceProperties']['deviceName']."_VK_KHR_portability";
+		$filename = preg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
+		$filename = preg_replace("([\.]{2,})", '', $filename);	
+		$filename .= ".json";
+
+
 		header('Content-Type: application/json');
+		header("Content-Disposition: attachment; filename=".strtolower($filename));
 	 
 		$report_output['$schema'] = 'https://schema.khronos.org/vulkan/devsim_VK_KHR_portability_subset-provisional-1.json#';
 
@@ -119,11 +128,15 @@
 		$report_output['comments']['device']['name'] = $report['properties']['deviceName'];
 		$report_output['comments']['device']['type'] = $report['properties']['deviceTypeText'];
 		$report_output['comments']['device']['driver'] = $report['properties']['driverVersionText'];
+		$report_output['comments']['report']['id'] = intval($reportid);
+		$report_output['comments']['report']['url'] = "https://vulkan.gpuinfo.org/displayreport.php?id=".$reportid;
+		$report_output['comments']['environment']['name'] = $report['environment']['name'];
+		$report_output['comments']['environment']['version'] = $report['environment']['version'];
+		$report_output['comments']['environment']['architecture'] = $report['environment']['architecture'];
+		$report_output['comments']['environment']['comment'] = $report['environment']['comment'];
 
 		echo json_encode($report_output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);		
 	}
-
-	$reportid = $_GET['id'];	
 
 	// Fetch report
 	DB::connect();
@@ -145,6 +158,6 @@
 
 
 	if (strcasecmp($extension, 'VK_KHR_portability_subset') == 0) {
-		VK_KHR_portability_subset($report_json);
+		VK_KHR_portability_subset($report_json, $reportid);
 	}
 ?>
