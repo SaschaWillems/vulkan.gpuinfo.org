@@ -1,0 +1,204 @@
+{
+    "groups": [
+        {
+            "Node": "Subgroup operations",
+            "id": "subgroup_operations",
+            "subjects": [
+                {
+                    "id": "subgroup_size",
+                    "caption": "Supported sizes",
+                    "selection": {
+                        "type": "select_database",
+                        "options": "select `subgroupProperties.subgroupSize` as `values` from deviceproperties where `subgroupProperties.subgroupSize` > 0 group by `values` order by `values` asc"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from deviceproperties where %where_arguments%)",
+                        "column": "`subgroupProperties.subgroupSize`",
+                        "comparator": "=",
+                        "caption": "subgroup size"
+                    }
+                },
+                {
+                    "id": "subgroup_supportedstages",
+                    "caption": "Supported stages",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "subgroupSupportedStageFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from deviceproperties where %where_arguments%)", 
+                        "column": "`subgroupProperties.supportedStages`",
+                        "comparator": "&", 
+                        "caption": "supported subgroup stages"
+                    }
+                },
+                {
+                    "id": "subgroup_supportedoperations",
+                    "caption": "Supported operations",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "subgroupSupportedOperationFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from deviceproperties where %where_arguments%)", 
+                        "column": "`subgroupProperties.supportedOperations`",
+                        "comparator": "&", 
+                        "caption": "supported subgroup operations"
+                    }
+                },
+                {
+                    "id": "subgroup_quadOperationsInAllStages",
+                    "caption": "Quad operations in all stages",
+                    "selection": {
+                        "type": "select",
+                        "options": [
+                            {"value": 1, "caption": "true"},
+                            {"value": 0, "caption": "false"}
+                        ]
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from deviceproperties where `subgroupProperties.quadOperationsInAllStages` = :quadOperationsInAllStages)", 
+                        "parameter": "quadOperationsInAllStages", 
+                        "caption": "quad operations in all stages"
+                    }
+                }
+            ]
+        },
+        {
+            "Node": "Formats",
+            "id": "formats",
+            "subjects": [
+                {
+                    "id": "format_features_linear",
+                    "caption": "Linear tiling feature flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "formatFeatureFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
+                        "column": "lineartilingfeatures",
+                        "comparator": "&", 
+                        "translator": "VulkanEnums::formatFlagName"
+                    }
+                },
+                {
+                    "id": "format_features_optimal",
+                    "caption": "Optimal tiling feature flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "formatFeatureFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
+                        "column": "optimaltilingfeatures",
+                        "comparator": "&", 
+                        "translator": "VulkanEnums::formatFlagName"
+                    }
+                },
+                {
+                    "id": "format_features_buffer",
+                    "caption": "Buffer feature flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "formatFeatureFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from deviceformats where %where_arguments% and formatid = :format )", 
+                        "column": "bufferfeatures",
+                        "comparator": "&", 
+                        "translator": "VulkanEnums::formatFlagName"
+                    }
+                }
+            ]
+        },
+        {
+            "Node": "Queue Families",
+            "id": "queue_families",
+            "subjects": [
+                {
+                    "id": "queuefamilyflags",
+                    "caption": "Supported flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "queueFamilyFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicequeues where %where_arguments%)", 
+                        "column": "flags",
+                        "comparator": "&", 
+                        "translator": "VulkanEnums::queueFamilyFlagName"
+                    }
+                }
+            ]
+        },
+        {
+            "Node": "Memory",
+            "id": "memory",
+            "subjects": [
+                {
+                    "id": "memorytypeflags",
+                    "caption": "Memory type flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "memoryTypeFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicememorytypes where %where_arguments%)",
+                        "column": "propertyflags",
+                        "comparator": "&",
+                        "translator": "VulkanEnums::memoryTypeFlagName"
+                    }
+                }
+            ]
+        },
+        {
+            "Node": "Surface",
+            "id": "surface",
+            "subjects": [
+                {
+                    "id": "surface_usage_flags",
+                    "caption": "Supported usage flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "imageUsageFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicesurfacecapabilities where %where_arguments%)", 
+                        "column": "supportedUsageFlags",
+                        "comparator": "&", 
+                        "translator": "VulkanEnums::imageUsageFlagName"
+                    }
+                },
+                {
+                    "id": "surface_transforms",
+                    "caption": "Supported transform flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "surfaceTransformFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicesurfacecapabilities where %where_arguments%)", 
+                        "column": "supportedTransforms",
+                        "comparator": "&", 
+                        "translator": "VulkanEnums::surfaceTransformFlagName"
+                    }
+                },
+                {
+                    "id": "surface_composite_alpha",
+                    "caption": "Supported composite alpha flags",
+                    "selection": {
+                        "type": "select_list_enum",
+                        "options": "surfaceCompositeAlphaFlags"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicesurfacecapabilities where %where_arguments%)", 
+                        "column": "supportedCompositeAlpha",
+                        "comparator": "&", 
+                        "translator": "VulkanEnums::surfaceCompositeAlphaFlagName"
+                    }
+                }
+            ]
+        }
+    ]
+}
