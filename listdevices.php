@@ -26,9 +26,9 @@
 
 	PageGenerator::header("Devices");
 
-	$platform = "all";
+	$selected_platform = "all";
 	if (isset($_GET['platform'])) {
-		$platform = $_GET['platform'];
+		$selected_platform = $_GET['platform'];
 		// TODO: Check valid platforms
 	}
 
@@ -36,7 +36,7 @@
 	$showTabs = true;
 
 	if (isset($_GET['platform'])) {
-		$caption = "Listing all <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform)." devices";
+		$caption = "Listing all <img src='images/".$selected_platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($selected_platform)." devices";
 	}
 	if (isset($_GET["extension"])) {
 		$caption .= " supporting ".$_GET["extension"];
@@ -70,13 +70,25 @@
 
 <?php	
 	if ($showTabs) {
+	// Get advanced search filter query string (if set)
+	$advanced_search_query_string = null;
+	if ($avanced_search_generator) {
+		$advanced_search_query_string = $avanced_search_generator->getQueryString($_REQUEST);
+	}
 ?>		
 	<div>
 		<ul class='nav nav-tabs'>
-			<li <?php if ($platform == "all") 	  { echo "class='active'"; } ?>> <a href='listdevices.php'>All platforms</a> </li>
-			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listdevices.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listdevices.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listdevices.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+<?php
+	$platforms = ['all', 'windows', 'linux', 'android'];
+	foreach ($platforms as $platform) {
+		$class = (strcasecmp($selected_platform, $platform) == 0) ? "class='active'" : "";
+		if ($platform == 'all') {
+			echo "<li $class > <a href='listdevices.php".($advanced_search_query_string ? "?$advanced_search_query_string" : "")."'>All platforms</a> </li>";
+		} else {
+			echo "<li $class > <a href='listdevices.php?platform=$platform".($advanced_search_query_string ? "&$advanced_search_query_string" : "")."'><img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'>".ucfirst($platform)."</a> </li>";
+		}
+	}
+?>		
 		</ul>
 	</div>
 <?php	
@@ -143,7 +155,7 @@
 			    }
 			],			
 			"ajax": {
-				url :"responses/devices.php?platform=<?php echo $platform ?>",
+				url :"responses/devices.php?platform=<?php echo $selected_platform ?>",
 				data: {
 					"filter": {
 						'extension' : '<?php echo $_GET["extension"] ?>' ,

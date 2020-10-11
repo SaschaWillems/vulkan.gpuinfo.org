@@ -57,6 +57,29 @@
             return json_encode($filter);
         }
 
+        /**
+         * Returns the query string for the current advanced search filter
+         */
+        public function getQueryString($request) {
+            $active_queries = [];
+            $queries = [];
+            parse_str($_SERVER['QUERY_STRING'], $queries);
+            // Only select query parameters that belong to an advanced search filter
+            foreach($queries as $query => $query_value) {
+                if (key_exists($query, $this->availablefilters)) {
+                    if (is_array($query_value)) {
+                        foreach($query_value as $index => $value) {
+                            $active_queries[] = $query."=".$value;
+                        }
+                    } else {
+                        $active_queries[] = $query."=".$query_value;
+                    }
+                }
+            }
+            $active_queries[] = "advancedsearch=" .($this->active ? "1" : "0");
+            return implode('&', $active_queries);
+        }
+
         /** 
          * Setup where clause and parameters for filtering for a given search subject
          */
