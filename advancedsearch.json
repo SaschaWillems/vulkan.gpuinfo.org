@@ -118,7 +118,7 @@
             "subjects": [
                 {
                     "id": "queuefamilyflags",
-                    "caption": "Supported flags",
+                    "caption": "Supported queue family flags",
                     "selection": {
                         "type": "select_list_enum",
                         "options": "queueFamilyFlags"
@@ -128,6 +128,58 @@
                         "column": "flags",
                         "comparator": "&", 
                         "translator": "VulkanEnums::queueFamilyFlagName"
+                    }
+                },
+                {
+                    "id": "queuefamily_timestampValidBits",
+                    "caption": "Supported timestamp valid bits",
+                    "selection": {
+                        "type": "select_database",
+                        "options": "select timestampValidBits as `values` from devicequeues where timestampValidBits > 0 group by `values` order by `values` asc"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicequeues where %where_arguments%)",
+                        "column": "timestampValidBits",
+                        "comparator": "="
+                    }
+                },
+                {
+                    "id": "queuefamily_minImageTransferGranularity_width",
+                    "caption": "Supported minimum granularity width for image transfer operations",
+                    "selection": {
+                        "type": "select_database",
+                        "options": "select `minImageTransferGranularity.width` as `values` from devicequeues where `minImageTransferGranularity.width` > 0 group by `values` order by `values` asc"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicequeues where %where_arguments%)",
+                        "column": "`minImageTransferGranularity.width`",
+                        "comparator": "="
+                    }
+                },
+                {
+                    "id": "queuefamily_minImageTransferGranularity_height",
+                    "caption": "Supported minimum granularity height for image transfer operations",
+                    "selection": {
+                        "type": "select_database",
+                        "options": "select `minImageTransferGranularity.height` as `values` from devicequeues where `minImageTransferGranularity.height` > 0 group by `values` order by `values` asc"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicequeues where %where_arguments%)",
+                        "column": "`minImageTransferGranularity.height`",
+                        "comparator": "="
+                    }
+                },
+                {
+                    "id": "queuefamily_minImageTransferGranularity_depth",
+                    "caption": "Supported minimum granularity depth for image transfer operations",
+                    "selection": {
+                        "type": "select_database",
+                        "options": "select `minImageTransferGranularity.depth` as `values` from devicequeues where `minImageTransferGranularity.depth` > 0 group by `values` order by `values` asc"
+                    },
+                    "filter": {
+                        "whereclause": "r.id in (select reportid from devicequeues where %where_arguments%)",
+                        "column": "`minImageTransferGranularity.depth`",
+                        "comparator": "="
                     }
                 }
             ]
