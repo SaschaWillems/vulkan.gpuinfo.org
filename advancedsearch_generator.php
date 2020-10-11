@@ -69,7 +69,7 @@
                 if (key_exists($query, $this->availablefilters)) {
                     if (is_array($query_value)) {
                         foreach($query_value as $index => $value) {
-                            $active_queries[] = $query."=".$value;
+                            $active_queries[] = $query."[]=".$value;
                         }
                     } else {
                         $active_queries[] = $query."=".$query_value;
@@ -89,9 +89,19 @@
             $where_arguments = [];
             $parameters = [];
             if (is_array($search['values'])) {
-                foreach($search['values'] as $index => $value) {
-                    $where_arguments[] = $filter['column'].' '.$filter['comparator'].' :p'.$index;
-                    $parameters['p'.$index] = (float)$value;
+                $index = 0;
+                foreach($search['values'] as $value) {
+                    if (is_array($value)) {
+                        foreach($value as $value_entry) {
+                            $where_arguments[] = $filter['column'].' '.$filter['comparator'].' :p'.$index;
+                            $parameters['p'.$index] = (float)$value_entry;
+                            $index++;
+                        }
+                    } else {
+                        $where_arguments[] = $filter['column'].' '.$filter['comparator'].' :p'.$index;
+                        $parameters['p'.$index] = (float)$value;
+                        $index++;
+                    }
                 }
             } else {
                 $where_arguments[] = $filter['column'].' '.$filter['comparator'].' :param';
