@@ -47,12 +47,13 @@
 		$showTabs = false;
 	}
 
-	$asg = null;
+	// Setup advanced search (if set)
+	$avanced_search_generator = null;
 	if (isset($_GET["advancedsearch"])) {
 		if ($_GET["advancedsearch"] == 1) {
 			$caption = "Advanced search:<br/>  $caption";
-			$asg = new AvancedSearchGenerator($_REQUEST);
-			$caption .= " with ".$asg->getCaption($_REQUEST);
+			$avanced_search_generator = new AvancedSearchGenerator($_REQUEST);
+			$caption .= " with ".$avanced_search_generator->getCaption($_REQUEST);
 		}
 	}
 ?>
@@ -113,9 +114,10 @@
 </center>
 
 <?php
+	// Get advanced search filter criteria for data tables ajax request(if set)
 	$advanced_search_ajax = null;
-	if ($asg) {
-		$advanced_search_ajax = '"advanced":'.$asg->getAjaxFilter($_REQUEST);
+	if ($avanced_search_generator) {
+		$advanced_search_ajax = '"advanced":'.$avanced_search_generator->getAjaxFilter($_REQUEST);
 	}
 ?>
 
