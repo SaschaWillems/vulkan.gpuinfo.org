@@ -19,37 +19,48 @@
 		*
 	*/
 	
+	function insertFeatureRow($feature, $value, $grouping) {
+		echo "<tr><td class='key'>$feature</td>";
+		echo "<td class='".($value ? 'supported' : 'unsupported')."'>".($value ? 'true' : 'false')."</td>";
+		echo "<td>$grouping</td>";
+		echo "</tr>";
+	}
+
+	function insertCoreFeatures($reportid, $table, $grouping) {
+		try {
+			$stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
+			$stmnt->execute(array(":reportid" => $reportid));
+			while ($row = $stmnt->fetch(PDO::FETCH_NUM)) {
+				for ($i = 0; $i < count($row); $i++) {
+					if ($row[$i] == "") { continue; }
+					$meta = $stmnt->getColumnMeta($i);
+					$fname = $meta["name"];
+					if ($fname == 'reportid') {
+						continue;
+					}
+					insertFeatureRow($fname, $row[$i], $grouping);
+				}				
+			}
+		} catch (Exception $e) {
+			die('Error while fetching report features');
+			DB::disconnect();
+		}
+	}
+
 ?>
 	<table id='devicefeatures' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
 		<thead>
 			<tr>
 				<td class='caption'>Feature</td>
-				<td class='caption'>Value</td>
+				<td class='caption'>Supported</td>
+				<td></td>
 			</tr>
 		</thead>
 	<tbody>
 <?php	
-	try {
-		$stmnt = DB::$connection->prepare("SELECT * from devicefeatures where reportid = :reportid");
-		$stmnt->execute(array(":reportid" => $reportID));
-		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-			for($i = 0; $i < count($row); $i++) {
-				if ($row[$i] == "") { continue; }
-				$meta = $stmnt->getColumnMeta($i);
-				$fname = $meta["name"];
-				if ($fname == 'reportid') {
-					continue;
-				}
-				$value = $row[$i];
-				echo "<tr><td class='key'>$fname</td><td>";					
-				echo ($value == 1) ? "<font color='green'>true</font>" : "<font color='red'>false</font>";
-				echo "</td></tr>\n";
-			}				
-		}
-	} catch (Exception $e) {
-		die('Error while fetching report features');
-		DB::disconnect();
-	}
+	insertCoreFeatures($reportID, 'devicefeatures', 'Vulkan Core 1.0');
+	insertCoreFeatures($reportID, 'devicefeatures11', 'Vulkan Core 1.1');
+	insertCoreFeatures($reportID, 'devicefeatures12', 'Vulkan Core 1.2');
 ?>
 	</tbody>
 </table>

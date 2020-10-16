@@ -208,7 +208,6 @@
 		$(document).ready(
 		function() {
 			var tableNames = [ 
-				'devicefeatures', 
 				'devicelimits', 
 				'deviceextensions', 
 				'deviceformats', 
@@ -238,35 +237,43 @@
 					);
 			}
 
+			// Grouped tables
+			tableNames = [ 
+				'devicefeatures', 
+				'deviceproperties'];
+
 			// Device properties table with grouping
-			$('#deviceproperties').dataTable(
-				{
-					"pageLength" : -1,
-					"paging" : false,
-					"order": [], 
-					"columnDefs": [
-						{ "visible": false, "targets": 2 }
-					],				
-					"searchHighlight": true,
-					"bAutoWidth": false,
-					"sDom": 'flpt',
-					"deferRender": true,
-					"processing": true,
-					"drawCallback": function (settings) {
-						var api = this.api();
-						var rows = api.rows( {page:'current'} ).nodes();
-						var last = null;
-						api.column(2, {page:'current'} ).data().each( function ( group, i ) {
-							if ( last !== group ) {
-								$(rows).eq( i ).before(
-									'<tr><td colspan="2" class="group">'+group+'</td></tr>'
-								);
-								last = group;
+			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
+			{
+					$('#'+tableNames[i]).dataTable(
+						{
+							"pageLength" : -1,
+							"paging" : false,
+							"order": [], 
+							"columnDefs": [
+								{ "visible": false, "targets": 2 }
+							],				
+							"searchHighlight": true,
+							"bAutoWidth": false,
+							"sDom": 'flpt',
+							"deferRender": true,
+							"processing": true,
+							"drawCallback": function (settings) {
+								var api = this.api();
+								var rows = api.rows( {page:'current'} ).nodes();
+								var last = null;
+								api.column(2, {page:'current'} ).data().each( function ( group, i ) {
+									if ( last !== group ) {
+										$(rows).eq( i ).before(
+											'<tr><td colspan="2" class="group">'+group+'</td></tr>'
+										);
+										last = group;
+									}
+								});
 							}
-						});
-					}
-				}
-			);			
+						}
+					);			
+			}
 
 			// Extended features table with grouping
 			$('#extended_features').dataTable(
