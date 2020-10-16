@@ -20,7 +20,7 @@
 	*/
 	
 	function insertFeatureRow($feature, $value, $grouping) {
-		echo "<tr><td class='key'>$feature</td>";
+		echo "<tr><td class='subkey'>$feature</td>";
 		echo "<td class='".($value ? 'supported' : 'unsupported')."'>".($value ? 'true' : 'false')."</td>";
 		echo "<td>$grouping</td>";
 		echo "</tr>";
@@ -58,9 +58,9 @@
 		</thead>
 	<tbody>
 <?php	
-	insertCoreFeatures($reportID, 'devicefeatures', 'Vulkan Core 1.0');
-	insertCoreFeatures($reportID, 'devicefeatures11', 'Vulkan Core 1.1');
-	insertCoreFeatures($reportID, 'devicefeatures12', 'Vulkan Core 1.2');
+	insertCoreFeatures($reportID, 'devicefeatures', VULKAN_CORE_1_0_TEXT);
+	insertCoreFeatures($reportID, 'devicefeatures11', VULKAN_CORE_1_1_TEXT);
+	insertCoreFeatures($reportID, 'devicefeatures12', VULKAN_CORE_1_2_TEXT);
 ?>
 	</tbody>
 </table>

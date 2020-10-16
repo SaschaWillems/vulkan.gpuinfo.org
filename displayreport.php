@@ -23,6 +23,7 @@
 
 	include './dbconfig.php';
 	include './functions.php';
+	include './constants.php';
 			
 	$reportID = $_GET['id']; 	
 	if ($reportID == '') {
