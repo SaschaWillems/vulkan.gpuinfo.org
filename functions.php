@@ -434,4 +434,16 @@ function setPageTitle(string $title) {
 	echo '<script language="javascript">document.title = "'.$title.' - Vulkan Hardware Database by Sascha Willems";</script>';
 }
 
+function UUIDtoString($uuid) {
+	try {
+		$arr = unserialize($uuid);
+		foreach ($arr as &$val) {
+			$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
+		}
+	return implode($arr);
+	} catch (Throwable $e) {
+		return null;
+	}
+}
+
 ?>
