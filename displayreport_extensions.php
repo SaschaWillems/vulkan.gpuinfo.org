@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -27,24 +27,16 @@
 		</tr>
 	</thead>
 	<tbody>
-<?php	
-	try {
-		if ($platform) {
-			$linkplatform .= "&platform=$platform";
+	<?php	
+		$data = $report->fetchExtensions();
+		if ($data) {
+			foreach($data as $extension) {
+				$link = "listdevicescoverage.php?extension=".$extension['name'].$linkplatform;
+				echo "<tr><td class='subkey'><a href='$link'>".$extension['name']."</a></td>";
+				echo "<td>".versionToString($extension['specversion'])."</td>";
+				echo "</tr>";
+			}
 		}
-		$stmnt = DB::$connection->prepare("SELECT e.name as name, de.specversion as specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
-		$stmnt->execute(array(":reportid" => $reportID));
-		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-			$link = "listdevicescoverage.php?extension=$row[0]$linkplatform";
-			echo "<tr><td class='key'><a href='$link'>".$row[0]."</a></td>";
-			echo "<td>".versionToString($row[1])."</td>";
-			echo "</tr>\n";
-			echo "</td></tr>\n";
-		}
-	} catch (Exception $e) {
-		die('Error while fetching report features');
-		DB::disconnect();
-	}
-?>
+	?>
 	</tbody>
 </table>

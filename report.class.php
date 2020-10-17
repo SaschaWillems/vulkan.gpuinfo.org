@@ -158,4 +158,19 @@
                 return null;
             }           
         }
+
+        public function fetchExtensions() 
+        {
+            try {
+                $sql = "SELECT e.name as name, de.specversion as specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid order by name asc";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }
+        }
+
+
     }
