@@ -19,35 +19,35 @@
 		*
 	*/
 ?>
-	<table id='devicelimits' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
-		<thead>
-			<tr>
-				<td class='caption'>Limit</td>
-				<td class='caption'>Value</td>
-			</tr>
-		</thead>
-		<tbody>
-		<?php	
-			$data = $report->fetchLimits();
-			if ($data) {
-				foreach($data as $key => $value) {
-					if ($key == 'reportid') {
-						continue;
-					}
-					echo "<tr><td class='subkey'>$key</td>";
-					if (strpos($key, 'SampleCounts')) {
-						$sampleCountflags = getSampleCountFlags($value);						
-						if (count($sampleCountflags) > 0) {
-							echo "<td>".implode(",", $sampleCountflags)."</td>";
-						} else {
-							echo "<td><font color='red'>none</font></td>";
-						}
-					} else {
-						echo "<td>".$value."</td>";
-					}			
-					echo "</tr>";
+<table id='devicelimits' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
+	<thead>
+		<tr>
+			<td class='caption'>Limit</td>
+			<td class='caption'>Value</td>
+		</tr>
+	</thead>
+	<tbody>
+	<?php	
+		$data = $report->fetchLimits();
+		if ($data) {
+			foreach($data as $key => $value) {
+				if ($key == 'reportid') {
+					continue;
 				}
+				echo "<tr><td class='subkey'>$key</td>";
+				if (strpos($key, 'SampleCounts')) {
+					$sampleCountflags = getSampleCountFlags($value);						
+					if (count($sampleCountflags) > 0) {
+						echo "<td>".implode(",", $sampleCountflags)."</td>";
+					} else {
+						echo "<td><font color='red'>none</font></td>";
+					}
+				} else {
+					echo "<td>".$value."</td>";
+				}			
+				echo "</tr>";
 			}
-		?>
-		</tbody>
-	</table>
+		}
+	?>
+	</tbody>
+</table>
