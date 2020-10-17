@@ -68,7 +68,6 @@
 		$queuecount = DB::getCount("SELECT count(*) from devicequeues where reportid = :reportid", [':reportid' => $reportID]);
 		$memtypecount = DB::getCount("SELECT count(*) from devicememorytypes where reportid = :reportid", [':reportid' => $reportID]);
 		$memheapcount = DB::getCount("SELECT count(*) from devicememoryheaps where reportid = :reportid", ["reportid" => $reportID]);
-		$layercount = DB::getCount("SELECT count(*) from devicelayers where reportid = :reportid", [':reportid' => $reportID]);
 		$surfaceformatscount =  DB::getCount("SELECT count(*) from devicesurfaceformats where reportid = :reportid", [':reportid' => $reportID]);
 		$surfacepresentmodescount =  DB::getCount("SELECT count(*) from devicesurfacemodes where reportid = :reportid", [':reportid' => $reportID]);			
 	} catch (PDOException $e) {
@@ -99,7 +98,6 @@
 			<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'><?php echo $queuecount ?></span></a></li>
 			<li><a data-toggle='tab' href='#memory'>Memory <span class='badge'><?php echo $memtypecount ?></span></a></a></li>
 			<?php if ($report->flags->has_surface_caps) { echo "<li><a data-toggle='tab' href='#surface'>Surface</a></a></li>"; } ?>
-			<!-- <li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>"; -->
 			<?php if ($report->flags->has_instance_data) { echo "<li><a data-toggle='tab' href='#instance'>Instance</a></li>"; } ?>
 		</ul>
 	</div>
@@ -155,11 +153,6 @@
 		include './displayreport_surface.php';
 		echo "</div>";					
 	}
-
-	// Layers ========================================================================================
-	// echo "<div id='layers' class='tab-pane fade reportdiv'>";
-	// include './displayreport_layers.php';
-	// echo "</div>";					
 
 	// Instance
 	if ($report->flags->has_instance_data) {
