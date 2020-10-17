@@ -30,30 +30,6 @@
 		</thead>
 	<tbody>
 <?php
-	
-	$sql = "SELECT 
-		p.devicename,
-		r.displayname,
-		p.driverversionraw,
-		p.driverversion,
-		p.devicetype,
-		p.apiversion,
-		p.vendorid,
-		VendorId(p.vendorid) as 'vendor',
-		concat('0x', hex(cast(p.deviceid as UNSIGNED))) as 'deviceid',
-		p.pipelineCacheUUID,
-		r.osname,
-		r.osarchitecture,
-		r.osversion,
-		r.submitter,
-		r.submissiondate,
-		r.version as reportversion,
-		r.description,
-		'devsim' as `devsim`
-	from reports r
-	left join
-	deviceproperties p on (p.reportid = r.id)
-	where r.id = :reportid";
 
 	$device_info_field_aliases = [
 		'devicename' => 'Name',
@@ -68,68 +44,69 @@
 	];
 
 	try {
-		$stmnt = DB::$connection->prepare($sql);
-		$stmnt->execute(array(":reportid" => $reportID));
-
+		$data = $report->fetchDeviceInfo();
 		$group = 'Device';
-		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-			for($i = 0; $i < count($row); $i++) {
-				if ($row[$i] == "") { continue; }
-				$meta = $stmnt->getColumnMeta($i);
-				$fname = $meta["name"];
-				$value = $row[$i];
-				if ($fname == 'osname') {
+		foreach ($data[0] as $key => $value) {
+			if ($value == "") { 
+				continue; 
+			}
+			$display_key = $key;
+			$display_value = $value;
+			switch($key) {
+				case 'driverversion':
+				case 'vendorid':
+					continue 2;
+				break;
+				case 'displayname':
+					if ($value == $data[0]['devicename']) {
+						continue 2;
+					}
+				break;
+				case 'osname':
 					$group = 'Platform';
-				}
-				if ($fname == 'submitter') {
+				break;
+				case 'submitter':
 					$value = '<a href="listreports.php?submitter='.$value.'">'.$value.'</a>';
 					$group = 'Report';
-				}
-				if ($fname == 'devicename') {
+				break;
+				case 'devicename':
 					$value = '<a href="listreports.php?devicename='.$value.'">'.$value.'</a>';			
-				}
-				if (($fname == 'displayname') && ($value == $row[0])) {
-					continue;
-				}
-				if ($fname == 'displayname') {
-					$value = '<a href="listreports.php?displayname='.$value.'">'.$value.'</a>';			
-				}
-				if (($fname == 'driverversion') | ($fname == 'vendorid')) {
-					continue;
-				}
-				if ($fname == 'driverversionraw') {
-					$fname = 'Driver version';
+				break;
+				case 'displayname':
+					$value = '<a href="listreports.php?displayname='.$value.'">'.$value.'</a>';
+				break;
+				case 'driverversionraw':
+					$key = 'Driver version';
 					$value = getDriverVerson($value, $row[2], $row[6], $row[11]);
-				}
-				if (($fname == 'pipelineCacheUUID') && (!is_null($value))) {
-					$arr = unserialize($value);
-					foreach ($arr as &$val) {
-						$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
-					}
-					$value = implode($arr);
-				}
-				if ($fname == 'devsim') {
+				break;
+				case 'devsim':
 					include './displayreport_devsim_downloads.php';
-					continue;
-				}
-				if (array_key_exists($fname, $device_info_field_aliases)) {
-					$fname = $device_info_field_aliases[$fname];
-				}
-				echo "<tr><td class='subkey'>".ucfirst($fname)."</td><td>".$value."</td><td>".$group."</td></tr>\n";
-			}				
+					continue 2;
+				break;
+				case 'pipelineCacheUUID':
+					$value = UUIDtoString($value);
+					if (!is_null($value)) {
+
+					}
+				break;
+			}
+			if (array_key_exists($key, $device_info_field_aliases)) {
+				$key = $device_info_field_aliases[$key];
+			}			
+			echo "<tr><td class='subkey'>".ucfirst($key)."</td><td>$value</td><td>$group</td></tr>";
 		}
-	
+		
 		// Platform details (if available)
-		$stmnt = DB::$connection->prepare("SELECT name, value from deviceplatformdetails dpfd join platformdetails pfd on dpfd.platformdetailid = pfd.id where dpfd.reportid = :reportid order by name asc");
-		$stmnt->execute(array(":reportid" => $reportID));
-		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-			echo "<tr><td class='subkey'>".$row[0]."</td><td>".$row[1]."</td><td>Platform details</td></tr>\n";
+		if ($report->flags->has_platform_details) {
+			$data = $report->fetchPlatformDetails();
+			foreach($data as $row) {
+				echo "<tr><td class='subkey'>".$row['name']."</td><td>".$row['value']."</td><td>Platform details</td></tr>";
+			}
 		}
 	} catch (Exception $e) {
 		die('Error while fetching report properties');
 		DB::disconnect();
 	}
-
-	
-	echo "</tbody></table>";	
 ?>
+		</tbody>
+	</table>
