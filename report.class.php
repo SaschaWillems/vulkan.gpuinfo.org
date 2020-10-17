@@ -145,4 +145,17 @@
                 return null;
             }
         }
+
+        public function fetchLimits()
+        {
+            try {
+                $sql = "SELECT * from devicelimits where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }           
+        }
     }
