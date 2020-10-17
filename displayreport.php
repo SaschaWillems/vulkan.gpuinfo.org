@@ -24,7 +24,8 @@
 	include './dbconfig.php';
 	include './functions.php';
 	include './constants.php';
-			
+	include './report.class.php';
+	
 	$reportID = $_GET['id']; 	
 	if ($reportID == '') {
 		PageGenerator::header();
@@ -38,45 +39,11 @@
 		PageGenerator::footer();
 		die();
 	}
+
+	$report = new Report($reportID);
+	$report->fetchData();
 	
-	DB::connect();
-	$sql = "SELECT
-		p.devicename,
-		p.driverversion,
-		p.devicetype,
-		VendorId(p.vendorid) as 'vendor',
-		r.osname,
-		r.osarchitecture,
-		r.osversion,
-		r.version as reportversion,
-		r.ostype
-		from reports r
-		left join
-		deviceproperties p on (p.reportid = r.id)
-		where r.id = :reportid";	
-
-	try {
-		$stmnt = DB::$connection->prepare($sql); 
-		$stmnt->execute([':reportid' => $reportID]); 
-		$present = $stmnt->rowCount() > 0;
-		$row = $stmnt->fetch(PDO::FETCH_ASSOC);
-		// Don't include vendor name if it's already part of the device name
-		if (strpos($row['devicename'], $row['vendor']) === 0) {
-			$devicedescription = $row['devicename'];
-		} else {
-			$devicedescription = $row['vendor']." ".$row['devicename'];
-		}
-		$devicename = $row['devicename'];
-		$reportversion = $row['reportversion'];
-		$ostype = $row['ostype'];
-		$platform = platformname($ostype);
-	} catch (PDOException $e) {
-		DB::disconnect();
-		die("<b>Error while fetcthing report data!</b><br>");
-	}
-	DB::disconnect();
-
-	if (!$present) {
+	if (!$report->exists()) {
 		PageGenerator::header();
 		?>
 		<div class="div-h-center">
@@ -91,7 +58,7 @@
 		die();
 	}
 
-	PageGenerator::header($devicename);
+	PageGenerator::header($report->info->device_description);
 
 	// Counters
 	try {
@@ -104,19 +71,16 @@
 		$layercount = DB::getCount("SELECT count(*) from devicelayers where reportid = :reportid", [':reportid' => $reportID]);
 		$surfaceformatscount =  DB::getCount("SELECT count(*) from devicesurfaceformats where reportid = :reportid", [':reportid' => $reportID]);
 		$surfacepresentmodescount =  DB::getCount("SELECT count(*) from devicesurfacemodes where reportid = :reportid", [':reportid' => $reportID]);			
-		$hassurfacecaps = DB::getCount("SELECT count(*) from devicesurfacecapabilities where reportid = :reportid", [':reportid' => $reportID]) > 0;
-		$hasextended =  DB::getCount("SELECT (select count(*) from devicefeatures2 where reportid = :reportid) + (select count(*) from deviceproperties2 where reportid = :reportid)", [':reportid' => $reportID]) > 0;
-		$hasinstance =  DB::getCount("SELECT (select count(*) from deviceinstanceextensions where reportid = :reportid) + (select count(*) from deviceinstancelayers where reportid = :reportid)", [':reportid' => $reportID]) > 0;		
 	} catch (PDOException $e) {
 		DB::disconnect();
 		die("<b>Error while fetcthing report data!</b><br>");
 	}
 	echo "<center>";				
 
-	// Header =====================================================================================
-	$header = "Device report for $devicedescription";
-	if ($platform !== null) {
-		$header .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+	// Header
+	$header = "Device report for ".$report->info->device_description;
+	if ($report->info->platform !== null) {
+		$header .= " on <img src='images/".$report->info->platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($report->info->platform);
 	}
 	echo "<div class='header'>";
 	echo "<h4>$header</h4>";
@@ -125,26 +89,24 @@
 	// Nav ========================================================================================
 ?>			
 	<div>
-		<ul class='nav nav-tabs'>
+		<ul class='nav nav-tabs nav-report'>
 			<li class='active'><a data-toggle='tab' href='#device'>Device</a></li>
-			<li><a data-toggle='tab' href='#features'>Features</a></li>
 			<li><a data-toggle='tab' href='#properties'>Properties</a></li>
+			<li><a data-toggle='tab' href='#features'>Features</a></li>
 			<li><a data-toggle='tab' href='#limits'>Limits</a></li>
-			<?php if ($hasextended) { echo "<li><a data-toggle='tab' href='#extended'>Extended</a></a></li>"; } ?>
 			<li><a data-toggle='tab' href='#extensions'>Extensions <span class='badge'><?php echo $extcount ?></span></a></li>
 			<li><a data-toggle='tab' href='#formats'>Formats <span class='badge'><?php echo $formatcount ?></span></a></a></li>
 			<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'><?php echo $queuecount ?></span></a></li>
 			<li><a data-toggle='tab' href='#memory'>Memory <span class='badge'><?php echo $memtypecount ?></span></a></a></li>
-			<?php if ($hassurfacecaps) { echo "<li><a data-toggle='tab' href='#surface'>Surface</a></a></li>"; } ?>
+			<?php if ($report->flags->has_surface_caps) { echo "<li><a data-toggle='tab' href='#surface'>Surface</a></a></li>"; } ?>
 			<!-- <li><a data-toggle='tab' href='#layers'>Layers <span class='badge'>$layercount</span></a></li>"; -->
-			<?php if ($hasinstance) { echo "<li><a data-toggle='tab' href='#instance'>Instance</a></li>"; } ?>
+			<?php if ($report->flags->has_instance_data) { echo "<li><a data-toggle='tab' href='#instance'>Instance</a></li>"; } ?>
 		</ul>
 	</div>
 	
 	<div class='tablediv tab-content' style='width:75%;'>
 
 <?php					
-	// setPageTitle($devicename);
 
 	// Device information
 	echo "<div id='device' class='tab-pane fade in active reportdiv'>";
@@ -153,48 +115,41 @@
 
 	// Device properties
 	echo "<div id='properties' class='tab-pane fade reportdiv'>";
-	include('displayreport_properties.php');
+	include 'displayreport_properties.php';
 	echo "</div>";		
 
-	// Device features ==============================================================================
+	// Device features
 	echo "<div id='features' class='tab-pane fade reportdiv'>";
 	include 'displayreport_features.php';									
 	echo "</div>";			
 	
-	// Device limits ================================================================================
+	// Device limits
 	echo "<div id='limits' class='tab-pane fade reportdiv'>";
 	include 'displayreport_limits.php';
 	echo "</div>";		
 
-	// Extended features and properites =============================================================
-	if ($hasextended) {	
-		echo "<div id='extended' class='tab-pane fade reportdiv'>";
-		include './displayreport_extended.php';
-		echo "</div>";					
-	}		
-	
-	// Extensions ===================================================================================
+	// Extensions
 	echo "<div id='extensions' class='tab-pane fade reportdiv'>";
 	include './displayreport_extensions.php';					
 	echo "</div>";	
 	
-	// Formats ======================================================================================
+	// Formats
 	echo "<div id='formats' class='tab-pane fade reportdiv'>";
 	include './displayreport_formats.php';		
 	echo "</div>";		
 				
-	// Queues =======================================================================================
+	// Queues
 	echo "<div id='queuefamilies' class='tab-pane fade reportdiv'>";			
 	include './displayreport_queues.php';
 	echo "</div>";
 	
-	// Memory properties ============================================================================
+	// Memory properties
 	echo "<div id='memory' class='tab-pane fade reportdiv'>";		
 	include './displayreport_memory.php';
 	echo "</div>";
 
-	// Surface properties ============================================================================
-	if ($hassurfacecaps)
+	// Surface properties
+	if ($report->flags->has_surface_caps)
 	{	
 		echo "<div id='surface' class='tab-pane fade reportdiv'>";
 		include './displayreport_surface.php';
@@ -206,8 +161,8 @@
 	// include './displayreport_layers.php';
 	// echo "</div>";					
 
-	// Instance ======================================================================================
-	if ($hasinstance) {
+	// Instance
+	if ($report->flags->has_instance_data) {
 		echo "<div id='instance' class='tab-pane fade reportdiv'>";
 		include 'displayreport_instance.php';
 		echo "</div>";	
@@ -253,7 +208,9 @@
 			[
 				'deviceinfo',
 				'devicefeatures', 
-				'deviceproperties'
+				'devicefeatures_extensions',
+				'deviceproperties',
+				'deviceproperties_extensions',
 			];
 
 			// Device properties table with grouping
@@ -485,7 +442,12 @@
 				// Nested tabs, need to show parent tab too
 				if ((a === '#memorytypes') || (a === '#memoryheaps')) {
 					$('.nav a[href=\\#memory]').tab('show');
-					console.log(a);
+				}
+				if ((a === '#features_core') || (a === '#features_extensions')) {
+					$('.nav a[href=\\#features]').tab('show');
+				}
+				if ((a === '#properties_core') || (a === '#properties_extensions')) {
+					$('.nav a[href=\\#properties]').tab('show');
 				}
 				$('.nav a[href=\\'+a+']').tab('show');
 			}

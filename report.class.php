@@ -29,23 +29,62 @@
         public $has_vulkan_1_1_properties = false;
         public $has_vulkan_1_2_features = false;
         public $has_vulkan_1_2_properties = false;
+        public $has_portability_extension = false;
+    }
+
+    class ReportInfo {
+        public $version = null;
+        public $device_description = null;
+        public $platform = null;
     }
 
     class Report {        
         public $id = null;
+        public ReportInfo $info;
         public ReportFlags $flags;
 
         function __construct($reportid)
         {
             $this->id = $reportid;
             $this->flags = new ReportFlags;
+            $this->info = new ReportInfo;
+        }
+
+        public function exists()
+        {
+            DB::connect();
+            $stmnt = DB::$connection->prepare("SELECT 1 from reports where id = :reportid LIMIT 1");
+            $stmnt->execute([':reportid' => $this->id]);
+            $result = $stmnt->fetchColumn();
+            DB::disconnect();
+            return $result;
         }
 
         public function fetchData() 
         {
-            // Counters (for badges)
-            // Flags for optional data
             DB::connect();
+            // Basic report information
+            $sql = "SELECT
+                p.devicename,
+                VendorId(p.vendorid) as 'vendor',
+                r.version as reportversion,
+                r.ostype
+                from reports r
+                left join
+                deviceproperties p on (p.reportid = r.id)
+                where r.id = :reportid";
+            $stmnt = DB::$connection->prepare($sql); 
+            $stmnt->execute([':reportid' => $this->id]);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+            $this->info->version = $row['reportversion'];
+            if (strpos($row['devicename'], $row['vendor']) === 0) {
+                // Don't include vendor name if it's already part of the device name
+                $this->info->device_description = $row['devicename'];
+            } else {
+                $this->info->device_description = $row['vendor']." ".$row['devicename'];
+            }
+            $this->info->platform = platformname($row['ostype']);
+            // Flags for optional data
             $this->flags->has_instance_data =  DB::getCount("SELECT (select count(*) from deviceinstanceextensions where reportid = :reportid) + (select count(*) from deviceinstancelayers where reportid = :reportid)", [':reportid' => $this->id]) > 0;
             $this->flags->has_surface_caps = DB::getCount("SELECT count(*) from devicesurfacecapabilities where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_platform_details = DB::getCount("SELECT count(*) from deviceplatformdetails where reportid = :reportid", [':reportid' => $this->id]) > 0;
@@ -55,6 +94,7 @@
             $this->flags->has_vulkan_1_1_properties = DB::getCount("SELECT count(*) from deviceproperties11 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_vulkan_1_2_features = DB::getCount("SELECT count(*) from devicefeatures12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
             DB::disconnect();
         }
 
