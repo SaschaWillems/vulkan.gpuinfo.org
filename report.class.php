@@ -172,5 +172,17 @@
             }
         }
 
+        public function fetchFormats() 
+        {
+            try {
+                $sql = "SELECT VkFormat(formatid) as format, deviceformats.* from deviceformats where reportid = :reportid order by format asc";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }
+        }       
 
     }
