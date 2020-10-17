@@ -123,6 +123,7 @@
 		<ul class='nav nav-tabs'>
 			<li class='active'><a data-toggle='tab' href='#device'>Device</a></li>
 			<li><a data-toggle='tab' href='#features'>Features</a></li>
+			<li><a data-toggle='tab' href='#properties'>Properties</a></li>
 			<li><a data-toggle='tab' href='#limits'>Limits</a></li>
 			<?php if ($hasextended) { echo "<li><a data-toggle='tab' href='#extended'>Extended</a></a></li>"; } ?>
 			<li><a data-toggle='tab' href='#extensions'>Extensions <span class='badge'><?php echo $extcount ?></span></a></li>
@@ -140,13 +141,17 @@
 <?php					
 	// setPageTitle($devicename);
 
-	// Device properites ============================================================================
+	// Device information
 	echo "<div id='device' class='tab-pane fade in active reportdiv'>";
-	include './displayreport_properties.php';									
+	include './displayreport_deviceinfo.php';									
 	echo "</div>";
-	
-	// Device features ==============================================================================
 
+	// Device properties
+	echo "<div id='properties' class='tab-pane fade reportdiv'>";
+	include('displayreport_properties.php');
+	echo "</div>";		
+
+	// Device features ==============================================================================
 	echo "<div id='features' class='tab-pane fade reportdiv'>";
 	include 'displayreport_features.php';									
 	echo "</div>";			
@@ -239,9 +244,12 @@
 			}
 
 			// Grouped tables
-			tableNames = [ 
+			tableNames = 
+			[
+				'deviceinfo',
 				'devicefeatures', 
-				'deviceproperties'];
+				'deviceproperties'
+			];
 
 			// Device properties table with grouping
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
