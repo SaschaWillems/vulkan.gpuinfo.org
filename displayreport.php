@@ -60,7 +60,12 @@
 		$stmnt->execute([':reportid' => $reportID]); 
 		$present = $stmnt->rowCount() > 0;
 		$row = $stmnt->fetch(PDO::FETCH_ASSOC);
-		$devicedescription = $row['vendor']." ".$row['devicename'];
+		// Don't include vendor name if it's already part of the device name
+		if (strpos($row['devicename'], $row['vendor']) === 0) {
+			$devicedescription = $row['devicename'];
+		} else {
+			$devicedescription = $row['vendor']." ".$row['devicename'];
+		}
 		$devicename = $row['devicename'];
 		$reportversion = $row['reportversion'];
 		$ostype = $row['ostype'];
