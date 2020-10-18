@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -20,7 +20,7 @@
 	*/	
 ?>
 <div>
-	<ul class='nav nav-tabs'>
+	<ul class='nav nav-tabs nav-level1'>
 		<li class='active'><a data-toggle='tab' href='#surfaceproperties'>Surface properties</a></li>
 		<li><a data-toggle='tab' href='#surfaceformats'>Surface formats <span class='badge'><?php echo $surfaceformatscount ?></span></a></li>
 		<li><a data-toggle='tab' href='#presentmodes'>Present modes <span class='badge'><?php echo $surfacepresentmodescount ?></span></a></li>

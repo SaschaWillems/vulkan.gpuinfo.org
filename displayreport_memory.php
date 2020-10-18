@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -20,7 +20,7 @@
 	*/	
 ?>	
 	<div>
-		<ul class='nav nav-tabs'>
+		<ul class='nav nav-tabs nav-level1'>
 			<li class='active'><a data-toggle='tab' href='#memorytypes'>Memory types <span class='badge'><?php echo $memtypecount ?></span></a></li>
 			<li><a data-toggle='tab' href='#memoryheaps'>Memory heaps <span class='badge'><?php echo $memheapcount ?></span></a></li>
 		</ul>
