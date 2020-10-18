@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -18,42 +18,44 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-	
-	try {
-		$stmnt = DB::$connection->prepare("SELECT * from devicequeues where reportid = :reportid");
-		$stmnt->execute(array(":reportid" => $reportID));
-		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-			echo "<table id='devicequeues-$index' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>";
-			echo "<thead>";
-			echo "<tr><td colspan=2 class=tablehead>Queue family $index</td></tr>";
-			echo "<tr>";
-			echo "</thead><tbody>";
-			for($i = 0; $i < count($row); $i++)
-			{
-				$meta = $stmnt->getColumnMeta($i);
-				$fname = $meta["name"];			
-				if (in_array($fname, array('id', 'reportid')))
-					continue;
-				$value = $row[$i];
-				if ($fname == 'count') {
-					$fname = 'queueCount';
-				}
-				if ($fname == 'flags') {
-					echo "<tr><td width='25%'>$fname</td>";
-					echo "<td>";
-					$flags = getQueueFlags($value);
-					listFlags($flags);
-					echo "</td>";
-				} else {
-					echo "<tr><td width='25%'>$fname</td><td>$value</td></tr>\n";
-				}
-			}				
-	
-			echo "</tbody></table>";								
-			$index++;			
-		}
-	} catch (Exception $e) {
-		die('Error while fetching report features');
-		DB::disconnect();
-	}		
 ?>
+<table id='devicequeues' class='table table-striped table-bordered table-hover reporttable'>
+	<thead>
+		<tr>
+			<td class='caption'>Property</td>
+			<td class='caption'>Value</td>
+			<td></td>
+		</tr>
+	</thead>
+	<tbody>
+	<?php		
+		$data = $report->fetchQueueFamilies();
+		$index = 0;
+		if ($data) {	
+			foreach($data as $queue_family) {
+				foreach($queue_family as $key => $value) {
+					if (in_array($key, ['id', 'reportid'])) {
+						continue;
+					}
+					echo "<tr>";
+					if ($key == 'count') {
+						$key = 'queueCount';
+					}
+					echo "<td style='width: 25%;'>$key</td>";
+					if ($key == 'flags') {
+						echo "<td>";
+						$flags = getQueueFlags($value);
+						listFlags($flags);
+						echo "</td>";
+					} else {
+						echo "<td>$value</td>";
+					}
+					echo "<td>Queue family $index</td>";
+					echo "</tr>";
+				}
+				$index++;				
+			}		
+		}
+	?>
+	</tbody>
+</table>

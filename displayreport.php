@@ -170,7 +170,6 @@
 				'devicelimits', 
 				'deviceextensions', 
 				'devicelayers', 
-				'devicequeues', 
 				'devicememory', 
 				'devicelayerextensions', 
 				'devicememoryheaps', 
@@ -202,6 +201,7 @@
 				'devicefeatures_extensions',
 				'deviceproperties',
 				'deviceproperties_extensions',
+				'devicequeues'
 			];
 
 			// Device properties table with grouping

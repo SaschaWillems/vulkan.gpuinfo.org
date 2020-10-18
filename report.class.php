@@ -183,6 +183,19 @@
             } catch (Throwable $e) {
                 return null;
             }
-        }       
+        }
+
+        public function fetchQueueFamilies()
+        {
+            try {
+                $sql = "SELECT * from devicequeues where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }
+        }
 
     }
