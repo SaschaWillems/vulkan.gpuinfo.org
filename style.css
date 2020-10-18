@@ -99,10 +99,33 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 	max-width:800px;	*/
 }
 
+/* .nav-report {
+	width: 75%;
+} */
+
+/* .nav-level1 {
+    margin-left: -41px;
+    margin-right: -41px;
+    margin-top: -36px;	
+} */
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs, .nav-pills {
+    text-align:center;
+}
+
 .tablediv {
 	padding-top: 25px;
 	padding-left: 40px;
 	padding-right: 40px;
+    border: 1px solid #ddd;
+    border-top: 0px;	
 	/*max-width: 1024px;*/
 	/*width:auto;*/
 }
@@ -131,16 +154,7 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 	padding-right:5px;
 }
 
-.nav-tabs > li, .nav-pills > li {
-    float:none;
-    display:inline-block;
-    *display:inline; /* ie7 fix */
-     zoom:1; /* hasLayout ie7 trigger */
-}
 
-.nav-tabs, .nav-pills {
-    text-align:center;
-}
 
 .reportheader {
     height: 65px;
@@ -163,13 +177,6 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 
 .navbar-default .navbar-nav>li>a {
     color: #fff;
-}
-
-.nav-tabs > li, .nav-pills > li {
-    float:none;
-    display:inline-block;
-    *display:inline; /* ie7 fix */
-     zoom:1; /* hasLayout ie7 trigger */
 }
 
 .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
@@ -473,4 +480,96 @@ h1 {
 
 .div-alert {
 	display: inline-block;
+}
+
+.header-rotate {
+	transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3); 
+}
+
+/* From https://www.jimmybonney.com/articles/column_header_rotation_css/ */
+
+.table-header-rotated th.row-header{
+	width: auto;
+}
+  
+.table-header-rotated td{
+	width: 40px;
+	border-top: 1px solid rgb(221, 221, 221);
+	border-left: 1px solid rgb(221, 221, 221);
+	border-right: 1px solid rgb(221, 221, 221);
+	vertical-align: middle;
+	text-align: center;
+}
+
+.table-header-rotated th.rotate-45{
+	height: 160px;
+	width: 40px;
+	min-width: 40px;
+	max-width: 40px;
+	position: relative;
+	vertical-align: bottom;
+	padding: 0;
+	font-size: 12px;
+	border-left: 0px; 
+	border-right: 0px;	
+}
+
+.table-header-rotated th.rotate-45 > div{
+	position: relative;
+	top: 0px;
+	left: 80px;
+	height: 100%;
+	-ms-transform:skew(-45deg,0deg);
+	-moz-transform:skew(-45deg,0deg);
+	-webkit-transform:skew(-45deg,0deg);
+	-o-transform:skew(-45deg,0deg);
+	transform:skew(-45deg,0deg);
+	overflow: hidden;
+	border-left: 1px solid rgb(221, 221, 221);
+	border-right: 1px solid rgb(221, 221, 221);
+	border-top: 1px solid rgb(221, 221, 221);
+	background-color: white;
+}
+
+.table-header-rotated th.rotate-45 span {
+	-ms-transform:skew(45deg,0deg) rotate(315deg);
+	-moz-transform:skew(45deg,0deg) rotate(315deg);
+	-webkit-transform:skew(45deg,0deg) rotate(315deg);
+	-o-transform:skew(45deg,0deg) rotate(315deg);
+	transform:skew(45deg,0deg) rotate(315deg);
+	position: absolute;
+	bottom: 30px;
+	left: -24px;
+	display: inline-block;
+	width: 100%;
+	width: 85px;
+	text-align: left;
+}
+
+.format-table {
+	table-layout: fixed !important;
+	width: auto;
+	border-left: 0px;
+	border-top: 0px;
+}
+
+.format-table .subkey { 
+	border-left-width: 1px !important;
+}
+
+
+.format-table-support {
+	width: 40px !important;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	vertical-align: middle !important;
+}
+
+.format-unsupported {
+	color: #9b9b9b;
 }

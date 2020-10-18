@@ -132,7 +132,7 @@
 	echo "</div>";	
 	
 	// Formats
-	echo "<div id='formats' class='tab-pane fade reportdiv'>";
+	echo "<div id='formats' class='tab-pane fade reportdiv' style='padding-right: 140px;'>";
 	include './displayreport_formats.php';		
 	echo "</div>";		
 				
@@ -169,7 +169,6 @@
 			var tableNames = [ 
 				'devicelimits', 
 				'deviceextensions', 
-				'deviceformats', 
 				'devicelayers', 
 				'devicequeues', 
 				'devicememory', 
@@ -197,8 +196,7 @@
 			}
 
 			// Grouped tables
-			tableNames = 
-			[
+			tableNames = [
 				'deviceinfo',
 				'devicefeatures', 
 				'devicefeatures_extensions',
@@ -238,6 +236,32 @@
 						}
 					);			
 			}
+
+			// Feature tables
+			tableNames = [ 
+				'deviceformats_linear',
+				'deviceformats_optimal',
+				'deviceformats_buffer',
+			];
+			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
+			{
+					$('#'+tableNames[i]).dataTable(
+						{
+							"pageLength" : -1,
+							"paging" : false,
+							"order": [], 
+							"searchHighlight": true,
+							"bAutoWidth": false,
+							"sDom": 'flpt',
+							"deferRender": true,
+							"processing": true,
+							"ordering": false,
+							"columnDefs": [
+    							{ "orderable": true, "targets": 0 }
+  							]
+						}
+					);
+			}	
 
 			// Extended features table with grouping
 			$('#extended_features').dataTable(
@@ -300,6 +324,7 @@
 			);							
 					
 			// Collapsible format flags
+			/*
 			var table = $('#deviceformats').DataTable();
 			table.columns(5).visible(false);
 			table.columns(6).visible(false);
@@ -323,7 +348,8 @@
 					row.child( formatFlags(row.data()) ).show();
 					tr.addClass('shown');
 				}
-			} );			
+			} );
+			*/
 			
 			// Collapsible layer extensions
 			var table = $('#devicelayers').DataTable();
@@ -441,6 +467,9 @@
 				}
 				if ((a === '#properties_core') || (a === '#properties_extensions')) {
 					$('.nav a[href=\\#properties]').tab('show');
+				}
+				if ((a === '#formats_linear') || (a === '#formats_optimal') || (a === '#formats_buffer')) {
+					$('.nav a[href=\\#formats]').tab('show');
 				}
 				$('.nav a[href=\\'+a+']').tab('show');
 			}
