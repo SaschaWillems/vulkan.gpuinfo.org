@@ -132,7 +132,7 @@
 	echo "</div>";	
 	
 	// Formats
-	echo "<div id='formats' class='tab-pane fade reportdiv' style='padding-right: 140px;'>";
+	echo "<div id='formats' class='tab-pane fade reportdiv'>";
 	include './displayreport_formats.php';		
 	echo "</div>";		
 				

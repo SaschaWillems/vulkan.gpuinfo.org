@@ -62,7 +62,7 @@
 					$supported = ($format[$column] > 0);
 					$class = $supported ? 'default' : 'format-unsupported';
 					echo "<tr>";
-					echo "<td class='subkey' style='text-align: left;'><span class='$class'>".$format["format"]."</span></td>";
+					echo "<td class='format-name'><span class='$class'>".$format["format"]."</span></td>";
 					foreach($flags as $flag_enum => $flag_name) {
 						echo "<td class='format-table-support'>";
 						if ($format[$column] & $flag_enum) {

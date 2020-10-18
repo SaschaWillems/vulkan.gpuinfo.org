@@ -507,7 +507,7 @@ h1 {
 }
 
 .table-header-rotated th.rotate-45{
-	height: 160px;
+	height: 240px;
 	width: 40px;
 	min-width: 40px;
 	max-width: 40px;
@@ -522,13 +522,13 @@ h1 {
 .table-header-rotated th.rotate-45 > div{
 	position: relative;
 	top: 0px;
-	left: 80px;
+	/* left: 80px; */
 	height: 100%;
-	-ms-transform:skew(-45deg,0deg);
+	/* -ms-transform:skew(-45deg,0deg);
 	-moz-transform:skew(-45deg,0deg);
 	-webkit-transform:skew(-45deg,0deg);
 	-o-transform:skew(-45deg,0deg);
-	transform:skew(-45deg,0deg);
+	transform:skew(-45deg,0deg); */
 	overflow: hidden;
 	border-left: 1px solid rgb(221, 221, 221);
 	border-right: 1px solid rgb(221, 221, 221);
@@ -537,17 +537,17 @@ h1 {
 }
 
 .table-header-rotated th.rotate-45 span {
-	-ms-transform:skew(45deg,0deg) rotate(315deg);
-	-moz-transform:skew(45deg,0deg) rotate(315deg);
-	-webkit-transform:skew(45deg,0deg) rotate(315deg);
-	-o-transform:skew(45deg,0deg) rotate(315deg);
-	transform:skew(45deg,0deg) rotate(315deg);
+	-ms-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	transform: rotate(-90deg);
 	position: absolute;
-	bottom: 30px;
-	left: -24px;
+	bottom: 20px;
+	/* left: -24px; */
 	display: inline-block;
 	width: 100%;
-	width: 85px;
+	/* width: 85px; */
 	text-align: left;
 }
 
@@ -558,8 +558,9 @@ h1 {
 	border-top: 0px;
 }
 
-.format-table .subkey { 
+.format-table .format-name { 
 	border-left-width: 1px !important;
+	text-align: left;
 }
 
 
