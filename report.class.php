@@ -225,4 +225,43 @@
             }            
         }
 
+        public function fetchSurfaceProperties()
+        {
+            try {
+                $sql = "SELECT * from devicesurfacecapabilities where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
+        public function fetchSurfaceFormats()
+        {
+            try {
+                $sql = "SELECT VkFormat(format) as format, colorspace from devicesurfaceformats where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
+        public function fetchSurfacePresentModes()
+        {
+            try {
+                $sql = "SELECT presentmode from devicesurfacemodes where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
     }

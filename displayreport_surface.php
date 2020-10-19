@@ -37,41 +37,30 @@
 				</tr>
 			</thead>
 			<tbody>
-<?php	
-                try {
-                    $stmnt = DB::$connection->prepare("SELECT * from devicesurfacecapabilities where reportid = :reportid");
-                    $stmnt->execute(array(":reportid" => $reportID));
-                    while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-						for($i = 0; $i < count($row); $i++)
-						{			
-							$meta = $stmnt->getColumnMeta($i);
-							$fname = $meta["name"];  			
-							$value = $row[$i];
-							if ($fname == "reportid")
-								continue;
-							echo "<tr><td class='key'>".$fname."</td><td>";
-							if ($fname == "supportedUsageFlags") {
+			<?php			
+				$surface_properties = $report->fetchSurfaceProperties();
+				if ($surface_properties) {
+					foreach($surface_properties as $key => $value) {
+						if ($key == "reportid")
+							continue;
+						echo "<tr><td class='key'>".$key."</td><td>";
+						switch($key) {
+							case "supportedUsageFlags":
 								listFlags(getImageUsageFlags($value));
-								continue;
-							}
-							if ($fname == "supportedTransforms") {
+							break;
+							case "supportedTransforms":
 								listFlags(getSurfaceTransformFlags($value));
-								continue;
-							}
-							if ($fname == "supportedCompositeAlpha") {
+							break;
+							case "supportedCompositeAlpha":
 								listFlags(getCompositeAlphaFlags($value));
-								continue;
-							}		
-							//
-							echo $value;			
-							echo "</td></tr>\n";
-						}
-                    }
-                } catch (Exception $e) {
-                    die('Error while fetching report surface capabilities');
-                    DB::disconnect();
-				}				
-?>	
+							break;
+							default:
+								echo $value;
+							}
+						}			
+						echo "</td></tr>";
+					}
+			?>	
 			</tbody>
 		</table>
 	</div>
@@ -87,32 +76,18 @@
 				</tr>
 			</thead>
 			<tbody>
-<?php	
-                try {
-                    $stmnt = DB::$connection->prepare("SELECT VkFormat(format), colorspace from devicesurfaceformats where reportid = :reportid");
-					$stmnt->execute(array(":reportid" => $reportID));
-					$n = 0;					
-                    while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
+			<?php
+				$surface_formats = $report->fetchSurfaceFormats();
+				if ($surface_formats) {
+					foreach($surface_formats as $index => $surface_format) {
 						echo "<tr>";
-						echo "<td class='key'>".$n."</td>";
-						$n++;
-						for($i = 0; $i < count($row); $i++) {			
-							$meta = $stmnt->getColumnMeta($i);
-							$fname = $meta["name"];  		  			
-							$value = $row[$i];
-							if ($fname == "colorspace") {
-								echo "<td class='key'>".getColorSpace($value)."</td>\n";
-								continue;
-							}
-							echo "<td class='key'>".$value."</td>\n";
-						}				
+						echo "<td>$index</td>";
+						echo "<td>".$surface_format['format']."</td>";
+						echo "<td>".getColorSpace($surface_format['colorspace'])."</td>";
 						echo "</tr>";
-                    }
-                } catch (Exception $e) {
-                    die('Error while fetching report surface formats');
-                    DB::disconnect();
-				}		
-?>
+					}
+				}	
+			?>
 			</tbody>
 		</table>
 	</div>
