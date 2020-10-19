@@ -41,7 +41,7 @@
 					if ($key == 'count') {
 						$key = 'queueCount';
 					}
-					echo "<td style='width: 25%;'>$key</td>";
+					echo "<td style='width: 25%;' class='subkey'>$key</td>";
 					if ($key == 'flags') {
 						echo "<td>";
 						$flags = getQueueFlags($value);
