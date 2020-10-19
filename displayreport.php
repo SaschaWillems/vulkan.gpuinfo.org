@@ -175,8 +175,8 @@
 				'devicememoryheaps', 
 				'devicememorytypes', 
 				'devicesurfaceproperties',
-				'instanceextensions',
-				'instancelayers'
+				'deviceinstanceextensions',
+				'deviceinstancelayers'
 			];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
@@ -470,6 +470,9 @@
 				}
 				if ((a === '#formats_linear') || (a === '#formats_optimal') || (a === '#formats_buffer')) {
 					$('.nav a[href=\\#formats]').tab('show');
+				}
+				if ((a === '#instanceextensions') || (a === '#instancelayers')) {
+					$('.nav a[href=\\#instance]').tab('show');
 				}
 				$('.nav a[href=\\'+a+']').tab('show');
 			}

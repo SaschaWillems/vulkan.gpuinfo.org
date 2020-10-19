@@ -19,26 +19,24 @@
 		*
 	*/
 
-	$extensions = DB::$connection->prepare("SELECT e.name as name, ie.specversion as specversion from deviceinstanceextensions ie join instanceextensions e on ie.extensionid = e.id where reportid = :reportid");
-	$extensions->execute([":reportid" => $reportID]);	
-	$extCount = $extensions->rowCount();
+	$instance_extensions = $report->fetchInstanceExtensions();
+	$instance_extensions_count = $instance_extensions ? count($instance_extensions) : 0;
 
-	$layers = DB::$connection->prepare("SELECT il.name as name, dil.specversion as specversion, dil.implversion as implversion from deviceinstancelayers dil join instancelayers il on il.id = dil.layerid where reportid = :reportid");
-	$layers->execute([":reportid" => $reportID]);	
-	$layerCount = $layers->rowCount();
+	$instance_layers = $report->fetchInstanceLayers();
+	$instance_layers_count = $instance_layers ? count($instance_layers) : 0;
 
 ?>	
 	<div>
 		<ul class='nav nav-tabs nav-level1'>
-			<li class='active'><a data-toggle='tab' href='#tabinstanceextensions'>Extensions <span class='badge'><?php echo $extCount ?></span></a></li>
-			<li><a data-toggle='tab' href='#tabinstancelayers'>Layers <span class='badge'><?php echo $layerCount ?></span></a></li>
+			<li class='active'><a data-toggle='tab' href='#instanceextensions'>Extensions <span class='badge'><?php echo $instance_extensions_count ?></span></a></li>
+			<li><a data-toggle='tab' href='#instancelayers'>Layers <span class='badge'><?php echo $instance_layers_count ?></span></a></li>
 		</ul>
 	</div>
 
 	<div class = "tab-content">
 
-		<div id='tabinstanceextensions' class='tab-pane fade in active reportdiv'>
-			<table id='instanceextensions' class='table table-striped table-bordered table-hover reporttable'>
+		<div id='instanceextensions' class='tab-pane fade in active reportdiv'>
+			<table id='deviceinstanceextensions' class='table table-striped table-bordered table-hover reporttable'>
 				<thead>
 					<tr>
 						<td class='caption'>Extension</td>
@@ -47,8 +45,8 @@
 				</thead>
 				<tbody>
 					<?php	
-						if ($extCount > 0) { 
-							foreach ($extensions as $ext) {
+						if ($instance_extensions) { 
+							foreach ($instance_extensions as $ext) {
 								echo "<tr><td><a href='listreports.php?instanceextension=".$ext["name"]."'>".$ext["name"]."</a></td>";
 								echo "<td>".versionToString($ext["specversion"])."</td>";
 								echo "</tr>\n";
@@ -59,8 +57,8 @@
 			</table>
 		</div>
 
-		<div id='tabinstancelayers' class='tab-pane reportdiv'>
-			<table id='instancelayers' class='table table-striped table-bordered table-hover reporttable'>
+		<div id='instancelayers' class='tab-pane reportdiv'>
+			<table id='deviceinstancelayers' class='table table-striped table-bordered table-hover reporttable'>
 				<thead>
 					<tr>
 						<td class='caption'>Layername</td>
@@ -70,8 +68,8 @@
 				</thead>
 				<tbody>
 					<?php	
-						if ($layerCount > 0) { 
-							foreach ($layers as $layer) {
+						if ($instance_layers) { 
+							foreach ($instance_layers as $layer) {
 								echo "<tr><td><a href='listreports.php?instancelayer=".$layer["name"]."'>".$layer["name"]."</a></td>";
 								echo "<td>".versionToString($layer["specversion"])."</td>";
 								echo "<td>".versionToString($layer["implversion"])."</td>";

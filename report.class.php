@@ -198,4 +198,31 @@
             }
         }
 
+
+        public function fetchInstanceExtensions()
+        {
+            try {
+                $sql = "SELECT e.name as name, ie.specversion as specversion from deviceinstanceextensions ie join instanceextensions e on ie.extensionid = e.id where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
+        public function fetchInstanceLayers()
+        {
+            try {
+                $sql = "SELECT il.name as name, dil.specversion as specversion, dil.implversion as implversion from deviceinstancelayers dil join instancelayers il on il.id = dil.layerid where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
     }
