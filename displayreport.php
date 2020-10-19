@@ -169,7 +169,6 @@
 			var tableNames = [ 
 				'devicelimits', 
 				'deviceextensions', 
-				'devicelayers', 
 				'devicememory', 
 				'devicelayerextensions', 
 				'devicememoryheaps', 
@@ -321,57 +320,7 @@
 						});
 					}
 				}
-			);							
-					
-			// Collapsible format flags
-			/*
-			var table = $('#deviceformats').DataTable();
-			table.columns(5).visible(false);
-			table.columns(6).visible(false);
-			table.columns(7).visible(false);
-	
-			$('#deviceformats tbody').on('click', 'td.details-control', function () 
-			{
-				var tr = $(this).closest('tr');
-				var table = $('#deviceformats').DataTable();
-				var row = table.row( tr );
-		 
-				if ( row.child.isShown() ) 
-				{
-					// This row is already open - close it
-					row.child.hide();
-					tr.removeClass('shown');
-				}
-				else 
-				{
-					// Open this row
-					row.child( formatFlags(row.data()) ).show();
-					tr.addClass('shown');
-				}
-			} );
-			*/
-			
-			// Collapsible layer extensions
-			var table = $('#devicelayers').DataTable();
-			table.columns(4).visible(false);
-			$('#devicelayers tbody').on('click', 'td.details-control', function () 
-			{
-				var tr = $(this).closest('tr');
-				var table = $('#devicelayers').DataTable();
-				var row = table.row( tr );
-		 
-				if ( row.child.isShown() ) 
-				{
-					row.child.hide();
-					tr.removeClass('shown');
-				}
-				else 
-				{
-					// Open this row
-					row.child( layerExtensions(row.data()) ).show();
-					tr.addClass('shown');
-				}
-			} );						
+			);				
 					
 		} );	
 		
