@@ -198,6 +198,32 @@
             }
         }
 
+        public function fetchMemoryHeaps()
+        {
+            // Complex statement, as database design is missing a proper foreign key
+            try {
+                $sql = "SELECT id, flags, size from devicememoryheaps where reportid = :reportid order by id asc";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
+        public function fetchMemoryTypes($heap_index)
+        {
+            try {
+                $sql = "SELECT * from devicememorytypes where heapindex = :heapindex and reportid = :reportid order by id asc";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id, ":heapindex" => $heap_index]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
 
         public function fetchInstanceExtensions()
         {

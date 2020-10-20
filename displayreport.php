@@ -169,7 +169,6 @@
 			var tableNames = [ 
 				'devicelimits', 
 				'deviceextensions', 
-				'devicememory', 
 				'devicelayerextensions', 
 				'devicememoryheaps', 
 				'devicememorytypes', 
@@ -200,7 +199,8 @@
 				'devicefeatures_extensions',
 				'deviceproperties',
 				'deviceproperties_extensions',
-				'devicequeues'
+				'devicequeues',
+				'devicememory'
 			];
 
 			// Device properties table with grouping
@@ -408,9 +408,6 @@
 			if (a) 
 			{
 				// Nested tabs, need to show parent tab too
-				if ((a === '#memorytypes') || (a === '#memoryheaps')) {
-					$('.nav a[href=\\#memory]').tab('show');
-				}
 				if ((a === '#features_core') || (a === '#features_extensions')) {
 					$('.nav a[href=\\#features]').tab('show');
 				}
@@ -422,6 +419,9 @@
 				}
 				if ((a === '#instanceextensions') || (a === '#instancelayers')) {
 					$('.nav a[href=\\#instance]').tab('show');
+				}
+				if ((a === '#surfaceproperties') || (a === '#surfaceformats') || (a === '#presentmodes')) {
+					$('.nav a[href=\\#surface]').tab('show');
 				}
 				$('.nav a[href=\\'+a+']').tab('show');
 			}
