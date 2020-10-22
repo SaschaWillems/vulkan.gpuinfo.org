@@ -290,4 +290,45 @@
             }            
         }
 
+        public function fetchCoreFeatures($version)
+        {
+            $table = null;
+            switch($version) {
+                case '1.0':
+                    $table = 'devicefeatures';
+                break;
+                case '1.1':
+                    $table = 'devicefeatures11';
+                break;
+                case '1.2':
+                    $table = 'devicefeatures12';
+                break;
+            }
+            if (!$table) {
+                return null;
+            }
+            try {
+                $sql = "SELECT * from $table where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }        
+
+        public function fetchExtensionFeatures()
+        {
+            try {
+                $sql = "SELECT name, supported, extension from devicefeatures2 where reportid = :reportid order by extension asc";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
     }
