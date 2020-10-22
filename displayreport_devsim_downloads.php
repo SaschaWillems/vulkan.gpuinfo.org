@@ -19,14 +19,13 @@
 		*
     */
 		
-	if ($reportversion >= '1.4') {
+	if ($report->info->version >= '1.4') {
 		echo "<tr><td class='subkey'>";
 		echo "Device simulation layer JSON <span title=\"JSON files that can be used with LunarG's Vulkan device simulation layer\" class=\"hint\">[?]</span>";
 		echo "</td><td>";
-		echo "<a href=\"api/v2/devsim/getreport.php?id=".$reportID."\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Full JSON file</a>";
-		$portability_ext_present = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $reportID, ':extension' => 'VK_KHR_portability_subset']);
-		if ($portability_ext_present > 0) {			
-			echo "<br/><a href=\"api/v2/devsim/extension_json.php?id=".$reportID."&extension=VK_KHR_portability_subset\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Portability extension JSON file (VK_KHR_portability_subset)</a>";
+		echo "<a href=\"api/v2/devsim/getreport.php?id=".$report->id."\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Full JSON file</a>";
+		if ($report->flags->has_portability_extension) {
+			echo "<br/><a href=\"api/v2/devsim/extension_json.php?id=".$report->id."&extension=VK_KHR_portability_subset\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Portability extension JSON file (VK_KHR_portability_subset)</a>";
 		}
 		echo "</td><td>".$group."</td></tr>\n";		
 	}
