@@ -383,6 +383,10 @@ function platformname($ostype) {
 			return 'linux';
 		case 2:
 			return 'android';
+		case 3:
+			return 'macOS';
+		case 4:
+			return 'ios';
 	}
 	return null;
 }
