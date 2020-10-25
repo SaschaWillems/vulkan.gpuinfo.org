@@ -35,10 +35,10 @@
 					continue;
 				}
 				echo "<tr><td class='subkey'>$key</td>";
-				if (strpos($key, 'SampleCounts')) {
-					$sampleCountflags = getSampleCountFlags($value);						
+				if (strpos($key, 'SampleCounts')) {				
+					$sampleCountflags = getSampleCountFlags($value);
 					if (count($sampleCountflags) > 0) {
-						echo "<td>".implode(",", $sampleCountflags)."</td>";
+						echo "<td>".listSampleCountFlags($value)."</td>";
 					} else {
 						echo "<td><font color='red'>none</font></td>";
 					}

@@ -198,6 +198,24 @@ function listSubgroupStageFlags($flag)
 	return $res;
 }
 
+function listSampleCountFlags($value) {
+	$flags = [
+		0x0001 => '1',
+		0x0002 => '2',
+		0x0004 => '4',
+		0x0008 => '8',
+		0x0010 => '16',
+		0x0020 => '32',
+		0x0040 => '64',
+	];
+	$res = [];
+	foreach ($flags as $flag => $text) {
+		$class = (($value & $flag) == $flag) ? "supported" : "unsupported-grey";
+		$res[] = "<span class='".$class."'>$text</span>";
+	}
+	return implode(',', $res);
+}
+
 // Generate a simple ul/li list for the flags
 function listFlags($flags)
 {

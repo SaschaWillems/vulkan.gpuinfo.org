@@ -90,6 +90,10 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 	color:#cc0000;
 }
 
+.unsupported-grey {
+	color: #9b9b9b;
+}
+
 .reportdiv {
 	/*width:85%;*/
 	/*width:85%;*/
