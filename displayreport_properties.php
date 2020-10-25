@@ -22,9 +22,9 @@
 
 <?php
 	function insertCoreProperties($report, $version) {
-		$features = $report->fetchCoreProperties($version);
-		if ($features) {
-			foreach($features as $key => $value) {
+		$core_properties = $report->fetchCoreProperties($version);
+		if ($core_properties) {
+			foreach($core_properties as $key => $value) {
 				if ($key == 'reportid') { continue; }
 				$displayvalue = getPropertyDisplayValue($key, $value);
 				echo "<tr><td class='subkey'>$key</td>";
@@ -35,13 +35,12 @@
 		}
 	}
 
-	function insertExtensionProperties($reportid) {
-		try {
-			$stmnt = DB::$connection->prepare("SELECT name, value, extension from deviceproperties2 where reportid = :reportid");
-			$stmnt->execute(array(":reportid" => $reportid));
-			while($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-				$key = $row[0];
-				$value = $row[1];
+	function insertExtensionProperties($report) {
+		$extension_properties = $report->fetchExtensionProperties();
+		if ($extension_properties) {
+			foreach ($extension_properties as $extension_property) {
+				$key = $extension_property['name'];
+				$value = $extension_property['value'];
 				$displayvalue = $value;
 				if (is_string($value) && substr($value, 0, 2) == "a:") {
 					$arr = unserialize($value);
@@ -51,12 +50,9 @@
 				}
 				echo "<tr><td class='subkey'>$key</td><td>";					
 				echo $displayvalue;
-				echo "<td>".$row[2]."</td>";
-				echo "</td></tr>\n";
-				}
-		} catch (Exception $e) {
-			die('Error while fetching report extended features');
-			DB::disconnect();
+				echo "<td>".$extension_property['extension']."</td>";
+				echo "</td></tr>";
+			}
 		}
 	}
 
@@ -111,9 +107,7 @@
 			</thead>
 			<tbody>
 			<?php
-			if ($report->flags->has_extended_properties) {
-				insertExtensionProperties($reportID);
-			}
+				insertExtensionProperties($report);
 			?>
 			</tbody>
 		</table>

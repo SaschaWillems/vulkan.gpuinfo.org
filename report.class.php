@@ -369,4 +369,17 @@
             }      
         }
 
+        public function fetchExtensionProperties()
+        {
+            try {
+                $sql = "SELECT name, value, extension from deviceproperties2 where reportid = :reportid order by name asc";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }        
+
     }
