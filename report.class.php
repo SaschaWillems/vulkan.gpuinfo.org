@@ -331,4 +331,42 @@
             }            
         }
 
+        public function fetchCoreProperties($version)
+        {
+            $table = null;
+            $columns = "*";
+            switch($version) {
+                case '1.0':
+                    $table = 'deviceproperties';
+                    $columns = "residencyAlignedMipSize,
+                    residencyNonResidentStrict, 
+                    residencyStandard2DBlockShape, 
+                    residencyStandard2DMultisampleBlockShape, 
+                    residencyStandard3DBlockShape,
+                    `subgroupProperties.subgroupSize`,
+                    `subgroupProperties.supportedStages`,
+                    `subgroupProperties.supportedOperations`,
+                    `subgroupProperties.quadOperationsInAllStages`";
+                break;
+                case '1.1':
+                    $table = 'deviceproperties11';
+                break;
+                case '1.2':
+                    $table = 'deviceproperties12';
+                break;
+            }
+            if (!$table) {
+                return null;
+            }
+            try {
+                $sql = "SELECT $columns from $table where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }      
+        }
+
     }
