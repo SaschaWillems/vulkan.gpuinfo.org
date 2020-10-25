@@ -77,7 +77,7 @@
             $stmnt->execute([':reportid' => $this->id]);
             $row = $stmnt->fetch(PDO::FETCH_ASSOC);
             $this->info->version = $row['reportversion'];
-            if (strpos($row['devicename'], $row['vendor']) === 0) {
+            if (($row['vendor']) && (strpos($row['devicename'], $row['vendor']) === 0)) {
                 // Don't include vendor name if it's already part of the device name
                 $this->info->device_description = $row['devicename'];
             } else {
