@@ -22,6 +22,7 @@
 	include './dbconfig.php';
 	include './header.inc';	
 	include './functions.php';	
+	include './report_compare.class.php';	
 
 	DB::connect();
 
@@ -64,6 +65,8 @@
 			}
 		}   
 	}
+
+	$report_compare = new ReportCompare($reportids);
 
 	// Compare from device list
 	if (isset($_REQUEST['devices'])) {
@@ -185,9 +188,7 @@
 		
 		<!-- Features -->
 		<div id='tab-features' class='tab-pane fade reportdiv'>
-			<table id='features' width='100%' class='table table-striped table-bordered table-hover'>			
-				<?php include 'compare_features.php'; ?>
-			</tbody></table>
+			<?php include 'compare_features.php'; ?>
 		</div>
 		
 		<!-- Limits  -->
@@ -261,7 +262,7 @@
 	<script>
 		$(document).ready(function() {
 		
-			var tableNames = ['features', 'limits', 'extensions', 'extended-features', 'extended-properties', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
+			var tableNames = ['limits', 'extensions', 'extended-features', 'extended-properties', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(
@@ -279,6 +280,48 @@
 						}
 					);
 			}		
+
+			// Grouped tables
+			tableNames = [
+				'comparefeatures'
+			];
+
+			// Device properties table with grouping
+			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
+			{
+					$('#'+tableNames[i]).dataTable(
+						{
+							"pageLength" : -1,
+							"paging" : false,
+							"order": [], 
+							"columnDefs": [
+								{ "visible": false, "targets": 1 }
+							],				
+							"searchHighlight": true,
+							"bAutoWidth": false,
+							"sDom": 'flpt',
+							"deferRender": true,
+							"processing": true,
+							"fixedHeader": {
+								"header": true,
+								"headerOffset": 50
+							},
+							"drawCallback": function (settings) {
+								var api = this.api();
+								var rows = api.rows( {page:'current'} ).nodes();
+								var last = null;
+								api.column(1, {page:'current'} ).data().each( function ( group, i ) {
+									if ( last !== group ) {
+										$(rows).eq( i ).before(
+											'<tr><td colspan="'+api.columns().header().length+'" class="group">'+group+'</td></tr>'
+										);
+										last = group;
+									}
+								});
+							}
+						}
+					);			
+			}			
 
 			// Device properties table with grouping
 			$('#devices').dataTable(

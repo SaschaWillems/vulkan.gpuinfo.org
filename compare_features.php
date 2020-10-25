@@ -18,100 +18,53 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-	
-	ReportCompare::insertTableHeader("Feature", $deviceinfo_data, count($reportids));
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
-	
-	$repids = implode(",", $reportids);   
-	
-	try {
-		$stmnt = DB::$connection->prepare(
-			"SELECT 
-				features.*
-			from reports r
-			left join
-				deviceproperties p on (p.reportid = r.id)
-			left join
-				devicefeatures features on (features.reportid = r.id)					
-			where r.id in (" . $repids . ")");
-			$stmnt->execute();
-	} catch (PDOException $e) {
-		die("Could not fetch device features!");
-	}	
 
-	$reportindex = 0;
+?>
+<table id='comparefeatures' width='100%' class='table table-striped table-bordered table-hover'>
+<?php
+
+	ReportCompare::insertTableHeader("Feature", $deviceinfo_data, count($reportids), true);
+	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids), "Device");
 	
-	// Gather data into array
-	$column    = array();
-	$captions  = array();
-	
-	while ($row = $stmnt->fetch(PDO::FETCH_NUM)) {
-		$colindex = 0;
-		$reportdata = array();		
-		
-		foreach ($row as $data) {
-			$meta = $stmnt->getColumnMeta($colindex);
-			$caption = $meta["name"];
-			if ($caption != "reportid") {
-				$reportdata[] = $data;	  
-				$captions[]   = $caption;
-			}									
-			
-			$colindex++;
-		} 
-		
-		$column[] = $reportdata; 
-		
-		$reportindex++;
+	// Gather values
+	$columns = [];
+	$captions = [];	
+	$compare_features = $report_compare->fetchFeatures();
+	foreach($compare_features as $index => $row) {
+		$reportdata = [];				
+		foreach ($row as $key => $data) {
+			if ($key == "reportid") { continue; }
+			$reportdata[] = $data;	  
+			if ($index == 0) {
+				$captions[] = $key;
+			}
+		} 	
+		$columns[] = $reportdata; 	
 	}   
 	
-	// Generate table from selected reports
-	$index = 1;  
-	for ($i = 0, $arrsize = sizeof($column[0]); $i < $arrsize; ++$i) { 	  
-		// Get min and max for this capability
-		if (is_numeric($column[0][$i])) {
-			
-			$minval = $column[0][$i];
-			$maxval = $column[0][$i];
-			
-			for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) {	 			
-				if ($column[$j][$i] < $minval) {
-					$minval = $column[$j][$i];
-				}
-				if ($column[$j][$i] > $maxval) {
-					$maxval = $column[$j][$i];
-				}
+	// Generate table
+	for ($i = 0; $i < count($columns[0]); $i++) { 	  
+		// Check of row contains differing values
+		$differing_values = false;
+		for ($j = 1; $j < sizeof($columns); $j++) {
+			if ($columns[$j][$i] !== $columns[0][$i]) {
+				$differing_values = true;
+				break;
 			}
-		}								
-		
-		// Report header
-		$fontStyle = ($minval < $maxval) ? "style='color:#FF0000;'" : "";					
-		$headerFields = array("device", "driverversion", "apiversion", "os");
-		if (!in_array($captions[$i], $headerFields)) {
-			$className = ($minval < $maxval) ? "" : "class='sameCaps'";
-		} else {
-			$className = "";
 		}
-		echo "<tr $className>\n";
-		echo "<td class='firstrow' $fontStyle>". $captions[$i] ."</td>\n";									
 		
-		// Values
-		for ($j = 0, $subarrsize = sizeof($column); $j < $subarrsize; ++$j) {	 
-			$fontstyle = '';
-			if ($column[$j][$i] < $maxval) {
-				$fontstyle = "style='color:#FF0000;'";
-			}
-
-			echo "<td>";
-			if (in_array($captions[$i], $headerFields)) {
-				echo $column[$j][$i];				
-			} else {
-				// Features are bool only
-				echo ($column[$j][$i] == 1) ? "<font color='green'>true</font>" : "<font color='red'>false</font>";
-			}
-			echo "</td>";			
-		} 
-		echo "</tr>\n";
-		$index++;
+		$row_class = "";
+		if (!$report_compare->isHeaderColumn($captions[$i])) {
+			$row_class = $differing_values ? "" : "class='sameCaps'";
+		};
+		echo "<tr $row_class>";
+		echo "<td class='subkey'>".($differing_values ? $report_compare->getDiffIcon() : "").$captions[$i] ."</td>";
+		echo "<td>Vulkan Core 1.0</td>";		
+		for ($j = 0; $j < count($columns); $j++) {	 
+			echo "<td>".displayBool($columns[$j][$i])."</td>";
+		}
+		echo "</tr>";
 	}   
 ?>
+	</tbody>
+</table>
