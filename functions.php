@@ -509,8 +509,100 @@ function UUIDtoString($uuid) {
 }
 
 function displayBool($value) {
+	if (($value == 'true') || ($value == 'false')) {
+		$class = (strtolower($value) == 'true') ? 'supported' : 'unsupported';
+		return "<span class='$class'>$value</span>";
+	}
 	return ($value == 1) ? "<span class='supported'>true</span>" : "<span class='unsupported'>false</span>";
 }
 
-
+/**
+ * Visualize certain properties (e.g. flags) in a more readable way
+ */
+function getPropertyDisplayValue($key, $value) {
+	$displayvalue = $value;
+	switch($key) {
+		// Core 1.0
+		case 'residencyAlignedMipSize':
+		case 'residencyNonResidentStrict':
+		case 'residencyStandard2DBlockShape':
+		case 'residencyStandard2DMultisampleBlockShape':
+		case 'residencyStandard3DBlockShape':
+		case 'subgroupProperties.quadOperationsInAllStages':
+			$displayvalue = displayBool($value);
+		break;
+		case 'subgroupProperties.supportedOperations':
+			$displayvalue = listSubgroupFeatureFlags($value);
+		break;
+		case 'subgroupProperties.supportedStages':
+			$displayvalue = listSubgroupStageFlags($value);
+		break;
+		// Core 1.1
+		case 'deviceUUID':
+		case 'driverUUID': 
+		case 'deviceLUID':
+			$displayvalue = UUIDtoString($value);
+		break;
+		case 'deviceLUIDValid':
+		case 'subgroupQuadOperationsInAllStages':
+		case 'protectedNoFault':
+			$displayvalue = displayBool($value);
+		break;
+		case 'subgroupSupportedStages':
+			$displayvalue = listSubgroupStageFlags($value);
+		break;
+		case 'subgroupSupportedOperations':
+			$displayvalue = listSubgroupFeatureFlags($value);
+		break;
+		// Core 1.2
+		case 'shaderSignedZeroInfNanPreserveFloat16':
+		case 'shaderSignedZeroInfNanPreserveFloat32':
+		case 'shaderSignedZeroInfNanPreserveFloat64':
+		case 'shaderDenormPreserveFloat16':
+		case 'shaderDenormPreserveFloat32':
+		case 'shaderDenormPreserveFloat64':
+		case 'shaderDenormFlushToZeroFloat16':
+		case 'shaderDenormFlushToZeroFloat32':
+		case 'shaderDenormFlushToZeroFloat64':
+		case 'shaderRoundingModeRTEFloat16':
+		case 'shaderRoundingModeRTEFloat32':
+		case 'shaderRoundingModeRTEFloat64':
+		case 'shaderRoundingModeRTZFloat16':
+		case 'shaderRoundingModeRTZFloat32':
+		case 'shaderRoundingModeRTZFloat64':
+		case 'shaderUniformBufferArrayNonUniformIndexingNative':
+		case 'shaderSampledImageArrayNonUniformIndexingNative':
+		case 'shaderStorageBufferArrayNonUniformIndexingNative':
+		case 'shaderStorageImageArrayNonUniformIndexingNative':
+		case 'shaderInputAttachmentArrayNonUniformIndexingNative':
+		case 'robustBufferAccessUpdateAfterBind':
+		case 'quadDivergentImplicitLod':
+		case 'independentResolveNone':
+		case 'independentResolve':
+		case 'filterMinmaxSingleComponentFormats':
+		case 'filterMinmaxImageComponentMapping':
+			$displayvalue = displayBool($value);
+		break;
+		case 'framebufferIntegerColorSampleCounts':
+			$displayvalue = listSampleCountFlags($value);
+		break;
+		case 'supportedDepthResolveModes':
+		case 'supportedStencilResolveModes':
+			$displayvalue = listResolveModeFlags($value);
+		break;
+		case 'denormBehaviorIndependence':
+		case 'roundingModeIndependence':
+			$displayvalue = getShaderFloatControlsIndependence($value);
+		break;
+		// Extensions
+		case 'sampleLocationSampleCounts':
+			$displayvalue = listSampleCountFlags($value);
+		break;
+		default:
+			if (($value == 'true') || ($value == 'false')) {
+				$displayvalue = displayBool($value);
+			};
+	}
+	return $displayvalue;
+}
 ?>
