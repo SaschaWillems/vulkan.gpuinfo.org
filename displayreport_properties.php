@@ -25,6 +25,8 @@
 		$features = $report->fetchCoreProperties($version);
 		if ($features) {
 			foreach($features as $key => $value) {
+				if ($key == 'reportid') { continue; }
+				/*
 				if ($version == '1.0') {
 					if (strpos($key, 'residency') !== false) {
 						$class = ($value == 1) ? "supported" : "unsupported";
@@ -53,14 +55,83 @@
 					echo "<tr><td class='subkey'>".$key."</td><td>".$value."</td><td>Vulkan Core $version</td></tr>";
 					continue;					
 				}
+				*/
 				$displayvalue = $value;
-				if (in_array($key, ['deviceUUID', 'driverUUID', 'deviceLUID'])) {
-					$arr = unserialize($value);
-					foreach ($arr as &$val) {
-						$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
-					}
-					$displayvalue = implode($arr);
-				}		
+				// Mappings
+				switch($key) {
+					// Core 1.0
+					case 'residencyAlignedMipSize':
+					case 'residencyNonResidentStrict':
+					case 'residencyStandard2DBlockShape':
+					case 'residencyStandard2DMultisampleBlockShape':
+					case 'residencyStandard3DBlockShape':
+					case 'subgroupProperties.quadOperationsInAllStages':
+						$displayvalue = displayBool($value);
+					break;
+					case 'subgroupProperties.supportedOperations':
+						$displayvalue = listSubgroupFeatureFlags($value);
+					break;
+					case 'subgroupProperties.supportedStages':
+						$displayvalue = listSubgroupStageFlags($value);
+					break;
+					// Core 1.1
+					case 'deviceUUID':
+					case 'driverUUID': 
+					case 'deviceLUID':
+						$displayvalue = UUIDtoString($value);
+					break;
+					case 'deviceLUIDValid':
+					case 'subgroupQuadOperationsInAllStages':
+					case 'protectedNoFault':
+						$displayvalue = displayBool($value);
+					break;
+					case 'subgroupSupportedStages':
+						$displayvalue = listSubgroupStageFlags($value);
+					break;
+					case 'subgroupSupportedOperations':
+						$displayvalue = listSubgroupFeatureFlags($value);
+					break;
+					// Core 1.2
+					case 'shaderSignedZeroInfNanPreserveFloat16':
+					case 'shaderSignedZeroInfNanPreserveFloat32':
+					case 'shaderSignedZeroInfNanPreserveFloat64':
+					case 'shaderDenormPreserveFloat16':
+					case 'shaderDenormPreserveFloat32':
+					case 'shaderDenormPreserveFloat64':
+					case 'shaderDenormFlushToZeroFloat16':
+					case 'shaderDenormFlushToZeroFloat32':
+					case 'shaderDenormFlushToZeroFloat64':
+					case 'shaderRoundingModeRTEFloat16':
+					case 'shaderRoundingModeRTEFloat32':
+					case 'shaderRoundingModeRTEFloat64':
+					case 'shaderRoundingModeRTZFloat16':
+					case 'shaderRoundingModeRTZFloat32':
+					case 'shaderRoundingModeRTZFloat64':
+					case 'shaderUniformBufferArrayNonUniformIndexingNative':
+					case 'shaderSampledImageArrayNonUniformIndexingNative':
+					case 'shaderStorageBufferArrayNonUniformIndexingNative':
+					case 'shaderStorageImageArrayNonUniformIndexingNative':
+					case 'shaderInputAttachmentArrayNonUniformIndexingNative':
+					case 'robustBufferAccessUpdateAfterBind':
+					case 'quadDivergentImplicitLod':
+					case 'independentResolveNone':
+					case 'independentResolve':
+					case 'filterMinmaxSingleComponentFormats':
+					case 'filterMinmaxImageComponentMapping':
+						$displayvalue = displayBool($value);
+					break;
+					case 'framebufferIntegerColorSampleCounts':
+						$displayvalue = listSampleCountFlags($value);
+					break;
+					case 'supportedDepthResolveModes':
+					case 'supportedStencilResolveModes':
+						$displayvalue = listResolveModeFlags($value);
+					break;
+					case 'denormBehaviorIndependence':
+					case 'roundingModeIndependence':
+						$displayvalue = getShaderFloatControlsIndependence($value);
+					break;
+				}
 				echo "<tr><td class='subkey'>$key</td>";
 				echo "<td>$displayvalue</td>";
 				echo "<td>Vulkan Core $version</td>";

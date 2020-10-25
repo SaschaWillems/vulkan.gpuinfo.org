@@ -213,7 +213,22 @@ function listSampleCountFlags($value) {
 		$class = (($value & $flag) == $flag) ? "supported" : "unsupported-grey";
 		$res[] = "<span class='".$class."'>$text</span>";
 	}
-	return implode(',', $res);
+	return implode(', ', $res);
+}
+
+function listResolveModeFlags($value) {
+	$flags = [
+		0x0001 => 'Zero',
+		0x0002 => 'Average',
+		0x0004 => 'Minimum',
+		0x0008 => 'Maximum',
+	];
+	$res = [];
+	foreach ($flags as $flag => $text) {
+		$class = (($value & $flag) == $flag) ? "supported" : "unsupported-grey";
+		$res[] = "<span class='".$class."'>$text</span>";
+	}
+	return implode(', ', $res);
 }
 
 // Generate a simple ul/li list for the flags
@@ -230,6 +245,16 @@ function listFlags($flags)
 	{
 		echo "none";
 	}
+}
+
+function getShaderFloatControlsIndependence($value)
+{
+	$values = [
+		'32-bit only' => 0,
+		'All bit widths' => 1,
+		'None' => 2,
+	];
+	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
 
 function getPresentMode($value)
@@ -482,5 +507,10 @@ function UUIDtoString($uuid) {
 		return null;
 	}
 }
+
+function displayBool($value) {
+	return ($value == 1) ? "<span class='supported'>true</span>" : "<span class='unsupported'>false</span>";
+}
+
 
 ?>
