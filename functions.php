@@ -315,6 +315,27 @@ function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 				($versionraw) & 0x3fff
 				);
 		}
+		// Imagination Technologies
+		if ($vendorid == 0x1010)
+		{
+			// For production drivers driverVersion is simply a monotonic integer
+			// changeset number that a driver release was built from, with each
+			// subsequent driver release comparing > than the previous.
+			//
+			// The VK_KHR_driver_properties driverInfo field provides more information
+			// such as the major/minor release branch, 1.10, 1.11. etc.
+			//
+			// Non-production builds are automatically given a made up version starting
+			// from 500,000,000 and can be ignored/formatted separately to not clash.
+			if ($versionraw > 500000000)
+			{
+				return sprintf("0.0.%d", $versionraw);
+			}
+			else
+			{
+				return sprintf("%d", $versionraw);
+			}
+		}
 		// Use Vulkan version conventions if vendor mapping is not available
 		return sprintf("%d.%d.%d",
 			($versionraw >> 22),
