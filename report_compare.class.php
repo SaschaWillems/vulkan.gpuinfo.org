@@ -126,30 +126,9 @@
         }
     
         /**
-         * Inserts the device identification rows and columns to a table (devicename, driver and api version)
-         */
-        // @todo: Deprecate
-        public static function insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, $count, $grouping_column = null)
-        {
-            for ($i = 1; $i < sizeof($deviceinfo_data[0]); ++$i) 
-            {
-                echo "<tr>";
-                echo "<td class='subkey'>".$deviceinfo_captions[$i]."</td>";
-                if ($grouping_column) {
-                    echo "<td>$grouping_column</td>";
-                }
-                for ($j = 0, $arrsize = $count; $j < $arrsize; ++$j) 				
-                {
-                    echo "<td class='deviceinfo'>".$deviceinfo_data[$j][$i]."</td>";
-                }
-                echo "</tr>";
-            }
-        }
-
-        /**
          * Insert device identification rows and columns into the current table
          */
-        public function insertDeviceInformation($grouping_column)
+        public function insertDeviceInformation($grouping_column = false)
         {            
             echo "<tr><td class='subkey'>Driver version</td>";
             if ($grouping_column) { echo "<td>$grouping_column</td>"; }
