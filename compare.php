@@ -163,9 +163,7 @@
 		
 		<!-- Limits  -->
 		<div id='tab-limits' class='tab-pane fade reportdiv'>
-			<table id='limits' width='100%' class='table table-striped table-bordered table-hover'>			
-				<?php include 'compare_limits.php'; ?>
-			</tbody></table>
+			<?php include 'compare_limits.php'; ?>
 		</div>
 		
 		<!-- Extensions -->
@@ -253,7 +251,8 @@
 
 			// Grouped tables
 			tableNames = [
-				'comparefeatures'
+				'comparefeatures',
+				'comparelimits'
 			];
 
 			// Device properties table with grouping

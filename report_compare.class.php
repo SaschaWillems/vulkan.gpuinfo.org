@@ -30,7 +30,7 @@
         public $has_vulkan_1_2_properties = false;
     }
 
-    class ReportDeviceInfo {
+    class ReportCompareDeviceInfo {
         public $name;
         public $driver_version;
         public $api_version;
@@ -39,11 +39,18 @@
         public $reportid;
     }
 
+    class ReportCompareData {
+        public $captions;
+        public $data;
+        public $count;
+    }
+
     class ReportCompare {
 
         private $header_column_names = ['device', 'driverversion', 'apiversion', 'os'];
         
         public $reports_ids = [];
+        public $report_count = 0;
         public ReportCompareFlags $flags;        
         public $device_infos = [];
 
@@ -52,6 +59,7 @@
             foreach($reportids as $id) {
                 $this->reports_ids[] = intval($id);
             }
+            $this->report_count = count($reportids);
             $this->flags = new ReportCompareFlags;
         }
 
@@ -90,7 +98,7 @@
                 die("Could not fetch report data!");
             }
             foreach($stmnt->fetchAll(PDO::FETCH_NUM) as $device) {
-                $device_info = new ReportDeviceInfo;
+                $device_info = new ReportCompareDeviceInfo;
                 $device_info->name = $device[0];
                 $device_info->driver_version = $device[1];
                 $device_info->api_version = $device[2];
@@ -150,17 +158,56 @@
             echo "</tr>";
         }
 
-        public function fetchFeatures() 
+        public function fetchFeatures()
         {
-            try {                
+            try {
                 $sql = "SELECT features.* from reports r left join deviceproperties p on (p.reportid = r.id) left join devicefeatures features on (features.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ")";
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute();
-                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                $result = new ReportCompareData;
+                foreach($rows as $index => $row) {
+                    $reportdata = [];				
+                    foreach ($row as $key => $values) {
+                        if ($key == "reportid") { continue; }
+                        $reportdata[] = $values;	  
+                        if ($index == 0) {
+                            $result->captions[] = $key;
+                        }
+                    } 	
+                    $result->data[] = $reportdata;
+                }                
+                $result->count = count($result->captions);
                 return $result;
             } catch (Throwable $e) {
-                return null;
-            }            
+                return [];
+            }
+        }
+
+        public function fetchLimits()
+        {
+            try {          
+                $sql = "SELECT limits.* from reports r left join deviceproperties p on (p.reportid = r.id) left join devicelimits limits on (limits.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ")";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute();
+                $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                $result = new ReportCompareData;
+                foreach($rows as $index => $row) {
+                    $reportdata = [];				
+                    foreach ($row as $key => $values) {
+                        if ($key == "reportid") { continue; }
+                        $reportdata[] = $values;	  
+                        if ($index == 0) {
+                            $result->captions[] = $key;
+                        }
+                    } 	
+                    $result->data[] = $reportdata;
+                }
+                $result->count = count($result->captions);
+                return $result;
+            } catch (Throwable $e) {
+                return [];
+            }
         }
 
         public function beginTable($id)

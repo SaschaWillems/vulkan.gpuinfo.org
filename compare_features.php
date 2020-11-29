@@ -24,40 +24,27 @@
 	$report_compare->insertDeviceInformation("Device");
 	
 	// Vulkan Core 1.0
-	$columns = [];
-	$captions = [];	
 	$compare_features = $report_compare->fetchFeatures();
-	foreach($compare_features as $index => $row) {
-		$reportdata = [];				
-		foreach ($row as $key => $data) {
-			if ($key == "reportid") { continue; }
-			$reportdata[] = $data;	  
-			if ($index == 0) {
-				$captions[] = $key;
-			}
-		} 	
-		$columns[] = $reportdata; 	
-	}   
 	
-	for ($i = 0; $i < count($columns[0]); $i++) { 	  
-		// Check of row contains differing values
+	for ($i = 0; $i < $compare_features->count; $i++) { 	  
+		// Check if row contains differing values
 		$differing_values = false;
-		for ($j = 1; $j < sizeof($columns); $j++) {
-			if ($columns[$j][$i] !== $columns[0][$i]) {
+		for ($j = 1; $j < count($compare_features->data); $j++) {
+			if ($compare_features->data[$j][$i] !== $compare_features->data[0][$i]) {
 				$differing_values = true;
 				break;
 			}
 		}
 		
 		$row_class = "";
-		if (!$report_compare->isHeaderColumn($captions[$i])) {
+		if (!$report_compare->isHeaderColumn($compare_features->captions[$i])) {
 			$row_class = $differing_values ? "" : "class='sameCaps'";
 		};
 		echo "<tr $row_class>";
-		echo "<td class='subkey'>".($differing_values ? $report_compare->getDiffIcon() : "").$captions[$i] ."</td>";
+		echo "<td class='subkey'>".($differing_values ? $report_compare->getDiffIcon() : "").$compare_features->captions[$i] ."</td>";
 		echo "<td>Vulkan Core 1.0</td>";		
-		for ($j = 0; $j < count($columns); $j++) {	 
-			echo "<td>".displayBool($columns[$j][$i])."</td>";
+		for ($j = 0; $j < count($compare_features->data); $j++) {	 
+			echo "<td>".displayBool($compare_features->data[$j][$i])."</td>";
 		}
 		echo "</tr>";
 	}
