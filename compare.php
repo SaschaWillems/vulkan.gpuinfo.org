@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -56,17 +56,15 @@
 			
 	// Compare from report list
 	if (isset($_REQUEST['id'])) {
-	foreach ($_REQUEST['id'] as $k => $v) {
+		foreach ($_REQUEST['id'] as $k => $v) {
 			$reportids[] = $k;	
 			// Limit to 8 reports
 			if (count($reportids) > 7) {
 				$reportlimit = true;	 
 				break; 
 			}
-		}   
+		}  
 	}
-
-	$report_compare = new ReportCompare($reportids);
 
 	// Compare from device list
 	if (isset($_REQUEST['devices'])) {
@@ -107,6 +105,9 @@
 		}
 	}
 
+	$report_compare = new ReportCompare($reportids);
+	$report_compare->fetchData();
+
 ?>
 	<div class='header'>
 		<h4 style='margin-left:10px;'>Comparing <?php count($reportids) ?> reports</h4>
@@ -121,38 +122,7 @@
 	echo "<center><div id='reportdiv'>";			
 	
 	sort($reportids, SORT_NUMERIC);
-		
-	// Gather device information (used in each compare table)
-	try {
-		$stmnt = DB::$connection->prepare(
-		"SELECT 
-			concat(VendorId(p.vendorid), ' ', p.devicename) as device,
-			concat(p.driverversion, ' (', p.apiversion, ')') as version,
-			concat(r.osname, ' ', r.osversion, ' (',  r.osarchitecture, ')') as os
-		from reports r
-		left join
-			deviceproperties p on (p.reportid = r.id)
-		where r.id in (" . implode(",", $reportids) . ")");
-		$stmnt->execute();
-	} catch (PDOException $e) {
-		die("Could not fetch report data!");
-	}
-	
-	$deviceinfo_captions = array();
-	$deviceinfo_data = array();
-	while($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-		$device_data = array();						
-		$colindex = 0;
-		foreach ($row as $data) {
-			$meta = $stmnt->getColumnMeta($colindex);
-			$caption = $meta["name"];
-			$device_data[] = $data;	  
-			$deviceinfo_captions[] = $caption;						
-			$colindex++;
-		} 					
-		$deviceinfo_data[] = $device_data; 					
-	}
-											
+												
 	// Header
 	$colspan = count($reportids) + 1;	
 
