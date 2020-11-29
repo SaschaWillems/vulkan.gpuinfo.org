@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -19,62 +19,27 @@
 		*
 	*/
 	
-	ReportCompare::insertTableHeader("Extension", $deviceinfo_data, count($reportids));
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+	$report_compare->beginTable("compareextensions");
+	$report_compare->insertTableHeader("Extension", true);
+	$report_compare->insertDeviceInformation("Device");
 
-	// Gather all extensions supported by at least one of the reports
-	try {
-		$stmnt = DB::$connection->prepare("SELECT distinct Name from deviceextensions 
-			left join extensions on extensions.ID = deviceextensions.extensionid 
-			where deviceextensions.ReportID in (" . $repids . ")");
-		$stmnt->execute();
-	} catch (PDOException $e) {
-		die("Could not fetch device extensions!");
-	}	
+	$compare_extensions = $report_compare->fetchExtensions();
 
-	$extcaption = array();
-	while($row = $stmnt->fetch(PDO::FETCH_NUM)) {	
-		foreach ($row as $data) {
-			$extcaption[] = $data;	  
-		}
-	}
-	
-	// Get extensions for each selected report into an array 
-	$extarray = array(); 
-	
-	foreach ($reportids as $repid) {
-		try {
-			$stmnt = DB::$connection->prepare("SELECT name from extensions left join deviceextensions on extensions.id = deviceextensions.extensionid where deviceextensions.reportId = :reportid");
-			$stmnt->execute(["reportid" => $repid]);
-		} catch (PDOException $e) {
-			die("Could not fetch device extension for single report!");
-		}	
-		$subarray = array();
-		while($row = $stmnt->fetch(PDO::FETCH_NUM)) {	
-			foreach ($row as $data) {
-				$subarray[] = $data;	  
-			}
-		}
-		$extarray[] = $subarray; 
-	}
-	
-	// Generate table
 	$colspan = count($reportids) + 1;	
-	
+
 	// Extension count 	
-	echo "<tr class='firstrow'><td class='firstrow'>Extension count</td>"; 
-	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i) { 	  
-		echo "<td class='valuezeroleftdark'>".count($extarray[$i])."</td>";
+	echo "<tr class='firstrow'><td class='subkey'>Supported extensions</td><td>Extension</td>"; 
+	for ($i = 0; $i < $report_compare->report_count; $i++) { 	  
+		echo "<td>".count($compare_extensions->data[$i])."</td>";
 	}
-	echo "</tr>"; 		
-	$rowindex++;
+	echo "</tr>";
 	
-	foreach ($extcaption as $extension) {		
-		// Check if missing it at least one report
+	foreach ($compare_extensions->captions as $extension) {		
+		// Check if missing in at least one report
 		$missing = false;
 		$index = 0;
 		foreach ($reportids as $repid) {
-			if (!in_array($extension, $extarray[$index])) {
+			if (!in_array($extension, $compare_extensions->data[$index])) {
 				$missing = true;
 			}
 			$index++;
@@ -87,22 +52,23 @@
 		$className = "same";
 		$index = 0;
 		foreach ($reportids as $repid) {
-			if (!in_array($extension, $extarray[$index])) { 
+			if (!in_array($extension, $compare_extensions->data[$index])) { 
 				$className = "diff";
 			}
 			$index++;
 		}
-		echo "<tr style='$add' class='$className'><td class='firstrow'>$extension</td>\n";		 
+		echo "<tr style='$add' class='$className'><td class='subkey'>$extension</td><td>Extension</td>";
 		$index = 0;
 		foreach ($reportids as $repid) {
-			if (in_array($extension, $extarray[$index])) { 
-				echo "<td class='valuezeroleftdark'><img src='icon_check.png' width=16px></td>";
+			if (in_array($extension, $compare_extensions->data[$index])) { 
+				echo "<td><img src='icon_check.png' width=16px></td>";
 				} else {
-				echo "<td class='valuezeroleftdark'><img src='icon_missing.png' width=16px></td>";
+				echo "<td><img src='icon_missing.png' width=16px></td>";
 			}	
 			$index++;
 		}  
-		$rowindex++;
 		echo "</tr>"; 
-	}	  
+	}
+
+	$report_compare->endTable();
 ?>

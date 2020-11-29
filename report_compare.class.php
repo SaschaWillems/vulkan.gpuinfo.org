@@ -210,6 +210,44 @@
             }
         }
 
+        public function fetchExtensions()
+        {
+            try {       
+                $result = new ReportCompareData;
+	            // Gather all extensions supported by at least one of the reports
+                $stmnt = DB::$connection->prepare("SELECT distinct Name from deviceextensions 
+                    left join extensions on extensions.ID = deviceextensions.extensionid 
+                    where deviceextensions.ReportID in (". $this->reportIdsParam().")");
+                $stmnt->execute();
+                $rows = $stmnt->fetchAll(PDO::FETCH_NUM);
+                foreach($rows as $row) {
+                    $result->captions[] = $row[0];
+                }
+
+                // Get extensions for each selected report              
+                foreach ($this->reports_ids as $report_id) {
+                    try {
+                        $stmnt = DB::$connection->prepare("SELECT name from extensions left join deviceextensions on extensions.id = deviceextensions.extensionid where deviceextensions.reportId = :reportid");
+                        $stmnt->execute(["reportid" => $report_id]);
+                    } catch (PDOException $e) {
+                        die("Could not fetch device extension for single report!");
+                    }	
+                    $report_extensions = [];
+                    while($row = $stmnt->fetch(PDO::FETCH_NUM)) {	
+                        foreach ($row as $extension) {
+                            $report_extensions[] = $extension;	  
+                        }
+                    }
+                    $result->data[] = $report_extensions; 
+                }
+                
+                $result->count = count($result->captions);
+                return $result;
+            } catch (Throwable $e) {
+                return [];
+            }
+        }        
+
         public function beginTable($id)
         {
             echo "<table id='$id' width='100%' class='table table-striped table-bordered table-hover'>";

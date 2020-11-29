@@ -168,9 +168,7 @@
 		
 		<!-- Extensions -->
 		<div id='tab-extensions' class='tab-pane fade reportdiv'>
-			<table id='extensions' width='100%' class='table table-striped table-bordered table-hover'>
-				<?php include 'compare_extensions.php'; ?>
-			</tbody></table>
+			<?php include 'compare_extensions.php'; ?>
 		</div>
 
 		<!-- Extended features -->
@@ -252,7 +250,8 @@
 			// Grouped tables
 			tableNames = [
 				'comparefeatures',
-				'comparelimits'
+				'comparelimits',
+				'compareextensions'
 			];
 
 			// Device properties table with grouping
