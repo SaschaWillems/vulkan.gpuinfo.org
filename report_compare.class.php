@@ -111,14 +111,17 @@
             return "<span class='glyphicon glyphicon-transfer' title='This value differs across reports' style='padding-right: 5px;'></span>";
         }
 
-        public static function insertTableHeader($caption, $deviceinfo_data, $count, $grouping_column = false) {
+        /**
+         * Insert table header with device names into the current table
+         */
+        public function insertTableHeader($caption, $grouping_column = false) {
             echo "<thead><tr><th>$caption</th>";
             if ($grouping_column) {
                 echo "<td class='caption'></td>";
             }
-            for ($i = 0; $i < $count; $i++) {
-                echo "<td class='caption'>".$deviceinfo_data[$i][0]."</td>";
-            }
+            foreach($this->device_infos as $device_info) {
+                echo "<td class='caption'>$device_info->name</td>";
+            }            
             echo "</th></thead><tbody>";
         }
     
@@ -151,19 +154,19 @@
             echo "<tr><td class='subkey'>Driver version</td>";
             if ($grouping_column) { echo "<td>$grouping_column</td>"; }
             foreach($this->device_infos as $device_info) {
-                echo "<td class='deviceinfo'>".$device_info->driver_version."</td>";
+                echo "<td>$device_info->driver_version</td>";
             }
             echo "</tr>";
             echo "<tr><td class='subkey'>API version</td>";
             if ($grouping_column) { echo "<td>$grouping_column</td>"; }
             foreach($this->device_infos as $device_info) {
-                echo "<td class='deviceinfo'>".$device_info->api_version."</td>";
+                echo "<td>$device_info->api_version</td>";
             }
             echo "</tr>";
             echo "<tr><td class='subkey'>Platform</td>";
             if ($grouping_column) { echo "<td>$grouping_column</td>"; }
             foreach($this->device_infos as $device_info) {
-                echo "<td class='deviceinfo'>".$device_info->platform."</td>";
+                echo "<td>$device_info->platform</td>";
             }
             echo "</tr>";
         }
