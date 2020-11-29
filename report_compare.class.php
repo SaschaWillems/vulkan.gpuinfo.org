@@ -117,10 +117,10 @@
         public function insertTableHeader($caption, $grouping_column = false) {
             echo "<thead><tr><th>$caption</th>";
             if ($grouping_column) {
-                echo "<td class='caption'></td>";
+                echo "<th></th>";
             }
             foreach($this->device_infos as $device_info) {
-                echo "<td class='caption'>$device_info->name</td>";
+                echo "<th>$device_info->name</th>";
             }            
             echo "</th></thead><tbody>";
         }
@@ -161,6 +161,16 @@
             } catch (Throwable $e) {
                 return null;
             }            
+        }
+
+        public function beginTable()
+        {
+            echo "<table id='comparefeatures' width='100%' class='table table-striped table-bordered table-hover'>";
+        }
+
+        public function endTable()
+        {
+            echo "</tbody></table>";
         }
         
     }
