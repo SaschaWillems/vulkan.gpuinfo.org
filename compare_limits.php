@@ -23,7 +23,7 @@
 	$report_compare->insertTableHeader("Limit", true);
 	$report_compare->insertDeviceInformation("Device");
 
-	$compare_limits = $report_compare->fetchLimits($compare_limits->captions, $compare_limits->data);
+	$compare_limits = $report_compare->fetchLimits();
 	
 	// Generate table from selected reports
 	for ($i = 0; $i < $compare_limits->count; $i++) {  
