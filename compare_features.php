@@ -19,7 +19,7 @@
 		*
 	*/
 
-	$report_compare->beginTable();
+	$report_compare->beginTable("comparefeatures");
 	$report_compare->insertTableHeader("Feature", true);
 	$report_compare->insertDeviceInformation("Device");
 	

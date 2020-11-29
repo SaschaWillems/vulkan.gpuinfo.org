@@ -163,9 +163,9 @@
             }            
         }
 
-        public function beginTable()
+        public function beginTable($id)
         {
-            echo "<table id='comparefeatures' width='100%' class='table table-striped table-bordered table-hover'>";
+            echo "<table id='$id' width='100%' class='table table-striped table-bordered table-hover'>";
         }
 
         public function endTable()
