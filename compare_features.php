@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -19,14 +19,11 @@
 		*
 	*/
 
-?>
-<table id='comparefeatures' width='100%' class='table table-striped table-bordered table-hover'>
-<?php
-
-	ReportCompare::insertTableHeader("Feature", $deviceinfo_data, count($reportids), true);
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids), "Device");
+	$report_compare->beginTable();
+	$report_compare->insertTableHeader("Feature", true);
+	$report_compare->insertDeviceInformation("Device");
 	
-	// Gather values
+	// Vulkan Core 1.0
 	$columns = [];
 	$captions = [];	
 	$compare_features = $report_compare->fetchFeatures();
@@ -42,7 +39,6 @@
 		$columns[] = $reportdata; 	
 	}   
 	
-	// Generate table
 	for ($i = 0; $i < count($columns[0]); $i++) { 	  
 		// Check of row contains differing values
 		$differing_values = false;
@@ -64,7 +60,9 @@
 			echo "<td>".displayBool($columns[$j][$i])."</td>";
 		}
 		echo "</tr>";
-	}   
+	}
+
+	// @todo: Display additional core features if at least one report supports them
+
+	$report_compare->endTable();
 ?>
-	</tbody>
-</table>
