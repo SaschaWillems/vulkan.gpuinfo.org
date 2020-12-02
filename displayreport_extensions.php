@@ -32,7 +32,7 @@
 		if ($data) {
 			foreach($data as $extension) {
 				$link = "listdevicescoverage.php?extension=".$extension['name'].$linkplatform;
-				echo "<tr><td class='subkey'><a href='$link'>".$extension['name']."</a></td>";
+				echo "<tr><td><a href='$link'>".$extension['name']."</a></td>";
 				echo "<td>".versionToString($extension['specversion'])."</td>";
 				echo "</tr>";
 			}

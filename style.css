@@ -110,7 +110,12 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 .nav-level1 {
     margin-left: -41px;
     margin-right: -41px;
-    margin-top: -36px;	
+	margin-top: -26px;
+	text-align: left !important;
+}
+
+.nav-level1 > li:first-child {
+    margin-left: 25px;
 }
 
 .nav-tabs > li, .nav-pills > li {
@@ -551,7 +556,7 @@ h1 {
 
 .format-table {
 	table-layout: fixed !important;
-	width: auto;
+	/*width: auto; */
 	border-left: 0px;
 	border-top: 0px;
 }
@@ -561,8 +566,27 @@ h1 {
 	text-align: left;
 }
 
-
 .format-table-support {
+	width: 40px !important;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	vertical-align: middle !important;
+}
+
+.queue-family-table {
+	table-layout: fixed !important;
+	/*width: auto; */
+	border-left: 0px;
+	border-top: 0px;
+}
+
+.queue-family-table .queue-family-name {
+	border-left-width: 1px !important;
+	text-align: left;
+}
+
+
+.rotated-table-column {
 	width: 40px !important;
 	padding-left: 0px !important;
 	padding-right: 0px !important;
@@ -571,4 +595,8 @@ h1 {
 
 .format-unsupported {
 	color: #9b9b9b;
+}
+
+.icon-pad-right {
+	padding-right: 5px;
 }

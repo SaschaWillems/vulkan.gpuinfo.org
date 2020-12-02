@@ -199,7 +199,6 @@
 				'devicefeatures_extensions',
 				'deviceproperties',
 				'deviceproperties_extensions',
-				'devicequeues',
 				'devicememory'
 			];
 
@@ -241,6 +240,7 @@
 				'deviceformats_linear',
 				'deviceformats_optimal',
 				'deviceformats_buffer',
+				'devicequeues'
 			];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
