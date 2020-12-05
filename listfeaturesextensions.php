@@ -84,11 +84,11 @@
 	
 						if ($stmnt->rowCount() > 0) { 
 							while ($feature = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-								$coverageLink = "listdevicescoverage.php?extensionname=".$feature['extension']."&extensionfeature=".$feature["name"]."&platform=$platform";
+								$coverageLink = "listdevicescoverage.php?extensionname=".$feature['extension']."&extensionfeature=".$feature['name']."&platform=$platform";
 								$coverage = round($feature['supporteddevices'] / $device_count * 100, 1);
 								echo "<tr>";
 								echo "<td>".$feature['extension']."</td>";
-								echo "<td>".$feature['name']."</td>";
+								echo "<td class='subkey'>".$feature['name']."</td>";
 								echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 								echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
 								echo "</tr>";
