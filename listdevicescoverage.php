@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database server implementation
 	 *	
-	 * Copyright (C) Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -72,6 +72,17 @@
 			:
 			"Listing first known driver version support for <b>".$_GET["feature"]."</b>";
 		$pageTitle = $_GET["feature"];
+	}
+
+	// Extension feature support
+	if (isset($_GET['extensionname']) && isset($_GET['extensionfeature'])) {
+		$ext_name = $_GET['extensionname'];
+		$ext_feature = $_GET['extensionfeature'];
+		$caption = $negate ? 
+			"Listing devices <span style='color:red;'>not</span> supporting <b>$ext_feature</b> ($ext_name)"
+			:
+			"Listing first known driver version support for <b>$ext_feature</b> ($ext_name)";
+		$pageTitle = $ext_feature;
 	}
 
 	if (isset($_GET['linearformat'])) {
@@ -151,7 +162,7 @@
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 
-	<div id='devices_div' class='tab-pane <?php if ($i == 0) { echo "fade in active"; } ?>'>
+	<div id='devices_div' class='tab-pane fade in active'>
 		<form method="get" action="compare.php">
 		<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 			<thead>
@@ -211,6 +222,8 @@
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
 						'devicename' : '<?php echo $_GET["devicename"] ?>',
 						'displayname' : '<?php echo $_GET["displayname"] ?>',
+						'extensionfeature_name': '<?=$_GET['extensionname']?>',
+						'extensionfeature_feature': '<?=$_GET['extensionfeature']?>',
 					}
 				},
 				error: function (xhr, error, thrown) {

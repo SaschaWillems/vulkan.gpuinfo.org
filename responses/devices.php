@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -101,6 +101,16 @@
 	    $feature = $_REQUEST['filter']['feature'];
         if ($feature != '') {
             $whereClause = "where r.devicename ".($negate ? "not" : "")." in (select r.devicename from reports r join devicefeatures df on df.reportid = r.id where df.$feature = 1)";
+        }    
+    }
+    // Extension features
+	if (isset($_REQUEST['filter']['extensionfeature_name']) && isset($_REQUEST['filter']['extensionfeature_feature'])) {
+	    $ext_name = $_REQUEST['filter']['extensionfeature_name'];
+	    $ext_feature = $_REQUEST['filter']['extensionfeature_feature'];
+        if (($ext_name != '') && ($ext_feature != '')) {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join devicefeatures2 df2 on df2.reportid = r.id where df2.extension = :filter_ext_name and df2.name = :filter_ext_feature and df2.supported = 1)";
+            $params['filter_ext_name'] = $ext_name;
+            $params['filter_ext_feature'] = $ext_feature;
         }    
     }
     // Submitter
