@@ -64,9 +64,9 @@
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Core
 							<span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a href="listfeatures.php">Features</a></li>
+								<li><a href="listfeatures.php">Features (1.0)</a></li>
+								<li><a href="list_properties_core.php">Properties (1.0)</a></li>
 								<li><a href="listlimits.php">Limits</a></li>
-								<li><a href="list_properties_core.php">Properties</a></li>
 							</ul>
 					</li>
 					<li class="dropdown">
