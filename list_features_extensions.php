@@ -38,9 +38,9 @@
 <center>
 	<div>
 		<ul class='nav nav-tabs'>
-			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='listfeaturesextensions.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='listfeaturesextensions.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='listfeaturesextensions.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+			<li <?php if ($platform == "windows") { echo "class='active'"; } ?>> <a href='list_features_extensions.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
+			<li <?php if ($platform == "linux")   { echo "class='active'"; } ?>> <a href='list_features_extensions.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
+			<li <?php if ($platform == "android") { echo "class='active'"; } ?>> <a href='list_features_extensions.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
 		</ul>
 	</div>
 
