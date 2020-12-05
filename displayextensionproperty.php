@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -79,7 +79,7 @@
 	</script>
 
 	<div class='header'>
-		<h4 class='headercaption'>Value distribution for <?php echo $name ?> (<?php echo $extname ?>)</h4>
+		<h4 class='headercaption'>Value distribution for <code><?=$name?></code> property of <code><?=$extname?></code></h4>
 	</div>
 
 	<center>	
