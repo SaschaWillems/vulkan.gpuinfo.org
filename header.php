@@ -69,6 +69,14 @@
 								<li><a href="listfeaturesextensions.php">Extensions</a></li>
 							</ul>
 					</li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties
+							<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="listproperties.php">Core 1.0</a></li>
+								<li><a href="listpropertiesextensions.php">Extensions</a></li>
+							</ul>
+					</li>					
 					<li><a href="listlimits.php">Limits</a></li>
 					<li><a href="listformats.php">Formats</a></li>
 					<li><a href="listmemory.php">Memory</a></li>
