@@ -28,7 +28,7 @@
 		$platform = $_GET['platform'];
 	}
 
-	PageGenerator::header("Features (extensions)");
+	PageGenerator::header("Extension features listing");
 ?>
 	
 <div class='header'>
