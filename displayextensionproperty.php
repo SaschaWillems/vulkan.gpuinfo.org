@@ -19,7 +19,7 @@
 		*
 	*/
 
-	include 'page_generator.php';
+	include 'page_generator.php';	
 	include 'dbconfig.php';	
 	
 	$name = null;
@@ -162,7 +162,7 @@
 	</script>
 
 	<?php 
-		include "footer.inc";
+		PageGenerator::footer();;
 	?>
 
 </body>
