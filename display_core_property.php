@@ -117,8 +117,15 @@
 					</thead>
 					<tbody>				
 						<?php		
-							DB::connect();			
-							$result = DB::$connection->prepare("SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 1");
+							DB::connect();
+							switch($name) {
+								case 'vendorid':
+									$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from deviceproperties $filter group by 1 order by 1";
+								break;
+								default:
+									$sql = "SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 1";
+							}
+							$result = DB::$connection->prepare($sql);
 							$result->execute();
 							$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 							foreach ($rows as $cap) {
@@ -146,7 +153,14 @@
 			['Value', 'Reports'],
 			<?php 
 				DB::connect();										
-				$result = DB::$connection->prepare("SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 2 desc");
+				switch($name) {
+					case 'vendorid':
+						$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from deviceproperties $filter group by 1 order by 2";
+					break;
+					default:
+						$sql = "SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 2";
+				}
+				$result = DB::$connection->prepare($sql);
 				$result->execute();
 				$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($rows as $row) {
