@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -32,9 +32,6 @@
 ?>
 
 <div class='header'>
-	<div class='alert alert-warning' role='alert' style='width:auto;'>
-		<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)
-	</div>
 	<?php echo "<h4>Surface format support on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>
 </div>		
 
