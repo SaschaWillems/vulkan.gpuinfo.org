@@ -102,9 +102,15 @@
 							$result->execute([":name" => $name]);
 							$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 							foreach ($rows as $group) {
+								$value = $group['value'];
+								// Some values are stored as serialized arrays and need to be unserialized
+								if (substr($value, 0, 2) == 'a:') {
+									$value = unserialize($value);
+									$value = '['.implode(',', $value).']';
+								}
 								$link ="listreports.php?extensionproperty=$name&value=".$group["value"];
 								echo "<tr>";						
-								echo "<td>".$group["value"]."</td>";
+								echo "<td>$value</td>";
 								echo "<td><a href='$link'>".$group["reports"]."</a></td>";
 								echo "</tr>";	    
 							}     
