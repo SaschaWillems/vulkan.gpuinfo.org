@@ -28,7 +28,7 @@
 		$platform = $_GET['platform'];
 	}
 
-	PageGenerator::header("Features");
+	PageGenerator::header("Core 1.0 properties");
 ?>
 	
 <div class='header'>
