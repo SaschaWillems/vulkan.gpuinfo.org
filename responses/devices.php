@@ -111,7 +111,17 @@
             $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join devicefeatures2 df2 on df2.reportid = r.id where df2.extension = :filter_ext_name and df2.name = :filter_ext_feature and df2.supported = 1)";
             $params['filter_ext_name'] = $ext_name;
             $params['filter_ext_feature'] = $ext_feature;
-        }    
+        }
+    }
+    // Extension properties
+	if (isset($_REQUEST['filter']['extensionproperty_name']) && isset($_REQUEST['filter']['extensionproperty_property'])) {
+	    $ext_name = $_REQUEST['filter']['extensionproperty_name'];
+	    $ext_property = $_REQUEST['filter']['extensionproperty_property'];
+        if (($ext_name != '') && ($ext_property != '')) {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join deviceproperties2 dp2 on dp2.reportid = r.id where dp2.extension = :filter_ext_name and dp2.name = :filter_ext_property and dp2.value = 'true')";
+            $params['filter_ext_name'] = $ext_name;
+            $params['filter_ext_property'] = $ext_property;
+        }
     }
     // Submitter
     if (isset($_REQUEST['filter']['submitter'])) {

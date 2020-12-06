@@ -78,12 +78,18 @@
 	if (isset($_GET['extensionname']) && isset($_GET['extensionfeature'])) {
 		$ext_name = $_GET['extensionname'];
 		$ext_feature = $_GET['extensionfeature'];
-		$caption = $negate ? 
-			"Listing devices <span style='color:red;'>not</span> supporting <b>$ext_feature</b> ($ext_name)"
-			:
-			"Listing first known driver version support for <b>$ext_feature</b> ($ext_name)";
+		$info = "<code>$ext_name ➞ $ext_property</code>";
+		$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 		$pageTitle = $ext_feature;
 	}
+	// Extension property support
+	if (isset($_GET['extensionname']) && isset($_GET['extensionproperty'])) {
+		$ext_name = $_GET['extensionname'];
+		$ext_property = $_GET['extensionproperty'];
+		$info = "<code>$ext_name ➞ $ext_property</code>";
+		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+		$pageTitle = $ext_property;
+	}	
 
 	if (isset($_GET['linearformat'])) {
 		$caption = $negate ?
@@ -224,6 +230,8 @@
 						'displayname' : '<?php echo $_GET["displayname"] ?>',
 						'extensionfeature_name': '<?=$_GET['extensionname']?>',
 						'extensionfeature_feature': '<?=$_GET['extensionfeature']?>',
+						'extensionproperty_name': '<?=$_GET['extensionname']?>',
+						'extensionproperty_property': '<?=$_GET['extensionproperty']?>',
 					}
 				},
 				error: function (xhr, error, thrown) {
