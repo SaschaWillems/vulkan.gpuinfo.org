@@ -19,7 +19,7 @@
 		*
 	*/
 
-	include 'header.inc';	
+	include 'page_generator.php';	
 	include 'dbconfig.php';	
 	
 	$name = null;
@@ -41,7 +41,9 @@
 				$filter = "where reportid in (select id from reports where osname not in ('windows', 'android', 'ios', 'osx'))";
 			}
 		}
-	}					
+	}
+
+	PageGenerator::header($name);
 
 	$totalCountWindows = 0;
 	$supportedCountWindows = 0;
@@ -220,7 +222,7 @@
 	</script>
 
 	<?php 
-		include "footer.inc";
+		PageGenerator::footer();;
 	?>
 
 </body>
