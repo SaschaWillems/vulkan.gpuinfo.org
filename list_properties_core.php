@@ -68,7 +68,9 @@
 					'headerversion',
 					'driverversionraw',
 					'pipelineCacheUUID',
-					'apiversionraw'
+					'apiversionraw',
+					'productManufacturer',
+					'productModel'
 				];
 				DB::connect();
 				try {
