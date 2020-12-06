@@ -129,13 +129,13 @@
 							$result->execute();
 							$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 							foreach ($rows as $cap) {
-								$link ="listreports.php?limit=$name&value=".$cap["value"].($platform ? "&platform=$platform" : "");
+								$link ="listreports.php?property=$name&value=".$cap["value"].($platform ? "&platform=$platform" : "");
 								echo "<tr>";						
 								echo "<td>".$cap["value"]."</td>";
 								echo "<td><a href='$link'>".$cap["reports"]."</a></td>";
 								echo "</tr>";	    
-							}     
-							DB::disconnect();       			
+							}
+							DB::disconnect();	
 						?>   					
 					</tbody>
 				</table> 

@@ -67,10 +67,8 @@
 	}
 
 	if (isset($_GET["feature"])) {
-		$caption = $negate ? 
-			"Listing devices <span style='color:red;'>not</span> supporting for <b>".$_GET["feature"]."</b>"
-			:
-			"Listing first known driver version support for <b>".$_GET["feature"]."</b>";
+		$info = "<code>".$_GET["feature"]."</code>";
+		$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting for $info" : "Listing first known driver version support for $info";
 		$pageTitle = $_GET["feature"];
 	}
 
