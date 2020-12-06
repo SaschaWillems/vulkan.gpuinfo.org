@@ -78,7 +78,7 @@
 	if (isset($_GET['extensionname']) && isset($_GET['extensionfeature'])) {
 		$ext_name = $_GET['extensionname'];
 		$ext_feature = $_GET['extensionfeature'];
-		$info = "<code>$ext_name ➞ $ext_property</code>";
+		$info = "<code>$ext_name ➞ $ext_feature</code>";
 		$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 		$pageTitle = $ext_feature;
 	}
