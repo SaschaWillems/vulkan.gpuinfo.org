@@ -66,7 +66,10 @@
 						$stmnt->execute(['ostype' => $os_type]);
 						$device_count = $stmnt->fetchColumn();
 	
-						$stmnt = DB::$connection->prepare("SELECT 
+						$stmnt = DB::$connection->prepare(
+							"SELECT extension, name, type, sum(supporteddevices) as supporteddevices FROM
+							(
+							SELECT 
 								extension,
 								name,
 								'coverage' as type,
@@ -78,8 +81,26 @@
 									JOIN
 								deviceproperties dp ON dp.reportid = r.id
 							WHERE
-								r.ostype = :ostype  and value in ('true', 'false')
+								r.ostype = :ostype and value = 'true'
 							GROUP BY extension , name
+							
+							UNION
+							
+							SELECT 
+								extension,
+								name,
+								'coverage' as type,
+								0 as supporteddevices
+							FROM
+								deviceproperties2 d2
+									JOIN
+								reports r ON d2.reportid = r.id
+									JOIN
+								deviceproperties dp ON dp.reportid = r.id
+							WHERE
+								r.ostype = :ostype and value = 'false'
+							GROUP BY extension , name
+							
 							
 							UNION
 							
@@ -97,7 +118,8 @@
 							WHERE
 								r.ostype = :ostype and value not in ('true', 'false')
 							GROUP BY extension , name
-							
+							) tbl
+							GROUP BY extension, name, type
 							ORDER BY extension ASC , name ASC");
 						$stmnt->execute(['ostype' => $os_type]);
 	
