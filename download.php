@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -32,24 +32,35 @@
 				The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">https://github.com/SaschaWillems/VulkanCapsViewer</a>.<br>
 			</div>
 			<div class="page-header">
-				<h3>Current stable release 2.21</h3>
+				<h3>Current stable release 2.23</h3>
 				<ul>
-					<li><a href="downloads/vulkancapsviewer_2_21_win64.zip">Windows x86-64 (zip)</a></li>
+					<li><a href="downloads/vulkancapsviewer_2_23_win64.zip">Windows x86-64 (zip)</a></li>
 					<li>Linux
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_2_21_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
-						<li><a href="downloads/vulkancapsviewer_2_21_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_2_23_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_2_23_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
 					</ul>
 					</li>
 					<li>Android
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_2_21_arm.apk">Android arm-v8 (apk)</a></li>
+						<li><a href="downloads/vulkancapsviewer_2_23_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
-					<li><a href="downloads/vulkancapsviewer_2_21_osx.dmg">Mac OSX (dmg)</a></li>
+					<li><a href="downloads/vulkancapsviewer_2_23_osx.dmg">Mac OSX (dmg)</a></li>
 				</ul>
 			</div>			
 			<div class="page-header">
 				<h3>Release notes</h3>
+				<h4>2.23 - 2020-11-23</h4>
+					<ul>
+						<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+							<ul>
+								<li>VK_KHR_acceleration_structure</li>
+								<li>VK_KHR_ray_tracing_pipeline</li>
+								<li>VK_KHR_ray_tracing</li>
+								<li>VK_KHR_ray_query</li>
+							</ul>
+						</li>
+					</ul>				
 				<h4>2.21 - 2020-09-26</h4>
 					<ul>
 						<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
