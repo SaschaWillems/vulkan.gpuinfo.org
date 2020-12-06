@@ -123,6 +123,14 @@
             $params['filter_ext_property'] = $ext_property;
         }
     }
+    // Core properties
+	if (isset($_REQUEST['filter']['coreproperty'])) {
+	    $property = $_REQUEST['filter']['coreproperty'];
+        if ($property != '') {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join deviceproperties dp on dp.reportid = r.id where dp.$property = 1)";
+            $params['filter_core_property'] = $property;
+        }
+    }
     // Submitter
     if (isset($_REQUEST['filter']['submitter'])) {
 	    $submitter = $_REQUEST['filter']['submitter'];

@@ -112,6 +112,7 @@
 						echo "<td>".$row[0]."</a></td>";
 						echo "<td class='text-center'>".($has_coverage ? 'Coverage' : 'Values')."</td>";
 						if ($has_coverage) {
+							$coverageLink = "listdevicescoverage.php?coreproperty=".$row[0]."&platform=$platform";
 							$coverage = round($supportedCounts[$row[0]] / $deviceCounts[$platform] * 100, 1);
 							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {

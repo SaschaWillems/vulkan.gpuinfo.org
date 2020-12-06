@@ -89,7 +89,14 @@
 		$info = "<code>$ext_name ➞ $ext_property</code>";
 		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 		$pageTitle = $ext_property;
-	}	
+	}
+	// Core property support
+	if (isset($_GET['coreproperty'])) {
+		$property = $_GET['coreproperty'];
+		$info = "<code>$property</code>";
+		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+		$pageTitle = $property;
+	}
 
 	if (isset($_GET['linearformat'])) {
 		$caption = $negate ?
@@ -232,6 +239,7 @@
 						'extensionfeature_feature': '<?=$_GET['extensionfeature']?>',
 						'extensionproperty_name': '<?=$_GET['extensionname']?>',
 						'extensionproperty_property': '<?=$_GET['extensionproperty']?>',
+						'coreproperty': '<?=$_GET['coreproperty']?>',
 					}
 				},
 				error: function (xhr, error, thrown) {
