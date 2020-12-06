@@ -136,7 +136,13 @@
 				$result->execute([":name" => $name]);
 				$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($rows as $row) {
-					echo "['".$row['value']."',".$row['reports']."],";
+					$value = $row['value'];
+					// Some values are stored as serialized arrays and need to be unserialized
+					if (substr($value, 0, 2) == 'a:') {
+						$value = unserialize($value);
+						$value = '['.implode(',', $value).']';
+					}					
+					echo "['$value',".$row['reports']."],";
 				}     
 				DB::disconnect();
 			?>		
