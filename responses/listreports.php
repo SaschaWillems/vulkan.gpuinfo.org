@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -179,18 +179,25 @@
         }
     }	    
     // Extension property    
-    if (isset($_REQUEST['filter']['extensionproperty']) && ($_REQUEST['filter']['extensionproperty'] != '')) {
+    if (isset($_REQUEST['filter']['extensionproperty']) && ($_REQUEST['filter']['extensionpropertyvalue'] != '')) {
         $extensionproperty = $_REQUEST['filter']['extensionproperty'];
         $extensionpropertyvalue =  $_REQUEST['filter']['extensionpropertyvalue'];
-        $whereClause = "where r.id in (select reportid from deviceproperties2 where name = :filter_extensionpropertyname and cast(value as char) = '".$extensionpropertyvalue."')";
-        $params['filter_extensionpropertyname'] = $extensionproperty;            
+        $whereClause = "where r.id in (select reportid from deviceproperties2 where name = :filter_extensionpropertyname and cast(value as char) = :filter_extensionpropertyvalue)";
+        $params['filter_extensionpropertyname'] = $extensionproperty;
+        $params['filter_extensionpropertyvalue'] = $extensionpropertyvalue;
     }
     // Extension feature    
     if (isset($_REQUEST['filter']['extensionfeature']) && ($_REQUEST['filter']['extensionfeature'] != '')) {
         $extensionfeature = $_REQUEST['filter']['extensionfeature'];
         $whereClause = "where r.id ".($negate ? "not" : "")." in (select reportid from devicefeatures2 where name = :filter_extensionfeaturename and supported = 1)";
         $params['filter_extensionfeaturename'] = $extensionfeature;            
-    }    
+    }
+    // Core property
+    if (isset($_REQUEST['filter']['coreproperty']) && ($_REQUEST['filter']['coreproperty'] != '')) {
+        $whereClause = "where r.id in (select reportid from deviceproperties where cast(`".$_REQUEST['filter']['coreproperty']."` as char) = :filter_corepropertyvalue)";
+        $params['filter_corepropertyvalue'] = $_REQUEST['filter']['corepropertyvalue'];            
+    }
+
     // Platform (os)
     if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
         $platform = $_REQUEST['filter']['platform'];

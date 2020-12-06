@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -102,6 +102,34 @@
         if ($feature != '') {
             $whereClause = "where r.devicename ".($negate ? "not" : "")." in (select r.devicename from reports r join devicefeatures df on df.reportid = r.id where df.$feature = 1)";
         }    
+    }
+    // Extension features
+	if (isset($_REQUEST['filter']['extensionfeature_name']) && isset($_REQUEST['filter']['extensionfeature_feature'])) {
+	    $ext_name = $_REQUEST['filter']['extensionfeature_name'];
+	    $ext_feature = $_REQUEST['filter']['extensionfeature_feature'];
+        if (($ext_name != '') && ($ext_feature != '')) {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join devicefeatures2 df2 on df2.reportid = r.id where df2.extension = :filter_ext_name and df2.name = :filter_ext_feature and df2.supported = 1)";
+            $params['filter_ext_name'] = $ext_name;
+            $params['filter_ext_feature'] = $ext_feature;
+        }
+    }
+    // Extension properties
+	if (isset($_REQUEST['filter']['extensionproperty_name']) && isset($_REQUEST['filter']['extensionproperty_property'])) {
+	    $ext_name = $_REQUEST['filter']['extensionproperty_name'];
+	    $ext_property = $_REQUEST['filter']['extensionproperty_property'];
+        if (($ext_name != '') && ($ext_property != '')) {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join deviceproperties2 dp2 on dp2.reportid = r.id where dp2.extension = :filter_ext_name and dp2.name = :filter_ext_property and dp2.value = 'true')";
+            $params['filter_ext_name'] = $ext_name;
+            $params['filter_ext_property'] = $ext_property;
+        }
+    }
+    // Core properties
+	if (isset($_REQUEST['filter']['coreproperty'])) {
+	    $property = $_REQUEST['filter']['coreproperty'];
+        if ($property != '') {
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join deviceproperties dp on dp.reportid = r.id where dp.$property = 1)";
+            $params['filter_core_property'] = $property;
+        }
     }
     // Submitter
     if (isset($_REQUEST['filter']['submitter'])) {

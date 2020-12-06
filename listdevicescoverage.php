@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database server implementation
 	 *	
-	 * Copyright (C) Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -67,11 +67,33 @@
 	}
 
 	if (isset($_GET["feature"])) {
-		$caption = $negate ? 
-			"Listing devices <span style='color:red;'>not</span> supporting for <b>".$_GET["feature"]."</b>"
-			:
-			"Listing first known driver version support for <b>".$_GET["feature"]."</b>";
+		$info = "<code>".$_GET["feature"]."</code>";
+		$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting for $info" : "Listing first known driver version support for $info";
 		$pageTitle = $_GET["feature"];
+	}
+
+	// Extension feature support
+	if (isset($_GET['extensionname']) && isset($_GET['extensionfeature'])) {
+		$ext_name = $_GET['extensionname'];
+		$ext_feature = $_GET['extensionfeature'];
+		$info = "<code>$ext_name ➞ $ext_feature</code>";
+		$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+		$pageTitle = $ext_feature;
+	}
+	// Extension property support
+	if (isset($_GET['extensionname']) && isset($_GET['extensionproperty'])) {
+		$ext_name = $_GET['extensionname'];
+		$ext_property = $_GET['extensionproperty'];
+		$info = "<code>$ext_name ➞ $ext_property</code>";
+		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+		$pageTitle = $ext_property;
+	}
+	// Core property support
+	if (isset($_GET['coreproperty'])) {
+		$property = $_GET['coreproperty'];
+		$info = "<code>$property</code>";
+		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+		$pageTitle = $property;
 	}
 
 	if (isset($_GET['linearformat'])) {
@@ -151,7 +173,7 @@
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 
-	<div id='devices_div' class='tab-pane <?php if ($i == 0) { echo "fade in active"; } ?>'>
+	<div id='devices_div' class='tab-pane fade in active'>
 		<form method="get" action="compare.php">
 		<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 			<thead>
@@ -211,6 +233,11 @@
 						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
 						'devicename' : '<?php echo $_GET["devicename"] ?>',
 						'displayname' : '<?php echo $_GET["displayname"] ?>',
+						'extensionfeature_name': '<?=$_GET['extensionname']?>',
+						'extensionfeature_feature': '<?=$_GET['extensionfeature']?>',
+						'extensionproperty_name': '<?=$_GET['extensionname']?>',
+						'extensionproperty_property': '<?=$_GET['extensionproperty']?>',
+						'coreproperty': '<?=$_GET['coreproperty']?>',
 					}
 				},
 				error: function (xhr, error, thrown) {

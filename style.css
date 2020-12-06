@@ -474,3 +474,9 @@ h1 {
 .div-alert {
 	display: inline-block;
 }
+
+.nav-level1-center {
+    margin-left: -41px;
+    margin-right: -41px;
+	margin-top: -26px;
+}

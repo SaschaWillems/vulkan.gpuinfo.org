@@ -60,9 +60,24 @@
 				<ul class="nav navbar-nav">
 					<li><a href="listdevices.php">Devices</a></li>
 					<li><a href="listreports.php">Reports</a></li>
-					<li><a href="listextensions.php">Extensions</a></li>
-					<li><a href="listfeatures.php">Features</a></li>
-					<li><a href="listlimits.php">Limits</a></li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Core
+							<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="listfeatures.php">Features (1.0)</a></li>
+								<li><a href="list_properties_core.php">Properties (1.0)</a></li>
+								<li><a href="listlimits.php">Limits</a></li>
+							</ul>
+					</li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Extensions
+							<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="listextensions.php">List</a></li>
+								<li><a href="list_features_extensions.php">Features</a></li>
+								<li><a href="list_properties_extensions.php">Properties</a></li>
+							</ul>
+					</li>
 					<li><a href="listformats.php">Formats</a></li>
 					<li><a href="listmemory.php">Memory</a></li>
 					<li class="dropdown">

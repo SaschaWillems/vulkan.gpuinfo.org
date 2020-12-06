@@ -194,6 +194,14 @@
 		$headerClass = $negate ? "header-red" : "header-green";			
 		$caption = "Reports ".($negate ? "<b>not</b>" : "")." supporting extension feature <b>".$extensionfeature."</b> ($extname)";
 		$caption .= " (<a href='listreports.php?extensionfeature=".$extensionfeature.($negate ? "" : "&option=not")."'>toggle</a>)";
+	}
+	// Core property
+	$coreproperty = $_GET['property'];
+	$corepropertyvalue = null;
+	if (isset($coreproperty) && ($coreproperty != '')) {
+		$defaultHeader = false;
+		$corepropertyvalue = $_GET['value'];		
+		$caption = "Reports with <code>$coreproperty</code> = $corepropertyvalue";
 	}	
 	// Platform (os)
 	if ($platform && $platform !== 'all') {
@@ -284,7 +292,7 @@
 			"lengthChange": false,
 			"dom": 'lrtip',	
 			"pageLength" : 25,		
-			"order": [[ 2, 'desc' ]],
+			"order": [[ 0, 'desc' ]],
 			"columnDefs": [
 				{ 
 					"searchable": false, "targets": [ 0, <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>] ,
@@ -314,6 +322,8 @@
 						'instanceextension': '<?php echo $_GET["instanceextension"] ?>',
 						'instancelayer': '<?php echo $_GET["instancelayer"] ?>',
 						'platform': '<?php echo $_GET["platform"] ?>',
+						<?php if ($coreproperty) { echo "'coreproperty' : '".$coreproperty."' ,"; } ?>
+						<?php if (!is_null($corepropertyvalue)) { echo "'corepropertyvalue' : '".$corepropertyvalue."' ,"; } ?>
 					}
 				},
 				error: function (xhr, error, thrown) {
