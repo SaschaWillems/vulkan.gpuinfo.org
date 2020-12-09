@@ -49,7 +49,7 @@
 
         private $header_column_names = ['device', 'driverversion', 'apiversion', 'os'];
         
-        public $reports_ids = [];
+        public $report_ids = [];
         public $report_count = 0;
         public ReportCompareFlags $flags;        
         public $device_infos = [];
@@ -57,16 +57,17 @@
         function __construct($reportids)
         {
             foreach($reportids as $id) {
-                $this->reports_ids[] = intval($id);
+                $this->report_ids[] = intval($id);
             }
+            sort($this->report_ids);
             $this->report_count = count($reportids);
             $this->flags = new ReportCompareFlags;
         }
 
         private function reportIdsParam()
         {
-            assert(count($this->reports_ids) > 0);
-            return implode(",", $this->reports_ids);
+            assert(count($this->report_ids) > 0);
+            return implode(",", $this->report_ids);
         }
 
         public function fetchData() 
@@ -161,7 +162,7 @@
         public function fetchFeatures()
         {
             try {
-                $sql = "SELECT features.* from reports r left join deviceproperties p on (p.reportid = r.id) left join devicefeatures features on (features.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ")";
+                $sql = "SELECT features.* from reports r left join deviceproperties p on (p.reportid = r.id) left join devicefeatures features on (features.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute();
                 $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
@@ -187,7 +188,7 @@
         public function fetchLimits()
         {
             try {          
-                $sql = "SELECT limits.* from reports r left join deviceproperties p on (p.reportid = r.id) left join devicelimits limits on (limits.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ")";
+                $sql = "SELECT limits.* from reports r left join deviceproperties p on (p.reportid = r.id) left join devicelimits limits on (limits.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute();
                 $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
@@ -225,7 +226,7 @@
                 }
 
                 // Get extensions for each selected report              
-                foreach ($this->reports_ids as $report_id) {
+                foreach ($this->report_ids as $report_id) {
                     try {
                         $stmnt = DB::$connection->prepare("SELECT name from extensions left join deviceextensions on extensions.id = deviceextensions.extensionid where deviceextensions.reportId = :reportid");
                         $stmnt->execute(["reportid" => $report_id]);
@@ -240,7 +241,17 @@
                     }
                     $result->data[] = $report_extensions; 
                 }
-                
+                foreach($rows as $index => $row) {
+                    $reportdata = [];				
+                    foreach ($row as $key => $values) {
+                        if ($key == "reportid") { continue; }
+                        $reportdata[] = $values;	  
+                        if ($index == 0) {
+                            $result->captions[] = $key;
+                        }
+                    } 	
+                    $result->data[] = $reportdata;
+                }
                 $result->count = count($result->captions);
                 return $result;
             } catch (Throwable $e) {
@@ -256,6 +267,16 @@
         public function endTable()
         {
             echo "</tbody></table>";
+        }
+
+        public function beginTab($id, $active = false)
+        {
+            echo "<div id='$id' class='tab-pane fade reportdiv ".($active ? "in active" : "")."'>";
+        }
+
+        public function endTab()
+        {
+            echo "</div>";
         }
         
     }
