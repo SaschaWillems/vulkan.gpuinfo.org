@@ -19,6 +19,7 @@
 		*
 	*/
 
+	// @todo: move to constants
 	$device_format_flags_tiling = [
 		0x0001 => "SAMPLED_IMAGE",
 		0x0002 => "STORAGE_IMAGE",
@@ -84,9 +85,9 @@
 
 <div>
 	<ul class='nav nav-tabs nav-level1'>
-		<li class='active'><a data-toggle='tab' href='#formats_linear'>Linear tiling</a></li>
-		<li><a data-toggle='tab' href='#formats_optimal'>Optimal tiling</a></li>
-		<li><a data-toggle='tab' href='#formats_buffer'>Buffer</a></li>
+		<li class='active'><a data-toggle='tab' href='#formats_linear'><span class='icon-pad-right glyphicon glyphicon-menu-hamburger'></span>Linear tiling</a></li>
+		<li><a data-toggle='tab' href='#formats_optimal'><span class='icon-pad-right glyphicon glyphicon-th'></span>Optimal tiling</a></li>
+		<li><a data-toggle='tab' href='#formats_buffer'><span class='icon-pad-right glyphicon glyphicon-tasks'></span>Buffer</a></li>
 	</ul>
 </div>
 

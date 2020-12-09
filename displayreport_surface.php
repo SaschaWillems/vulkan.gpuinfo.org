@@ -29,7 +29,7 @@
 <div class='tab-content'>
 	<!-- Surface properties -->
 	<div id='surfaceproperties' class='tab-pane fade in active reportdiv'>
-		<table id='devicesurfaceproperties' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>
+		<table id='devicesurfaceproperties' class='table table-striped table-bordered table-hover reporttable'>
 			<thead>
 				<tr>
 					<td class='caption'>Property</td>
@@ -67,7 +67,7 @@
 
 	<!-- Surface formats	 -->
 	<div id='surfaceformats' class='tab-pane fade reportdiv'>
-		<table id='devicesurfaceformats' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>
+		<table id='devicesurfaceformats' class='table table-striped table-bordered table-hover reporttable'>
 			<thead>
 				<tr>
 					<td class='caption'>Index</td>
@@ -94,7 +94,7 @@
 	
 	<!-- Present modes	 -->
 	<div id='presentmodes' class='tab-pane fade reportdiv'>
-		<table id='devicepresentmodes' class='table table-striped table-bordered table-hover responsive' style='width:auto;'>
+		<table id='devicepresentmodes' class='table table-striped table-bordered table-hover reporttable'>
 			<thead>
 				<tr>
 					<td class='caption'>Present mode</td>

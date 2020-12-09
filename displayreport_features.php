@@ -65,8 +65,8 @@
 ?>		
 		<div>
 			<ul class='nav nav-tabs nav-level1'>
-				<li class='active'><a data-toggle='tab' href='#features_core'>Core</a></li>
-				<li><a data-toggle='tab' href='#features_extensions'>Extensions</a></li>
+				<li class='active'><a data-toggle='tab' href='#features_core'><span class='glyphicon glyphicon-ok icon-pad-right'></span>Core</a></li>
+				<li><a data-toggle='tab' href='#features_extensions'><span class='glyphicon glyphicon-cog icon-pad-right'></span>Extensions</a></li>
 			</ul>
 		</div>
 <?php		
