@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -19,9 +19,135 @@
 		*
 	*/
 
-	echo "<table id='queue-families' width='100%' class='table table-striped table-bordered'>";
-	ReportCompare::insertTableHeader("Queue family", $deviceinfo_data, count($reportids));
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+	$report_compare->beginTable("comparequeuefamilies");
+	$report_compare->insertTableHeader("Queue family", true);
+	$report_compare->insertDeviceInformation("Device");
+
+	$compare_queue_families = $report_compare->fetchQueueFamilies();
+
+	$max_queue_family_count = 0;
+	foreach ($compare_queue_families->data as $report_queue_families) {
+		if (count($report_queue_families) > $max_queue_family_count) {
+			$max_queue_family_count = count($report_queue_families);
+		}
+	}
+
+	// Per report queue counts
+	echo "<tr><td class='subkey'>Queue count</td><td>Device</td>";
+	for ($i = 0; $i < $report_compare->report_count; $i++) {
+		echo "<td>".count($compare_queue_families->data[$i])."</td>";
+	}
+	echo "</tr>";
+
+	for ($i = 0; $i < $max_queue_family_count; $i++) {
+		$queue_family = "Queue family $i";		
+		// Queue counts
+		echo "<tr><td class='subkey'>Count</td><td>$queue_family</td>";
+		foreach ($compare_queue_families->data as $report_queue_families) {
+			if (count($report_queue_families) > $i) {
+				echo "<td>".$report_queue_families[$i]->count."</td>";
+			} else {
+				echo "<td><font color=#BABABA>n/a</font></td>";
+			}
+		}
+		echo "</tr>";
+		// Flags
+		echo "<tr><td class='subkey'>Flags</td><td>$queue_family</td>";
+		foreach ($compare_queue_families->data as $report_queue_families) {
+			if (count($report_queue_families) > $i) {
+				echo "<td>";
+				$flags = getQueueFlags($report_queue_families[$i]->flags);
+				if (sizeof($flags) > 0) {
+					foreach ($flags as $flag) {
+						echo $flag."<br>";
+					}
+				} else {
+					echo "none";
+				}
+				echo "</td>";
+			} else {
+				echo "<td><font color=#BABABA>n/a</font></td>";
+			}
+		}
+		echo "</tr>";
+
+
+		/*
+		// Counts
+		echo "<tr><td class='subkey'>queueCount</td><td>$queue_family</td>";
+		$index = 0;
+
+		foreach ($reportids as $repid) {
+			if ($i < $queueCounts[$index]) {
+				echo "<td>".$qCount[$index][$i]."</td>";
+			} else {
+				echo "<td><font color=#BABABA>n/a</font></td>";
+			}
+			$index++;
+		}
+		echo "</tr>";
+
+ 		// Flags
+		echo "<tr><td class='subkey'>Flags</td><td>$queue_family</td>";
+		$index = 0;
+		foreach ($reportids as $repid) {
+			echo "<td>";
+			if ($i < $queueCounts[$index]) {
+				$flags = getQueueFlags($qFlags[$index][$i]);
+				if (sizeof($flags) > 0) {
+					foreach ($flags as $flag) {
+						echo $flag."<br>";
+					}
+				} else {
+					echo "none";
+				}
+			} else {
+				echo "<font color=#BABABA>n/a</font>";
+			}
+
+			echo "</td>";
+			$index++;
+		}
+		echo "</tr>";
+
+		for ($j = 0; $j < 4; ++$j) {
+			$arr = array();
+			switch ($j)
+			{
+				case 0:
+					echo "<tr><td class='subkey'>timestampValidBits</td>";
+					$arr = $qTimestampBits;
+					break;
+				case 1:
+					echo "<tr><td class='subkey'>minImageTransferGranularity.width</td>";
+					$arr = $qTransferW;
+					break;
+				case 2:
+					echo "<tr><td class='subkey'>minImageTransferGranularity.height</td>";
+					$arr = $qTransferH;
+					break;
+				case 3:
+					echo "<tr><td class='subkey'>minImageTransferGranularity.depth</td>";
+					$arr = $qTransferD;
+					break;
+			}
+			echo "<td>$queue_family</td>";
+
+			$index = 0;
+			foreach ($reportids as $repid) {
+				if ($i < $queueCounts[$index]) {
+					echo "<td>".$arr[$index][$i]."</td>";
+				} else {
+					echo "<td><font color=#BABABA>n/a</font></td>";
+				}
+				$index++;
+			}
+			echo "</tr>";
+		}
+		*/
+	}
+
+	/*
 
 	// Get queues for each selected report into an array
 	$qCount = array();
@@ -65,22 +191,19 @@
 		$reportIndex++;
 	}
 
-	// Generate table
-	$colspan = count($reportids) + 1;
-
-	reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, sizeof($reportids));
-
-	// Memory type counts
-	echo "<tr class='firstrow'><td class='firstrow'>Queue count</td>";
-	for ($i = 0, $arrsize = sizeof($extarray); $i < $arrsize; ++$i) {
+	// Queue counts
+	echo "<tr><td class='subkey'>Queue count</td><td>Device</td>";
+	for ($i = 0; $i < $report_compare->report_count; $i++) {
 		echo "<td>".$queueCounts[$i]."</td>";
 	}
 	echo "</tr>";
 
 	for ($i = 0; $i < $maxQueueCount; ++$i) {
-		echo "<tr><td class='caption' colspan=".$colspan.">Queue ".$i."</td></tr>";
-		// Count
-		echo "<tr><td class='subkey'>queueCount</td>";
+		$queue_family = "Queue family $i";
+		// echo "<tr><td class='caption' colspan=".$colspan.">Queue ".$i."</td></tr>";
+
+		// Counts
+		echo "<tr><td class='subkey'>queueCount</td><td>$queue_family</td>";
 		$index = 0;
 		foreach ($reportids as $repid) {
 			if ($i < $queueCounts[$index]) {
@@ -91,8 +214,9 @@
 			$index++;
 		}
 		echo "</tr>";
+
  		// Flags
-		echo "<tr><td class='subkey'>Flags</td>";
+		echo "<tr><td class='subkey'>Flags</td><td>$queue_family</td>";
 		$index = 0;
 		foreach ($reportids as $repid) {
 			echo "<td>";
@@ -135,6 +259,7 @@
 					$arr = $qTransferD;
 					break;
 			}
+			echo "<td>$queue_family</td>";
 
 			$index = 0;
 			foreach ($reportids as $repid) {
@@ -148,6 +273,9 @@
 			echo "</tr>";
 		}
 
-		}
-	echo "</tbody></table>";
+	}
+
+	*/
+
+	$report_compare->endTable();
 ?>

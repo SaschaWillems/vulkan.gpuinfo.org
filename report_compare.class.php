@@ -257,7 +257,31 @@
             } catch (Throwable $e) {
                 return [];
             }
-        }        
+        }
+
+        public function fetchQueueFamilies()
+        {
+            try {       
+                $result = new ReportCompareData;
+                foreach ($this->report_ids as $reportid) {
+                    $stmnt = DB::$connection->prepare("SELECT count, flags, timestampValidBits, `minImageTransferGranularity.width`, `minImageTransferGranularity.height`, `minImageTransferGranularity.depth` from devicequeues where reportid = :reportid");
+                    $stmnt->execute(["reportid" => $reportid]);
+                    $queue_families = [];
+                    foreach($stmnt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                        $queue_family = new stdClass;                        
+                        $queue_family->count = $row['count'];
+                        $queue_family->flags = $row['flags'];
+                        $queue_families[] = $queue_family;
+                    }                    
+                    $result->data[] = $queue_families;
+
+                }            
+                $result->count = count($result->data);
+                return $result;
+            } catch (Throwable $e) {
+                return [];
+            }            
+        }
 
         public function beginTable($id)
         {
