@@ -19,8 +19,8 @@
 		*
 	*/
 	
-	ReportCompare::insertTableHeader("Ext. Property", $deviceinfo_data, count($reportids));
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+	$report_compare->insertTableHeader("Ext. Property");
+	$report_compare->insertDeviceInformation();
 
 	// Gather all extended properties for reports to compare
 	$extended_properties = null;

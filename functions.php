@@ -309,21 +309,6 @@ function getColorSpace($value)
 	}
 }
 
-// Generate device info table part for report compare pages
-function reportCompareDeviceColumns($deviceinfo_captions, $deviceinfo_data, $count)
-{
-	for ($i = 0; $i < sizeof($deviceinfo_data[0]); ++$i) 
-	{
-		echo "<tr>";
-		echo "<td>".$deviceinfo_captions[$i]."</td>";
-		for ($j = 0, $arrsize = $count; $j < $arrsize; ++$j) 				
-		{
-			echo "<td class='deviceinfo'>".$deviceinfo_data[$j][$i]."</td>";
-		}
-		echo "</tr>";
-	}
-}
-
 // Convert vendor specific driver version string
 function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 {

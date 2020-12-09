@@ -79,8 +79,8 @@
 		echo "<table id='formats-".($i)."' width='100%' class='table table-striped table-bordered table-hover'>";	
 		
 		$captions = ['Linear image', 'Optimal image', 'Buffer'];
-		ReportCompare::insertTableHeader($captions[$i]." format", $deviceinfo_data, count($reportids));
-		ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+		$report_compare->insertTableHeader($captions[$i]." format");
+		$report_compare->insertDeviceInformation();
 	
 		$rowindex = 0;
 		foreach ($formatnames as $extension) {

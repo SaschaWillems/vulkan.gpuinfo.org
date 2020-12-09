@@ -104,11 +104,7 @@
 	}   
 
 	// Generate table from selected reports
-	echo "<thead><tr><th/><th>Group</th>";
-	foreach ($reportids as $index => $reportId) {
-		echo "<th>".$deviceinfo_data[$index][0]."</th>";
-	}
-	echo "</tr></thead><tbody>";
+	$report_compare->insertTableHeader("", true);
 
 	for ($i = 0; $i < count($column[0]); $i++) { 	  	
 		if (strcasecmp($captions[$i], "displayname") == 0) {

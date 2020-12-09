@@ -51,8 +51,8 @@
 		$reportIndex = 0;
 
 		echo "<table id='surface-caps' width='100%' class='table table-striped table-bordered'>";
-		ReportCompare::insertTableHeader("Surface property", $deviceinfo_data, count($reportids));
-		ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));		
+		$report_compare->insertTableHeader("Surface property");
+		$report_compare->insertDeviceInformation();		
 
 		$props = null;
 
@@ -132,8 +132,8 @@
 		$reportIndex = 0;
 
 		echo "<table id='surface-formats' width='100%' class='table table-striped table-bordered'>";
-		ReportCompare::insertTableHeader("Surface format", $deviceinfo_data, count($reportids));
-		ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));		
+		$report_compare->insertTableHeader("Surface format");
+		$report_compare->insertDeviceInformation();
 	
 		try {
 			$stmnt = DB::$connection->prepare("SELECT dsf.reportid AS reportid, vf.name as name FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (".implode(',', $reportids).")");

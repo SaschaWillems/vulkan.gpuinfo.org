@@ -20,8 +20,8 @@
 		*
 	*/
 	
-	ReportCompare::insertTableHeader("Ext. Feature", $deviceinfo_data, count($reportids));
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+	$report_compare->insertTableHeader("Ext. Feature");
+	$report_compare->insertDeviceInformation();
 
 	// Gather all extended features for reports to compare
 	$extended_features = null;

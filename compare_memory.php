@@ -34,8 +34,8 @@
 
 	echo "<table id='memory-types' width='100%' class='table table-striped table-bordered'>";
 
-	ReportCompare::insertTableHeader("Memory type", $deviceinfo_data, count($reportids));
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+	$report_compare->insertTableHeader("Memory type");
+	$report_compare->insertDeviceInformation();
 
 	// Get memory types for each selected report into an array
 	$memoryFlags = array();
@@ -133,8 +133,8 @@
 
 	echo "<table id='memory-heaps' width='100%' class='table table-striped table-bordered'>";
 
-	ReportCompare::insertTableHeader("Memory heap", $deviceinfo_data, count($reportids));
-	ReportCompare::insertDeviceColumns($deviceinfo_captions, $deviceinfo_data, count($reportids));
+	$report_compare->insertTableHeader("Memory heap");
+	$report_compare->insertDeviceInformation();
 
 	// Get memory types for each selected report into an array
 	$memoryHeapSizes = array();

@@ -110,7 +110,7 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 .nav-level1 {
     margin-left: -41px;
     margin-right: -41px;
-	margin-top: -26px;
+	margin-top: -10px;
 	text-align: left !important;
 }
 
