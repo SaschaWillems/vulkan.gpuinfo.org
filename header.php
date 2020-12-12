@@ -3,6 +3,8 @@
 	<meta http-equiv="Content-Type" content="text/html" charset="ISO-8859-1">
 	<?php echo "<title>".(isset($page_title) ? ($page_title." - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems")."</title>"; ?>
 
+	<link rel="icon" type="image/png" href="/images/Vulkan_LogoBug_32px_Nov17.png" sizes="32x32">
+
 	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/dataTables.bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="external/css/responsive.bootstrap.min.css"/>
