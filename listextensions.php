@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -62,31 +62,42 @@
 			<?php		
 				DB::connect();
 				try {
-					$viewDeviceCount =DB::$connection->prepare("SELECT * from viewDeviceCount");
-					$viewDeviceCount->execute(); 
-					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);					
+					$viewDeviceCount =DB::$connection->prepare("SELECT count(DISTINCT displayname) from reports where ostype = :ostype");
+					$viewDeviceCount->execute(['ostype' => ostype($platform)]); 
+					$deviceCount = $viewDeviceCount->fetch(PDO::FETCH_COLUMN);					
 
-					$extensions = DB::$connection->prepare("SELECT 
-						ext.name AS name,
-						(SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM deviceproperties dp JOIN reports r ON (r.id = dp.reportid) WHERE r.ostype = :ostype AND r.id IN (SELECT de.reportid FROM deviceextensions de WHERE (de.extensionid = ext.id))) AS extcount,
-						(SELECT COUNT(DISTINCT df2.name) FROM devicefeatures2 df2 WHERE (df2.extension = ext.name)) AS features2,
-						(SELECT COUNT(DISTINCT dp2.name) FROM deviceproperties2 dp2 WHERE (dp2.extension = ext.name)) AS properties2
-						FROM extensions ext");
-					$extensions->execute(['ostype' => ostype($platform)]);
+					// Fetch extension features and properties to highlight extensions with a detail page
+					$stmnt = DB::$connection->prepare("SELECT distinct(extension) FROM devicefeatures2");
+					$stmnt->execute(['ostype' => ostype($platform)]);
+					$extensionFeatures = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
+					$stmnt = DB::$connection->prepare("SELECT distinct(extension) FROM deviceproperties2");
+					$stmnt->execute(['ostype' => ostype($platform)]);
+					$extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
 
-					if ($extensions->rowCount() > 0) { 
-						while ($extension = $extensions->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {								
-							$link = ($extension['features2'] > 0 || $extension['properties2'] > 0) ? " <a href=\"displayextension.php?name=".$extension['name']."\" title=\"Show additional features and properties for this extensions\">[?]</a>" : "";
-							$coverageLink = "listdevicescoverage.php?extension=".$extension['name']."&platform=$platform";
-							$coverage = round($extension['extcount']/$deviceCounts[$platform]*100, 1);
-							echo "<tr>";
-							echo "<td>".$extension['name'].$link."</td>";
-							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
-							echo "</tr>";
+					$stmnt = DB::$connection->prepare(
+						"SELECT e.name, count(distinct displayname) as coverage from extensions e 
+						join deviceextensions de on de.extensionid = e.id 
+						join reports r on r.id = de.reportid 
+						where ostype = :ostype
+						group by name");
+					$stmnt->execute(['ostype' => ostype($platform)]);
+					$extensions = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+
+					foreach ($extensions as $extension) {
+						$coverageLink = "listdevicescoverage.php?extension=".$extension['name']."&platform=$platform";
+						$coverage = round($extension['coverage'] / $deviceCount * 100, 1);
+						// Generate link to detail page if extension has additional features or properties
+						if ((in_array($extension['name'], $extensionFeatures) != false) || (in_array($extension['name'], $extensionProperties) != false)) {
+							$detail_link = " <a href=\"displayextension.php?name=".$extension['name']."\" title=\"Show additional features and properties for this extensions\">[?]</a>";
+						} else {
+							$detail_link = null;
 						}
+						echo "<tr>";
+						echo "<td>".$extension['name'].$detail_link."</td>";
+						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 1)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "</tr>";
 					}
-
 				} catch (PDOException $e) {
 					echo "<b>Error while fetcthing data!</b><br>";
 				}
