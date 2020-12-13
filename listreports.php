@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -23,8 +23,6 @@
 	include './functions.php';	
 	include './dbconfig.php';	
 ?>
-
-<center>
 
 <?php
 	// Header
@@ -209,15 +207,15 @@
 		$defaultHeader = false;
 	}
 
+	PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");	
+
 	if ($defaultHeader) {
 		echo "<div class='header'>";	
 		echo "	<h4>Listing reports</h4>";
 		echo "</div>";
 	}	
-
-	PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");	
 ?>
-
+	<center>
 <?php
 	if (!$defaultHeader) {
 		// echo "<caption class='".$headerClass." header-span'>".$caption."</caption>";

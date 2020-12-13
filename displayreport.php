@@ -44,6 +44,7 @@
 		p.driverversion,
 		p.devicetype,
 		VendorId(p.vendorid) as 'vendor',
+		r.displayname,
 		r.osname,
 		r.osarchitecture,
 		r.osversion,
@@ -59,8 +60,7 @@
 		$stmnt->execute([':reportid' => $reportID]); 
 		$present = $stmnt->rowCount() > 0;
 		$row = $stmnt->fetch(PDO::FETCH_ASSOC);
-		$devicedescription = $row['vendor']." ".$row['devicename'];
-		$devicename = $row['devicename'];
+		$devicename = $row['displayname'];
 		$reportversion = $row['reportversion'];
 		$ostype = $row['ostype'];
 		$platform = platformname($ostype);
@@ -108,7 +108,7 @@
 	echo "<center>";				
 
 	// Header =====================================================================================
-	$header = "Device report for $devicedescription";
+	$header = "Device report for $devicename";
 	if ($platform !== null) {
 		$header .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
 	}
@@ -137,8 +137,6 @@
 	<div class='tablediv tab-content' style='width:75%;'>
 
 <?php					
-	// setPageTitle($devicename);
-
 	// Device properites ============================================================================
 	echo "<div id='device' class='tab-pane fade in active reportdiv'>";
 	include './displayreport_properties.php';									
