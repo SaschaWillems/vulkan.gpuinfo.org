@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -78,13 +78,13 @@
 					$value = '<a href="listreports.php?submitter='.$value.'">'.$value.'</a>';
 				}
 				if ($fname == 'devicename') {
-					$value = '<a href="listreports.php?devicename='.$value.'">'.$value.'</a>';			
+					$value = '<a href="listreports.php?devicename='.urlencode($value).'">'.$value.'</a>';			
 				}
 				if (($fname == 'displayname') && ($value == $row[0])) {
 					continue;
 				}
 				if ($fname == 'displayname') {
-					$value = '<a href="listreports.php?displayname='.$value.'">'.$value.'</a>';			
+					$value = '<a href="listreports.php?displayname='.urlencode($value).'">'.$value.'</a>';			
 				}
 				if (strpos($fname, 'residency') !== false) {
 					$class = ($value == 1) ? "supported" : "unsupported";
