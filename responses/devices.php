@@ -324,7 +324,7 @@
     $devices->execute($params);
     if ($devices->rowCount() > 0) { 
         foreach ($devices as $device) {
-            $url = 'listreports.php?devicename='.$device["device"];
+            $url = 'listreports.php?devicename='.urlencode($device["device"]);
             if ($platform !== 'all') {
                 $url .= '&platform='.$platform;
             }
