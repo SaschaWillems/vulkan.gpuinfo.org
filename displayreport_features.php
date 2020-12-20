@@ -20,15 +20,22 @@
 	*/
 	
 	function insertCoreFeatures($report, $version) {
+		$report->beginTab('features_core_'.str_replace('.', '',$version), $version == '1.0');
+		$report->beginTable('table_features_core_'.str_replace('.', '',$version), ['Feature', 'Supported']);
+
 		$features = $report->fetchCoreFeatures($version);
 		if ($features) {
 			foreach($features as $key => $value) {
-				echo "<tr><td class='subkey'>$key</td>";
-				echo "<td class='".($value ? 'supported' : 'unsupported')."'>".($value ? 'true' : 'false')."</td>";
-				echo "<td>Vulkan Core $version</td>";
-				echo "</tr>";				
+				if ($key !== 'reportid') {
+					echo "<tr><td class='subkey'>$key</td>";
+					echo "<td class='".($value ? 'supported' : 'unsupported')."'>".($value ? 'true' : 'false')."</td>";
+					echo "</tr>";
+				}	
 			}
 		}
+
+		$report->endTable();
+		$report->endTab();		
 	}
 
 	function insertExtensionFeatures($report) {
@@ -57,49 +64,40 @@
 				</tbody>
 			</table>
 		</div>
-
 <?php
 	}
-	
-	if ($report->flags->has_extended_features) {
-?>		
-		<div>
-			<ul class='nav nav-tabs nav-level1'>
-				<li class='active'><a data-toggle='tab' href='#features_core'><span class='glyphicon glyphicon-ok icon-pad-right'></span>Core features</a></li>
-				<li><a data-toggle='tab' href='#features_extensions'><span class='glyphicon glyphicon-cog icon-pad-right'></span>Extension features</a></li>
-			</ul>
-		</div>
-<?php		
+	$display_tabs = ($report->flags->has_vulkan_1_1_features || $report->has_vulkan_1_2_features || $report->flags->has_extended_features);
+	if ($display_tabs) {
+		echo "<div>";
+		echo "	<ul class='nav nav-tabs nav-level1'>";		
+		echo "		<li class='active'><a data-toggle='tab' href='#features_core_10'>Core 1.0</a></li>";
+		if ($report->flags->has_vulkan_1_1_features) {
+			echo "<li><a data-toggle='tab' href='#features_core_11'>Core 1.1</a></li>";
+		}
+		if ($report->flags->has_vulkan_1_2_features) {
+			echo "<li><a data-toggle='tab' href='#features_core_12'>Core 1.2</a></li>";
+		}
+		if ($report->flags->has_extended_features) {
+			echo "<li><a data-toggle='tab' href='#features_extensions'>Extensions</a></li>";
+		}
+		echo "	</ul>";
+		echo "</div>";
+		echo "<div class='tab-content'>";
 	}
 
-?>
-	<div class='tab-content'>
-        <!-- Core -->
-        <div id='features_core' class='tab-pane fade in active reportdiv'>
-			<table id='devicefeatures' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
-				<thead>
-					<tr>
-						<td class='caption'>Feature</td>
-						<td class='caption'>Supported</td>
-						<td></td>
-					</tr>
-				</thead>
-				<tbody>				
-				<?php
-					insertCoreFeatures($report, '1.0');
-					if ($report->flags->has_vulkan_1_1_features) {
-						insertCoreFeatures($report, '1.1');
-					}
-					if ($report->flags->has_vulkan_1_2_features) {
-						insertCoreFeatures($report, '1.2');
-					}
-				?>
-				</tbody>
-			</table>
-		</div>
-<?php
+	insertCoreFeatures($report, '1.0');
+	if ($report->flags->has_vulkan_1_1_features) {
+		insertCoreFeatures($report, '1.1');
+	}
+	if ($report->flags->has_vulkan_1_2_features) {
+		insertCoreFeatures($report, '1.2');
+	}
 	if ($report->flags->has_extended_features) {
 		insertExtensionFeatures($report);
 	}
+
+	if ($display_tabs) {
+		echo "</div>";
+	}
+
 ?>
-	</div>
