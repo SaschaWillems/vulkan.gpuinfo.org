@@ -177,7 +177,10 @@
 				'deviceinstancelayers',
 				'table_features_core_10',
 				'table_features_core_11',
-				'table_features_core_12'
+				'table_features_core_12',
+				'table_properties_core_10',
+				'table_properties_core_11',
+				'table_properties_core_12'
 			];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) 
 			{
@@ -201,7 +204,8 @@
 			// Grouped tables
 			tableNames = [
 				'deviceinfo',
-				'devicefeatures_extensions',
+				'table_features_extensions',
+				'table_properties_extensions',
 				'deviceproperties',
 				'deviceproperties_extensions',
 				'devicememory'
@@ -210,6 +214,8 @@
 			// Device properties table with grouping
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
+				if (typeof $('#'+tableNames[i]) != undefined) 
+				{
 					$('#'+tableNames[i]).dataTable(
 						{
 							"pageLength" : -1,
@@ -237,7 +243,8 @@
 								});
 							}
 						}
-					);			
+					);		
+				}	
 			}
 
 			// Feature tables

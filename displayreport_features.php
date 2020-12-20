@@ -48,7 +48,7 @@
 			}
 		}
 		$report->endTable();
-		$report->endTab();		
+		$report->endTab();
 	}
 	
 	$display_tabs = ($report->flags->has_vulkan_1_1_features || $report->has_vulkan_1_2_features || $report->flags->has_extended_features);

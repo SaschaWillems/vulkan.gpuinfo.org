@@ -18,10 +18,10 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-?>
 
-<?php
 	function insertCoreProperties($report, $version) {
+		$report->beginTab('properties_core_'.str_replace('.', '',$version), $version == '1.0');
+		$report->beginTable('table_properties_core_'.str_replace('.', '',$version), ['Property', 'Value']);				
 		$core_properties = $report->fetchCoreProperties($version);
 		if ($core_properties) {
 			foreach($core_properties as $key => $value) {
@@ -29,13 +29,16 @@
 				$displayvalue = getPropertyDisplayValue($key, $value);
 				echo "<tr><td class='subkey'>$key</td>";
 				echo "<td>$displayvalue</td>";
-				echo "<td>Vulkan Core $version</td>";
 				echo "</tr>";
 			}
 		}
+		$report->endTable();
+		$report->endTab();		
 	}
 
 	function insertExtensionProperties($report) {
+		$report->beginTab('properties_extensions', false);
+		$report->beginTable('table_properties_extensions', ['Property', 'Value', 'Extension']);		
 		$extension_properties = $report->fetchExtensionProperties();
 		if ($extension_properties) {
 			foreach ($extension_properties as $extension_property) {
@@ -54,65 +57,41 @@
 				echo "</td></tr>";
 			}
 		}
+		$report->endTable();
+		$report->endTab();
 	}
 
-	if ($report->flags->has_extended_properties) {
-	?>		
-			<div>
-				<ul class='nav nav-tabs nav-level1'>
-					<li class='active'><a data-toggle='tab' href='#properties_core'><span class='glyphicon glyphicon-ok icon-pad-right'></span>Core properties</a></li>
-					<li><a data-toggle='tab' href='#properties_extensions'><span class='glyphicon glyphicon-cog icon-pad-right'></span>Extension properties</a></li>
-				</ul>
-			</div>
-	<?php		
+	$display_tabs = ($report->flags->has_vulkan_1_1_properties || $report->has_vulkan_1_2_properties || $report->flags->has_extended_properties);
+	if ($display_tabs) {
+		echo "<div>";
+		echo "	<ul class='nav nav-tabs nav-level1'>";		
+		echo "		<li class='active'><a data-toggle='tab' href='#properties_core_10'>Core 1.0</a></li>";
+		if ($report->flags->has_vulkan_1_1_properties) {
+			echo "<li><a data-toggle='tab' href='#properties_core_11'>Core 1.1</a></li>";
+		}
+		if ($report->flags->has_vulkan_1_2_properties) {
+			echo "<li><a data-toggle='tab' href='#properties_core_12'>Core 1.2</a></li>";
+		}
+		if ($report->flags->has_extended_properties) {
+			echo "<li><a data-toggle='tab' href='#properties_extensions'>Extensions</a></li>";
+		}
+		echo "	</ul>";
+		echo "</div>";
+		echo "<div class='tab-content'>";
 	}
-	?>
-	<div class='tab-content'>
-        <!-- Core -->
-        <div id='properties_core' class='tab-pane fade in active reportdiv'>
-			<table id='deviceproperties' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
-				<thead>
-					<tr>
-						<td class='caption'>Property</td>
-						<td class='caption'>Value</td>
-						<td class='caption'></td>
-					</tr>
-				</thead>
-			<tbody>
-			<?php
-			insertCoreProperties($report, '1.0');
-			if ($report->flags->has_vulkan_1_1_properties) {
-				insertCoreProperties($report, '1.1');
-			}
-			if ($report->flags->has_vulkan_1_2_properties) {
-				insertCoreProperties($report, '1.2');
-			}
-			?>
-			</tbody>
-		</table>
-	</div>
 
-	<!-- Extensions -->
-<?php
+	insertCoreProperties($report, '1.0');
+	if ($report->flags->has_vulkan_1_1_properties) {
+		insertCoreProperties($report, '1.1');
+	}
+	if ($report->flags->has_vulkan_1_2_properties) {
+		insertCoreProperties($report, '1.2');
+	}
 	if ($report->flags->has_extended_properties) {
-?>
-	<div id='properties_extensions' class='tab-pane fade reportdiv'>
-		<table id='deviceproperties_extensions' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
-			<thead>
-				<tr>
-					<td class='caption'>Feature</td>
-					<td class='caption'>Supported</td>
-					<td>Extension</td>
-				</tr>
-			</thead>
-			<tbody>
-			<?php
-				insertExtensionProperties($report);
-			?>
-			</tbody>
-		</table>
-	</div>
-<?php
+		insertExtensionProperties($report);
+	}
+
+	if ($display_tabs) {
+		echo "</div>";
 	}
 ?>
-</div>
