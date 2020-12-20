@@ -22,50 +22,35 @@
 	function insertCoreFeatures($report, $version) {
 		$report->beginTab('features_core_'.str_replace('.', '',$version), $version == '1.0');
 		$report->beginTable('table_features_core_'.str_replace('.', '',$version), ['Feature', 'Supported']);
-
 		$features = $report->fetchCoreFeatures($version);
 		if ($features) {
 			foreach($features as $key => $value) {
-				if ($key !== 'reportid') {
-					echo "<tr><td class='subkey'>$key</td>";
-					echo "<td class='".($value ? 'supported' : 'unsupported')."'>".($value ? 'true' : 'false')."</td>";
-					echo "</tr>";
-				}	
+				if ($key == 'reportid') { continue; }
+				echo "<tr><td class='subkey'>$key</td>";
+				echo "<td class='".($value ? 'supported' : 'unsupported')."'>".($value ? 'true' : 'false')."</td>";
+				echo "</tr>";
 			}
 		}
-
 		$report->endTable();
 		$report->endTab();		
 	}
 
 	function insertExtensionFeatures($report) {
-?>
-        <div id='features_extensions' class='tab-pane fade reportdiv'>
-			<table id='devicefeatures_extensions' class='table table-striped table-bordered table-hover responsive' style='width:100%;'>
-				<thead>
-					<tr>
-						<td class='caption'>Feature</td>
-						<td class='caption'>Supported</td>
-						<td>Extension</td>
-					</tr>
-				</thead>
-				<tbody>
-				<?php
-					$extension_features = $report->fetchExtensionFeatures();
-					if ($extension_features) {
-						foreach($extension_features as $extension_feature) {
-							echo "<tr><td class='subkey'>".$extension_feature['name']."</td><td>";
-							echo ($extension_feature['supported'] == 1) ? "<font color='green'>true</font>" : "<font color='red'>false</font>";
-							echo "<td>".$extension_feature['extension']."</td>";
-							echo "</td></tr>";
-						}
-					}
-				?>
-				</tbody>
-			</table>
-		</div>
-<?php
+		$report->beginTab('features_extensions', false);
+		$report->beginTable('table_features_extensions', ['Feature', 'Supported', 'Extension']);
+		$extension_features = $report->fetchExtensionFeatures();
+		if ($extension_features) {
+			foreach($extension_features as $extension_feature) {
+				echo "<tr><td class='subkey'>".$extension_feature['name']."</td><td>";
+				echo ($extension_feature['supported'] == 1) ? "<font color='green'>true</font>" : "<font color='red'>false</font>";
+				echo "<td>".$extension_feature['extension']."</td>";
+				echo "</td></tr>";
+			}
+		}
+		$report->endTable();
+		$report->endTab();		
 	}
+	
 	$display_tabs = ($report->flags->has_vulkan_1_1_features || $report->has_vulkan_1_2_features || $report->flags->has_extended_features);
 	if ($display_tabs) {
 		echo "<div>";
