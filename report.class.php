@@ -380,6 +380,37 @@
             } catch (Throwable $e) {
                 return null;
             }            
-        }        
+        }
+
+        /**
+         * Helper functions for setting up tabs and tables
+         */
+
+        public function beginTable($id, $header_columns)
+        {
+            echo "<table id='$id' width='100%' class='table table-striped table-bordered table-hover'>";
+            if (count($header_columns) > 0) {
+                echo "<thead><tr>";
+                foreach ($header_columns as $header_column) {
+                    echo "<th>$header_column</th>";
+                }
+                echo "</tr></thead>";
+            }
+        }
+
+        public function endTable()
+        {
+            echo "</tbody></table>";
+        }
+
+        public function beginTab($id, $active = false)
+        {
+            echo "<div id='$id' class='tab-pane fade reportdiv ".($active ? "in active" : "")."'>";
+        }
+
+        public function endTab()
+        {
+            echo "</div>";
+        }
 
     }
