@@ -22,6 +22,7 @@
     /**
      * Implements report update check logic
      * A report can be updated if:
+	 *  - Extensions are missing (@todo: not sure on this yet, should technically never happen)
      *  - If the newer report has Core 1.1 features and/or properties that the old report is lacking
      *  - If the newer report has Core 1.2 features and/or properties that the old report is lacking
      *  - If the newer report has extension features and/or properties that the old report is lacking
@@ -29,7 +30,18 @@
 
 	include './../../dbconfig.php';
 
-	function checkCore11Update($report, $compare_id) {
+	function check_extension_list_updatable($report, $compare_id, &$updatable) {
+		$stmnt = DB::$connection->prepare("SELECT count(*) from deviceextensions where reportid = :reportid");
+		$stmnt->execute(['reportid' => $compare_id]);
+		$count_report = count($report['extensions']);
+		$count_database = intval($stmnt->fetchColumn());
+		if ($count_report > $count_database) {
+			$updatable[] = 'Vulkan extension list';
+			return true;
+		}
+	}
+
+	function check_core11_data_updatable($report, $compare_id, &$updatable) {
 		if (array_key_exists('core11', $report)) {
 			if (array_key_exists('features', $report['core11'])) {
 				// Update allowed if features are present in new report, but no in old report
@@ -37,6 +49,7 @@
 					$stmnt = DB::$connection->prepare("SELECT * from devicefeatures11 where reportid = :reportid");
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
+						$updatable[] = 'Vulkan core 1.1 features';
 						return true;
 					}
 				}
@@ -47,6 +60,7 @@
 					$stmnt = DB::$connection->prepare("SELECT * from deviceproperties11 where reportid = :reportid");
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
+						$updatable[] = 'Vulkan core 1.1 properties';
 						return true;
 					}
 				}
@@ -55,7 +69,7 @@
 		return false;
 	}
 
-	function checkCore12Update($report, $compare_id) {
+	function check_core12_data_updatable($report, $compare_id, &$updatable) {
 		if (array_key_exists('core12', $report)) {
 			if (array_key_exists('features', $report['core12'])) {
 				// Update allowed if features are present in new report, but no in old report
@@ -64,6 +78,7 @@
 					$stmnt = DB::$connection->prepare("SELECT * from devicefeatures12 where reportid = :reportid");
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
+						$updatable[] = 'Vulkan core 1.2 features';
 						return true;
 					}
 				}
@@ -74,6 +89,7 @@
 					$stmnt = DB::$connection->prepare("SELECT * from deviceproperties12 where reportid = :reportid");
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
+						$updatable[] = 'Vulkan core 1.2 properties';
 						return true;
 					}
 				}
@@ -82,7 +98,7 @@
 		return false;	
 	}
 
-	function checkExtensionFeaturesUpdate($report, $compare_id) {
+	function check_extension_features_updatable($report, $compare_id, &$updatable) {
 		if (array_key_exists('extended', $report)) {
 			if (array_key_exists('devicefeatures2', $report['extended'])) {
 				if ((is_array($report['extended']['devicefeatures2'])) && (count($report['extended']['devicefeatures2']) > 0)) {
@@ -92,6 +108,7 @@
 					$count_report = count($report['extended']['devicefeatures2']);
 					$count_database = intval($stmnt->fetchColumn());
 					if ($count_report > $count_database) {
+						$updatable[] = 'Vulkan extension features';
 						return true;
 					}
 				}
@@ -100,7 +117,7 @@
 		return false;
 	}
 
-	function checkExtensionPropertiesUpdate($report, $compare_id) {
+	function check_extension_properties_updatable($report, $compare_id, &$updatable) {
 		if (array_key_exists('extended', $report)) {
 			if (array_key_exists('deviceproperties2', $report['extended'])) {
 				if ((is_array($report['extended']['deviceproperties2'])) && (count($report['extended']['deviceproperties2']) > 0)) {
@@ -110,6 +127,7 @@
 					$count_report = count($report['extended']['deviceproperties2']);
 					$count_database = intval($stmnt->fetchColumn());
 					if ($count_report > $count_database) {
+						$updatable[] = 'Vulkan extension properties';
 						return true;
 					}
 				}
@@ -147,6 +165,7 @@
 		echo "Report '$file' is not of file type json!";
 		exit();  
 	}
+	$path = './';
 	$file_name = uniqid('report_update_check').'json';
 	move_uploaded_file($_FILES['data']['tmp_name'], $path.$file_name) or die('');
 
@@ -182,26 +201,25 @@
 
 
 	$can_update = false;
+	$updatable = [];
 
 	try {
 		DB::connect();
-		$can_update = checkCore11Update($report, $reportid);
-		if (!$can_update) {
-			$can_update = checkCore12Update($report, $reportid);
-		}
-		if (!$can_update) {
-			$can_update = checkExtensionFeaturesUpdate($report, $reportid);
-		}
-		if (!$can_update) {
-			$can_update = checkExtensionPropertiesUpdate($report, $reportid);
-		}
+		check_extension_list_updatable($report, $reportid, $updatable);
+		check_core11_data_updatable($report, $reportid, $updatable);
+		check_core12_data_updatable($report, $reportid, $updatable);
+		check_extension_features_updatable($report, $reportid, $updatable);
+		check_extension_properties_updatable($report, $reportid, $updatable);
 		DB::disconnect();
-		if ($can_update) {
+		$can_update = count($updatable) > 0;
+		if ($can_update) {			
 			header('HTTP/1.1 200 update_allowed');
-			echo 1;
+			header('Content-Type: application/json');
+			echo json_encode(['canupdate' => true, 'updatable' => $updatable]);
 		} else {
 			header('HTTP/1.1 200 update_not_allowed');
-			echo 0;
+			header('Content-Type: application/json');
+			echo json_encode(['canupdate' => false]);
 		}
 	} catch (Exception $e) {
 		header('HTTP/1.1 500 error');
