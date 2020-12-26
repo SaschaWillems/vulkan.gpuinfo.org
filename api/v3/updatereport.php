@@ -31,42 +31,108 @@
 
     include './../../dbconfig.php';
 
+    function update_core_features($version, $json, $reportid, &$update_log) {
+        $version_short = str_replace('.', '', $version);
+        $node_name = 'core'.$version_short;
+        $table_name = 'devicefeatures'.$version_short;
+        $stmnt = DB::$connection->prepare("SELECT * from $table_name where reportid = :reportid");
+        $stmnt->execute(['reportid' => $reportid]);
+        if ($stmnt->rowCount() == 0) {
+            // Update if target report has no core 1.1 features
+            if (array_key_exists('features', $json[$node_name ])) {
+                $jsonnode = $json[$node_name ]['features'];
+                $columns = ['reportid'];
+                $params = [':reportid'];
+                $values = [':reportid' => $reportid];
+                foreach($jsonnode as $key => $value) {
+                    $columns[] = $key;
+                    $params[] = ":$key";
+                    $values[":$key"] = $value;
+                }
+                $sql = sprintf("INSERT INTO $table_name (%s) VALUES (%s)", implode(",", $columns), implode(",", $params));
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute($values);
+                $update_log[] = "Core features for version $version";
+            }            
+        }
+    }
+
+    function update_core_properties($version, $json, $reportid, &$update_log) {
+        $version_short = str_replace('.', '', $version);
+        $node_name = 'core'.$version_short;
+        $table_name = 'deviceproperties'.$version_short;
+        $stmnt = DB::$connection->prepare("SELECT * from $table_name where reportid = :reportid");
+        $stmnt->execute(['reportid' => $reportid]);
+        if ($stmnt->rowCount() == 0) {
+            // Update if target report has no core 1.1 features
+            if (array_key_exists('features', $json[$node_name])) {
+                $jsonnode = $json[$node_name ]['properties'];
+                $columns = ['reportid'];
+                $params = [':reportid'];
+                $values = [':reportid' => $reportid];
+                foreach($jsonnode as $key => $value) {
+                    $columns[] = $key;
+                    $params[] = ":$key";
+                    if (is_array($value)) {
+                        // UUIDs etc. need to be serialized
+                        $values[":$key"] = serialize($value);
+                    } else {
+                        $values[":$key"] = $value;
+                    }
+                }
+                $sql = sprintf("INSERT INTO $table_name (%s) VALUES (%s)", implode(",", $columns), implode(",", $params));
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute($values);	
+                $update_log[] = "Core properties for version $version";
+            }            
+        }
+    }    
+
     function update_extended_data($json, $reportid, &$update_log) {
         // Extended feature set
         if (array_key_exists('extended', $json)) {
             $extended = $json['extended'];
             // Device features
             if (array_key_exists('devicefeatures2', $extended)) {
+                $updated_extenstion_list = [];
                 foreach ($extended['devicefeatures2'] as $feature) {
                     $params = [
                         'reportid' => $reportid, 
                         'name' => $feature['name'], 
                         'extension' => $feature['extension']
-                    ];                    
+                    ];        
                     $stmnt_present = DB::$connection->prepare("SELECT * from devicefeatures2 where reportid = :reportid and name = :name and extension = :extension");
                     $stmnt_present->execute($params);
                     if ($stmnt_present->rowCount() == 0) {
-                        // @todo: log only for testing
-                        $update_log[] = sprintf('Inserted missing extension feature %s for %s', $feature['name'], $feature['extension']); 
+                        if (!in_array($feature['extension'], $updated_extenstion_list)) {
+                            $updated_extenstion_list[] = $feature['extension'];
+                        }
                         $params['supported'] = $feature['supported'];
                         $stmnt_insert = DB::$connection->prepare("INSERT INTO devicefeatures2 (reportid, name, extension, supported) VALUES (:reportid, :name, :extension, :supported)");
                         $stmnt_insert->execute($params);
                     }
                 }
+                if (count($updated_extenstion_list) > 0) {
+                    foreach ($updated_extenstion_list as $updated_extension) {
+                        $update_log[] = sprintf('Extension features for %s', $updated_extension);
+                    }
+                }
             }
             // Device properties
             if (array_key_exists('deviceproperties2', $extended)) {
+                $updated_extenstion_list = [];
                 foreach ($extended['deviceproperties2'] as $property) {
                     $params = [
                         'reportid' => $reportid, 
                         'name' => $property['name'], 
                         'extension' => $property['extension']
-                    ];                    
+                    ];
                     $stmnt_present = DB::$connection->prepare("SELECT * from deviceproperties2 where reportid = :reportid and name = :name and extension = :extension");
                     $stmnt_present->execute($params);
                     if ($stmnt_present->rowCount() == 0) {
-                        // @todo: log only for testing
-                        $update_log[] = sprintf('Inserted missing extension property %s for %s', $property['name'], $property['extension']); 
+                        if (!in_array($property['extension'], $updated_extenstion_list)) {
+                            $updated_extenstion_list[] = $property['extension'];
+                        }
                         if (is_array($property['value'])) {
                             $value = serialize($property['value']);
                         } else {
@@ -77,7 +143,12 @@
                         $stmnt_insert->execute($params);
                     }
                 }
-            }		
+                if (count($updated_extenstion_list) > 0) {
+                    foreach ($updated_extenstion_list as $updated_extension) {
+                        $update_log[] = sprintf('Extension properties for %s', $updated_extension);
+                    }
+                }
+            }	
         }        
     }
 
@@ -148,6 +219,10 @@
 
     DB::connect();
     try {
+        update_core_features("1.1", $report, $reportid, $update_log);
+        update_core_features("1.2", $report, $reportid, $update_log);
+        update_core_properties("1.1", $report, $reportid, $update_log);
+        update_core_properties("1.2", $report, $reportid, $update_log);
         update_extended_data($report, $reportid, $update_log);
     } finally {
         DB::disconnect();
@@ -165,8 +240,8 @@
         ];
         $stmnt_update = DB::$connection->prepare("INSERT into reportupdatehistory (submitter, log, reportid, json, reportversion) VALUES (:submitter, :log, :reportid, :json, :reportversion)");
         $stmnt_update->execute($params);
-        echo implode('<br/>', $update_log);
+        echo json_encode(['updated' => true, 'log' => $update_log]);
         DB::disconnect();
     } else {
-        echo "Nothing was updated!";
+        echo json_encode(['updated' => false]);
     }
