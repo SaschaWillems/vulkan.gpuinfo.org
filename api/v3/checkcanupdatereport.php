@@ -42,6 +42,7 @@
 	}
 
 	function check_core11_data_updatable($report, $compare_id, &$updatable) {
+		$result = false;
 		if (array_key_exists('core11', $report)) {
 			if (array_key_exists('features', $report['core11'])) {
 				// Update allowed if features are present in new report, but no in old report
@@ -50,7 +51,7 @@
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
 						$updatable[] = 'Vulkan core 1.1 features';
-						return true;
+						$result = true;
 					}
 				}
 			}
@@ -61,15 +62,16 @@
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
 						$updatable[] = 'Vulkan core 1.1 properties';
-						return true;
+						$result = true;
 					}
 				}
 			}
 		}
-		return false;
+		return $result;
 	}
 
 	function check_core12_data_updatable($report, $compare_id, &$updatable) {
+		$result = false;
 		if (array_key_exists('core12', $report)) {
 			if (array_key_exists('features', $report['core12'])) {
 				// Update allowed if features are present in new report, but no in old report
@@ -79,7 +81,7 @@
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
 						$updatable[] = 'Vulkan core 1.2 features';
-						return true;
+						$result = true;
 					}
 				}
 			}
@@ -90,12 +92,12 @@
 					$stmnt->execute(['reportid' => $compare_id]);
 					if ($stmnt->rowCount() == 0) {
 						$updatable[] = 'Vulkan core 1.2 properties';
-						return true;
+						$result = true;
 					}
 				}
 			}
 		}
-		return false;	
+		return $result;
 	}
 
 	function check_extension_features_updatable($report, $compare_id, &$updatable) {
