@@ -201,10 +201,7 @@
 		exit();
 	}
 
-
-	$can_update = false;
 	$updatable = [];
-
 	try {
 		DB::connect();
 		check_extension_list_updatable($report, $reportid, $updatable);
