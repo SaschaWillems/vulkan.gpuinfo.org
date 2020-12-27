@@ -34,12 +34,15 @@
     function update_core_features($version, $json, $reportid, &$update_log) {
         $version_short = str_replace('.', '', $version);
         $node_name = 'core'.$version_short;
+        if (!array_key_exists($node_name, $json)) {
+            return;
+        }
         $table_name = 'devicefeatures'.$version_short;
         $stmnt = DB::$connection->prepare("SELECT * from $table_name where reportid = :reportid");
         $stmnt->execute(['reportid' => $reportid]);
         if ($stmnt->rowCount() == 0) {
             // Update if target report has no core 1.1 features
-            if (array_key_exists('features', $json[$node_name ])) {
+            if (array_key_exists('features', $json[$node_name])) {
                 $jsonnode = $json[$node_name ]['features'];
                 $columns = ['reportid'];
                 $params = [':reportid'];
@@ -60,6 +63,9 @@
     function update_core_properties($version, $json, $reportid, &$update_log) {
         $version_short = str_replace('.', '', $version);
         $node_name = 'core'.$version_short;
+        if (!array_key_exists($node_name, $json)) {
+            return;
+        }
         $table_name = 'deviceproperties'.$version_short;
         $stmnt = DB::$connection->prepare("SELECT * from $table_name where reportid = :reportid");
         $stmnt->execute(['reportid' => $reportid]);
