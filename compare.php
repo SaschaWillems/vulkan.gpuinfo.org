@@ -20,9 +20,11 @@
 	*/
 			
 	include './dbconfig.php';
-	include './header.inc';	
+	include 'page_generator.php';
 	include './functions.php';	
 	include './report_compare.class.php';	
+
+	PageGenerator::header('Compare reports');
 
 	DB::connect();
 
@@ -49,7 +51,7 @@
 			<strong>Warning!</strong><br> No report IDs set!
 		</div>				
 		<?php
-		include './footer.inc';
+		PageGenerator::footer();
 		echo "</center>";
 		die();
 	}
@@ -246,7 +248,7 @@
 							},
 						}
 					);
-			}		
+			}				
 
 			// Grouped tables
 			tableNames = [
@@ -361,7 +363,7 @@
 		
 	</div>
 
-	<?php include './footer.inc'; ?>
+	<?php PageGenerator::footer(); ?>
 
 </body>
 </html>

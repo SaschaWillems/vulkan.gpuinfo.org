@@ -40,30 +40,50 @@
 			if (in_array($os, ['linux'])) {
 				$filter = "where reportid in (select id from reports where osname not in ('windows', 'android', 'ios', 'osx'))";
 			}
-		}
-	}					
-
+		}		
+	}
 	PageGenerator::header($name);
 
-	DB::connect();	
-	$result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name");
-	$result->execute([":name" => $name]);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-	$extname = $row["extension"];
+	$caption = "Value distribution for <code>$name</code>";
+
+	$platform = null;
+	if (isset($_GET['platform'])) {
+        $platform = $_GET["platform"];
+        if ($platform !== "all") {
+            switch($platform) {
+                case 'windows':
+                    $ostype = 0;
+                    break;
+                case 'linux':
+                    $ostype = 1;
+                    break;
+                case 'android':
+                    $ostype = 2;
+                    break;
+            }
+			$filter .= "where reportid in (select id from reports where ostype = '".$ostype."')";
+			$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+        }
+	}
+
+	// Check if property is valid and part of the selected table
+	DB::connect();
+	$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = 'deviceproperties' and column_name = :columnname");
+	$result->execute([":columnname" => $name]);
+	DB::disconnect();
 	if ($result->rowCount() == 0) {
 		echo "<center>";
 		?>
 			<div class="alert alert-danger error">
-			<strong>This is not the <strike>droid</strike> extension property you are looking for!</strong><br><br>
-			You may have passed a wrong extension property name.
+			<strong>This is not the <strike>droid</strike> device property you are looking for!</strong><br><br>
+			You may have passed a wrong device limit name.
 			</div>				
 		<?php
 		include "footer.html";
 		echo "</center>";
 		die();		
 	}
-	DB::disconnect();
-	
+
 ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>	
 	<script>
@@ -81,7 +101,7 @@
 	</script>
 
 	<div class='header'>
-		<h4 class='headercaption'>Value distribution for <code><?=$name?></code> property of <code><?=$extname?></code></h4>
+		<h4 class='headercaption'><?php echo $caption; ?></h4>
 	</div>
 
 	<center>	
@@ -97,24 +117,25 @@
 					</thead>
 					<tbody>				
 						<?php		
-							DB::connect();			
-							$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name group by 1 order by 1");
-							$result->execute([":name" => $name]);
+							DB::connect();
+							switch($name) {
+								case 'vendorid':
+									$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from deviceproperties $filter group by 1 order by 1";
+								break;
+								default:
+									$sql = "SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 1";
+							}
+							$result = DB::$connection->prepare($sql);
+							$result->execute();
 							$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-							foreach ($rows as $group) {
-								$value = $group['value'];
-								// Some values are stored as serialized arrays and need to be unserialized
-								if (substr($value, 0, 2) == 'a:') {
-									$value = unserialize($value);
-									$value = '['.implode(',', $value).']';
-								}
-								$link ="listreports.php?extensionproperty=$name&value=".$group["value"];
+							foreach ($rows as $cap) {
+								$link ="listreports.php?property=$name&value=".$cap["value"].($platform ? "&platform=$platform" : "");
 								echo "<tr>";						
-								echo "<td>$value</td>";
-								echo "<td><a href='$link'>".$group["reports"]."</a></td>";
+								echo "<td>".$cap["value"]."</td>";
+								echo "<td><a href='$link'>".$cap["reports"]."</a></td>";
 								echo "</tr>";	    
-							}     
-							DB::disconnect();       			
+							}
+							DB::disconnect();	
 						?>   					
 					</tbody>
 				</table> 
@@ -132,17 +153,18 @@
 			['Value', 'Reports'],
 			<?php 
 				DB::connect();										
-				$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name group by 1 order by 2 desc");
-				$result->execute([":name" => $name]);
+				switch($name) {
+					case 'vendorid':
+						$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from deviceproperties $filter group by 1 order by 2";
+					break;
+					default:
+						$sql = "SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 2";
+				}
+				$result = DB::$connection->prepare($sql);
+				$result->execute();
 				$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($rows as $row) {
-					$value = $row['value'];
-					// Some values are stored as serialized arrays and need to be unserialized
-					if (substr($value, 0, 2) == 'a:') {
-						$value = unserialize($value);
-						$value = '['.implode(',', $value).']';
-					}					
-					echo "['$value',".$row['reports']."],";
+					echo "['".$row['value']."',".$row['reports']."],";
 				}     
 				DB::disconnect();
 			?>		
@@ -161,9 +183,7 @@
 	  }
 	</script>
 
-	<?php 
-		PageGenerator::footer();;
-	?>
+<?php PageGenerator::footer(); ?>
 
 </body>
 </html>

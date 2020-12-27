@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -32,7 +32,7 @@
 ?>
 	
 <div class='header'>
-	<?php echo "<h4>Device feature coverage for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
+	<?php echo "<h4>Core 1.0 device feature coverage for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
 </div>			
 
 <center>

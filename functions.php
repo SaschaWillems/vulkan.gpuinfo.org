@@ -42,7 +42,7 @@ function getFormatFlags($flag)
 		0x4000 => "TRANSFER_SRC_BIT",
 		0x8000 => "TRANSFER_DST_BIT",
 	);
-	return getFlags($flags, $flag);
+	return getFlags($flags, $flag);	
 }
 
 function getImageUsageFlags($flag)
@@ -97,7 +97,7 @@ function getMemoryTypeFlags($flag)
 		0x0010 => "LAZILY_ALLOCATED_BIT",
 		0x0020 => "PROTECTED_BIT",
 		0x0040 => "DEVICE_COHERENT_BIT_AMD",
-		0x0080 => "DEVICE_UNCACHED_BIT_AMD",
+		0x0080 => "DEVICE_UNCACHED_BIT_AMD",		
 	);
 	return getFlags($flags, $flag);
 }
@@ -296,7 +296,7 @@ function getColorSpace($value)
 		"ADOBERGB_NONLINEAR_EXT" => 1000104012,
 		"PASS_THROUGH_EXT" => 1000104013,
 		"EXTENDED_SRGB_NONLINEAR_EXT" => 1000104014,
-		"DISPLAY_NATIVE_AMD" => 1000213000
+		"DISPLAY_NATIVE_AMD" => 1000213000	
 	);
 	if (in_array($value, $modes))
 	{

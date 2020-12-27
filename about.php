@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -18,7 +18,8 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-	include './header.inc';	
+	include 'page_generator.php';
+	PageGenerator::header('About');
 ?>
 
 <div id='reportdiv'>	   
@@ -31,7 +32,7 @@
 				<img src="images/vulkanlogoscene.png" width="320px">
 			</p>
 			<div>
-				Welcome to the public (inofficial) Vulkan hardware database, an online tool for developers that want to check out GPU hardware capabilites for the <a href="https://www.khronos.org/vulkan">new explicit graphics and compute
+				Welcome to the non-official Vulkan hardware database, an online tool for developers that want to check out GPU hardware capabilites for the <a href="https://www.khronos.org/vulkan">new explicit graphics and compute
 				API from Khronos</a>.<br><br>
 				This database and the client applications to submit reports are developed and maintained by me (<a href="http://www.saschawillems.de/" target="_blank">Sascha Willems</a>) in my spare time.<br><br>		
 				Thanks to the authors of <a href="https://www.datatables.net/" target="_blank">datatables</a> and <a href="https://github.com/vedmack/yadcf" target="_blank">yadcf</a> which are both used by the front-end of the database.<br><br>
@@ -52,9 +53,7 @@
 	</div>
 </div>
 
-<?php
-	include './footer.inc';
-?>
+<?php PageGenerator::footer(); ?>
 
 </body>
 </html>

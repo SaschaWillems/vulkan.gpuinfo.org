@@ -59,6 +59,7 @@
 	
 	$jsonFile = file_get_contents($file);	
 	$json = json_decode($jsonFile, true);
+	$display_name = null;
 	
 	// Check report version
 	$reportversion = floatval($json['environment']['reportversion']);
@@ -616,6 +617,8 @@
 	{		
 		$jsonnode = $json['platformdetails']; 
 		$index = 0;
+		$platform_model = null;
+		$platform_manufacturer = null;
 		foreach ($jsonnode as $key => $value) {
 			try {
 				// Add to global mapping table (if not already present)
@@ -639,7 +642,27 @@
 					":value" => $value));
 			} catch (Exception $e) {
 				die('Error while trying to upload report (error at platform details)');
-			}														
+			}													
+		}
+		// Construct display name for Anroid devices, device name only contains GPU name
+		try {
+			if ($jsonnode) {
+				$display_name_parts = [];
+				if (array_key_exists('android.ProductManufacturer', $jsonnode)) {
+					$display_name_parts[] = ucfirst($jsonnode['android.ProductManufacturer']);
+				}
+				if (array_key_exists('android.ProductModel', $jsonnode)) {
+					$display_name_parts[] = $jsonnode['android.ProductModel'];
+				}
+				if (count($display_name_parts) > 0 ) {
+					$display_name = implode(' ', $display_name_parts);				
+					$sql = "UPDATE reports set displayname = :displayname where reportid = :reportid and displayname is null";
+					$stmnt = DB::$connection->prepare($sql);
+					$stmnt->execute([":reportid" => $reportid, ":displayname" => $display_name]);
+				}
+			}
+		} catch (Exception $e) {
+			// Don't fail here, as it's not critical
 		}
 	}	
 
@@ -773,30 +796,36 @@
 	}	
 	
 	DB::$connection->commit();
+	DB::disconnect();
 		
 	echo "res_uploaded";	  	
-			
-	$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
-	if ($development_db) {
-		$msgtitle = "[DEVELOPMENT] ".$msgtitle;
-		$msg = "New Vulkan hardware report uploaded to the development database\n\n";
-		$msg .= "Link : http://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
-	} else {
-		$msg = "New Vulkan hardware report uploaded to the database\n\n";
-		$msg .= "Link : http://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
-	}
-	
-	$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
-	$msg .= "Driver version = ".$json['properties']['driverVersionText']."\n";
-	$msg .= "API version = ".$json['properties']['apiVersionText']."\n";
-	$msg .= "OS = ".$json['environment']['name']."\n";
-	$msg .= "OS version = ".$json['environment']['version']."\n";
-	$msg .= "OS arch = ".$json['environment']['architecture']."\n";
-	$msg .= "Submitter = ".$json['environment']['submitter']."\n";
-	$msg .= "Comment = ".$json['environment']['comment']."\n";
-	$msg .= "Report version = ".$json['environment']['reportversion']."\n";
-	
-	mail($mailto, $msgtitle, $msg); 
-	
-	DB::disconnect();
+
+	try {
+		$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
+		if ($development_db) {
+			$msgtitle = "[DEVELOPMENT] ".$msgtitle;
+			$msg = "New Vulkan hardware report uploaded to the development database\n\n";
+			$msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
+		} else {
+			$msg = "New Vulkan hardware report uploaded to the database\n\n";
+			$msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
+		}
+		
+		$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
+		if ($display_name !== null) {
+			$msg .= "Displayname = ".$displayname."\n";
+		}
+		$msg .= "Driver version = ".$json['properties']['driverVersionText']."\n";
+		$msg .= "API version = ".$json['properties']['apiVersionText']."\n";
+		$msg .= "OS = ".$json['environment']['name']."\n";
+		$msg .= "OS version = ".$json['environment']['version']."\n";
+		$msg .= "OS arch = ".$json['environment']['architecture']."\n";
+		$msg .= "Submitter = ".$json['environment']['submitter']."\n";
+		$msg .= "Comment = ".$json['environment']['comment']."\n";
+		$msg .= "Report version = ".$json['environment']['reportversion']."\n";
+		
+		mail($mailto, $msgtitle, $msg);
+	} catch (Exception $e) {
+		// Failure to mail is not critical
+	}	
 ?>
