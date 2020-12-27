@@ -245,3 +245,18 @@
     } else {
         echo json_encode(['updated' => false]);
     }
+
+	try {
+		$msgtitle = "Vulkan report updated for ".$report['properties']['deviceName']." (".$report['properties']['driverVersionText'].")";
+        $msg = "Vulkan hardware report has been updated\n\n";
+        $msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
+		$msg .= "Devicename = ".$report['properties']['deviceName']."\n";
+		if ($display_name !== null) {
+			$msg .= "Displayname = ".$$display_name."\n";
+        }
+        $msg .= "Updated data:\n";
+        $msg .= implode('\n', $update_log);		
+		mail($mailto, $msgtitle, $msg);
+	} catch (Exception $e) {
+		// Failure to mail is not critical
+	}	    
