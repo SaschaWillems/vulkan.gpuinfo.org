@@ -67,6 +67,7 @@
             // Basic report information
             $sql = "SELECT
                 p.devicename,
+                r.displayname,
                 VendorId(p.vendorid) as 'vendor',
                 r.version as reportversion,
                 r.ostype
@@ -78,11 +79,16 @@
             $stmnt->execute([':reportid' => $this->id]);
             $row = $stmnt->fetch(PDO::FETCH_ASSOC);
             $this->info->version = $row['reportversion'];
-            if (($row['vendor']) && (strpos($row['devicename'], $row['vendor']) === 0)) {
-                // Don't include vendor name if it's already part of the device name
-                $this->info->device_description = $row['devicename'];
+            if ($row['ostype'] == 2) {
+                // Display device name from platform data instead of GPU vendor and name on Android
+                $this->info->device_description = $row['displayname'];
             } else {
-                $this->info->device_description = $row['vendor']." ".$row['devicename'];
+                if (($row['vendor']) && (strpos($row['devicename'], $row['vendor']) === 0)) {
+                    // Don't include vendor name if it's already part of the device name
+                    $this->info->device_description = $row['devicename'];
+                } else {
+                    $this->info->device_description = $row['vendor']." ".$device_name;
+                }
             }
             $this->info->platform = platformname($row['ostype']);
             // Flags for optional data
