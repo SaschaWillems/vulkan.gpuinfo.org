@@ -30,6 +30,7 @@
         public $has_vulkan_1_2_features = false;
         public $has_vulkan_1_2_properties = false;
         public $has_portability_extension = false;
+        public $has_update_history = false;
     }
 
     class ReportInfo {
@@ -95,6 +96,7 @@
             $this->flags->has_vulkan_1_2_features = DB::getCount("SELECT count(*) from devicefeatures12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
+            $this->flags->has_update_history = DB::getCount("SELECT count(*) from reportupdatehistory where reportid = :reportid", [':reportid' => $this->id]) > 0;
             DB::disconnect();
         }
 
@@ -117,6 +119,7 @@
                 r.osversion,
                 r.submitter,
                 r.submissiondate,
+                (SELECT max(date) from reportupdatehistory where reportid = :reportid) as lastupdate,
                 r.version as reportversion,
                 r.description,
                 'devsim' as `devsim`
@@ -373,6 +376,19 @@
         {
             try {
                 $sql = "SELECT name, value, extension from deviceproperties2 where reportid = :reportid order by name asc";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }            
+        }
+
+        public function fetchUpdateHistory()
+        {
+            try {
+                $sql = "SELECT date, submitter, log, reportversion from reportupdatehistory where reportid = :reportid order by id desc";
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute([":reportid" => $this->id]);
                 $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);

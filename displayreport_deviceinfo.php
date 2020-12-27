@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016~2018 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -66,8 +66,12 @@
 					$group = 'Platform';
 				break;
 				case 'submitter':
+					$key = 'Submitted by';
 					$value = '<a href="listreports.php?submitter='.$value.'">'.$value.'</a>';
 					$group = 'Report';
+				break;
+				case 'submissiondate':
+					$key = 'Submitted at';
 				break;
 				case 'devicename':
 					$value = '<a href="listreports.php?devicename='.$value.'">'.$value.'</a>';			
@@ -78,6 +82,10 @@
 				case 'driverversionraw':
 					$key = 'Driver version';
 					$value = getDriverVerson($value, $row[2], $row[6], $row[11]);
+				break;
+				case 'lastupdate':
+					$key = 'Last update at';
+					$value = '<a href=# data-toggle="modal" data-target="#modal_report_history">'.$value.'</a>';
 				break;
 				case 'devsim':
 					include './displayreport_devsim_downloads.php';

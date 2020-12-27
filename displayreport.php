@@ -159,10 +159,12 @@
 		echo "<div id='instance' class='tab-pane fade reportdiv'>";
 		include 'displayreport_instance.php';
 		echo "</div>";	
-	}						
+	}
+
+	if ($report->flags->has_update_history) {
+		include 'displayreport_history.php';
+	}
 ?>
-
-
 	<script>
 		$(document).ready(
 		function() {
