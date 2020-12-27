@@ -45,7 +45,7 @@
         public static function disconnect() {
             DB::$connection = null;
         }
-        public static function getCount($statement, $params) {
+        public static function getCount($statement, $params = null) {
             $stmnt = DB::$connection->prepare($statement);
             $stmnt->execute($params);				
             return $stmnt->fetchColumn();

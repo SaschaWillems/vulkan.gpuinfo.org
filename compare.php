@@ -135,7 +135,7 @@
 			<li><a data-toggle='tab' href='#tab-features'>Features</a></li>
 			<li><a data-toggle='tab' href='#tab-limits'>Limits</a></li>
 			<li><a data-toggle='tab' href='#tab-extensions'>Extensions</a></li>
-			<li><a data-toggle='tab' href='#tab-extended-features'>Ext.Features</a></li>
+			<!-- <li><a data-toggle='tab' href='#tab-extended-features'>Ext.Features</a></li> -->
 			<li><a data-toggle='tab' href='#tab-extended-properties'>Ext.Props.</a></li>
 			<li><a data-toggle='tab' href='#tab-formats'>Formats</a></li>
 			<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>
@@ -179,11 +179,12 @@
 		</div>	
 
 		<!-- Extended Properties -->
-		<div id='tab-extended-properties' class='tab-pane fade reportdiv'>
+		<!-- @todo: remove -->
+		<!-- <div id='tab-extended-properties' class='tab-pane fade reportdiv'>
 			<table id='extended-properties' width='100%' class='table table-striped table-bordered table-hover'>
 				<?php include 'compare_extended_properties.php'; ?>
 			</tbody></table>
-		</div>	
+		</div>	 -->
 
 		<!-- Formats -->
 		<div id='tab-formats' class='tab-pane fade reportdiv'>
@@ -228,7 +229,7 @@
 	<script>
 		$(document).ready(function() {
 		
-			var tableNames = ['limits', 'extensions', 'extended-features', 'extended-properties', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
+			var tableNames = ['limits', 'extensions', 'extended-properties', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
 			{
 					$('#'+tableNames[i]).dataTable(
@@ -249,9 +250,11 @@
 
 			// Grouped tables
 			tableNames = [
-				'comparefeatures',
 				'comparelimits',
-				'compareextensions'
+				'compareextensions',
+				'comparequeuefamilies',
+				'compare_core_features',
+				'compare_extended_features',
 			];
 
 			// Device properties table with grouping
@@ -343,6 +346,16 @@
 		$('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
         	$($.fn.dataTable.tables()).DataTable().fixedHeader.adjust();
       	});
+
+		// Activate tab selected via anchor
+		$(function() 
+		{
+			var a = document.location.hash;
+			$('a[data-toggle="tab"]').on('show.bs.tab', function (e) 
+			{
+				window.location.hash = e.target.hash;
+			});
+		});		
 
 	</script>
 		

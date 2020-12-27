@@ -159,10 +159,25 @@
             echo "</tr>";
         }
 
-        public function fetchFeatures()
+        public function fetchFeatures($version)
         {
+            $table = null;
+            switch($version) {
+                case '1.0':
+                    $table = 'devicefeatures';
+                break;
+                case '1.1':
+                    $table = 'devicefeatures11';
+                break;
+                case '1.2':
+                    $table = 'devicefeatures12';
+                break;
+            }
+            if (!$table) {
+                return null;
+            }            
             try {
-                $sql = "SELECT features.* from reports r left join deviceproperties p on (p.reportid = r.id) left join devicefeatures features on (features.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
+                $sql = "SELECT features.* from reports r left join deviceproperties p on (p.reportid = r.id) left join $table features on (features.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute();
                 $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
