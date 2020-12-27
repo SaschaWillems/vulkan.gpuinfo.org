@@ -911,7 +911,7 @@
 		
 		$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
 		if ($display_name !== null) {
-			$msg .= "Displayname = ".$$display_name."\n";
+			$msg .= "Displayname = ".$display_name."\n";
 		}
 		$msg .= "Driver version = ".$json['properties']['driverVersionText']."\n";
 		$msg .= "API version = ".$json['properties']['apiVersionText']."\n";
