@@ -247,15 +247,19 @@
     }
 
 	try {
-		$msgtitle = "Vulkan report updated for ".$report['properties']['deviceName']." (".$report['properties']['driverVersionText'].")";
+		if (array_key_exists('displayName', $report['properties'])) {
+            $display_name = $report['properties']['displayName'];
+        } else {
+            $display_name = $report['properties']['deviceName'];
+        }
+        $msgtitle = "Vulkan report updated for ".$display_name." (".$report['properties']['driverVersionText'].")";
         $msg = "Vulkan hardware report has been updated\n\n";
         $msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
-		$msg .= "Devicename = ".$report['properties']['deviceName']."\n";
-		if ($display_name !== null) {
-			$msg .= "Displayname = ".$$display_name."\n";
-        }
+        $msg .= "Devicename = ".$report['properties']['deviceName']."\n";
         $msg .= "Updated data:\n";
-        $msg .= implode('\n', $update_log);		
+        foreach ($update_log as $log) {
+            $msg .= $log."\n";
+        }
 		mail($mailto, $msgtitle, $msg);
 	} catch (Exception $e) {
 		// Failure to mail is not critical
