@@ -83,11 +83,11 @@
                 // Display device name from platform data instead of GPU vendor and name on Android
                 $this->info->device_description = $row['displayname'];
             } else {
-                if (($row['vendor']) && (strpos($row['devicename'], $row['vendor']) === 0)) {
+                if (($row['vendor']) && (stripos($row['devicename'], $row['vendor']) === 0)) {
                     // Don't include vendor name if it's already part of the device name
                     $this->info->device_description = $row['devicename'];
                 } else {
-                    $this->info->device_description = $row['vendor']." ".$device_name;
+                    $this->info->device_description = $row['vendor']." ".$row['devicename'];
                 }
             }
             $this->info->platform = platformname($row['ostype']);
