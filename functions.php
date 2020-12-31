@@ -503,6 +503,10 @@ function displayBool($value) {
 	return ($value == 1) ? "<span class='supported'>true</span>" : "<span class='unsupported'>false</span>";
 }
 
+function displayHex($value) {
+	return '0x'.strtoupper(dechex($value));
+}
+
 /**
  * Visualize certain properties (e.g. flags) in a more readable way
  */
@@ -510,6 +514,10 @@ function getPropertyDisplayValue($key, $value) {
 	$displayvalue = $value;
 	switch($key) {
 		// Core 1.0
+		case 'vendorID':
+		case 'deviceID':
+			$displayvalue = displayHex($value);
+		break;
 		case 'residencyAlignedMipSize':
 		case 'residencyNonResidentStrict':
 		case 'residencyStandard2DBlockShape':

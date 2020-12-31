@@ -36,7 +36,6 @@
 		'displayname' => 'Display Name',
 		'devicetype' => 'Type',
 		'apiversion' => 'API Version',
-		'deviceid' => 'ID',
 		'osname' => 'Name',
 		'osarchitecture' => 'Architecture',
 		'osversion' => 'Version'
@@ -54,6 +53,7 @@
 			switch($key) {
 				case 'driverversion':
 				case 'vendorid':
+				case 'deviceid':
 				case 'pipelineCacheUUID':
 					continue 2;
 				break;
@@ -64,6 +64,7 @@
 				break;
 				case 'osname':
 					$group = 'Platform';
+					$value = ucfirst($value);
 				break;
 				case 'submitter':
 					$key = 'Submitted by';
