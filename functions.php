@@ -515,6 +515,8 @@ function getPropertyDisplayValue($key, $value) {
 		case 'residencyStandard2DBlockShape':
 		case 'residencyStandard2DMultisampleBlockShape':
 		case 'residencyStandard3DBlockShape':
+			$displayvalue = displayBool($value);
+		break;			
 		case 'pipelineCacheUUID':
 			$displayvalue = UUIDtoString($value);
 		break;
