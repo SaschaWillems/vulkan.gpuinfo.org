@@ -267,20 +267,20 @@ function getPointClippingBehavior($value) {
 
 function getDriverId($value) {
 	$values = [
-		'AMD_PROPRIETARY' => 1,
-		'AMD_OPEN_SOURCE' => 2,
-		'MESA_RADV' => 3,
-		'NVIDIA_PROPRIETARY' => 4,
-		'INTEL_PROPRIETARY_WINDOWS' => 5,
-		'INTEL_OPEN_SOURCE_MESA' => 6,
-		'IMAGINATION_PROPRIETARY' => 7,
-		'QUALCOMM_PROPRIETARY' => 8,
-		'ARM_PROPRIETARY' => 9,
-		'GOOGLE_SWIFTSHADER'=> 10,
-		'GGP_PROPRIETARY' => 11,
-		'BROADCOM_PROPRIETARY' => 12,
-		'MESA_LLVMPIPE' => 13,
-		'MOLTENVK' => 14
+		'AMD (Proprietary)' => 1,
+		'AMD (Open Source)' => 2,
+		'MESA RADV' => 3,
+		'NVIDIA (Proprietary)' => 4,
+		'Intel Windows (Proprietary)' => 5,
+		'Intel MESA (Open Source)' => 6,
+		'Imagination (Proprietary)' => 7,
+		'Qualcomm (Proprietary)' => 8,
+		'ARM (Proprietary)' => 9,
+		'Google Swiftshader'=> 10,
+		'GGP (Proprietary)' => 11,
+		'Broadcom (Proprietary)' => 12,
+		'MESA LLVMPIPE' => 13,
+		'MoltenVK' => 14
 	];
 	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
