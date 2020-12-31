@@ -19,6 +19,33 @@
 		*
 	*/
 
+	// Combined listing of properties, limits and sparse properties as in VkPhysicalDeviceProperties
+	function insertCore10Properties($report) {
+		$report->beginTab('properties_core_10', true);
+		$report->beginTable('table_properties_core_10', ['Property', 'Value', 'Category']);
+		$core_properties = $report->fetchCoreProperties('1.0');
+		if ($core_properties) {
+			$category = 'Properties';
+			foreach($core_properties as $key => $value) {
+				if ($key == 'reportid') { continue; }
+				if (strpos($key, 'subgroupProperties') === 0) { continue; }
+				if (strpos($key, 'residency') === 0) {
+					$category = 'Sparse properties';
+				}
+				$displayvalue = getPropertyDisplayValue($key, $value);				
+				if (strpos($key, 'subgroupProperties') === 0) {
+					$key = str_replace('subgroupProperties.', '', $key);
+				}
+				echo "<tr><td class='subkey'>$key</td>";
+				echo "<td>$displayvalue</td>";
+				echo "<td>$category</td>";
+				echo "</tr>";
+			}
+		}
+		$report->endTable();
+		$report->endTab();		
+	}
+
 	function insertCoreProperties($report, $version) {
 		$report->beginTab('properties_core_'.str_replace('.', '',$version), $version == '1.0');
 		$report->beginTable('table_properties_core_'.str_replace('.', '',$version), ['Property', 'Value']);				
@@ -30,6 +57,17 @@
 				echo "<tr><td class='subkey'>$key</td>";
 				echo "<td>$displayvalue</td>";
 				echo "</tr>";
+			}
+		} else {
+			// If the device has no dedicated 1.1 properties (only available if Vulkan 1.2 is supported), display sub group properties
+			if (($report->apiversion->major >= 1) && ($report->apiversion->minor >= 1)) {
+				$subgroup_properties = $report->fetchSubgroupProperties();
+				foreach($subgroup_properties as $key => $value) {
+					$displayvalue = getPropertyDisplayValue($key, $value);
+					echo "<tr><td class='subkey'>$key</td>";
+					echo "<td>$displayvalue</td>";
+					echo "</tr>";
+				}
 			}
 		}
 		$report->endTable();
@@ -80,7 +118,7 @@
 		echo "<div class='tab-content'>";
 	}
 
-	insertCoreProperties($report, '1.0');
+	insertCore10Properties($report);
 	if ($report->flags->has_vulkan_1_1_properties) {
 		insertCoreProperties($report, '1.1');
 	}

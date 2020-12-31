@@ -180,7 +180,6 @@
 				'table_features_core_10',
 				'table_features_core_11',
 				'table_features_core_12',
-				'table_properties_core_10',
 				'table_properties_core_11',
 				'table_properties_core_12'
 			];
@@ -206,6 +205,7 @@
 			// Grouped tables
 			tableNames = [
 				'deviceinfo',
+				'table_properties_core_10',
 				'table_features_extensions',
 				'table_properties_extensions',
 				'deviceproperties',

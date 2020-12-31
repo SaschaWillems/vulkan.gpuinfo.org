@@ -33,6 +33,12 @@
         public $has_update_history = false;
     }
 
+    class ReportApiVersion {
+        public $major = null;
+        public $minor = null;
+        public $patch = null;
+    }
+
     class ReportInfo {
         public $version = null;
         public $device_description = null;
@@ -41,12 +47,14 @@
 
     class Report {        
         public $id = null;
+        public ReportApiVersion $apiversion;
         public ReportInfo $info;
         public ReportFlags $flags;
 
         function __construct($reportid)
         {
             $this->id = $reportid;
+            $this->apiversion = new ReportApiVersion;
             $this->flags = new ReportFlags;
             $this->info = new ReportInfo;
         }
@@ -70,7 +78,8 @@
                 r.displayname,
                 VendorId(p.vendorid) as 'vendor',
                 r.version as reportversion,
-                r.ostype
+                r.ostype,
+                p.apiversionraw
                 from reports r
                 left join
                 deviceproperties p on (p.reportid = r.id)
@@ -90,6 +99,9 @@
                     $this->info->device_description = $row['vendor']." ".$row['devicename'];
                 }
             }
+            $this->apiversion->major = $row['apiversionraw'] >> 22;
+            $this->apiversion->minor = ($row['apiversionraw'] >> 12) & 0x3ff;
+            $this->apiversion->patch = ($row['apiversionraw'] & 0xfff);
             $this->info->platform = platformname($row['ostype']);
             // Flags for optional data
             $this->flags->has_instance_data =  DB::getCount("SELECT (select count(*) from deviceinstanceextensions where reportid = :reportid) + (select count(*) from deviceinstancelayers where reportid = :reportid)", [':reportid' => $this->id]) > 0;
@@ -99,6 +111,9 @@
             $this->flags->has_extended_properties = DB::getCount("SELECT count(*) from deviceproperties2 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_vulkan_1_1_features = DB::getCount("SELECT count(*) from devicefeatures11 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_vulkan_1_1_properties = DB::getCount("SELECT count(*) from deviceproperties11 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            if ($this->flags->has_vulkan_1_1_properties === false) {
+                $this->flags->has_vulkan_1_1_properties = (($this->apiversion->major >= 1) && ($this->apiversion->minor >= 1));
+            }
             $this->flags->has_vulkan_1_2_features = DB::getCount("SELECT count(*) from devicefeatures12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
@@ -347,7 +362,14 @@
             switch($version) {
                 case '1.0':
                     $table = 'deviceproperties';
-                    $columns = "residencyAlignedMipSize,
+                    $columns = "apiVersion,
+                    driverVersion,
+                    vendorID,
+                    deviceID,
+                    deviceType,
+                    deviceName,
+                    pipelineCacheUUID,
+                    residencyAlignedMipSize,
                     residencyNonResidentStrict, 
                     residencyStandard2DBlockShape, 
                     residencyStandard2DMultisampleBlockShape, 
@@ -377,6 +399,24 @@
                 return null;
             }      
         }
+
+        public function fetchSubgroupProperties()
+        {
+            $table = null;
+            $columns = "`subgroupProperties.subgroupSize` as subgroupSize,
+                `subgroupProperties.supportedStages` as subgroupSupportedStages,
+                `subgroupProperties.supportedOperations` as subgroupSupportedOperations,
+                `subgroupProperties.quadOperationsInAllStages` as subgroupQuadOperationsInAllStages";
+            try {
+                $sql = "SELECT $columns from deviceproperties where reportid = :reportid";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute([":reportid" => $this->id]);
+                $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+                return $result;
+            } catch (Throwable $e) {
+                return null;
+            }      
+        }        
 
         public function fetchExtensionProperties()
         {

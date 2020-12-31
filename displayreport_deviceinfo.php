@@ -37,7 +37,6 @@
 		'devicetype' => 'Type',
 		'apiversion' => 'API Version',
 		'deviceid' => 'ID',
-		'pipelineCacheUUID' => 'Pipeline Cache UUID',
 		'osname' => 'Name',
 		'osarchitecture' => 'Architecture',
 		'osversion' => 'Version'
@@ -55,6 +54,7 @@
 			switch($key) {
 				case 'driverversion':
 				case 'vendorid':
+				case 'pipelineCacheUUID':
 					continue 2;
 				break;
 				case 'displayname':
@@ -90,12 +90,6 @@
 				case 'devsim':
 					include './displayreport_devsim_downloads.php';
 					continue 2;
-				break;
-				case 'pipelineCacheUUID':
-					$value = UUIDtoString($value);
-					if (!is_null($value)) {
-
-					}
 				break;
 			}
 			if (array_key_exists($key, $device_info_field_aliases)) {

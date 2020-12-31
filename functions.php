@@ -515,14 +515,8 @@ function getPropertyDisplayValue($key, $value) {
 		case 'residencyStandard2DBlockShape':
 		case 'residencyStandard2DMultisampleBlockShape':
 		case 'residencyStandard3DBlockShape':
-		case 'subgroupProperties.quadOperationsInAllStages':
-			$displayvalue = displayBool($value);
-		break;
-		case 'subgroupProperties.supportedOperations':
-			$displayvalue = listSubgroupFeatureFlags($value);
-		break;
-		case 'subgroupProperties.supportedStages':
-			$displayvalue = listSubgroupStageFlags($value);
+		case 'pipelineCacheUUID':
+			$displayvalue = UUIDtoString($value);
 		break;
 		// Core 1.1
 		case 'deviceUUID':
