@@ -32,7 +32,7 @@
 ?>
 	
 <div class='header'>
-	<?php echo "<h4>Core 1.0 device properties for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
+	<?php echo "<h4>Core 1.0 properties for <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform); ?>	
 </div>			
 
 <center>
