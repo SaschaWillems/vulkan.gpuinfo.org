@@ -113,7 +113,7 @@
                     break;
                 default:
                     $tablename = 'devicefeatures';
-                }
+            }
             $whereClause = "where r.devicename ".($negate ? "not" : "")." in (select r.devicename from reports r join $tablename df on df.reportid = r.id where df.$feature = 1)";
         }    
     }
@@ -141,7 +141,17 @@
 	if (isset($_REQUEST['filter']['coreproperty'])) {
 	    $property = $_REQUEST['filter']['coreproperty'];
         if ($property != '') {
-            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join deviceproperties dp on dp.reportid = r.id where dp.$property = 1)";
+            switch($core) {
+                case '1.1':
+                    $tablename = 'deviceproperties11';
+                    break;
+                case '1.2':
+                    $tablename = 'deviceproperties12';
+                    break;
+                default:
+                    $tablename = 'deviceproperties';
+            }
+            $whereClause = "where r.id ".($negate ? "not" : "")." in (select r.id from reports r join $tablename dp on dp.reportid = r.id where dp.$property = 1)";
             $params['filter_core_property'] = $property;
         }
     }
