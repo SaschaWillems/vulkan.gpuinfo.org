@@ -10,3 +10,5 @@ $queue_flag_bits = [
     0x0008 => "SPARSE_BINDING_BIT",
     0x0010 => "PROTECTED_BIT",
 ];
+
+$platforms = ['windows', 'linux', 'android'];

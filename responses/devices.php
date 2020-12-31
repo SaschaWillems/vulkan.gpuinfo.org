@@ -27,9 +27,13 @@
     $data = array();
     $params = array();    
     $ostype = null;
+    $core = '1.0';
 
     if (isset($_REQUEST["platform"])) {
         $ostype = ostype($_REQUEST["platform"]);
+    }
+    if (isset($_REQUEST['filter']['core'])) {
+        $core = $_REQUEST['filter']['core'];
     }
     
     // Ordering
@@ -100,7 +104,17 @@
 	if (isset($_REQUEST['filter']['feature'])) {
 	    $feature = $_REQUEST['filter']['feature'];
         if ($feature != '') {
-            $whereClause = "where r.devicename ".($negate ? "not" : "")." in (select r.devicename from reports r join devicefeatures df on df.reportid = r.id where df.$feature = 1)";
+            switch($core) {
+                case '1.1':
+                    $tablename = 'devicefeatures11';
+                    break;
+                case '1.2':
+                    $tablename = 'devicefeatures12';
+                    break;
+                default:
+                    $tablename = 'devicefeatures';
+                }
+            $whereClause = "where r.devicename ".($negate ? "not" : "")." in (select r.devicename from reports r join $tablename df on df.reportid = r.id where df.$feature = 1)";
         }    
     }
     // Extension features

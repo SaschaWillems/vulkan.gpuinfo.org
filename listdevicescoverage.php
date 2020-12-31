@@ -238,6 +238,7 @@
 						'extensionproperty_name': '<?=$_GET['extensionname']?>',
 						'extensionproperty_property': '<?=$_GET['extensionproperty']?>',
 						'coreproperty': '<?=$_GET['coreproperty']?>',
+						'core': '<?=$_GET['core']?>'
 					}
 				},
 				error: function (xhr, error, thrown) {

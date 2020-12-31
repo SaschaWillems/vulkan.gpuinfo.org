@@ -97,7 +97,7 @@ PageGenerator::header("Core 1.1 features");
 					}
 
 					foreach ($features as $feature) {
-						$coverageLink = "listdevicescoverage.php?feature=" . $feature . "&platform=$platform";
+						$coverageLink = "listdevicescoverage.php?core=1.1&feature=" . $feature . "&platform=$platform";
 						$coverage = $deviceCount > 0 ? round($supportedCounts[$feature] / $deviceCount * 100, 1) : 0;
 						echo "<tr>";
 						echo "<td>" . $feature . "</td>";
