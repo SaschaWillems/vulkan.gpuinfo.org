@@ -257,6 +257,35 @@ function getShaderFloatControlsIndependence($value)
 	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
 
+function getPointClippingBehavior($value) {
+	$values = [
+		'All clip planes' => 0,
+		'User clip planes only' => 1
+	];
+	return (in_array($value, $values) ? array_search($value, $values) : null);
+}
+
+function getDriverId($value) {
+	$values = [
+		'AMD_PROPRIETARY' => 1,
+		'AMD_OPEN_SOURCE' => 2,
+		'MESA_RADV' => 3,
+		'NVIDIA_PROPRIETARY' => 4,
+		'INTEL_PROPRIETARY_WINDOWS' => 5,
+		'INTEL_OPEN_SOURCE_MESA' => 6,
+		'IMAGINATION_PROPRIETARY' => 7,
+		'QUALCOMM_PROPRIETARY' => 8,
+		'ARM_PROPRIETARY' => 9,
+		'GOOGLE_SWIFTSHADER'=> 10,
+		'GGP_PROPRIETARY' => 11,
+		'BROADCOM_PROPRIETARY' => 12,
+		'MESA_LLVMPIPE' => 13,
+		'MOLTENVK' => 14
+	];
+	return (in_array($value, $values) ? array_search($value, $values) : null);
+}
+
+
 function getPresentMode($value)
 {
 	$modes = array(
@@ -506,6 +535,9 @@ function getPropertyDisplayValue($key, $value) {
 		case 'protectedNoFault':
 			$displayvalue = displayBool($value);
 		break;
+		case 'pointClippingBehavior':
+			$displayvalue = getPointClippingBehavior($value);
+		break;
 		case 'subgroupSupportedStages':
 			$displayvalue = listSubgroupStageFlags($value);
 		break;
@@ -513,6 +545,9 @@ function getPropertyDisplayValue($key, $value) {
 			$displayvalue = listSubgroupFeatureFlags($value);
 		break;
 		// Core 1.2
+		case 'driverID':
+			$displayvalue = getDriverId($value);
+		break;
 		case 'shaderSignedZeroInfNanPreserveFloat16':
 		case 'shaderSignedZeroInfNanPreserveFloat32':
 		case 'shaderSignedZeroInfNanPreserveFloat64':
