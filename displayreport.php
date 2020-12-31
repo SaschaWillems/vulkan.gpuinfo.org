@@ -92,7 +92,6 @@
 			<li class='active'><a data-toggle='tab' href='#device'>Device</a></li>
 			<li><a data-toggle='tab' href='#properties'>Properties</a></li>
 			<li><a data-toggle='tab' href='#features'>Features</a></li>
-			<li><a data-toggle='tab' href='#limits'>Limits</a></li>
 			<li><a data-toggle='tab' href='#extensions'>Extensions <span class='badge'><?php echo $extcount ?></span></a></li>
 			<li><a data-toggle='tab' href='#formats'>Formats <span class='badge'><?php echo $formatcount ?></span></a></a></li>
 			<li><a data-toggle='tab' href='#queuefamilies'>Queue families <span class='badge'><?php echo $queuecount ?></span></a></li>
@@ -121,11 +120,6 @@
 	include 'displayreport_features.php';									
 	echo "</div>";			
 	
-	// Device limits
-	echo "<div id='limits' class='tab-pane fade reportdiv'>";
-	include 'displayreport_limits.php';
-	echo "</div>";		
-
 	// Extensions
 	echo "<div id='extensions' class='tab-pane fade reportdiv'>";
 	include './displayreport_extensions.php';					
@@ -169,7 +163,6 @@
 		$(document).ready(
 		function() {
 			var tableNames = [ 
-				'devicelimits', 
 				'deviceextensions', 
 				'devicelayerextensions', 
 				'devicememoryheaps', 

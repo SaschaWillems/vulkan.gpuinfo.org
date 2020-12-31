@@ -540,6 +540,17 @@ function getPropertyDisplayValue($key, $value) {
 		case 'subgroupSupportedOperations':
 			$displayvalue = listSubgroupFeatureFlags($value);
 		break;
+		case 'framebufferColorSampleCounts':
+		case 'framebufferDepthSampleCounts':
+		case 'framebufferNoAttachmentsSampleCounts':
+		case 'framebufferStencilSampleCounts':
+		case 'sampledImageColorSampleCounts':
+		case 'sampledImageDepthSampleCounts':
+		case 'sampledImageIntegerSampleCounts':
+		case 'sampledImageStencilSampleCounts':
+		case 'storageImageSampleCounts':
+			$displayvalue = listSampleCountFlags($value);
+		break;		
 		// Core 1.2
 		case 'driverID':
 			$displayvalue = getDriverId($value);
