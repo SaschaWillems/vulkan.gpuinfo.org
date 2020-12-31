@@ -43,6 +43,17 @@ if (isset($_GET['os'])) {
 		}
 	}
 }
+$tablename = 'deviceproperties';
+if (isset($_GET['core'])) {
+	switch ($_GET['core']) {
+		case '1.1':
+			$tablename = 'deviceproperties11';
+			break;
+		case '1.2':
+			$tablename = 'deviceproperties12';
+			break;
+	}
+}
 PageGenerator::header($name);
 
 $caption = "Value distribution for <code>$name</code>";
@@ -69,8 +80,8 @@ if (isset($_GET['platform'])) {
 
 // Check if property is valid and part of the selected table
 DB::connect();
-$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = 'deviceproperties' and column_name = :columnname");
-$result->execute([":columnname" => $name]);
+$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :tablename and column_name = :columnname");
+$result->execute(["tablename" => $tablename, "columnname" => $name]);
 DB::disconnect();
 if ($result->rowCount() == 0) {
 	echo "<center>";
@@ -123,10 +134,10 @@ if ($result->rowCount() == 0) {
 					DB::connect();
 					switch ($name) {
 						case 'vendorid':
-							$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from deviceproperties $filter group by 1 order by 1";
+							$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from $tablename $filter group by 1 order by 1";
 							break;
 						default:
-							$sql = "SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 1";
+							$sql = "SELECT `$name` as value, count(0) as reports from $tablename $filter group by 1 order by 1";
 					}
 					$result = DB::$connection->prepare($sql);
 					$result->execute();
@@ -161,10 +172,10 @@ if ($result->rowCount() == 0) {
 			DB::connect();
 			switch ($name) {
 				case 'vendorid':
-					$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from deviceproperties $filter group by 1 order by 2";
+					$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from $tablename $filter group by 1 order by 2";
 					break;
 				default:
-					$sql = "SELECT `$name` as value, count(0) as reports from deviceproperties $filter group by 1 order by 2";
+					$sql = "SELECT `$name` as value, count(0) as reports from $tablename $filter group by 1 order by 2";
 			}
 			$result = DB::$connection->prepare($sql);
 			$result->execute();
