@@ -20,8 +20,9 @@
  *
  */
 
-include 'page_generator.php';
-include 'dbconfig.php';
+require 'page_generator.php';
+require 'dbconfig.php';
+require 'functions.php';
 
 $name = null;
 if (isset($_GET['name'])) {
@@ -144,8 +145,9 @@ if ($result->rowCount() == 0) {
 					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 					foreach ($rows as $cap) {
 						$link = "listreports.php?property=$name&value=" . $cap["value"] . ($platform ? "&platform=$platform" : "");
+						$value = getPropertyDisplayValue($name, $cap['value']);
 						echo "<tr>";
-						echo "<td>" . $cap["value"] . "</td>";
+						echo "<td>$value</td>";
 						echo "<td><a href='$link'>" . $cap["reports"] . "</a></td>";
 						echo "</tr>";
 					}
