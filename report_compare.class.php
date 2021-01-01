@@ -136,9 +136,15 @@ class ReportCompare
             echo "<th></th>";
         }
         foreach ($this->device_infos as $device_info) {
-            echo "<th>$device_info->name</th>";
+            echo "<th>";
+            echo $device_info->name;
+            echo "<br>";
+            echo "Driver $device_info->driver_version";
+            echo "<br>";
+            echo ucfirst($device_info->platform);
+            echo "</th>";
         }
-        echo "</th></thead><tbody>";
+        echo "</thead><tbody>";
     }
 
     /**
