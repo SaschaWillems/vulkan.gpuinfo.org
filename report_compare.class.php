@@ -172,6 +172,38 @@ class ReportCompare
         echo "</tr>";
     }
 
+    public function fetchDeviceInfo()
+    {
+        try {
+            $stmnt = DB::$connection->prepare(
+                "SELECT 
+                        r.displayname,
+                        p.driverversion,
+                        p.devicetype,
+                        p.apiversion,
+                        p.vendorid,
+                        VendorId(p.vendorid) as 'vendor',
+                        concat('0x', hex(cast(p.deviceid as UNSIGNED))) as 'deviceid',
+                        r.osname,
+                        r.osarchitecture,
+                        r.osversion,
+                        r.submitter,
+                        r.submissiondate,
+                        (SELECT max(date) from reportupdatehistory where reportid = r.id) as lastupdate,
+                        r.version as reportversion,                        
+                        r.description		
+                    from reports r
+                    left join
+                    deviceproperties p on (p.reportid = r.id)				
+                    where r.id in (" . $this->reportIdsParam() . ")" );
+            $stmnt->execute();
+            $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (Throwable $e) {
+            return null;
+        }
+    }    
+
     public function fetchFeatures($version)
     {
         $table = null;
