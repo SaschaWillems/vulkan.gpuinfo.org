@@ -162,7 +162,12 @@
 		<div id='tab-features' class='tab-pane fade reportdiv'>
 			<?php include 'compare_features.php'; ?>
 		</div>
-		
+
+		<!-- Properties -->
+		<div id='properties' class='tab-pane fade in active reportdiv'>
+			<?php include 'reportcompare/properties.php'; ?>
+		</div>
+
 		<!-- Limits  -->
 		<div id='tab-limits' class='tab-pane fade reportdiv'>
 			<?php include 'compare_limits.php'; ?>
@@ -256,6 +261,10 @@
 				'compareextensions',
 				'comparequeuefamilies',
 				'compare_core_features',
+				'table_properties_core_10',
+				'table_properties_core_11',
+				'table_properties_core_12',
+				'table_properties_extensions',
 				'compare_extended_features',
 			];
 
