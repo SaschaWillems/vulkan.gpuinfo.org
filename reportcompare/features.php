@@ -26,26 +26,19 @@ function insertCoreFeatures($report_compare, $version)
 
 	$report_compare->beginTab('features_core_' . str_replace('.', '', $version), $version == '1.0');
 	$report_compare->beginTable("table_features_core_" . str_replace('.', '', $version));
-	$report_compare->insertTableHeader("Feature", true);
-	$report_compare->insertDeviceInformation("Device");
+	$report_compare->insertTableHeader("Feature", false);
 
 	for ($i = 0; $i < $compare_features->count; $i++) {
 		// Check if row contains differing values
 		$differing_values = false;
 		for ($j = 1; $j < count($compare_features->data); $j++) {
-			if ($compare_features->data[$j][$i] !== $compare_features->data[0][$i]) {
+			if (($compare_features->data[$j][$i] !== null) && ($compare_features->data[$j][$i] !== $compare_features->data[0][$i])) {
 				$differing_values = true;
 				break;
 			}
 		}
-
-		$row_class = "";
-		if (!$report_compare->isHeaderColumn($compare_features->captions[$i])) {
-			$row_class = $differing_values ? "" : "class='sameCaps'";
-		};
-		echo "<tr $row_class>";
+		echo "<tr ".($differing_values ? "" : "class='sameCaps'").">";
 		echo "<td class='subkey'>" . ($differing_values ? $report_compare->getDiffIcon() : "") . $compare_features->captions[$i] . "</td>";
-		echo "<td>Feature</td>";
 		for ($j = 0; $j < count($compare_features->data); $j++) {
 			$value = $compare_features->data[$j][$i];
 			$displayvalue = (($value !== null) ? displayBool($value) : "<span class='na'>n/a</span>");
@@ -64,7 +57,6 @@ function insertExtensionFeatures($report_compare)
 	$report_compare->beginTab('features_extensions');
 	$report_compare->beginTable("compare_extended_features");
 	$report_compare->insertTableHeader("Feature", true);
-	$report_compare->insertDeviceInformation("Device");
 
 	$extended_features = [];
 	$extended_features_reports = [];

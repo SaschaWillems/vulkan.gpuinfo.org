@@ -199,82 +199,86 @@ $repids = implode(",", $reportids);
 	<script>
 		$(document).ready(function() {
 
+			// Ungrouped tables
 			var tableNames = [
 				'formats-0', 
 				'formats-1', 
 				'formats-2', 
-				'surface-1', 
-				'surface-2', 
-				'surface-3'
+				'surface-caps', 
+				'surface-formats', 
+				'table_features_core_10',
+				'table_features_core_11',
+				'table_features_core_12',
+				'table_properties_core_11',
+				'table_properties_core_12',
 			];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
-				$('#' + tableNames[i]).dataTable({
-					"pageLength": -1,
-					"paging": false,
-					"order": [],
-					"searchHighlight": true,
-					"sDom": 'flpt',
-					"deferRender": true,
-					"fixedHeader": {
-						"header": true,
-						"headerOffset": 50
-					},
-				});
+				if (typeof $('#'+tableNames[i]) != undefined) {
+					$('#' + tableNames[i]).dataTable({
+						"pageLength": -1,
+						"paging": false,
+						"order": [],
+						"searchHighlight": true,
+						"sDom": 'flpt',
+						"deferRender": true,
+						"fixedHeader": {
+							"header": true,
+							"headerOffset": 50
+						},
+					});
+				}
 			}
 
 			// Grouped tables
 			tableNames = [
 				'comparedevices',
 				'compareextensions',
-				'comparequeuefamilies',
-				'table_features_core_10',
-				'table_features_core_11',
-				'table_features_core_12',
+				'table_queue_families',
 				'table_features_extensions',
 				'table_properties_core_10',
-				'table_properties_core_11',
-				'table_properties_core_12',
 				'table_properties_extensions',
 				'compare_extended_features',
 			];
 
 			// Device properties table with grouping
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
-				$('#' + tableNames[i]).dataTable({
-					"pageLength": -1,
-					"paging": false,
-					"order": [],
-					"columnDefs": [{
-						"visible": false,
-						"targets": 1
-					}],
-					"searchHighlight": true,
-					"bAutoWidth": false,
-					"sDom": 'flpt',
-					"deferRender": true,
-					"processing": true,
-					"fixedHeader": {
-						"header": true,
-						"headerOffset": 50
-					},
-					"drawCallback": function(settings) {
-						var api = this.api();
-						var rows = api.rows({
-							page: 'current'
-						}).nodes();
-						var last = null;
-						api.column(1, {
-							page: 'current'
-						}).data().each(function(group, i) {
-							if (last !== group) {
-								$(rows).eq(i).before(
-									'<tr><td colspan="' + api.columns().header().length + '" class="group">' + group + '</td></tr>'
-								);
-								last = group;
-							}
-						});
-					}
-				});
+				if (typeof $('#'+tableNames[i]) != undefined) {
+					$('#' + tableNames[i]).dataTable({
+						"pageLength": -1,
+						"paging": false,
+						"order": [],
+						"columnDefs": [{
+							"visible": false,
+							"targets": 1
+						}],
+						"searchHighlight": true,
+						"bAutoWidth": false,
+						"sDom": 'flpt',
+						"deferRender": true,
+						"processing": true,
+						"fixedHeader": {
+							"header": true,
+							"headerOffset": 50
+						},
+						"drawCallback": function(settings) {
+							var api = this.api();
+							var rows = api.rows({
+								page: 'current'
+							}).nodes();
+							var last = null;
+							api.column(1, {
+								page: 'current'
+							}).data().each(function(group, i) {
+								if (last !== group) {
+									$(rows).eq(i).before(
+										'<tr><td colspan="' + api.columns().header().length + '" class="group">' + group + '</td></tr>'
+									);
+									last = group;
+								}
+							});
+						}
+					});
+				}
 			}
 
 			$('#devices').show();
