@@ -131,9 +131,10 @@
 	$repids = implode(",", $reportids);   
 ?>			
 							
-		<div id='tabs'>
+		<div>
 		<ul class='nav nav-tabs'>
 			<li class='active'><a data-toggle='tab' href='#tab-devices'>Devices</a></li>
+			<li><a data-toggle='tab' href='#properties'>Properties</a></li>
 			<li><a data-toggle='tab' href='#tab-features'>Features</a></li>
 			<li><a data-toggle='tab' href='#tab-limits'>Limits</a></li>
 			<li><a data-toggle='tab' href='#tab-extensions'>Extensions</a></li>
@@ -143,28 +144,26 @@
 			<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>
 			<li><a data-toggle='tab' href='#tab-memory'>Memory</a></li>
 			<li><a data-toggle='tab' href='#tab-surface'>Surface</a></li>
-		</ul>		
+		</ul>
+		</div>
 		
 		<div class='tablediv tab-content' style='width:75%;'>		
 
-		<div id='tab-devices' class='tab-pane fade in active reportdiv'>
-
 		<!-- Devices -->		
-		<div id="overlay_devices"><center><h4>Fetching data...</h4><img src="./images/loading.gif"></center></div>
+		<div id='tab-devices' class='tab-pane fade in active reportdiv'>
+			<div id="overlay_devices"><center><h4>Fetching data...</h4><img src="./images/loading.gif"></center></div>
 			<table id='devices' width='100%' class='table table-striped table-bordered table-hover' >
-			<!-- style='display:none' -->
 				<?php include 'compare_devices.php'; ?>
 			</tbody></table>
 		</div>
-
 		
 		<!-- Features -->
 		<div id='tab-features' class='tab-pane fade reportdiv'>
-			<?php include 'compare_features.php'; ?>
+			<?php include 'reportcompare/features.php'; ?>
 		</div>
 
 		<!-- Properties -->
-		<div id='properties' class='tab-pane fade in active reportdiv'>
+		<div id='properties' class='tab-pane fade reportdiv'>
 			<?php include 'reportcompare/properties.php'; ?>
 		</div>
 
@@ -260,7 +259,10 @@
 				'comparelimits',
 				'compareextensions',
 				'comparequeuefamilies',
-				'compare_core_features',
+				'table_features_core_10',
+				'table_features_core_11',
+				'table_features_core_12',
+				'table_features_extensions',
 				'table_properties_core_10',
 				'table_properties_core_11',
 				'table_properties_core_12',
