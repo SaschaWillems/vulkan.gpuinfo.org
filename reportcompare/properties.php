@@ -52,7 +52,8 @@ function insertCore10Properties($report_compare)
 		echo "<td class='subkey'>" . ($differing_values ? $report_compare->getDiffIcon() : "") . $caption . "</td>";
 		echo "<td>Properties</td>";
 		for ($j = 0; $j < count($compare_properties->data); $j++) {
-			$displayvalue = getPropertyDisplayValue($caption, $compare_properties->data[$j][$i]);
+			$value = $compare_properties->data[$j][$i];
+			$displayvalue = ($value ? getPropertyDisplayValue($caption, $value) : "<span class='na'>n/a</span>");
 			echo "<td>$displayvalue</td>";
 		}
 		echo "</tr>";
@@ -116,7 +117,8 @@ function insertCoreProperties($report_compare, $version)
 		echo "<td class='subkey'>" . ($differing_values ? $report_compare->getDiffIcon() : "") . $compare_properties->captions[$i] . "</td>";
 		echo "<td>Property</td>";
 		for ($j = 0; $j < count($compare_properties->data); $j++) {
-			$displayvalue = getPropertyDisplayValue($compare_properties->captions[$i], $compare_properties->data[$j][$i]);
+			$value = $compare_properties->data[$j][$i];
+			$displayvalue = (($value !== null) ? getPropertyDisplayValue($compare_properties->captions[$i], $value) : "<span class='na'>n/a</span>");
 			echo "<td>$displayvalue</td>";
 		}
 		echo "</tr>";

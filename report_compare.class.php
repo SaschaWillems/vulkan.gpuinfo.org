@@ -53,6 +53,7 @@ class ReportCompare
 {
 
     private $header_column_names = ['device', 'driverversion', 'apiversion', 'os'];
+    private $report_column_names = ['id', 'submissiondate', 'submitter', 'devicename', 'driverversion', 'apiversion', 'counter', 'osarchitecture', 'osname', 'osversion', 'description', 'version', 'headerversion', 'displayname', 'ostype', 'internalid', 'reportid'];    
 
     public $report_ids = [];
     public $report_count = 0;
@@ -228,7 +229,8 @@ class ReportCompare
             return null;
         }
         try {
-            $sql = "SELECT features.* from reports r left join deviceproperties p on (p.reportid = r.id) left join $table features on (features.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
+            // Need to join with reports to get rows for reports with no row in the properties tabel
+            $sql = "SELECT * from reports r left join $table dp on r.id = dp.reportid where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute();
             $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
@@ -236,9 +238,7 @@ class ReportCompare
             foreach ($rows as $index => $row) {
                 $reportdata = [];
                 foreach ($row as $key => $values) {
-                    if ($key == "reportid") {
-                        continue;
-                    }
+                    if (in_array($key, $this->report_column_names)) { continue; }                    
                     $reportdata[] = $values;
                     if ($index == 0) {
                         $result->captions[] = $key;
@@ -288,7 +288,8 @@ class ReportCompare
             return null;
         }
         try {
-            $sql = "SELECT $columns from $table where reportid in (" . $this->reportIdsParam() . ") order by reportid asc";
+            // Need to join with reports to get rows for reports with no row in the properties tabel
+            $sql = "SELECT $columns from reports r left join $table dp on r.id = dp.reportid where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute();
             $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
@@ -296,9 +297,7 @@ class ReportCompare
             foreach ($rows as $index => $row) {
                 $reportdata = [];
                 foreach ($row as $key => $values) {
-                    if ($key == "reportid") {
-                        continue;
-                    }
+                    if (in_array($key, $this->report_column_names)) { continue; }                    
                     $reportdata[] = $values;
                     if ($index == 0) {
                         $result->captions[] = $key;

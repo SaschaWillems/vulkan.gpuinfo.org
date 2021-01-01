@@ -22,7 +22,6 @@
 
 function insertCoreFeatures($report_compare, $version)
 {
-	// @todo: Move data fetching to report compare class
 	$compare_features = $report_compare->fetchFeatures($version);
 
 	$report_compare->beginTab('features_core_' . str_replace('.', '', $version), $version == '1.0');
@@ -48,7 +47,9 @@ function insertCoreFeatures($report_compare, $version)
 		echo "<td class='subkey'>" . ($differing_values ? $report_compare->getDiffIcon() : "") . $compare_features->captions[$i] . "</td>";
 		echo "<td>Feature</td>";
 		for ($j = 0; $j < count($compare_features->data); $j++) {
-			echo "<td>" . displayBool($compare_features->data[$j][$i]) . "</td>";
+			$value = $compare_features->data[$j][$i];
+			$displayvalue = (($value !== null) ? displayBool($value) : "<span class='na'>n/a</span>");
+			echo "<td>$displayvalue</td>";
 		}
 		echo "</tr>";
 	}
