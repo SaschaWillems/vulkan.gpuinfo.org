@@ -170,7 +170,7 @@ $repids = implode(",", $reportids);
 
 	<!-- Formats -->
 	<div id='formats' class='tab-pane fade reportdiv'>
-		<?php include 'compare_formats.php'; ?>
+		<?php include 'reportcompare/formats.php'; ?>
 	</div>
 
 	<!-- Queues -->
