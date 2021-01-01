@@ -70,12 +70,9 @@ for ($i = 0; $i < count($compare_device_infos); $i++) {
 		if (array_key_exists($key, $device_info_field_aliases)) {
 			$display_key = $device_info_field_aliases[$key];
 		}
-
-		if (!(in_array($colname, ['reportid', 'driverversion', 'pipelineCacheUUID']))) {
-			$reportdata[] = $display_value;
-			$captions[] = ucfirst($display_key);
-			$groups[] = $group;
-		}
+		$reportdata[] = $display_value;
+		$captions[] = ucfirst($display_key);
+		$groups[] = $group;
 	}
 	$column[] = $reportdata;
 }

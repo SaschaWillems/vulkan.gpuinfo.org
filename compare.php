@@ -165,7 +165,7 @@ $repids = implode(",", $reportids);
 
 	<!-- Extensions -->
 	<div id='extensions' class='tab-pane fade reportdiv'>
-		<?php include 'compare_extensions.php'; ?>
+		<?php include 'reportcompare/extensions.php'; ?>
 	</div>
 
 	<!-- Formats -->
