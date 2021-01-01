@@ -607,6 +607,12 @@ function getPropertyDisplayValue($key, $value) {
 			$displayvalue = listSampleCountFlags($value);
 		break;
 		default:
+			// Serialized arrays
+			if (is_string($value) && (substr($value, 0, 2) == "a:") && (strpos($value, '{') !== false)) {
+				$arr = unserialize($value);
+				$displayvalue = "[".implode(',', $arr)."]";
+			}
+			// Boolean string
 			if (($value == 'true') || ($value == 'false')) {
 				$displayvalue = displayBool($value);
 			};
