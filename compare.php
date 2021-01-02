@@ -220,7 +220,6 @@ $repids = implode(",", $reportids);
 			// Device properties table with grouping
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
 				if (typeof $('#'+tableNames[i]) != undefined) {
-					console.log(tableNames[i]);
 					$('#' + tableNames[i]).dataTable({
 						"pageLength": -1,
 						"paging": false,
