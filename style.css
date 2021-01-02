@@ -303,6 +303,9 @@ h4 {
 {
 	width:1px;
 	padding-left:25px !important;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;	
 }
 
 .value

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2020-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -19,38 +19,25 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.		
  *
  */
-
-class PageGenerator
-{
-
-	public static function header($title = null)
-	{
-		$page_title = $title;
-		include './header.php';
-	}
-
-	public static function footer()
-	{
-		include './footer.php';
-	}
-
-	public static function errorMessage($message, $header = true, $footer = true, $end_script = true)
-	{
-		if ($header) {
-			self::header();
 ?>
-			<div class="div-h-center">
-				<div class="div-alert alert alert-danger error">
-					<?= $message ?>
-				</div>
-			</div>
-<?php
-			if ($footer) {
-				self::footer();
-			}
-			if ($end_script) {
-				die();
+<table id='deviceextensions' class='table table-striped table-bordered table-hover reporttable'>
+	<thead>
+		<tr>
+			<td class='caption'>Extension</td>
+			<td class='caption'>Version</td>
+		</tr>
+	</thead>
+	<tbody>
+		<?php
+		$data = $report->fetchExtensions();
+		if ($data) {
+			foreach ($data as $extension) {
+				$link = "listdevicescoverage.php?extension=" . $extension['name'] . $linkplatform;
+				echo "<tr><td><a href='$link'>" . $extension['name'] . "</a></td>";
+				echo "<td>" . versionToString($extension['specversion']) . "</td>";
+				echo "</tr>";
 			}
 		}
-	}
-}
+		?>
+	</tbody>
+</table>

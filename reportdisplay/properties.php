@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -59,17 +59,7 @@ function insertCore10Properties($report)
 			echo "<tr><td class='subkey'>$key</td>";
 			echo "<td>$displayvalue</td>";
 			echo "<td>Limits</td>";
-			echo "</tr>";
-			// if (strpos($key, 'SampleCounts')) {				
-			// 	$sampleCountflags = getSampleCountFlags($value);
-			// 	if (count($sampleCountflags) > 0) {
-			// 		echo "<td>".listSampleCountFlags($value)."</td>";
-			// 	} else {
-			// 		echo "<td><font color='red'>none</font></td>";
-			// 	}
-			// } else {
-			// 	echo "<td>".$value."</td>";
-			// }			
+			echo "</tr>";			
 		}
 	}	
 	$report->endTable();

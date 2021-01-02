@@ -23,6 +23,7 @@
 require './dbconfig.php';
 require 'page_generator.php';
 require './functions.php';
+require './constants.php';
 require './report_compare.class.php';
 
 PageGenerator::header('Compare reports');
@@ -178,9 +179,6 @@ $repids = implode(",", $reportids);
 
 			// Ungrouped tables
 			var tableNames = [
-				'formats-0', 
-				'formats-1', 
-				'formats-2', 
 				'surface-caps', 
 				'surface-formats', 
 				'table_features_core_10',
