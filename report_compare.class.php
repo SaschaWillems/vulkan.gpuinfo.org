@@ -260,12 +260,12 @@ class ReportCompare
         switch ($version) {
             case '1.0':
                 $table = 'deviceproperties';
-                $columns = "apiVersion,
-                        driverVersion,
+                $columns = "r.apiVersion,
+                        r.driverVersion,
                         vendorID,
                         deviceID,
                         deviceType,
-                        deviceName,
+                        r.deviceName,
                         pipelineCacheUUID,
                         residencyAlignedMipSize,
                         residencyNonResidentStrict, 
