@@ -130,20 +130,26 @@ class ReportCompare
     /**
      * Insert table header with device names into the current table
      */
-    public function insertTableHeader($caption, $grouping_column = false)
+    public function insertTableHeader($caption, $grouping_column = false, $device_info = true)
     {
         echo "<thead><tr><th>$caption</th>";
         if ($grouping_column) {
             echo "<th></th>";
         }
-        foreach ($this->device_infos as $device_info) {
-            echo "<th>";
-            echo $device_info->name;
-            echo "<br>";
-            echo "Driver $device_info->driver_version";
-            echo "<br>";
-            echo ucfirst($device_info->platform);
-            echo "</th>";
+        if ($device_info) {
+            foreach ($this->device_infos as $device_info) {
+                echo "<th>";
+                echo $device_info->name;
+                echo "<br>";
+                echo "Driver $device_info->driver_version";
+                echo "<br>";
+                echo ucfirst($device_info->platform);
+                echo "</th>";
+            }
+        } else {
+            foreach ($this->device_infos as $device_info) {
+                echo "<th>&nbsp;</th>";
+            }
         }
         echo "</thead><tbody>";
     }

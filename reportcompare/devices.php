@@ -78,7 +78,7 @@ for ($i = 0; $i < count($compare_device_infos); $i++) {
 }
 
 $report_compare->beginTable('comparedevices');
-$report_compare->insertTableHeader('', true);
+$report_compare->insertTableHeader('', true, false);
 
 for ($i = 0; $i < count($column[0]); $i++) {
 	$empty_row = true;
