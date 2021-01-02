@@ -49,6 +49,13 @@ class ReportCompareData
     public $count;
 }
 
+class ReportCompareFormatData
+{
+    public $linear;
+    public $optimal;
+    public $buffer;
+}
+
 class ReportCompare
 {
 
@@ -475,6 +482,17 @@ class ReportCompare
         } catch (Throwable $e) {
             return [];
         }
+    }
+
+    public function fetchAvailableFormats()
+    {
+        try {
+            $stmnt = DB::$connection->prepare("SELECT name from VkFormat where value > 0");
+            $stmnt->execute();
+            return $stmnt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            return [];
+        }        
     }
 
     public function beginTable($id)

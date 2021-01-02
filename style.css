@@ -600,3 +600,20 @@ h1 {
 .icon-pad-right {
 	padding-right: 5px;
 }
+
+.format-table-device
+{
+	text-align: left !important;
+	width:1px;
+	padding-left:25px !important;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;	
+}
+
+.format-table-format-name
+{
+	text-align: left !important;
+	color:#a31d21;
+	background-color: #f4f4f4 !important;	
+}

@@ -19,64 +19,126 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.		
  *
  */
+
+function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
+{
 ?>
+	<table id='<?= $id ?>' class='table table-striped table-bordered table-hover table-header-rotated format-table'>
+		<thead>
+			<tr>
+				<th class='caption' style='border-left: 0px; border-right: 0px;'>Format</th>
+				<?php
+				foreach ($flags as $key => $value) {
+					echo "<th class='caption rotate-45'><div><span>$value</span></div></th>";
+				}
+				?>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			foreach ($format_data as $format_name => $format_support) {
+				$format_supported = false;
+				// Check if format is supported by at least one report
+				foreach ($report_compare->device_infos as $device_index => $device) {
+					if ($format_support[$device_index] != 0) {
+						$format_supported = true;
+						break;
+					}
+				}
+				if (!$format_supported) {
+					continue;
+				}
+				echo "<tr>";
+				$class = 'default';
+				echo "<td colspan='".(count($flags)+1)."' class='format-table-format-name'><span class='$class'>$format_name</span></td>";
+				echo "</tr>";
+				// Display flags per device 
+				foreach ($report_compare->device_infos as $device_index => $device) {
+					echo "<tr>";
+					echo "<td class='format-table-device'>$device->name</td>";
+					foreach ($flags as $flag_enum => $flag_name) {
+						$icon = 'icon_missing_unsupported';
+						if ($format_support[$device_index] != 0) {
+							$icon = ($format_support[$device_index] & $flag_enum) ? 'icon_check' : 'icon_missing';
+						}
+						echo "<td class='format-table-support'>";
+						echo "<img src='$icon.png' width=16px>";
+						echo "</td>";
+					}
+					echo "</tr>";
+				}
+			}
+			?>
+		</tbody>
+	</table>
+<?php
+}
+?>
+
 <div>
 	<ul class='nav nav-tabs nav-level1'>
-		<li class='active'><a data-toggle='tab' href='#format-tabs-1'>Linear tiling</a></li>
-		<li><a data-toggle='tab' href='#format-tabs-2'>Optimal tiling</a></li>
-		<li><a data-toggle='tab' href='#format-tabs-3'>Buffer</a></li>
+		<li class='active'><a data-toggle='tab' href='#formats_linear'>Linear tiling</a></li>
+		<li><a data-toggle='tab' href='#formats_optimal'>Optimal tiling</a></li>
+		<li><a data-toggle='tab' href='#formats_buffer'>Buffer</a></li>
 	</ul>
 </div>
 <div class='tab-content'>
+
 	<?php
 
-	// Get format names
-	try {
-		$stmnt = DB::$connection->prepare("SELECT distinct VkFormat(formatid) as format from deviceformats where reportid in (" . $repids . ")");
-		$stmnt->execute();
-		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-			$formatnames[] = $row["format"];
+	$available_formats = $report_compare->fetchAvailableFormats();
+
+	// Pre-initialize array with all available formats
+	$format_support = new ReportCompareFormatData;
+	foreach ($available_formats as $format) {
+		$format_name = $format['name'];
+		foreach ($report_compare->report_ids as $report_id) {
+			$format_support->linear[$format_name][] = null;
+			$format_support->optimal[$format_name][] = null;
+			$format_support->buffer[$format_name][] = null;
 		}
-	} catch (PDOException $e) {
-		die("Could not fetch device formats!");
 	}
-
-	// Get format feature flags
-	$linearfeatures = array();
-	$optimalfeatures = array();
-	$bufferfeatures = array();
-
-	foreach ($reportids as $repid) {
+	// Populate array with report format suppot
+	foreach ($report_compare->report_ids as $index => $report_id) {
 		try {
-			$stmnt = DB::$connection->prepare("SELECT lineartilingfeatures, optimaltilingfeatures, bufferfeatures from deviceformats where reportid = :reportid");
-			$stmnt->execute(["reportid" => $repid]);
+			$stmnt = DB::$connection->prepare("SELECT vkf.name, lineartilingfeatures, optimaltilingfeatures, bufferfeatures from deviceformats df join VkFormat vkf on df.formatid = vkf.value where reportid = :reportid order by reportid asc");
+			$stmnt->execute(["reportid" => $report_id]);
 		} catch (PDOException $e) {
 			die("Could not fetch device formats!");
 		}
-		$linear = array();
-		$optimal = array();
-		$buffer = array();
 		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-			$linear[] = $row["lineartilingfeatures"];
-			$optimal[] = $row["optimaltilingfeatures"];
-			$buffer[] = $row["bufferfeatures"];
+			$format_name = $row['name'];
+			$format_support->linear[$format_name][$index] = $row['lineartilingfeatures'];
+			$format_support->optimal[$format_name][$index] = $row['optimaltilingfeatures'];
+			$format_support->buffer[$format_name][$index] = $row['bufferfeatures'];
+		
 		}
-		$linearfeatures[] = $linear;
-		$optimalfeatures[] = $optimal;
-		$bufferfeatures[] = $buffer;
 	}
+
+	?>
+
+	<div id='formats_linear' class='tab-pane fade in active reportdiv'>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_linear', $format_support->linear, $device_format_flags_tiling); ?>
+	</div>
+	<div id='formats_optimal' class='tab-pane fade reportdiv'>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_optimal', $format_support->optimal, $device_format_flags_tiling); ?>
+	</div>
+	<div id='formats_buffer' class='tab-pane fade reportdiv'>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_buffer', $format_support->buffer, $device_format_flags_buffer); ?>
+	</div>
+
+	<?php
 
 	// Generate tables
 	$colspan = count($reportids) + 1;
 
+	$tab_names = ['formats_linear', 'formats_optimal', 'formats_buffer'];
 	$featurearrays = array($linearfeatures, $optimalfeatures, $bufferfeatures);
 	for ($i = 0; $i < sizeof($featurearrays); $i++) {
 		$featurearray = $featurearrays[$i];
-		if ($i == 0) {
-			echo "<div id='format-tabs-" . ($i + 1) . "' class='tab-pane fade in active reportdiv'>";
-		} else {
-			echo "<div id='format-tabs-" . ($i + 1) . "' class='tab-pane fade reportdiv'>";
-		}
+		//echo "<div id='".$tab_names[$i]."' class='tab-pane fade ".($i == 0 ? "in active" : null)." reportdiv'>";
+
+		/*
 		echo "<table id='formats-" . ($i) . "' width='100%' class='table table-striped table-bordered table-hover'>";
 
 		$captions = ['Linear image', 'Optimal image', 'Buffer'];
@@ -112,7 +174,9 @@
 			$rowindex++;
 			echo "</tr>";
 		}
-		echo "</tbody></table></div>";
+		echo "</tbody></table>";
+		*/
+		//echo "</div>";
 	}
 	echo "</div>";
 	?>
