@@ -52,39 +52,40 @@ function insertCoreFeatures($report_compare, $version)
 }
 
 function insertExtensionFeatures($report_compare)
-{
-	
+{	
 	$report_compare->beginTab('features_extensions');
 	$report_compare->beginTable("compare_extended_features");
 	$report_compare->insertTableHeader("Feature", true);
 
 	$extended_features = [];
-	$extended_features_reports = [];
-	if ($report_compare->fetchExtensionFeatures($extended_features, $extended_features_reports)) {	
+	$reports = [];
+	if ($report_compare->fetchExtensionFeatures($extended_features, $reports)) {	
 		foreach ($extended_features as $extension => $features) {
 			foreach ($features as $feature) {
 				$html = '';
 				$diff = false;
 				$last_val = null;
-				foreach ($extended_features_reports as $index => $extended_features_report) {
-					$ext_present = array_key_exists($extension, $extended_features_report);
+				foreach ($reports as $index => $report) {
+					$ext_present = array_key_exists($extension, $report);
+					$supported = null;
 					if ($ext_present) {
-						$supported = false;
-						if (array_key_exists($extension, $extended_features_report)) {
-							foreach ($extended_features_report[$extension] as $ext_report_f) {
-								if ($ext_report_f['name'] == $feature['name']) {
-									$supported = $ext_report_f['supported'] == 1;
+						if (array_key_exists($extension, $report)) {
+							foreach ($report[$extension] as $ext_report_feature) {
+								if ($ext_report_feature['name'] == $feature['name']) {
+									$supported = ($ext_report_feature['supported'] == 1);
+									break;
 								}
 							}
 						}
-						if ($index > 0 && $supported != $last_val) {
+						if (($index > 0) && ($supported !== null) && ($supported !== $last_val)) {
 							$diff = true;
 						}
 						$last_val = $supported;
+					}
+					if ($supported !== null) {
 						$html .= "<td><span class=" . ($supported ? "supported" : "unsupported") . ">" . ($supported ? "true" : "false") . "</span></td>";
 					} else {
 						$html .= "<td class='na'>n.a.</td>";
-						$diff = true;
 					}
 				}
 				$html = "<tr class='" . ($diff ? "diff" : "same") . "'><td class='subkey'>" . ($diff ? $report_compare->getDiffIcon() : "") . $feature['name'] . "</td><td>" . $extension . "</td>" . $html . "</tr>";
