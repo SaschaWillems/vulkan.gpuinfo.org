@@ -281,6 +281,26 @@ $repids = implode(",", $reportids);
 		// Activate tab selected via anchor
 		$(function() {
 			var a = document.location.hash;
+			if (a) 
+			{
+				// Nested tabs, need to show parent tab too
+				if ((a === '#features_core') || (a === '#features_extensions')) {
+					$('.nav a[href=\\#features]').tab('show');
+				}
+				if ((a === '#properties_core') || (a === '#properties_extensions')) {
+					$('.nav a[href=\\#properties]').tab('show');
+				}
+				if ((a === '#formats_linear') || (a === '#formats_optimal') || (a === '#formats_buffer')) {
+					$('.nav a[href=\\#formats]').tab('show');
+				}
+				if ((a === '#instanceextensions') || (a === '#instancelayers')) {
+					$('.nav a[href=\\#instance]').tab('show');
+				}
+				if ((a === '#surfaceproperties') || (a === '#surfaceformats') || (a === '#presentmodes')) {
+					$('.nav a[href=\\#surface]').tab('show');
+				}
+				$('.nav a[href=\\'+a+']').tab('show');
+			}			
 			$('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
 				window.location.hash = e.target.hash;
 			});
