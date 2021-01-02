@@ -1,36 +1,37 @@
 <?php
-	/*
-		*
-		* Vulkan hardware capability database server implementation
-		*
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
-		*
-		* This code is free software, you can redistribute it and/or
-		* modify it under the terms of the GNU Affero General Public
-		* License version 3 as published by the Free Software Foundation.
-		*
-		* Please review the following information to ensure the GNU Lesser
-		* General Public License version 3 requirements will be met:
-		* http://www.gnu.org/licenses/agpl-3.0.de.html
-		*
-		* The code is distributed WITHOUT ANY WARRANTY; without even the
-		* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-		* PURPOSE.  See the GNU AGPL 3.0 for more details.
-		*
-	*/
+
+/**
+ *
+ * Vulkan hardware capability database server implementation
+ *
+ * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ *
+ * This code is free software, you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public
+ * License version 3 as published by the Free Software Foundation.
+ *
+ * Please review the following information to ensure the GNU Lesser
+ * General Public License version 3 requirements will be met:
+ * http://www.gnu.org/licenses/agpl-3.0.de.html
+ *
+ * The code is distributed WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.
+ *
+ */
 ?>
 
-	<div>
-	<ul class='nav nav-tabs'>
-		<li class='active'><a data-toggle='tab' href='#surface-tabs-1'>Surface properties</a></li>
-		<li><a data-toggle='tab' href='#surface-tabs-2'>Surface formats</a></li>
-	<!-- <li><a data-toggle='tab' href='#surface-tabs-3'>Present modes</a></li> -->
+<div>
+	<ul class='nav nav-tabs nav-level1'>
+		<li class='active'><a data-toggle='tab' href='#surface-tabs-1'>Properties</a></li>
+		<li><a data-toggle='tab' href='#surface-tabs-2'>Formats</a></li>
+		<!-- <li><a data-toggle='tab' href='#surface-tabs-3'>Present modes</a></li> -->
 	</ul>
-	</div>
+</div>
 
-	<div class='tab-content'>
+<div class='tab-content'>
 
-<?php	
+	<?php
 	/* 
 		Surface properties
 	*/
@@ -40,33 +41,32 @@
 
 	$rowCount = 0;
 	try {
-		$stmnt = DB::$connection->prepare("SELECT count(*) from devicesurfacecapabilities WHERE reportid in (".implode(',', $reportids).")");
+		$stmnt = DB::$connection->prepare("SELECT count(*) from devicesurfacecapabilities WHERE reportid in (" . implode(',', $reportids) . ")");
 		$stmnt->execute();
 		$rowCount = $stmnt->rowCount();
 	} catch (PDOException $e) {
 		die("Could not fetch device surface!");
-	}		
+	}
 
 	if ($rowCount > 0) {
 		$reportIndex = 0;
 
 		echo "<table id='surface-caps' width='100%' class='table table-striped table-bordered'>";
 		$report_compare->insertTableHeader("Surface property");
-		$report_compare->insertDeviceInformation();		
 
 		$props = null;
 
 		try {
-			$stmnt = DB::$connection->prepare("SELECT *from devicesurfacecapabilities WHERE reportid in (".implode(',', $reportids).")");
+			$stmnt = DB::$connection->prepare("SELECT *from devicesurfacecapabilities WHERE reportid in (" . implode(',', $reportids) . ")");
 			$stmnt->execute();
 			$rowCount = $stmnt->rowCount();
 		} catch (PDOException $e) {
 			die("Could not fetch device surface!");
-		}		
-	
+		}
+
 		$idx = 0;
 		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-			foreach($row as $key => $value) {
+			foreach ($row as $key => $value) {
 				if ($key == "reportid") {
 					continue;
 				}
@@ -79,7 +79,7 @@
 		}
 
 		foreach ($props as $prop) {
-			echo "<tr><td>".$prop."</td>";
+			echo "<tr><td>" . $prop . "</td>";
 			foreach ($reportids as $repid) {
 				echo "<td>";
 				if ($surfaceProperties[$repid] == null) {
@@ -97,13 +97,13 @@
 					if ($prop == "supportedCompositeAlpha") {
 						listFlags(getCompositeAlphaFlags($value));
 						continue;
-					}	
+					}
 					echo $value;
 				}
 				echo "</td>";
 			}
 			echo "</tr>";
-		}	
+		}
 
 		echo "</tbody></table>";
 	} else {
@@ -116,27 +116,26 @@
 	/* 
 		Surface formats
 	*/
-	$surfaceFormats = array(); 
+	$surfaceFormats = array();
 
 	echo "<div id='surface-tabs-2' class='tab-pane fade in reportdiv'>";
 
 	$rowCount = 0;
 	try {
-		$stmnt = DB::$connection->prepare("SELECT *from devicesurfaceformats WHERE reportid in (".implode(',', $reportids).")");
+		$stmnt = DB::$connection->prepare("SELECT *from devicesurfaceformats WHERE reportid in (" . implode(',', $reportids) . ")");
 		$stmnt->execute();
 		$rowCount = $stmnt->rowCount();
 	} catch (PDOException $e) {
 		die("Could not fetch device surface formats!");
-	}		
-	if ($rowCount > 0 ) {
+	}
+	if ($rowCount > 0) {
 		$reportIndex = 0;
 
 		echo "<table id='surface-formats' width='100%' class='table table-striped table-bordered'>";
 		$report_compare->insertTableHeader("Surface format");
-		$report_compare->insertDeviceInformation();
-	
+
 		try {
-			$stmnt = DB::$connection->prepare("SELECT dsf.reportid AS reportid, vf.name as name FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (".implode(',', $reportids).")");
+			$stmnt = DB::$connection->prepare("SELECT dsf.reportid AS reportid, vf.name as name FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (" . implode(',', $reportids) . ")");
 			$stmnt->execute();
 			$rowCount = $stmnt->rowCount();
 		} catch (PDOException $e) {
@@ -144,7 +143,7 @@
 		}
 		$idx = 0;
 		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-			foreach($row as $key => $value) {
+			foreach ($row as $key => $value) {
 				if ($key == "reportid") {
 					continue;
 				}
@@ -154,7 +153,7 @@
 		}
 
 		foreach ($formats as $key => $format) {
-			echo "<tr><td>".$key."</td>";
+			echo "<tr><td>" . $key . "</td>";
 			foreach ($reportids as $repid) {
 				if (isset($format[$repid])) {
 					echo "<td class='supported'>true</td>";
@@ -163,7 +162,7 @@
 				}
 			}
 			echo "</tr>";
-		}	
+		}
 
 		echo "</tbody></table>";
 	} else {
@@ -171,6 +170,6 @@
 	}
 
 	echo "</div>";
-	
+
 	echo "</div>";
-?>
+	?>

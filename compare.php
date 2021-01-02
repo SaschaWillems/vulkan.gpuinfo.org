@@ -135,7 +135,7 @@ $repids = implode(",", $reportids);
 		<li><a data-toggle='tab' href='#features'>Features</a></li>
 		<li><a data-toggle='tab' href='#extensions'>Extensions</a></li>
 		<li><a data-toggle='tab' href='#formats'>Formats</a></li>
-		<li><a data-toggle='tab' href='#queues'>Queue families</a></li>
+		<li><a data-toggle='tab' href='#queuefamilies'>Queue families</a></li>
 		<li><a data-toggle='tab' href='#memory'>Memory</a></li>
 		<li><a data-toggle='tab' href='#surface'>Surface</a></li>
 	</ul>
@@ -143,52 +143,29 @@ $repids = implode(",", $reportids);
 
 <div class='tablediv tab-content' style='width:75%;'>
 
-	<!-- Devices -->
-	<div id='devices' class='tab-pane fade in active reportdiv'>
-		<div id="overlay_devices">
-			<center>
-				<h4>Fetching data...</h4><img src="./images/loading.gif">
-			</center>
-		</div>
-		<?php include 'reportcompare/devices.php'; ?>
-	</div>
-
-	<!-- Features -->
-	<div id='features' class='tab-pane fade reportdiv'>
-		<?php include 'reportcompare/features.php'; ?>
-	</div>
-
-	<!-- Properties -->
-	<div id='properties' class='tab-pane fade reportdiv'>
-		<?php include 'reportcompare/properties.php'; ?>
-	</div>
-
-	<!-- Extensions -->
-	<div id='extensions' class='tab-pane fade reportdiv'>
-		<?php include 'reportcompare/extensions.php'; ?>
-	</div>
-
-	<!-- Formats -->
-	<div id='formats' class='tab-pane fade reportdiv'>
-		<?php include 'reportcompare/formats.php'; ?>
-	</div>
-
-	<!-- Queues -->
-	<div id='queues' class='tab-pane fade reportdiv'>
-		<?php include 'compare_queues.php'; ?>
-	</div>
-
-	<!-- Memory -->
-	<div id='memory' class='tab-pane fade reportdiv'>
-		<?php include 'compare_memory.php'; ?>
-	</div>
-
-	<!-- Surface -->
-	<div id='surface' class='tab-pane fade reportdiv'>
-		<?php include 'compare_surface.php'; ?>
+	<div id="overlay_devices">
+		<center>
+			<h4>Fetching data...</h4><img src="./images/loading.gif">
+		</center>
 	</div>
 
 	<?php
+	$views = [
+		'devices',
+		'features',
+		'properties',
+		'extensions',
+		'formats',
+		'queuefamilies',
+		'memory',
+		'surface'
+	];
+	foreach ($views as $index => $view) {
+		echo "<div id='$view' class='tab-pane fade ".($index == 0 ? "in active" : null)." reportdiv'>";
+			include "reportcompare/$view.php";
+		echo "</div>";
+	}
+
 	if ($diff) {
 		echo "<script>$('.same').hide();</script>";
 	}
@@ -243,6 +220,7 @@ $repids = implode(",", $reportids);
 			// Device properties table with grouping
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
 				if (typeof $('#'+tableNames[i]) != undefined) {
+					console.log(tableNames[i]);
 					$('#' + tableNames[i]).dataTable({
 						"pageLength": -1,
 						"paging": false,
