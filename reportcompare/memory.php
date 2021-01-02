@@ -36,7 +36,6 @@
 	echo "<table id='memory-types' width='100%' class='table table-striped table-bordered'>";
 
 	$report_compare->insertTableHeader("Memory type");
-	$report_compare->insertDeviceInformation();
 
 	// Get memory types for each selected report into an array
 	$memoryFlags = array();
@@ -61,7 +60,7 @@
 			$memoryHeapIndices[$reportIndex][] = $row[1];
 			$memoryCounts[$reportIndex]++;
 		}
-		//$extarray[] = $subarray;
+		$extarray[] = $subarray;
 		$reportIndex++;
 	}
 
@@ -126,16 +125,9 @@
 	// Memory heaps
 	echo "<div id='memory-tabs-2' class='tab-pane fade reportdiv'>";
 
-	?>
-	<div class="alert alert-warning" role="alert">
-		<b>Note:</b> Listing may contain memory heaps with host sizes!
-	</div>
-	<?php
-
 	echo "<table id='memory-heaps' width='100%' class='table table-striped table-bordered'>";
 
 	$report_compare->insertTableHeader("Memory heap");
-	$report_compare->insertDeviceInformation();
 
 	// Get memory types for each selected report into an array
 	$memoryHeapSizes = array();
