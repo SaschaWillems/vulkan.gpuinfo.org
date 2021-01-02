@@ -62,24 +62,30 @@
 				<ul class="nav navbar-nav">
 					<li><a href="listdevices.php">Devices</a></li>
 					<li><a href="listreports.php">Reports</a></li>
+
 					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Core
-							<span class="caret"></span></a>
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties<span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a href="listfeatures.php">Features (1.0)</a></li>
-								<li><a href="list_properties_core.php">Properties (1.0)</a></li>
-								<li><a href="listlimits.php">Limits</a></li>
+								<li><a href="list_properties_core_10.php">Core 1.0</a></li>
+								<li><a href="list_properties_core_11.php">Core 1.1</a></li>
+								<li><a href="list_properties_core_12.php">Core 1.2</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="list_properties_extensions.php">Extensions</a></li>
 							</ul>
 					</li>
+
 					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Extensions
-							<span class="caret"></span></a>
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Features<span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a href="listextensions.php">List</a></li>
-								<li><a href="list_features_extensions.php">Features</a></li>
-								<li><a href="list_properties_extensions.php">Properties</a></li>
+								<li><a href="listfeatures.php">Core 1.0</a></li>
+								<li><a href="list_features_core_11.php">Core 1.1</a></li>
+								<li><a href="list_features_core_12.php">Core 1.2</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="list_features_extensions.php">Extensions</a></li>
 							</ul>
-					</li>
+					</li>					
+
+					<li><a href="listextensions.php">Extensions</a></li>
 					<li><a href="listformats.php">Formats</a></li>
 					<li><a href="listmemory.php">Memory</a></li>
 					<li class="dropdown">
@@ -98,7 +104,6 @@
 							<li><a href="listinstancelayers.php">Layers</a></li>
 						</ul>
 					</li>
-					<!-- <li><a href="vulkansupport.php">Devices</a></li> -->
 					<li><a href="download.php">Download</a></li>
 					<li><a href="about.php">About</a></li>
 				</ul>

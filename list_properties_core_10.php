@@ -20,9 +20,10 @@
  *
  */
 
-include 'page_generator.php';
-include './dbconfig.php';
-include './functions.php';
+require 'page_generator.php';
+require './dbconfig.php';
+require './functions.php';
+require './constants.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
@@ -39,17 +40,14 @@ PageGenerator::header("Core 1.0 properties");
 <center>
 	<div>
 		<ul class='nav nav-tabs'>
-			<li <?php if ($platform == "windows") {
-					echo "class='active'";
-				} ?>> <a href='list_properties_core.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-			<li <?php if ($platform == "linux") {
-					echo "class='active'";
-				} ?>> <a href='list_properties_core.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-			<li <?php if ($platform == "android") {
-					echo "class='active'";
-				} ?>> <a href='list_properties_core.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
+			<?php
+			foreach ($platforms as $navplatform) {
+				$active = ($platform == $navplatform);
+				echo "<li" . ($active ? ' class="active"' : null) . "><a href='list_properties_core_10.php?platform=$navplatform'><img src='images/" . $navplatform . "logo.png' height='14px' style='padding-right:5px'>" . ucfirst($navplatform) . "</a> </li>\n";
+			}
+			?>
 		</ul>
-	</div>
+	</div>	
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 
