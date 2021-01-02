@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -107,7 +107,7 @@ PageGenerator::header("Core 1.1 properties");
 						echo "<td>" . $row[0] . "</a></td>";
 						echo "<td class='text-center'>" . ($has_coverage ? 'Coverage' : 'Values') . "</td>";
 						if ($has_coverage) {
-							$coverageLink = "listdevicescoverage.php?coreproperty=" . $row[0] . "&platform=$platform";
+							$coverageLink = "listdevicescoverage.php?core=1.1&coreproperty=" . $row[0] . "&platform=$platform";
 							$coverage = round($supportedCounts[$row[0]] / $deviceCount * 100, 1);
 							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {
