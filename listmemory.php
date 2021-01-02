@@ -49,8 +49,8 @@
 		<thead>
 			<tr>
 				<th>Memory type</th>
-				<th style="text-align: center;"><img src="icon_check.png" width="16px"></th>
-				<th style="text-align: center;"><img src="icon_missing.png" width="16px"></th>
+				<th style="text-align: center;"><img src="images/icons/check.png" width="16px"></th>
+				<th style="text-align: center;"><img src="images/icons/missing.png" width="16px"></th>
 			</tr>
 		</thead>
 		<tbody>

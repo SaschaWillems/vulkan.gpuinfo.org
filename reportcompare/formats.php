@@ -57,12 +57,12 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 					echo "<tr>";
 					echo "<td class='format-table-device'>$device->name</td>";
 					foreach ($flags as $flag_enum => $flag_name) {
-						$icon = 'icon_missing_unsupported';
+						$icon = 'unsupported';
 						if ($format_support[$device_index] != 0) {
-							$icon = ($format_support[$device_index] & $flag_enum) ? 'icon_check' : 'icon_missing';
+							$icon = ($format_support[$device_index] & $flag_enum) ? 'check' : 'missing';
 						}
 						echo "<td class='format-table-support'>";
-						echo "<img src='$icon.png' width=16px>";
+						echo "<img src='images/icons/$icon.png' width=16px>";
 						echo "</td>";
 					}
 					echo "</tr>";
@@ -136,47 +136,6 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 	$featurearrays = array($linearfeatures, $optimalfeatures, $bufferfeatures);
 	for ($i = 0; $i < sizeof($featurearrays); $i++) {
 		$featurearray = $featurearrays[$i];
-		//echo "<div id='".$tab_names[$i]."' class='tab-pane fade ".($i == 0 ? "in active" : null)." reportdiv'>";
-
-		/*
-		echo "<table id='formats-" . ($i) . "' width='100%' class='table table-striped table-bordered table-hover'>";
-
-		$captions = ['Linear image', 'Optimal image', 'Buffer'];
-		$report_compare->insertTableHeader('Format');
-
-		$rowindex = 0;
-		foreach ($formatnames as $extension) {
-			// Check format diffs
-			$diff = false;
-			$reportindex = 0;
-			$lastval = ($featurearray[0][$rowindex] > 0);
-			foreach ($reportids as $repid) {
-				if (($featurearray[$reportindex][$rowindex] > 0) != $lastval) {
-					$diff = true;
-					break;
-				} else {
-					$lastval = ($featurearray[$reportindex][$rowindex] > 0);
-				}
-				$reportindex++;
-			}
-
-			$className = ($diff) ? "diff" : "same";
-			echo "<tr class='$className'><td class='firstrow'>".($diff ? $report_compare->getDiffIcon() : "")."$extension</td>";
-			$reportindex = 0;
-			foreach ($reportids as $repid) {
-				if ($featurearray[$reportindex][$rowindex] > 0) {
-					echo "<td class='valuezeroleftdark'><img src='icon_check.png' width=16px</td>";
-				} else {
-					echo "<td class='valuezeroleftdark'><img src='icon_missing.png' width=16px></td>";
-				}
-				$reportindex++;
-			}
-			$rowindex++;
-			echo "</tr>";
-		}
-		echo "</tbody></table>";
-		*/
-		//echo "</div>";
 	}
 	echo "</div>";
 	?>

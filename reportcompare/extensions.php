@@ -57,11 +57,11 @@ foreach ($compare_extensions->captions as $extension) {
 	echo "<tr class='$className'><td class='subkey'>".($missing ? $report_compare->getDiffIcon() : "")."$extension</td><td>Extension</td>";
 	$index = 0;
 	foreach ($reportids as $repid) {
+		$icon = 'missing';
 		if (in_array($extension, $compare_extensions->data[$index])) {
-			echo "<td><img src='icon_check.png' width=16px></td>";
-		} else {
-			echo "<td><img src='icon_missing.png' width=16px></td>";
+			$icon = 'check';
 		}
+		echo "<td><img src='images/icons/$icon.png' width=16px></td>";
 		$index++;
 	}
 	echo "</tr>";

@@ -65,11 +65,11 @@ $data = $report->fetchQueueFamilies();
 				echo "<td class='rotated-table-column'>" . $queue_family["minImageTransferGranularity.width"] . "</td>";
 				echo "<td class='rotated-table-column'>" . $queue_family["minImageTransferGranularity.height"] . "</td>";
 				echo "<td class='rotated-table-column'>" . $queue_family["minImageTransferGranularity.depth"] . "</td>";
-				echo "<td class='format-table-support'><img src='" . ($queue_family["supportsPresent"] ? 'icon_check.png' : 'icon_missing.png') . "' width='16px'></td>";
+				echo "<td class='format-table-support'><img src='images/icons/" . ($queue_family["supportsPresent"] ? 'check' : 'missing') . ".png' width='16px'></td>";
 				foreach ($queue_flag_bits as $flag_enum => $value) {
 					echo "<td class='format-table-support'>";
-					$image = ($queue_family["flags"] & $flag_enum) ? 'icon_check.png' : 'icon_missing.png';
-					echo "<img src='$image' width='16px'>";
+					$icon = ($queue_family["flags"] & $flag_enum) ? 'check' : 'missing';
+					echo "<img src='/images/icons/$icon.png' width='16px'>";
 					echo "</td>";
 				}
 				echo "</tr>";

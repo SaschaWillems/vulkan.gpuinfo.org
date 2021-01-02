@@ -53,8 +53,8 @@
 				<th colspan=2 style="text-align: center;">Device coverage</th>
 			</tr>
 				<th>Format</th>
-				<th style="text-align: center;"><img src='icon_check.png' width=16px></th>
-				<th style="text-align: center;"><img src='icon_missing.png' width=16px></th>
+				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
 			</th>
 		</thead>
 		<tbody>

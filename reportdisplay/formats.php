@@ -46,11 +46,11 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 					echo "<td class='format-name'><span class='$class'>" . $format["format"] . "</span></td>";
 					foreach ($flags as $flag_enum => $flag_name) {
 						echo "<td class='format-table-support'>";
-						if ($format[$column] & $flag_enum) {
-							echo "<img src='icon_check.png' width=16px>";
-						} else {
-							echo "<img src='" . ($supported ? 'icon_missing.png' : 'icon_missing_unsupported.png') . "' width=16px>";
+						$icon = 'unsupported';
+						if ($supported) {
+							$icon = ($format[$column] & $flag_enum ? 'check' : 'missing');
 						}
+						echo "<img src='images/icons/$icon.png' width=16px>";
 						echo "</td>";
 					}
 					echo "</tr>";
