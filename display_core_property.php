@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -55,6 +55,15 @@ if (isset($_GET['core'])) {
 			break;
 	}
 }
+// Check if property is valid and part of the selected table
+DB::connect();
+$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :tablename and column_name = :columnname");
+$result->execute(["tablename" => $tablename, "columnname" => $name]);
+DB::disconnect();
+if ($result->rowCount() == 0) {
+	PageGenerator::errorMessage("<strong>This is not the <strike>droid</strike> device property you are looking for!</strong><br><br>You may have passed a wrong device property name.");
+}
+
 PageGenerator::header($name);
 
 $caption = "Value distribution for <code>$name</code>";
@@ -77,24 +86,6 @@ if (isset($_GET['platform'])) {
 		$filter .= "where reportid in (select id from reports where ostype = '" . $ostype . "')";
 		$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	}
-}
-
-// Check if property is valid and part of the selected table
-DB::connect();
-$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :tablename and column_name = :columnname");
-$result->execute(["tablename" => $tablename, "columnname" => $name]);
-DB::disconnect();
-if ($result->rowCount() == 0) {
-	echo "<center>";
-?>
-	<div class="alert alert-danger error">
-		<strong>This is not the <strike>droid</strike> device property you are looking for!</strong><br><br>
-		You may have passed a wrong device limit name.
-	</div>
-<?php
-	include "footer.html";
-	echo "</center>";
-	die();
 }
 
 ?>

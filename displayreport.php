@@ -24,7 +24,7 @@ require 'page_generator.php';
 require './dbconfig.php';
 require './functions.php';
 require './constants.php';
-require './report.class.php';
+require './reportdisplay/reportdisplay.class.php';
 
 $reportID = $_GET['id'];
 if (!$reportID) {
