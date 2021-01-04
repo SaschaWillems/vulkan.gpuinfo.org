@@ -23,7 +23,7 @@
 require 'page_generator.php';
 require './database/database.class.php';
 require './functions.php';
-require './constants.php';
+require './includes/constants.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {

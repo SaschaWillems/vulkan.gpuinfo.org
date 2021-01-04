@@ -23,7 +23,7 @@
 require './database/database.class.php';
 require 'page_generator.php';
 require './functions.php';
-require './constants.php';
+require './includes/constants.php';
 require './reportcompare/reportcompare.class.php';
 
 PageGenerator::header('Compare reports');

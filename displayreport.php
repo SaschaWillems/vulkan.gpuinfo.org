@@ -23,7 +23,7 @@
 require 'page_generator.php';
 require './database/database.class.php';
 require './functions.php';
-require './constants.php';
+require './includes/constants.php';
 require './reportdisplay/reportdisplay.class.php';
 
 $reportID = $_GET['id'];
