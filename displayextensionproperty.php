@@ -21,7 +21,7 @@
  */
 
 include 'page_generator.php';
-include 'dbconfig.php';
+include 'database/database.class.php';
 
 $name = null;
 if (isset($_GET['name'])) {

@@ -20,7 +20,7 @@
      */
 
 	include "./../../functions.php";
-	include './../../dbconfig.php';	
+	include './../../database/database.class.php';	
 	
 	// Check for valid file
 	$path='./';

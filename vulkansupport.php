@@ -19,7 +19,7 @@
 		*
 	*/
 	
-	include './dbconfig.php';
+	include './database/database.class.php';
 	include 'page_generator.php';
 	include './functions.php';	
 	

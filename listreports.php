@@ -21,7 +21,7 @@
 
 	include 'page_generator.php';
 	include './functions.php';	
-	include './dbconfig.php';	
+	include './database/database.class.php';	
 ?>
 
 <?php

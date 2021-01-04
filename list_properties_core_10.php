@@ -21,7 +21,7 @@
  */
 
 require 'page_generator.php';
-require './dbconfig.php';
+require './database/database.class.php';
 require './functions.php';
 require './constants.php';
 

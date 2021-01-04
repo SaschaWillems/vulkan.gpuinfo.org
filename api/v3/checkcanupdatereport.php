@@ -28,7 +28,7 @@
      *  - If the newer report has extension features and/or properties that the old report is lacking
      */
 
-	include './../../dbconfig.php';
+	include './../../database/database.class.php';
 
 	function check_extension_list_updatable($report, $compare_id, &$updatable) {
 		$stmnt = DB::$connection->prepare("SELECT count(*) from deviceextensions where reportid = :reportid");

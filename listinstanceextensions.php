@@ -20,7 +20,7 @@
 	*/
 	
 	include 'page_generator.php';
-	include './dbconfig.php';
+	include './database/database.class.php';
 	
 	PageGenerator::header("Instance extensions");
 ?>

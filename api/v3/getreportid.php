@@ -19,7 +19,7 @@
 	 *
 	 */
 
-	include './../../dbconfig.php';
+	include './../../database/database.class.php';
 	
 	header("Connection: keep-alive");
 

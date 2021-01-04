@@ -19,7 +19,7 @@
 		*
 	*/
 
-    include '../dbconfig.php';
+    include '../database/database.class.php';
     include '../functions.php';
 
     DB::connect();

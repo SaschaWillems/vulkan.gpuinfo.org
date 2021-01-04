@@ -21,7 +21,7 @@
  */
 
 require 'page_generator.php';
-require 'dbconfig.php';
+require 'database/database.class.php';
 
 $name = null;
 if (isset($_GET['name'])) {

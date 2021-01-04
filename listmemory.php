@@ -19,7 +19,7 @@
 	 */
 	
 	include 'page_generator.php';
-	include './dbconfig.php';
+	include './database/database.class.php';
 	include './functions.php';
 
 	$platform = "windows";
