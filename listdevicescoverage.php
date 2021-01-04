@@ -20,7 +20,7 @@
 	 */
 
 	include 'page_generator.php';
-	include './functions.php';
+	include './includes/functions.php';
 	include './database/database.class.php';
 
 	$platform = "all";

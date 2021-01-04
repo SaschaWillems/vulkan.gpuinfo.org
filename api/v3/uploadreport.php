@@ -19,7 +19,7 @@
 	 *
      */
 
-	include "./../../functions.php";
+	include "./../../includes/functions.php";
 	include './../../database/database.class.php';	
 	
 	// Check for valid file

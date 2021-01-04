@@ -22,7 +22,7 @@
 
 require 'page_generator.php';
 require './database/database.class.php';
-require './functions.php';
+require './includes/functions.php';
 require './includes/constants.php';
 
 $platform = "windows";

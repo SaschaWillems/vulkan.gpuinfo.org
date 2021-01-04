@@ -20,7 +20,7 @@
 	*/
 
     include '../database/database.class.php';
-    include '../functions.php';
+    include '../includes/functions.php';
 
     DB::connect();
 

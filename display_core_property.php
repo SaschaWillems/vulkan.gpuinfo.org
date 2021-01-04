@@ -22,7 +22,7 @@
 
 require 'page_generator.php';
 require 'database/database.class.php';
-require 'functions.php';
+require './includes/functions.php';
 
 $name = null;
 if (isset($_GET['name'])) {

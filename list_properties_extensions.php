@@ -21,7 +21,7 @@
 	
 	include 'page_generator.php';
 	include './database/database.class.php';
-	include './functions.php';	
+	include './includes/functions.php';	
 	
 	$platform = "windows";
 	if (isset($_GET['platform'])) {
