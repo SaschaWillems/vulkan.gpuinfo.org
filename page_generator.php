@@ -26,12 +26,12 @@ class PageGenerator
 	public static function header($title = null)
 	{
 		$page_title = $title;
-		include 'header.php';
+		include './includes/header.php';
 	}
 
 	public static function footer()
 	{
-		include 'footer.php';
+		include './includes/footer.php';
 	}
 
 	public static function errorMessage($message, $header = true, $footer = true, $end_script = true)

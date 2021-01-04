@@ -1,15 +1,38 @@
+<?php
+
+/**
+ *
+ * Vulkan hardware capability database server implementation
+ *	
+ * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ *	
+ * This code is free software, you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public
+ * License version 3 as published by the Free Software Foundation.
+ *	
+ * Please review the following information to ensure the GNU Lesser
+ * General Public License version 3 requirements will be met:
+ * http://www.gnu.org/licenses/agpl-3.0.de.html
+ *	
+ * The code is distributed WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.		
+ *
+ */
+?>
 <html>
+
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="ISO-8859-1">
-	<?php echo "<title>".(isset($page_title) ? ($page_title." - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems")."</title>"; ?>
+	<?php echo "<title>" . (isset($page_title) ? ($page_title . " - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems") . "</title>"; ?>
 
 	<link rel="icon" type="image/png" href="/images/Vulkan_LogoBug_32px_Nov17.png" sizes="32x32">
 
-	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css"/>
-	<link rel="stylesheet" type="text/css" href="external/css/dataTables.bootstrap.min.css"/>
-	<link rel="stylesheet" type="text/css" href="external/css/responsive.bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="external/css/dataTables.bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="external/css/responsive.bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="external/bootstrap-toggle.min.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
 
 	<link rel="stylesheet" type="text/css" href="style.css">
 
@@ -18,18 +41,18 @@
 	<script type="text/javascript" src="external/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="external/jquery.dataTables.yadcf.js"></script>
 	<script type="text/javascript" src="external/dataTables.bootstrap.min.js"></script>
-	<script type="text/javascript" src="external/bootstrap-toggle.min.js"></script>	
+	<script type="text/javascript" src="external/bootstrap-toggle.min.js"></script>
 	<script type="text/javascript" src="external/dataTables.fixedHeader.min.js"></script>
 
-<!--	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script> -->
+	<!--	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script> -->
 	<script type="text/javascript" src="external/responsive.bootstrap.min.js"></script>
 
 	<script>
-		$(document).ready(function () {
-				$.each($('#navbar').find('li'), function() {
-						$(this).toggleClass('active',
-								'/' + $(this).find('a').attr('href') == window.location.pathname);
-				});
+		$(document).ready(function() {
+			$.each($('#navbar').find('li'), function() {
+				$(this).toggleClass('active',
+					'/' + $(this).find('a').attr('href') == window.location.pathname);
+			});
 		});
 	</script>
 
@@ -45,7 +68,7 @@
 </head>
 
 <body>
-<!-- Bootstrap nav bar -->
+	<!-- Bootstrap nav bar -->
 	<nav class="navbar navbar-default navbar-fixed-top" id="navbar">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -65,25 +88,25 @@
 
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties<span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="list_properties_core_10.php">Core 1.0</a></li>
-								<li><a href="list_properties_core_11.php">Core 1.1</a></li>
-								<li><a href="list_properties_core_12.php">Core 1.2</a></li>
-								<li role="separator" class="divider"></li>
-								<li><a href="list_properties_extensions.php">Extensions</a></li>
-							</ul>
+						<ul class="dropdown-menu">
+							<li><a href="list_properties_core_10.php">Core 1.0</a></li>
+							<li><a href="list_properties_core_11.php">Core 1.1</a></li>
+							<li><a href="list_properties_core_12.php">Core 1.2</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="list_properties_extensions.php">Extensions</a></li>
+						</ul>
 					</li>
 
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Features<span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="listfeatures.php">Core 1.0</a></li>
-								<li><a href="list_features_core_11.php">Core 1.1</a></li>
-								<li><a href="list_features_core_12.php">Core 1.2</a></li>
-								<li role="separator" class="divider"></li>
-								<li><a href="list_features_extensions.php">Extensions</a></li>
-							</ul>
-					</li>					
+						<ul class="dropdown-menu">
+							<li><a href="listfeatures.php">Core 1.0</a></li>
+							<li><a href="list_features_core_11.php">Core 1.1</a></li>
+							<li><a href="list_features_core_12.php">Core 1.2</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="list_features_extensions.php">Extensions</a></li>
+						</ul>
+					</li>
 
 					<li><a href="listextensions.php">Extensions</a></li>
 					<li><a href="listformats.php">Formats</a></li>
