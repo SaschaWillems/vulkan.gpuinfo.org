@@ -20,6 +20,10 @@
  *
  */
 
+ /**
+  * Device coverage based listing of extension property value distribution
+  */
+
 require './page_generator.php';
 require './database/database.class.php';
 require './includes/functions.php';
@@ -40,29 +44,32 @@ if ($result->rowCount() == 0) {
 DB::disconnect();
 
 $caption = "Value distribution for <code>$name</code> property of <code>$extname</code>";
-$filter = null;
+
+$sql = 'SELECT value, count(distinct(r.displayname)) as `count` from deviceproperties2 dp2 join reports r on dp2.reportid = r.id where name = :name';
 
 $platform = null;
 if (isset($_GET['platform'])) {
 	$platform = $_GET['platform'];
 	$ostype = ostype($platform);
 	if ($ostype !== false) {
-		$filter .= "and reportid in (select id from reports where ostype = '" . $ostype . "')";
+		$sql .= " and r.ostype = $ostype";
 		$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	}
 }
+
+$sql .= ' group by value';
 
 PageGenerator::header($name);
 ?>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
 	$(document).ready(function() {
-		var table = $('#extensions').DataTable({
+		var table = $('#values').DataTable({
 			"pageLength": -1,
 			"paging": false,
 			"stateSave": false,
 			"searchHighlight": true,
-			"dom": '',
+			"dom": 'f',
 			"bInfo": false,
 			"order": [
 				[0, "asc"]
@@ -79,33 +86,33 @@ PageGenerator::header($name);
 	<div class='parentdiv'>
 		<div id="chart"></div>
 		<div class='property-table'>
-			<table id="extensions" class="table table-striped table-bordered table-hover reporttable">
+			<table id="values" class="table table-striped table-bordered table-hover reporttable">
 				<thead>
 					<tr>
 						<th>Value</th>
-						<th>Reports</th>
+						<th>Devices</th>
 					</tr>
 				</thead>
 				<tbody>
 					<?php
 					DB::connect();
-					$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name $filter group by 1 order by 1");
+					$result = DB::$connection->prepare("$sql order by 1");
 					$result->execute([":name" => $name]);
 					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-					foreach ($rows as $group) {
-						$value = $group['value'];
+					foreach ($rows as $row) {
+						$value = $row['value'];
 						// Some values are stored as serialized arrays and need to be unserialized
 						if (substr($value, 0, 2) == 'a:') {
 							$value = unserialize($value);
 							$value = '[' . implode(',', $value) . ']';
 						}
-						$link = "listreports.php?extensionproperty=$name&value=" . $group["value"];
+						$link = "listdevicescoverage.php?extensionname=$extname&extensionproperty=$name&extensionpropertyvalue=$value";
 						if ($platform) {
 							$link .= "&platform=$platform";
 						}
 						echo "<tr>";
 						echo "<td>$value</td>";
-						echo "<td><a href='$link'>" . $group["reports"] . "</a></td>";
+						echo "<td><a href='$link'>" . $row['count'] . "</a></td>";
 						echo "</tr>";
 					}
 					DB::disconnect();
@@ -129,7 +136,7 @@ PageGenerator::header($name);
 			['Value', 'Reports'],
 			<?php
 			DB::connect();
-			$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name $filter group by 1 order by 2 desc");
+			$result = DB::$connection->prepare("$sql order by 2 desc");
 			$result->execute([":name" => $name]);
 			$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 			foreach ($rows as $row) {
@@ -139,7 +146,7 @@ PageGenerator::header($name);
 					$value = unserialize($value);
 					$value = '[' . implode(',', $value) . ']';
 				}
-				echo "['$value'," . $row['reports'] . "],";
+				echo "['$value'," . $row['count'] . "],";
 			}
 			DB::disconnect();
 			?>

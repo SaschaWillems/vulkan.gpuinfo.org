@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database server implementation
 	 *	
-	 * Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -84,7 +84,8 @@
 	if (isset($_GET['extensionname']) && isset($_GET['extensionproperty'])) {
 		$ext_name = $_GET['extensionname'];
 		$ext_property = $_GET['extensionproperty'];
-		$info = "<code>$ext_property</code> for <code>$ext_name</code>";
+		$ext_property_value = $_GET['extensionpropertyvalue'];
+		$info = "value <code>$ext_property_value</code> in <code>$ext_property</code> for <code>$ext_name</code>";
 		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 		$pageTitle = $ext_property;
 	}
@@ -237,6 +238,7 @@
 						'extensionfeature_feature': '<?=$_GET['extensionfeature']?>',
 						'extensionproperty_name': '<?=$_GET['extensionname']?>',
 						'extensionproperty_property': '<?=$_GET['extensionproperty']?>',
+						'extensionproperty_value': '<?=$_GET['extensionpropertyvalue']?>',
 						'coreproperty': '<?=$_GET['coreproperty']?>',
 						'core': '<?=$_GET['core']?>'
 					}
