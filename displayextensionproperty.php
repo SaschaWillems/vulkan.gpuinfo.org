@@ -20,28 +20,13 @@
  *
  */
 
-include 'page_generator.php';
-include 'database/database.class.php';
+require './page_generator.php';
+require './database/database.class.php';
+require './includes/functions.php';
 
 $name = null;
 if (isset($_GET['name'])) {
 	$name = $_GET['name'];
-}
-$os = null;
-$filter = null;
-if (isset($_GET['os'])) {
-	$os = $_GET['os'];
-	if (!in_array($os, ['windows', 'android', 'linux', 'ios', 'osx'])) {
-		$os = null;
-	}
-	if ($os) {
-		if (in_array($os, ['windows', 'android', 'ios', 'osx'])) {
-			$filter = "where reportid in (select id from reports where osname = '$os')";
-		}
-		if (in_array($os, ['linux'])) {
-			$filter = "where reportid in (select id from reports where osname not in ('windows', 'android', 'ios', 'osx'))";
-		}
-	}
 }
 
 DB::connect();
@@ -53,6 +38,19 @@ if ($result->rowCount() == 0) {
 	PageGenerator::errorMessage("This is not the <strike>droid</strike> extension property you are looking for!</strong><br><br>You may have passed a wrong extension property name.");
 }
 DB::disconnect();
+
+$caption = "Value distribution for <code>$name</code> property of <code>$extname</code>";
+$filter = null;
+
+$platform = null;
+if (isset($_GET['platform'])) {
+	$platform = $_GET['platform'];
+	$ostype = ostype($platform);
+	if ($ostype !== false) {
+		$filter .= "and reportid in (select id from reports where ostype = '" . $ostype . "')";
+		$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+	}
+}
 
 PageGenerator::header($name);
 ?>
@@ -74,13 +72,13 @@ PageGenerator::header($name);
 </script>
 
 <div class='header'>
-	<h4 class='headercaption'>Value distribution for <code><?= $name ?></code> property of <code><?= $extname ?></code></h4>
+	<h4 class='headercaption'><?=$caption?></h4>
 </div>
 
 <center>
 	<div class='parentdiv'>
 		<div id="chart"></div>
-		<div class='tablediv' style='width:auto; display: inline-block;'>
+		<div class='property-table'>
 			<table id="extensions" class="table table-striped table-bordered table-hover reporttable">
 				<thead>
 					<tr>
@@ -91,7 +89,7 @@ PageGenerator::header($name);
 				<tbody>
 					<?php
 					DB::connect();
-					$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name group by 1 order by 1");
+					$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name $filter group by 1 order by 1");
 					$result->execute([":name" => $name]);
 					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 					foreach ($rows as $group) {
@@ -102,6 +100,9 @@ PageGenerator::header($name);
 							$value = '[' . implode(',', $value) . ']';
 						}
 						$link = "listreports.php?extensionproperty=$name&value=" . $group["value"];
+						if ($platform) {
+							$link .= "&platform=$platform";
+						}
 						echo "<tr>";
 						echo "<td>$value</td>";
 						echo "<td><a href='$link'>" . $group["reports"] . "</a></td>";
@@ -128,7 +129,7 @@ PageGenerator::header($name);
 			['Value', 'Reports'],
 			<?php
 			DB::connect();
-			$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name group by 1 order by 2 desc");
+			$result = DB::$connection->prepare("SELECT value, count(*) as reports from deviceproperties2 where name = :name $filter group by 1 order by 2 desc");
 			$result->execute([":name" => $name]);
 			$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 			foreach ($rows as $row) {

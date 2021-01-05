@@ -620,3 +620,10 @@ h1 {
 	color:#a31d21;
 	background-color: #f4f4f4 !important;	
 }
+
+.property-table
+{
+	width: auto;
+	display: inline-block;
+	padding-bottom: 15px;
+}
