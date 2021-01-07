@@ -20,7 +20,7 @@
  *
  */
 
-include 'page_generator.php';
+include 'pagegenerator.php';
 include './database/database.class.php';
 require './includes/constants.php';
 include './includes/functions.php';
@@ -49,21 +49,12 @@ PageGenerator::header("Extension features listing");
 </div>
 
 <center>
-	<?php if (!$extension) { ?>
-		<div>
-			<ul class='nav nav-tabs'>
-				<?php
-				foreach ($platforms as $navplatform) {
-					$active = ($platform == $navplatform);
-					echo "<li" . ($active ? ' class="active"' : null) . "><a href='list_features_extensions.php?platform=$navplatform'>" . PageGenerator::platformInfo($navplatform) . "</a> </li>\n";
-				}
-				?>
-			</ul>
-		</div>
-	<?php } ?>
+	<?php if (!$extension) {
+		PageGenerator::platformNavigation('listfeaturesextensions.php', $platform);
+	}
+	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-
 		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				<tr>
@@ -122,7 +113,6 @@ PageGenerator::header("Extension features listing");
 				?>
 			</tbody>
 		</table>
-
 	</div>
 
 	<script>

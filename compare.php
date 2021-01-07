@@ -21,7 +21,7 @@
  */
 
 require './database/database.class.php';
-require 'page_generator.php';
+require 'pagegenerator.php';
 require './includes/functions.php';
 require './includes/constants.php';
 require './reportcompare/reportcompare.class.php';

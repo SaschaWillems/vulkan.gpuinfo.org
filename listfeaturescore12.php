@@ -20,7 +20,7 @@
  *
  */
 
-require 'page_generator.php';
+require 'pagegenerator.php';
 require './database/database.class.php';
 require './includes/functions.php';
 require './includes/constants.php';
@@ -34,26 +34,16 @@ PageGenerator::header("Core 1.2 features");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.2 feature coverage for <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php echo "<h4>Core 1.2 feature coverage for".PageGenerator::platformInfo($platform) ?>
 </div>
 <div class="alert alert-info" role="alert" style="text-align: center">
 	<b>Note:</b> Data is based on reports submitted or updated with version 3.0 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
 </div>
 
 <center>
-	<div>
-		<ul class='nav nav-tabs'>
-			<?php
-			foreach ($platforms as $navplatform) {
-				$active = ($platform == $navplatform);
-				echo "<li" . ($active ? ' class="active"' : null) . "><a href='list_features_core_12.php?platform=$navplatform'><img src='images/" . $navplatform . "logo.png' height='14px' style='padding-right:5px'>" . ucfirst($navplatform) . "</a> </li>\n";
-			}
-			?>
-		</ul>
-	</div>
+	<?php PageGenerator::platformNavigation('listfeaturescore12.php', $platform); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-
 		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				<tr>
@@ -112,7 +102,6 @@ PageGenerator::header("Core 1.2 features");
 				?>
 			</tbody>
 		</table>
-
 	</div>
 
 	<script>

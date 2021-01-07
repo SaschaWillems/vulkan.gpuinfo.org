@@ -89,22 +89,22 @@
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties<span class="caret"></span></a>
 						<ul class="dropdown-menu">
-							<li><a href="list_properties_core_10.php">Core 1.0</a></li>
-							<li><a href="list_properties_core_11.php">Core 1.1</a></li>
-							<li><a href="list_properties_core_12.php">Core 1.2</a></li>
+							<li><a href="listpropertiescore10.php">Core 1.0</a></li>
+							<li><a href="listpropertiescore11.php">Core 1.1</a></li>
+							<li><a href="listpropertiescore12.php">Core 1.2</a></li>
 							<li role="separator" class="divider"></li>
-							<li><a href="list_properties_extensions.php">Extensions</a></li>
+							<li><a href="listpropertiesextensions.php">Extensions</a></li>
 						</ul>
 					</li>
 
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Features<span class="caret"></span></a>
 						<ul class="dropdown-menu">
-							<li><a href="listfeatures.php">Core 1.0</a></li>
-							<li><a href="list_features_core_11.php">Core 1.1</a></li>
-							<li><a href="list_features_core_12.php">Core 1.2</a></li>
+							<li><a href="listfeaturescore10.php">Core 1.0</a></li>
+							<li><a href="listfeaturescore11.php">Core 1.1</a></li>
+							<li><a href="listfeaturescore12.php">Core 1.2</a></li>
 							<li role="separator" class="divider"></li>
-							<li><a href="list_features_extensions.php">Extensions</a></li>
+							<li><a href="listfeaturesextensions.php">Extensions</a></li>
 						</ul>
 					</li>
 

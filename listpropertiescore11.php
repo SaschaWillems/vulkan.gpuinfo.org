@@ -20,7 +20,7 @@
  *
  */
 
-require 'page_generator.php';
+require 'pagegenerator.php';
 require './database/database.class.php';
 require './includes/functions.php';
 require './includes/constants.php';
@@ -30,28 +30,21 @@ if (isset($_GET['platform'])) {
 	$platform = $_GET['platform'];
 }
 
-PageGenerator::header("Core 1.0 properties");
+PageGenerator::header("Core 1.1 properties");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.0 properties for <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php echo "<h4>Core 1.1 properties for ".PageGenerator::platformInfo($platform) ?>
+</div>
+<div class="alert alert-info" role="alert" style="text-align: center">
+	<b>Note:</b> Data is based on reports submitted or updated with version 3.0 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
 </div>
 
 <center>
-	<div>
-		<ul class='nav nav-tabs'>
-			<?php
-			foreach ($platforms as $navplatform) {
-				$active = ($platform == $navplatform);
-				echo "<li" . ($active ? ' class="active"' : null) . "><a href='list_properties_core_10.php?platform=$navplatform'><img src='images/" . $navplatform . "logo.png' height='14px' style='padding-right:5px'>" . ucfirst($navplatform) . "</a> </li>\n";
-			}
-			?>
-		</ul>
-	</div>	
+	<?php PageGenerator::platformNavigation('listpropertiescore11.php', $platform); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-
-		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<table id="properties" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				</tr>
 				<th>Property</th>
@@ -62,38 +55,24 @@ PageGenerator::header("Core 1.0 properties");
 			<tbody>
 				<?php
 				$coverage_columns = [
-					'residencyAlignedMipSize',
-					'residencyNonResidentStrict',
-					'residencyStandard2DBlockShape',
-					'residencyStandard2DMultisampleBlockShape',
-					'residencyStandard3DBlockShape',
-					'subgroupProperties.quadOperationsInAllStages',
+					'deviceLUIDValid',
+					'subgroupQuadOperationsInAllStages',
+					'protectedNoFault'
 				];
-				$ignore_columns = [
-					'headerversion',
-					'driverversionraw',
-					'pipelineCacheUUID',
-					'apiversionraw',
-					'productManufacturer',
-					'productModel'
-				];
+				$ignore_columns = [];
 				DB::connect();
 				try {
-					$viewDeviceCount = DB::$connection->prepare("SELECT * from viewDeviceCount");
-					$viewDeviceCount->execute();
-					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);
+					$deviceCount = DB::getCount("SELECT count(distinct(displayname)) from reports join deviceproperties11 dp on dp.reportid = id where ostype = :platform", ['platform' => ostype($platform)]);
 
 					// Collect coverage numbers
-					$sqlColumns = '';
+					$columns = [];
 					foreach ($coverage_columns as $column) {
-						$sqlColumns .= "max(dp.`$column`) as `$column`,";
+						$columns[] = "max(dp.`$column`) as `$column`";
 					}
 
 					$supportedCounts = [];
 					$stmnt = DB::$connection->prepare(
-						"SELECT ifnull(r.displayname, dp.devicename) as device, "
-							. substr($sqlColumns, 0, -1) .
-							" FROM deviceproperties dp join reports r on r.id = dp.reportid where r.ostype = :ostype group by device"
+						"SELECT r.displayname as device, " . implode(',', $columns) . " FROM deviceproperties11 dp join reports r on r.id = dp.reportid where r.ostype = :ostype group by device"
 					);
 					$stmnt->execute(['ostype' => ostype($platform)]);
 					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
@@ -105,7 +84,7 @@ PageGenerator::header("Core 1.0 properties");
 					}
 
 					// Collect properties from column names
-					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'deviceproperties' and COLUMN_NAME not in ('reportid')";
+					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'deviceproperties11' and COLUMN_NAME not in ('reportid')";
 					$stmnt = DB::$connection->prepare($sql);
 					$stmnt->execute();
 
@@ -114,30 +93,17 @@ PageGenerator::header("Core 1.0 properties");
 							continue;
 						}
 						$has_coverage = in_array($row[0], $coverage_columns);
-						$sqlColumns .= "max(" . $row[0] . ") as `$row[0]`," . PHP_EOL;
-						$link = "<a href='display_core_property.php?name=" . $row[0] . "&platform=$platform'>";
+						$link = "<a href='display_core_property.php?core=1.1&name=" . $row[0] . "&platform=$platform'>";
 						echo "<tr>";
 						echo "<td>" . $row[0] . "</a></td>";
 						echo "<td class='text-center'>" . ($has_coverage ? 'Coverage' : 'Values') . "</td>";
 						if ($has_coverage) {
-							$coverageLink = "listdevicescoverage.php?coreproperty=" . $row[0] . "&platform=$platform";
-							$coverage = round($supportedCounts[$row[0]] / $deviceCounts[$platform] * 100, 1);
+							$coverageLink = "listdevicescoverage.php?core=1.1&coreproperty=" . $row[0] . "&platform=$platform";
+							$coverage = $deviceCount > 0 ? round($supportedCounts[$row[0]] / $deviceCount * 100, 1) : 0;
 							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {
 							echo "<td class='text-center'>" . $link . "Listing</a></td>";
 						}
-						echo "</tr>";
-					}
-
-					// Collect limits
-					$sql = "SELECT COLUMN_NAME as name, (SELECT feature from limitrequirements where limitname = name) as requirement from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')";
-					$limits = DB::$connection->prepare($sql);
-					$limits->execute();
-					while ($limit = $limits->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
-						echo "<tr>";
-						echo "<td>$limit[0]</td>";
-						echo "<td class='text-center'>Limit</td>";
-						echo "<td><a href='displaydevicelimit.php?name=".$limit[0]."&platform=$platform'>Listing</a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
@@ -147,12 +113,11 @@ PageGenerator::header("Core 1.0 properties");
 				?>
 			</tbody>
 		</table>
-
 	</div>
 
 	<script>
 		$(document).ready(function() {
-			var table = $('#features').DataTable({
+			var table = $('#properties').DataTable({
 				"pageLength": -1,
 				"paging": false,
 				"stateSave": false,

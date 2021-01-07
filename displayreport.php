@@ -20,7 +20,7 @@
  *
  */
 
-require 'page_generator.php';
+require 'pagegenerator.php';
 require './database/database.class.php';
 require './includes/functions.php';
 require './includes/constants.php';

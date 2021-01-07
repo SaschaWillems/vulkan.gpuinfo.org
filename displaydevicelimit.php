@@ -20,7 +20,7 @@
  *
  */
 
-require 'page_generator.php';
+require 'pagegenerator.php';
 require 'database/database.class.php';
 
 $name = null;

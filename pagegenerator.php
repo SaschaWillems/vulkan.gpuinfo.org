@@ -22,6 +22,7 @@
 
 class PageGenerator
 {
+	private static $platform_list = ['windows', 'linux', 'android'];
 
 	public static function header($title = null)
 	{
@@ -56,6 +57,18 @@ class PageGenerator
 
 	public static function platformInfo($platform)
 	{
-		return "<img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+	}
+
+	public static function platformNavigation($base_url, $active_platform)
+	{
+		echo "<div>";
+		echo "	<ul class='nav nav-tabs'>";
+		foreach (self::$platform_list as $navplatform) {
+			$active = ($active_platform == $navplatform);
+			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$base_url?platform=$navplatform'><img src='images/" . $navplatform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($navplatform) . "</a> </li>";
+		};
+		echo "	</ul>";
+		echo "</div>";
 	}
 }

@@ -20,7 +20,7 @@
  *
  */
 
-include 'page_generator.php';
+include 'pagegenerator.php';
 include './includes/functions.php';
 include 'database/database.class.php';
 

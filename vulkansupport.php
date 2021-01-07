@@ -20,7 +20,7 @@
 	*/
 	
 	include './database/database.class.php';
-	include 'page_generator.php';
+	include 'pagegenerator.php';
 	include './includes/functions.php';	
 	
 	PageGenerator::header('Vulkan device support');

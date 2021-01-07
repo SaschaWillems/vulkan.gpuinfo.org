@@ -1,10 +1,10 @@
 <?php
 
-/** 		
+/**
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,40 +20,27 @@
  *
  */
 
-require 'page_generator.php';
-require './database/database.class.php';
-require './includes/functions.php';
-require './includes/constants.php';
+include 'pagegenerator.php';
+include './database/database.class.php';
+include './includes/constants.php';
+include './includes/functions.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
 	$platform = $_GET['platform'];
 }
 
-PageGenerator::header("Core 1.1 features");
+PageGenerator::header("Features");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.1 feature coverage for <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
-</div>
-<div class="alert alert-info" role="alert" style="text-align: center">
-	<b>Note:</b> Data is based on reports submitted or updated with version 3.0 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
+	<?php echo "<h4>Core 1.0 device feature coverage for ".PageGenerator::platformInfo($platform) ?>
 </div>
 
 <center>
-	<div>
-		<ul class='nav nav-tabs'>
-			<?php
-			foreach ($platforms as $navplatform) {
-				$active = ($platform == $navplatform);
-				echo "<li" . ($active ? ' class="active"' : null) . "><a href='list_features_core_11.php?platform=$navplatform'><img src='images/" . $navplatform . "logo.png' height='14px' style='padding-right:5px'>" . ucfirst($navplatform) . "</a> </li>\n";
-			}
-			?>
-		</ul>
-	</div>
+	<?php PageGenerator::platformNavigation('listfeaturescore10.php', $platform); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-
 		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				<tr>
@@ -69,23 +56,27 @@ PageGenerator::header("Core 1.1 features");
 				<?php
 				DB::connect();
 				try {
-					$deviceCount = DB::getCount("SELECT count(distinct(displayname)) from reports join devicefeatures11 dp on dp.reportid = id where ostype = :platform", ['platform' => ostype($platform)]);
+					$viewDeviceCount = DB::$connection->prepare("SELECT * from viewDeviceCount");
+					$viewDeviceCount->execute();
+					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);
 
 					// Collect feature column names
-					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures11' and COLUMN_NAME not in ('reportid')";
+					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures' and COLUMN_NAME not in ('reportid')";
 					$stmnt = DB::$connection->prepare($sql);
 					$stmnt->execute();
 
-					$features = [];
-					$columns = [];
+					$features = array();
+					$sqlColumns = "";
 					while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
 						$features[] = $row[0];
-						$columns[] = "max(" . $row[0] . ") as $row[0]";
+						$sqlColumns .= "max(" . $row[0] . ") as $row[0],";
 					}
 
 					$supportedCounts = [];
 					$stmnt = DB::$connection->prepare(
-						"SELECT r.displayname as device, " . implode(',', $columns) . " FROM devicefeatures11 df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = " . ostype($platform) . " group by device"
+						"SELECT ifnull(r.displayname, dp.devicename) as device, "
+							. substr($sqlColumns, 0, -1) .
+							" FROM devicefeatures df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = " . ostype($platform) . " group by device"
 					);
 					$stmnt->execute();
 					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
@@ -97,8 +88,8 @@ PageGenerator::header("Core 1.1 features");
 					}
 
 					foreach ($features as $feature) {
-						$coverageLink = "listdevicescoverage.php?core=1.1&feature=" . $feature . "&platform=$platform";
-						$coverage = $deviceCount > 0 ? round($supportedCounts[$feature] / $deviceCount * 100, 1) : 0;
+						$coverageLink = "listdevicescoverage.php?feature=" . $feature . "&platform=$platform";
+						$coverage = round($supportedCounts[$feature] / $deviceCounts[$platform] * 100, 1);
 						echo "<tr>";
 						echo "<td>" . $feature . "</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
@@ -112,7 +103,6 @@ PageGenerator::header("Core 1.1 features");
 				?>
 			</tbody>
 		</table>
-
 	</div>
 
 	<script>

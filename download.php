@@ -18,7 +18,7 @@
 		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
 		*
 	*/
-	include 'page_generator.php';
+	include 'pagegenerator.php';
 	PageGenerator::header('Download');
 ?>
 
