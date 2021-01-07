@@ -100,11 +100,11 @@ PageGenerator::header("Extensions");
 						$ext = $extension['name'];
 						$feature_link = null;
 						if (in_array($extension['name'], $extensionFeatures) != false) {
-							$feature_link = "<a href='list_features_extensions.php?search=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
+							$feature_link = "<a href='list_features_extensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
 						}
 						$property_link = null;
 						if (in_array($extension['name'], $extensionProperties) != false) {
-							$property_link = "<a href='list_properties_extensions.php?search=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
+							$property_link = "<a href='list_properties_extensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
 						}
 						echo "<tr>";
 						echo "<td>$ext</td>";
@@ -132,6 +132,10 @@ PageGenerator::header("Extensions");
 				"searchHighlight": true,
 				"dom": 'f',
 				"bInfo": false,
+				"fixedHeader": {
+					"header": true,
+					"headerOffset": 50
+				},
 				"order": [
 					[0, "asc"]
 				],

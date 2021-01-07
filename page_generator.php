@@ -53,4 +53,9 @@ class PageGenerator
 			}
 		}
 	}
+
+	public static function platformInfo($platform)
+	{
+		return "<img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
+	}
 }

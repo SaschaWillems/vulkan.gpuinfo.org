@@ -22,6 +22,7 @@
 
 require 'page_generator.php';
 require './database/database.class.php';
+require './includes/constants.php';
 require './includes/functions.php';
 
 $platform = "windows";
@@ -29,33 +30,37 @@ if (isset($_GET['platform'])) {
 	$platform = $_GET['platform'];
 }
 
-$search = null;
-if (isset($_GET['search'])) {
-	$search = $_GET['search'];
+$extension = null;
+if (isset($_GET['extension'])) {
+	$extension = $_GET['extension'];
 }
 
 PageGenerator::header("Extension properties listing");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Extension device properties for <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php
+	if ($extension) {
+		echo "<h4>Available extension properties for <code>$extension</code> on " . PageGenerator::platformInfo($platform);
+	} else {
+		echo "<h4>Extension device properties on " . PageGenerator::platformInfo($platform);
+	}
+	?>
 </div>
 
 <center>
-	<div>
-		<ul class='nav nav-tabs'>
-			<li <?php if ($platform == "windows") {
-					echo "class='active'";
-				} ?>> <a href='list_properties_extensions.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-			<li <?php if ($platform == "linux") {
-					echo "class='active'";
-				} ?>> <a href='list_properties_extensions.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-			<li <?php if ($platform == "android") {
-					echo "class='active'";
-				} ?>> <a href='list_properties_extensions.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
-		</ul>
-	</div>
-
+	<?php if (!$extension) { ?>
+		<div>
+			<ul class='nav nav-tabs'>
+				<?php
+				foreach ($platforms as $navplatform) {
+					$active = ($platform == $navplatform);
+					echo "<li" . ($active ? ' class="active"' : null) . "><a href='list_properties_extensions.php?platform=$navplatform'>" . PageGenerator::platformInfo($navplatform) . "</a> </li>\n";
+				}
+				?>
+			</ul>
+		</div>
+	<?php } ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 
@@ -77,7 +82,7 @@ PageGenerator::header("Extension properties listing");
 					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.ostype = :ostype AND r.version >= '1.4'");
 					$stmnt->execute(['ostype' => $os_type]);
 					$device_count = $stmnt->fetchColumn();
-
+					$ext_filter = $extension ? 'AND d2.extension = :extension' : null;
 					$stmnt = DB::$connection->prepare(
 						"SELECT extension, name, type, sum(supporteddevices) as supporteddevices FROM
 							(
@@ -93,7 +98,7 @@ PageGenerator::header("Extension properties listing");
 									JOIN
 								deviceproperties dp ON dp.reportid = r.id
 							WHERE
-								r.ostype = :ostype and value = 'true'
+								r.ostype = :ostype and value = 'true' $ext_filter
 							GROUP BY extension , name
 							
 							UNION
@@ -110,7 +115,7 @@ PageGenerator::header("Extension properties listing");
 									JOIN
 								deviceproperties dp ON dp.reportid = r.id
 							WHERE
-								r.ostype = :ostype and value = 'false'
+								r.ostype = :ostype and value = 'false' $ext_filter
 							GROUP BY extension , name
 							
 							
@@ -128,13 +133,17 @@ PageGenerator::header("Extension properties listing");
 									JOIN
 								deviceproperties dp ON dp.reportid = r.id
 							WHERE
-								r.ostype = :ostype and value not in ('true', 'false')
+								r.ostype = :ostype and value not in ('true', 'false') $ext_filter
 							GROUP BY extension , name
 							) tbl
 							GROUP BY extension, name, type
 							ORDER BY extension ASC , name ASC"
 					);
-					$stmnt->execute(['ostype' => $os_type]);
+					$params = ['ostype' => $os_type];
+					if ($extension) {
+						$params['extension'] = $extension;
+					}
+					$stmnt->execute($params);
 
 					if ($stmnt->rowCount() > 0) {
 						while ($property = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
@@ -175,7 +184,7 @@ PageGenerator::header("Extension properties listing");
 				}],
 				"searchHighlight": true,
 				"bAutoWidth": false,
-				"sDom": 'flpt',
+				"sDom": <?= $extension ? "''" : "'flpt'" ?>,
 				"deferRender": true,
 				"processing": true,
 				"drawCallback": function(settings) {
@@ -199,7 +208,7 @@ PageGenerator::header("Extension properties listing");
 			<?php
 			if ($search !== null) {
 			?>
-				table.search('\\b<?=$search?>\\b', true, false).draw();
+				table.search('\\b<?= $search ?>\\b', true, false).draw();
 			<?php
 			}
 			?>
