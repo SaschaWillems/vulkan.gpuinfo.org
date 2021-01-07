@@ -58,11 +58,14 @@ PageGenerator::header("Extensions");
 				<tr>
 					<th></th>
 					<th colspan=2 style="text-align: center;">Device coverage</th>
+					<th colspan=2>Additional</th>
 				</tr>
 				<tr>
 					<th>Extension</th>
 					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
 					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
+					<th><abbr title="Extension-related features">F.</abbr></th>
+					<th><abbr title="Extension-related properties">P.</abbr></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -94,16 +97,21 @@ PageGenerator::header("Extensions");
 					foreach ($extensions as $extension) {
 						$coverageLink = "listdevicescoverage.php?extension=" . $extension['name'] . "&platform=$platform";
 						$coverage = round($extension['coverage'] / $deviceCount * 100, 1);
-						// Generate link to detail page if extension has additional features or properties
-						if ((in_array($extension['name'], $extensionFeatures) != false) || (in_array($extension['name'], $extensionProperties) != false)) {
-							$detail_link = " <a href=\"displayextension.php?name=" . $extension['name'] . "\" title=\"Show additional features and properties for this extensions\">[?]</a>";
-						} else {
-							$detail_link = null;
+						$ext = $extension['name'];
+						$feature_link = null;
+						if (in_array($extension['name'], $extensionFeatures) != false) {
+							$feature_link = "<a href='list_features_extensions.php?search=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
+						}
+						$property_link = null;
+						if (in_array($extension['name'], $extensionProperties) != false) {
+							$property_link = "<a href='list_properties_extensions.php?search=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
 						}
 						echo "<tr>";
-						echo "<td>" . $extension['name'] . $detail_link . "</td>";
+						echo "<td>$ext</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center' style='vertical-align: middle'>$feature_link</td>";
+						echo "<td class='text-center' style='vertical-align: middle'>$property_link</td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
