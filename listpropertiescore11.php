@@ -93,7 +93,7 @@ PageGenerator::header("Core 1.1 properties");
 							continue;
 						}
 						$has_coverage = in_array($row[0], $coverage_columns);
-						$link = "<a href='display_core_property.php?core=1.1&name=" . $row[0] . "&platform=$platform'>";
+						$link = "<a href='displaycoreproperty.php?core=1.1&name=" . $row[0] . "&platform=$platform'>";
 						echo "<tr>";
 						echo "<td>" . $row[0] . "</a></td>";
 						echo "<td class='text-center'>" . ($has_coverage ? 'Coverage' : 'Values') . "</td>";

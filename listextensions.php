@@ -33,26 +33,13 @@ PageGenerator::header("Extensions");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Extension coverage for <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php echo "<h4>Extension coverage for ".PageGenerator::platformInfo($platform) ?>
 </div>
 
 <center>
-	<div>
-		<ul class='nav nav-tabs'>
-			<li <?php if ($platform == "windows") {
-					echo "class='active'";
-				} ?>> <a href='listextensions.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-			<li <?php if ($platform == "linux") {
-					echo "class='active'";
-				} ?>> <a href='listextensions.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-			<li <?php if ($platform == "android") {
-					echo "class='active'";
-				} ?>> <a href='listextensions.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
-		</ul>
-	</div>
+	<?php PageGenerator::platformNavigation('listextensions.php', $platform); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-
 		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				<tr>
@@ -100,11 +87,11 @@ PageGenerator::header("Extensions");
 						$ext = $extension['name'];
 						$feature_link = null;
 						if (in_array($extension['name'], $extensionFeatures) != false) {
-							$feature_link = "<a href='list_features_extensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
+							$feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
 						}
 						$property_link = null;
 						if (in_array($extension['name'], $extensionProperties) != false) {
-							$property_link = "<a href='list_properties_extensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
+							$property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
 						}
 						echo "<tr>";
 						echo "<td>$ext</td>";

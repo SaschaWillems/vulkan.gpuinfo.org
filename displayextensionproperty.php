@@ -24,7 +24,7 @@
   * Device coverage based listing of extension property value distribution
   */
 
-require './page_generator.php';
+require './pagegenerator.php';
 require './database/database.class.php';
 require './includes/functions.php';
 

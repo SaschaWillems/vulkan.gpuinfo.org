@@ -57,10 +57,10 @@ if (isset($_GET["extension"])) {
 			if ($res['features2'] > 0 || $res['properties2'] > 0) {
 				$links = [];
 				if ($res['features2'] > 0) {
-					$links[] = "<a href='list_features_extensions.php?search=$ext&platform=$platform'>features</a>";
+					$links[] = "<a href='listfeaturesextensions.php?search=$ext&platform=$platform'>features</a>";
 				}
 				if ($res['properties2'] > 0) {
-					$links[] = "<a href='list_properties_extensions.php?search=$ext&platform=$platform'>properties</a>";
+					$links[] = "<a href='listpropertiesextensions.php?search=$ext&platform=$platform'>properties</a>";
 				}
 				$linkInfo = implode(' and ', $links);
 				$subcaption = "<div style='margin-top: 10px;'>This extension has additional $linkInfo</div>";
