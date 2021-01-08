@@ -126,10 +126,10 @@ if (isset($_GET['platform'])) {
 					DB::connect();
 					switch ($name) {
 						case 'vendorid':
-							$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from $tablename $filter group by 1 order by 1";
+							$sql = "SELECT `$name`as value, VendorId(vendorid) as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 1";
 							break;
 						default:
-							$sql = "SELECT `$name` as value, count(0) as reports from $tablename $filter group by 1 order by 1";
+							$sql = "SELECT `$name` as value, null as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 1";
 					}
 					$result = DB::$connection->prepare($sql);
 					$result->execute();
@@ -138,7 +138,7 @@ if (isset($_GET['platform'])) {
 						$link = "listreports.php?property=$name&value=" . $cap["value"] . ($platform ? "&platform=$platform" : "");
 						$value = getPropertyDisplayValue($name, $cap['value']);
 						echo "<tr>";
-						echo "<td>$value</td>";
+						echo "<td>".($cap['displayvalue'] !== null ? $cap['displayvalue'] : $value)."</td>";
 						echo "<td><a href='$link'>" . $cap["reports"] . "</a></td>";
 						echo "</tr>";
 					}
