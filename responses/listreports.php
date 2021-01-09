@@ -199,19 +199,9 @@
     }
 
     // Platform (os)
-    if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
+    if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {        
         $platform = $_REQUEST['filter']['platform'];
-        switch($platform) {
-            case 'windows':
-                $ostype = 0;
-                break;
-            case 'linux':
-                $ostype = 1;
-                break;
-            case 'android':
-                $ostype = 2;
-                break;
-        }
+        $ostype = ostype($platform);
         $whereClause .= (($whereClause != '') ? ' and ' : ' where ') . 'r.ostype = :ostype';
         $params['ostype'] = $ostype;
     }
