@@ -72,40 +72,18 @@ if ($_GET['extensionproperty']) {
 
 	<div class='header'>
 		<h4>
-			<?php
-			echo $caption;
-			?>
+			<?= $caption; ?>
 		</h4>
 	</div>
 
 	<?php
 	if ($showTabs) {
-	?>
-		<div>
-			<ul class='nav nav-tabs'>
-				<li <?php if ($platform == "all") {
-						echo "class='active'";
-					} ?>> <a href='listdevices.php'>All platforms</a> </li>
-				<li <?php if ($platform == "windows") {
-						echo "class='active'";
-					} ?>> <a href='listdevices.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-				<li <?php if ($platform == "linux") {
-						echo "class='active'";
-					} ?>> <a href='listdevices.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-				<li <?php if ($platform == "android") {
-						echo "class='active'";
-					} ?>> <a href='listdevices.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
-			</ul>
-		</div>
-	<?php
+		PageGenerator::platformNavigation('listdevices.php', $platform, true);
 	}
 	?>
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
-
-		<div id='devices_div' class='tab-pane <?php if ($i == 0) {
-													echo "fade in active";
-												} ?>'>
+		<div id='devices_div' class='tab-pane fade in active'>
 			<form method="get" action="compare.php">
 				<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 					<thead>
@@ -129,8 +107,8 @@ if ($_GET['extensionproperty']) {
 				</table>
 				<div id="errordiv" style="color:#D8000C;"></div>
 			</form>
-
 		</div>
+	</div>
 </center>
 
 <script>

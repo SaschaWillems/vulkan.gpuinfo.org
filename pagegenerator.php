@@ -60,13 +60,18 @@ class PageGenerator
 		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	}
 
-	public static function platformNavigation($base_url, $active_platform)
+	public static function platformNavigation($base_url, $active_platform, $combined_tab = false)
 	{
 		echo "<div>";
 		echo "	<ul class='nav nav-tabs'>";
+		if ($combined_tab) {
+			$active = ($active_platform == 'all');
+			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$base_url'>All platforms</a> </li>";
+		}
 		foreach (self::$platform_list as $navplatform) {
 			$active = ($active_platform == $navplatform);
-			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$base_url?platform=$navplatform'><img src='images/" . $navplatform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($navplatform) . "</a> </li>";
+			$icon_size = ($navplatform == 'windows') ? 14 : 16;
+			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$base_url?platform=$navplatform'><img src='images/" . $navplatform . "logo.png' height='".$icon_size."px' style='padding-right:5px'/>" . ucfirst($navplatform) . "</a> </li>";
 		};
 		echo "	</ul>";
 		echo "</div>";
