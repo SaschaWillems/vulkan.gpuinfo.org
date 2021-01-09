@@ -226,28 +226,10 @@ if ($defaultHeader) {
 	}
 
 	if ($showTabs) {
-	?>
-		<div>
-			<ul class='nav nav-tabs'>
-				<li <?php if ($platform == "all") {
-						echo "class='active'";
-					} ?>> <a href='listreports.php'>All platforms</a> </li>
-				<li <?php if ($platform == "windows") {
-						echo "class='active'";
-					} ?>> <a href='listreports.php?platform=windows'><img src="images/windowslogo.png" height="14px" style="padding-right:5px">Windows</a> </li>
-				<li <?php if ($platform == "linux") {
-						echo "class='active'";
-					} ?>> <a href='listreports.php?platform=linux'><img src="images/linuxlogo.png" height="16px" style="padding-right:4px">Linux</a> </li>
-				<li <?php if ($platform == "android") {
-						echo "class='active'";
-					} ?>> <a href='listreports.php?platform=android'><img src="images/androidlogo.png" height="16px" style="padding-right:4px">Android</a> </li>
-			</ul>
-		</div>
-	<?php
+		PageGenerator::platformNavigation('listreports.php', $platform, true);
 	}
 	?>
 	<div class='tablediv tab-content' style='display: inline-flex;'>
-
 		<form method="get" action="compare.php?compare">
 			<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 				<thead>

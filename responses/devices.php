@@ -290,17 +290,7 @@ if (isset($_REQUEST["platform"])) {
         } else {
             $whereClause = ' where ';
         }
-        switch ($platform) {
-            case 'windows':
-                $ostype = 0;
-                break;
-            case 'linux':
-                $ostype = 1;
-                break;
-            case 'android':
-                $ostype = 2;
-                break;
-        }
+        $ostype = ostype($platform);
         $whereClause .= "r.ostype = '" . $ostype . "'";
     }
 }
