@@ -1,7 +1,27 @@
 <?php
+
+/**
+ *
+ * Vulkan hardware capability database server implementation
+ *
+ * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ *
+ * This code is free software, you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public
+ * License version 3 as published by the Free Software Foundation.
+ *
+ * Please review the following information to ensure the GNU Lesser
+ * General Public License version 3 requirements will be met:
+ * http://www.gnu.org/licenses/agpl-3.0.de.html
+ *
+ * The code is distributed WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.
+ */
+
 function versionToString($version)
 {
-	$versionStr = ($version >> 22).".".(($version >> 12) & 0x3ff).".".($version & 0xfff);
+	$versionStr = ($version >> 22) . "." . (($version >> 12) & 0x3ff) . "." . ($version & 0xfff);
 	return $versionStr;
 }
 
@@ -12,10 +32,8 @@ function getFlags($flagList, $flag)
 	$arrVals = array_values($flagList);
 
 	$index = 0;
-	foreach ($flagList as $i => $value)
-	{
-		if ($flag & $i)
-		{
+	foreach ($flagList as $i => $value) {
+		if ($flag & $i) {
 			$flags[] = $arrVals[$index];
 		}
 		$index++;
@@ -42,7 +60,7 @@ function getFormatFlags($flag)
 		0x4000 => "TRANSFER_SRC_BIT",
 		0x8000 => "TRANSFER_DST_BIT",
 	);
-	return getFlags($flags, $flag);	
+	return getFlags($flags, $flag);
 }
 
 function getImageUsageFlags($flag)
@@ -97,7 +115,7 @@ function getMemoryTypeFlags($flag)
 		0x0010 => "LAZILY_ALLOCATED_BIT",
 		0x0020 => "PROTECTED_BIT",
 		0x0040 => "DEVICE_COHERENT_BIT_AMD",
-		0x0080 => "DEVICE_UNCACHED_BIT_AMD",		
+		0x0080 => "DEVICE_UNCACHED_BIT_AMD",
 	);
 	return getFlags($flags, $flag);
 }
@@ -125,8 +143,7 @@ function getQueueFlags($flag)
 function getSampleCountFlags($flag)
 {
 	$flags = array();
-	for ($i = 0; $i < 7; ++$i)
-	{
+	for ($i = 0; $i < 7; ++$i) {
 		$flags[pow(2, $i)] = pow(2, $i);
 	}
 	return getFlags($flags, $flag);
@@ -165,7 +182,7 @@ function listSubgroupFeatureFlags($flag)
 	$index = 0;
 	foreach ($flags as $i => $value) {
 		$class = ($flag & $i) ? "supported" : "unsupported";
-		$res .= "<span class='".$class."'>".strtolower($arr_values[$index])."</span><br>";
+		$res .= "<span class='" . $class . "'>" . strtolower($arr_values[$index]) . "</span><br>";
 		$index++;
 	}
 	return $res;
@@ -192,13 +209,14 @@ function listSubgroupStageFlags($flag)
 		} else {
 			$class = ($flag & $i) ? "supported" : "unsupported";
 		}
-		$res .= "<span class='".$class."'>".strtolower($arr_values[$index])."</span><br>";
+		$res .= "<span class='" . $class . "'>" . strtolower($arr_values[$index]) . "</span><br>";
 		$index++;
 	}
 	return $res;
 }
 
-function listSampleCountFlags($value) {
+function listSampleCountFlags($value)
+{
 	$flags = [
 		0x0001 => '1',
 		0x0002 => '2',
@@ -211,12 +229,13 @@ function listSampleCountFlags($value) {
 	$res = [];
 	foreach ($flags as $flag => $text) {
 		$class = (($value & $flag) == $flag) ? "supported" : "unsupported-grey";
-		$res[] = "<span class='".$class."'>$text</span>";
+		$res[] = "<span class='" . $class . "'>$text</span>";
 	}
 	return implode(', ', $res);
 }
 
-function listResolveModeFlags($value) {
+function listResolveModeFlags($value)
+{
 	$flags = [
 		0x0001 => 'Zero',
 		0x0002 => 'Average',
@@ -226,7 +245,7 @@ function listResolveModeFlags($value) {
 	$res = [];
 	foreach ($flags as $flag => $text) {
 		$class = (($value & $flag) == $flag) ? "supported" : "unsupported-grey";
-		$res[] = "<span class='".$class."'>$text</span>";
+		$res[] = "<span class='" . $class . "'>$text</span>";
 	}
 	return implode(', ', $res);
 }
@@ -234,15 +253,11 @@ function listResolveModeFlags($value) {
 // Generate a simple ul/li list for the flags
 function listFlags($flags)
 {
-	if (sizeof($flags) > 0)
-	{
-		foreach ($flags as $flag)
-		{
-			echo $flag."<br>";
+	if (sizeof($flags) > 0) {
+		foreach ($flags as $flag) {
+			echo $flag . "<br>";
 		}
-	}
-	else
-	{
+	} else {
 		echo "none";
 	}
 }
@@ -257,7 +272,8 @@ function getShaderFloatControlsIndependence($value)
 	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
 
-function getPointClippingBehavior($value) {
+function getPointClippingBehavior($value)
+{
 	$values = [
 		'All clip planes' => 0,
 		'User clip planes only' => 1
@@ -265,7 +281,8 @@ function getPointClippingBehavior($value) {
 	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
 
-function getDriverId($value) {
+function getDriverId($value)
+{
 	$values = [
 		'AMD (Proprietary)' => 1,
 		'AMD (Open Source)' => 2,
@@ -276,7 +293,7 @@ function getDriverId($value) {
 		'Imagination (Proprietary)' => 7,
 		'Qualcomm (Proprietary)' => 8,
 		'ARM (Proprietary)' => 9,
-		'Google Swiftshader'=> 10,
+		'Google Swiftshader' => 10,
 		'GGP (Proprietary)' => 11,
 		'Broadcom (Proprietary)' => 12,
 		'MESA LLVMPIPE' => 13,
@@ -296,14 +313,11 @@ function getPresentMode($value)
 		"SHARED_DEMAND_REFRESH_KHR" => 1000111000,
 		"SHARED_CONTINUOUS_REFRESH_KHR" => 1000111001,
 	);
-	if (in_array($value, $modes))
-	{
+	if (in_array($value, $modes)) {
 		$key = array_search($value, $modes);
 		return $key;
-	}
-	else
-	{
-		return "unknown"; 
+	} else {
+		return "unknown";
 	}
 }
 
@@ -325,54 +339,52 @@ function getColorSpace($value)
 		"ADOBERGB_NONLINEAR_EXT" => 1000104012,
 		"PASS_THROUGH_EXT" => 1000104013,
 		"EXTENDED_SRGB_NONLINEAR_EXT" => 1000104014,
-		"DISPLAY_NATIVE_AMD" => 1000213000	
+		"DISPLAY_NATIVE_AMD" => 1000213000
 	);
-	if (in_array($value, $modes))
-	{
+	if (in_array($value, $modes)) {
 		$key = array_search($value, $modes);
 		return $key;
-	}
-	else
-	{
-		return "unknown"; 
+	} else {
+		return "unknown";
 	}
 }
 
 // Convert vendor specific driver version string
 function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
 {
-	if ($versionraw != '')
-	{
+	if ($versionraw != '') {
 		// NVIDIA
-		if ($vendorid == 4318)
-		{
-			return sprintf("%d.%d.%d.%d",
+		if ($vendorid == 4318) {
+			return sprintf(
+				"%d.%d.%d.%d",
 				($versionraw >> 22) & 0x3ff,
 				($versionraw >> 14) & 0x0ff,
 				($versionraw >> 6) & 0x0ff,
 				($versionraw) & 0x003f
-				);
+			);
 		}
-		if ($vendorid == 0x8086 && $osname == 'windows')
-		{
-			return sprintf("%d.%d",
+		if ($vendorid == 0x8086 && $osname == 'windows') {
+			return sprintf(
+				"%d.%d",
 				($versionraw >> 14),
 				($versionraw) & 0x3fff
-				);
+			);
 		}
 		// Use Vulkan version conventions if vendor mapping is not available
-		return sprintf("%d.%d.%d",
+		return sprintf(
+			"%d.%d.%d",
 			($versionraw >> 22),
 			($versionraw >> 12) & 0x3ff,
 			$versionraw & 0xfff,
 			"<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true' title='The version number conversion scheme for this vendor is not yet available'></span>"
-			);
+		);
 	}
-	
+
 	return $versiontext;
 }
 
-function mailError($error, $content) {
+function mailError($error, $content)
+{
 	$msgtitle = "Vulkan database upload error";
 	$msg = "Error:\n";
 	$msg .= $error;
@@ -387,14 +399,19 @@ function mailError($error, $content) {
  * @param string $platform Human readable platform name (Windows, Linux, Android)
  * @return int|null Database mapped os type or null if unknown
  */
-function ostype($platform) {
-	switch($platform) {
+function ostype($platform)
+{
+	switch (strtolower($platform)) {
 		case 'windows':
 			return 0;
 		case 'linux':
 			return 1;
 		case 'android':
 			return 2;
+		case 'macos':
+			return 3;
+		case 'ios':
+			return 4;
 	}
 	return null;
 }
@@ -405,8 +422,9 @@ function ostype($platform) {
  * @param integer $ostype Database os type
  * @return int|null Numan readable platform name or null if unknown
  */
-function platformname($ostype) {
-	switch($ostype) {
+function platformname($ostype)
+{
+	switch ($ostype) {
 		case 0:
 			return 'windows';
 		case 1:
@@ -429,73 +447,78 @@ function platformname($ostype) {
  * @return string The prettified output
  * @author Jay Roberts (https://github.com/GloryFish)
  */
-function _format_json($json, $html = false) {
-	$tabcount = 0; 
-	$result = ''; 
-	$inquote = false; 
-	$ignorenext = false; 
-	if ($html) { 
-		$tab = "&nbsp;&nbsp;&nbsp;"; 
-		$newline = "<br/>"; 
-	} else { 
-		$tab = "\t"; 
-		$newline = "\n"; 
-	} 
-	for($i = 0; $i < strlen($json); $i++) { 
-		$char = $json[$i]; 
-		if ($ignorenext) { 
-			$result .= $char; 
-			$ignorenext = false; 
-		} else { 
-			switch($char) { 
-				case '{': 
-					$tabcount++; 
-					$result .= $char . $newline . str_repeat($tab, $tabcount); 
-					break; 
-				case '}': 
-					$tabcount--; 
-					$result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char; 
-					break; 
-				case ',': 
-					$result .= $char . $newline . str_repeat($tab, $tabcount); 
-					break; 
-				case '"': 
-					$inquote = !$inquote; 
-					$result .= $char; 
-					break; 
-				case '\\': 
-					if ($inquote) $ignorenext = true; 
-					$result .= $char; 
-					break; 
-				default: 
-					$result .= $char; 
-			} 
-		} 
-	} 
-	return $result; 
+function _format_json($json, $html = false)
+{
+	$tabcount = 0;
+	$result = '';
+	$inquote = false;
+	$ignorenext = false;
+	if ($html) {
+		$tab = "&nbsp;&nbsp;&nbsp;";
+		$newline = "<br/>";
+	} else {
+		$tab = "\t";
+		$newline = "\n";
+	}
+	for ($i = 0; $i < strlen($json); $i++) {
+		$char = $json[$i];
+		if ($ignorenext) {
+			$result .= $char;
+			$ignorenext = false;
+		} else {
+			switch ($char) {
+				case '{':
+					$tabcount++;
+					$result .= $char . $newline . str_repeat($tab, $tabcount);
+					break;
+				case '}':
+					$tabcount--;
+					$result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char;
+					break;
+				case ',':
+					$result .= $char . $newline . str_repeat($tab, $tabcount);
+					break;
+				case '"':
+					$inquote = !$inquote;
+					$result .= $char;
+					break;
+				case '\\':
+					if ($inquote) $ignorenext = true;
+					$result .= $char;
+					break;
+				default:
+					$result .= $char;
+			}
+		}
+	}
+	return $result;
 }
 
-function getDeviceCount($platform, $andWhere = null) {
+function getDeviceCount($platform, $andWhere = null)
+{
 	return DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype $andWhere", ['ostype' => ostype($platform)]);
 }
 
-function setPageTitle(string $title) {
-	echo '<script language="javascript">document.title = "'.$title.' - Vulkan Hardware Database by Sascha Willems";</script>';
+function setPageTitle(string $title)
+{
+	echo '<script language="javascript">document.title = "' . $title . ' - Vulkan Hardware Database by Sascha Willems";</script>';
 }
 
-function UUIDtoString($uuid) {
+function UUIDtoString($uuid)
+{
 	try {
 		$arr = unserialize($uuid);
 		foreach ($arr as &$val) {
 			$val = strtoupper(str_pad(dechex($val), 2, "0", STR_PAD_LEFT));
 		}
-	return implode($arr);
+		return implode($arr);
 	} catch (Throwable $e) {
 		return null;
 	}
 }
 
-function displayBool($value) {
+function displayBool($value)
+{
 	if (($value == 'true') || ($value == 'false')) {
 		$class = (strtolower($value) == 'true') ? 'supported' : 'unsupported';
 		return "<span class='$class'>$value</span>";
@@ -503,51 +526,53 @@ function displayBool($value) {
 	return ($value == 1) ? "<span class='supported'>true</span>" : "<span class='unsupported'>false</span>";
 }
 
-function displayHex($value) {
-	return '0x'.strtoupper(dechex($value));
+function displayHex($value)
+{
+	return '0x' . strtoupper(dechex($value));
 }
 
 /**
  * Visualize certain properties (e.g. flags) in a more readable way
  */
-function getPropertyDisplayValue($key, $value) {
+function getPropertyDisplayValue($key, $value)
+{
 	$displayvalue = $value;
-	switch($key) {
-		// Core 1.0
+	switch ($key) {
+			// Core 1.0
 		case 'vendorID':
 		case 'deviceID':
 			$displayvalue = displayHex($value);
-		break;
+			break;
 		case 'residencyAlignedMipSize':
 		case 'residencyNonResidentStrict':
 		case 'residencyStandard2DBlockShape':
 		case 'residencyStandard2DMultisampleBlockShape':
 		case 'residencyStandard3DBlockShape':
 			$displayvalue = displayBool($value);
-		break;			
+			break;
 		case 'pipelineCacheUUID':
 			$displayvalue = UUIDtoString($value);
-		break;
-		// Core 1.1
+			break;
+			// Core 1.1
 		case 'deviceUUID':
-		case 'driverUUID': 
+		case 'driverUUID':
 		case 'deviceLUID':
 			$displayvalue = UUIDtoString($value);
-		break;
+			break;
 		case 'deviceLUIDValid':
 		case 'subgroupQuadOperationsInAllStages':
 		case 'protectedNoFault':
 			$displayvalue = displayBool($value);
-		break;
+			break;
 		case 'pointClippingBehavior':
 			$displayvalue = getPointClippingBehavior($value);
-		break;
+			break;
 		case 'subgroupSupportedStages':
 			$displayvalue = listSubgroupStageFlags($value);
-		break;
+			break;
 		case 'subgroupSupportedOperations':
 			$displayvalue = listSubgroupFeatureFlags($value);
-		break;
+			break;
 		case 'framebufferColorSampleCounts':
 		case 'framebufferDepthSampleCounts':
 		case 'framebufferNoAttachmentsSampleCounts':
@@ -558,11 +583,11 @@ function getPropertyDisplayValue($key, $value) {
 		case 'sampledImageStencilSampleCounts':
 		case 'storageImageSampleCounts':
 			$displayvalue = listSampleCountFlags($value);
-		break;		
-		// Core 1.2
+			break;
+			// Core 1.2
 		case 'driverID':
 			$displayvalue = getDriverId($value);
-		break;
+			break;
 		case 'shaderSignedZeroInfNanPreserveFloat16':
 		case 'shaderSignedZeroInfNanPreserveFloat32':
 		case 'shaderSignedZeroInfNanPreserveFloat64':
@@ -590,27 +615,27 @@ function getPropertyDisplayValue($key, $value) {
 		case 'filterMinmaxSingleComponentFormats':
 		case 'filterMinmaxImageComponentMapping':
 			$displayvalue = displayBool($value);
-		break;
+			break;
 		case 'framebufferIntegerColorSampleCounts':
 			$displayvalue = listSampleCountFlags($value);
-		break;
+			break;
 		case 'supportedDepthResolveModes':
 		case 'supportedStencilResolveModes':
 			$displayvalue = listResolveModeFlags($value);
-		break;
+			break;
 		case 'denormBehaviorIndependence':
 		case 'roundingModeIndependence':
 			$displayvalue = getShaderFloatControlsIndependence($value);
-		break;
-		// Extensions
+			break;
+			// Extensions
 		case 'sampleLocationSampleCounts':
 			$displayvalue = listSampleCountFlags($value);
-		break;
+			break;
 		default:
 			// Serialized arrays
 			if (is_string($value) && (substr($value, 0, 2) == "a:") && (strpos($value, '{') !== false)) {
 				$arr = unserialize($value);
-				$displayvalue = "[".implode(',', $arr)."]";
+				$displayvalue = "[" . implode(',', $arr) . "]";
 			}
 			// Boolean string
 			if (($value == 'true') || ($value == 'false')) {
@@ -619,4 +644,3 @@ function getPropertyDisplayValue($key, $value) {
 	}
 	return $displayvalue;
 }
-?>
