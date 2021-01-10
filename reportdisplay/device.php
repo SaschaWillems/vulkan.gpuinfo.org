@@ -83,7 +83,7 @@
 						break;
 					case 'driverversionraw':
 						$key = 'Driver version';
-						$value = getDriverVerson($value, $row[2], $row[6], $row[11]);
+						$value = getDriverVerson($value, $data[0]['driverversion'], $data[0]['vendorid'], $data[0]['osname']);
 						break;
 					case 'lastupdate':
 						$key = 'Last update at';

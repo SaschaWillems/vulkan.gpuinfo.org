@@ -59,6 +59,11 @@ if ($limit != '') {
 
 array_push($searchColumns, 'devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
 
+if (isset($_REQUEST['filter']['portability'])) {
+    if ($_REQUEST['filter']['portability']) {
+        $searchColumns = ['id', 'devicename', 'r.osname', 'r.osversion', 'p.driverversion', 'p.apiversion'];
+    }
+}
 // Per-column, filtering
 $filters = array();
 for ($i = 0; $i < count($_REQUEST['columns']); $i++) {
@@ -211,6 +216,15 @@ if (isset($_REQUEST['filter']['coreproperty']) && ($_REQUEST['filter']['coreprop
     $whereClause = "where r.id in (select reportid from $tablename where cast(`" . $_REQUEST['filter']['coreproperty'] . "` as char) = :filter_corepropertyvalue)";
 }
 
+// Portability subset
+$portabilitysubset = false;
+if (isset($_REQUEST['filter']['portability'])) {
+    if ($_REQUEST['filter']['portability']) {
+        $portabilitysubset = true;
+        $whereClause = "where r.id in (SELECT reportid from deviceproperties2 dp2 where dp2.extension = 'VK_KHR_portability_subset')";
+    }
+}
+
 // Platform (os)
 if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
     $platform = $_REQUEST['filter']['platform'];
@@ -262,7 +276,8 @@ if ($devices->rowCount() > 0) {
             'osname' => $device["osname"],
             'osversion' => $device["osversion"],
             'osarchitecture' => $device["osarchitecture"],
-            'compare' => '<center><input type="checkbox" name="id[' . $device["id"] . ']"></center>'
+            'compare' => '<center><input type="checkbox" name="id[' . $device["id"] . ']"></center>',
+            'devsim' => ($portabilitysubset ? "<center><a href=\"api/v2/devsim/extension_json.php?id=".$device["id"]."&extension=VK_KHR_portability_subset\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Download</a></center>" : null)
         );
     }
 }
