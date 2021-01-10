@@ -197,10 +197,12 @@ if (isset($_GET['extensionfeature']) && ($_GET['extensionfeature'] != '')) {
 // Core property
 $coreproperty = $_GET['property'];
 $corepropertyvalue = null;
+$coreversion = $_GET['core'];
 if (isset($coreproperty) && ($coreproperty != '')) {
 	$defaultHeader = false;
 	$corepropertyvalue = $_GET['value'];
-	$caption = "Reports with <code>$coreproperty</code> = $corepropertyvalue";
+	$displayvalue = getPropertyDisplayValue($coreproperty, $corepropertyvalue);
+	$caption = "Reports with <code>$coreproperty</code> = $displayvalue";
 }
 // Platform (os)
 if ($platform && $platform !== 'all') {
@@ -326,6 +328,10 @@ if ($defaultHeader) {
 						<?php if (!is_null($corepropertyvalue)) {
 							echo "'corepropertyvalue' : '" . $corepropertyvalue . "' ,";
 						} ?>
+						<?php if ($coreversion) {
+							echo "'core' : '" . $coreversion . "' ,";
+						} ?>
+
 					}
 				},
 				error: function(xhr, error, thrown) {

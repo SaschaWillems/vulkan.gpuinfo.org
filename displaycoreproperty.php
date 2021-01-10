@@ -28,24 +28,11 @@ $name = null;
 if (isset($_GET['name'])) {
 	$name = $_GET['name'];
 }
-$os = null;
 $filter = null;
-if (isset($_GET['os'])) {
-	$os = $_GET['os'];
-	if (!in_array($os, ['windows', 'android', 'linux', 'ios', 'osx'])) {
-		$os = null;
-	}
-	if ($os) {
-		if (in_array($os, ['windows', 'android', 'ios', 'osx'])) {
-			$filter = "where reportid in (select id from reports where osname = '$os')";
-		}
-		if (in_array($os, ['linux'])) {
-			$filter = "where reportid in (select id from reports where osname not in ('windows', 'android', 'ios', 'osx'))";
-		}
-	}
-}
 $tablename = 'deviceproperties';
+$core = null;
 if (isset($_GET['core'])) {
+	$core = $_GET['core'];
 	switch ($_GET['core']) {
 		case '1.1':
 			$tablename = 'deviceproperties11';
@@ -71,18 +58,8 @@ $caption = "Value distribution for <code>$name</code>";
 $platform = null;
 if (isset($_GET['platform'])) {
 	$platform = $_GET["platform"];
-	if ($platform !== "all") {
-		switch ($platform) {
-			case 'windows':
-				$ostype = 0;
-				break;
-			case 'linux':
-				$ostype = 1;
-				break;
-			case 'android':
-				$ostype = 2;
-				break;
-		}
+	$ostype = ostype($platform);
+	if ($ostype !== null) {
 		$filter .= "where reportid in (select id from reports where ostype = '" . $ostype . "')";
 		$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	}
@@ -136,6 +113,9 @@ if (isset($_GET['platform'])) {
 					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 					foreach ($rows as $cap) {
 						$link = "listreports.php?property=$name&value=" . $cap["value"] . ($platform ? "&platform=$platform" : "");
+						if ($core) {
+							$link .= "&core=$core";
+						}
 						$value = getPropertyDisplayValue($name, $cap['value']);
 						echo "<tr>";
 						echo "<td>".($cap['displayvalue'] !== null ? $cap['displayvalue'] : $value)."</td>";

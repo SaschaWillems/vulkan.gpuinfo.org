@@ -209,7 +209,7 @@ if ($memorytype != '') {
 			)
 			and r.version >= '1.2'";
     $params['filter_memorytype'] = $memorytype;
-    if ($ostype) {
+    if ($ostype !== null) {
         $params['ostype'] = $ostype;
     }
 }
@@ -227,7 +227,7 @@ if ($surfaceformat != '') {
             )
             and r.version >= '1.2'";
     $params['filter_surfaceformat'] = $surfaceformat;
-    if ($ostype) {
+    if ($ostype !== null) {
         $params['ostype'] = $ostype;
     }
 }
@@ -245,7 +245,7 @@ if ($surfacepresentmode != '') {
             )
             and r.version >= '1.2'";
     $params['filter_surfacepresentmode'] = $surfacepresentmode;
-    if ($ostype) {
+    if ($ostype !== null) {
         $params['ostype'] = $ostype;
     }
 }
