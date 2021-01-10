@@ -19,9 +19,9 @@
 		*
 	*/
 	
-	include './dbconfig.php';
-	include 'page_generator.php';
-	include './functions.php';	
+	include './database/database.class.php';
+	include 'pagegenerator.php';
+	include './includes/functions.php';	
 	
 	PageGenerator::header('Vulkan device support');
 

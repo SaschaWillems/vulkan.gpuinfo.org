@@ -1,3 +1,5 @@
 dbsettings.php
+database.config.php
 external/
 xdebug.log
+.vscode/

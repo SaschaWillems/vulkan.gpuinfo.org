@@ -19,8 +19,8 @@
 		*
 	*/
 	
-	include 'page_generator.php';
-	include './dbconfig.php';
+	include 'pagegenerator.php';
+	include './database/database.class.php';
 	
 	PageGenerator::header("Instance extensions");
 ?>

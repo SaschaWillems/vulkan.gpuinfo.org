@@ -21,7 +21,7 @@
 
 	// Return report as json (uploaded from client application)
 	
-	include './../dbconfig.php';
+	include './../database/database.class.php';
 	
 	/**
 	 * Formats a JSON string for pretty printing

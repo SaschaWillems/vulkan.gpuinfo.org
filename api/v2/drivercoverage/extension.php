@@ -19,8 +19,8 @@
 	*
 	*/
 
-	include './../../../dbconfig.php';
-	include './../../../functions.php';
+	include './../../../database/database.class.php';
+	include './../../../includes/functions.php';
 	include './apiendpoint.php';
 
 	header('Content-Type: application/json');

@@ -1,345 +1,313 @@
 <?php
-	/* 		
-		*
-		* Vulkan hardware capability database server implementation
-		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
-		*	
-		* This code is free software, you can redistribute it and/or
-		* modify it under the terms of the GNU Affero General Public
-		* License version 3 as published by the Free Software Foundation.
-		*	
-		* Please review the following information to ensure the GNU Lesser
-		* General Public License version 3 requirements will be met:
-		* http://www.gnu.org/licenses/agpl-3.0.de.html
-		*	
-		* The code is distributed WITHOUT ANY WARRANTY; without even the
-		* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
-		*
-	*/
-			
-	include './dbconfig.php';
-	include 'page_generator.php';
-	include './functions.php';	
 
-	PageGenerator::header('Compare reports');
+/**
+ *
+ * Vulkan hardware capability database server implementation
+ *	
+ * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ *	
+ * This code is free software, you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public
+ * License version 3 as published by the Free Software Foundation.
+ *	
+ * Please review the following information to ensure the GNU Lesser
+ * General Public License version 3 requirements will be met:
+ * http://www.gnu.org/licenses/agpl-3.0.de.html
+ *	
+ * The code is distributed WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.		
+ *
+ */
 
-	DB::connect();
+require './database/database.class.php';
+require 'pagegenerator.php';
+require './includes/functions.php';
+require './includes/constants.php';
+require './reportcompare/reportcompare.class.php';
 
-	$extDiffOnly = false;
-	if (isset($_GET['extDiffOnly'])) {
-		$extDiffOnly = true;
+PageGenerator::header('Compare reports');
+
+DB::connect();
+
+// Use url parameter to enable diff only display
+$diff = false;
+if (isset($_GET['diff'])) {
+	$diff = (int)($_GET['diff']) == 1;
+}
+
+$headerFields = array("device", "driverversion", "apiversion", "os");
+
+$reportids = array();
+$reportlimit = false;
+
+if ((!isset($_REQUEST['id'])) && (!isset($_REQUEST['devices']))) {
+	echo "<center>";
+?>
+	<div class="alert alert-warning">
+		<strong>Warning!</strong><br> No report IDs set!
+	</div>
+<?php
+	PageGenerator::footer();
+	echo "</center>";
+	die();
+}
+
+// Compare from report list
+if (isset($_REQUEST['id'])) {
+	foreach ($_REQUEST['id'] as $k => $v) {
+		$reportids[] = $k;
+		// Limit to 8 reports
+		if (count($reportids) > 7) {
+			$reportlimit = true;
+			break;
+		}
 	}
-	
-	// Use url parameter to enable diff only display
-	$diff = false;
-	if (isset($_GET['diff'])) {
-		$diff = (int)($_GET['diff']) == 1;
-	}
-	
-	$headerFields = array("device", "driverversion", "apiversion", "os");		
-	
-	$reportids = array();
-	$reportlimit = false;
+}
 
-	if ((!isset($_REQUEST['id'])) && (!isset($_REQUEST['devices']))) {
-		echo "<center>";
-		?>
-		<div class="alert alert-warning">
-			<strong>Warning!</strong><br> No report IDs set!
-		</div>				
-		<?php
-		PageGenerator::footer();
-		echo "</center>";
+// Compare from device list
+if (isset($_REQUEST['devices'])) {
+	$devices = $_REQUEST["devices"];
+	if (empty($devices)) {
 		die();
 	}
-			
-	// Compare from report list
-	if (isset($_REQUEST['id'])) {
-	foreach ($_REQUEST['id'] as $k => $v) {
-			$reportids[] = $k;	
-			// Limit to 8 reports
-			if (count($reportids) > 7) {
-				$reportlimit = true;	 
-				break; 
-			}
-		}   
-	}
+	for ($i = 0; $i < count($devices); $i++) {
+		$device = explode('&os=', $devices[$i]);
 
-	// Compare from device list
-	if (isset($_REQUEST['devices'])) {
-		$devices = $_REQUEST["devices"];
-		if (empty($devices)) {
-			die();
+		$oswhere = '';
+		switch ($device[1]) {
+			case 'windows':
+				$oswhere = ' and ostype = 0';
+				break;
+			case 'linux':
+				$oswhere = ' and ostype = 1';
+				break;
+			case 'android':
+				$oswhere = ' and ostype = 2';
+				break;
 		}
-		for ($i = 0; $i < count($devices); $i++) {
-			$device = explode('&os=', $devices[$i]);
-	
-			$oswhere = '';
-			switch($device[1]) {
-				case 'windows':
-					$oswhere = ' and ostype = 0';
-					break;
-				case 'linux':
-					$oswhere = ' and ostype = 1';
-					break;
-				case 'android':
-					$oswhere = ' and ostype = 2';
-					break;
-			}
 
-			$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $oswhere order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
-			$result->execute([":device" => $device[0]]);
-			$row = $result->fetch(PDO::FETCH_ASSOC);
+		$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $oswhere order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
+		$result->execute([":device" => $device[0]]);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
 
-			if ($row) {
-				$reportids[] = $row['id'];
-			}
+		if ($row) {
+			$reportids[] = $row['id'];
+		}
 
-			// Limit to 8 reports
-			if (count($reportids) > 7) {
-				$reportlimit = true;	 
-				break; 
-			}
-
+		// Limit to 8 reports
+		if (count($reportids) > 7) {
+			$reportlimit = true;
+			break;
 		}
 	}
+}
+
+$report_compare = new ReportCompare($reportids);
+$report_compare->fetchData();
 
 ?>
-	<div class='header'>
-		<h4 style='margin-left:10px;'>Comparing <?php count($reportids) ?> reports</h4>
-		<label id="toggle-label" class="checkbox-inline" style="display:none;">
-			<input id="toggle-event" type="checkbox" data-toggle="toggle" data-size="small" data-onstyle="success"> Display only different values
-		</label>
+<div class='header'>
+	<h4 style='margin-left:10px;'>Comparing <?php count($reportids) ?> reports</h4>
+	<label id="toggle-label" class="checkbox-inline" style="display:none;">
+		<input id="toggle-event" type="checkbox" data-toggle="toggle" data-size="small" data-onstyle="success"> Display only different values
+	</label>
+</div>
+
+<?php
+if ($reportlimit) {
+	echo "<b>Note : </b>You selected more than 8 reports to compare, only displaying the first 8 selected reports.\n";
+}
+
+echo "<center><div id='reportdiv'>";
+
+sort($reportids, SORT_NUMERIC);
+
+// Header
+$colspan = count($reportids) + 1;
+
+$repids = implode(",", $reportids);
+?>
+
+<div>
+	<ul class='nav nav-tabs'>
+		<li class='active'><a data-toggle='tab' href='#devices'>Devices</a></li>
+		<li><a data-toggle='tab' href='#properties'>Properties</a></li>
+		<li><a data-toggle='tab' href='#features'>Features</a></li>
+		<li><a data-toggle='tab' href='#extensions'>Extensions</a></li>
+		<li><a data-toggle='tab' href='#formats'>Formats</a></li>
+		<li><a data-toggle='tab' href='#queuefamilies'>Queue families</a></li>
+		<li><a data-toggle='tab' href='#memory'>Memory</a></li>
+		<li><a data-toggle='tab' href='#surface'>Surface</a></li>
+	</ul>
+</div>
+
+<div class='tablediv tab-content' style='width:75%;'>
+
+	<div id="overlay_devices">
+		<center>
+			<h4>Fetching data...</h4><img src="./images/loading.gif">
+		</center>
 	</div>
 
-<?php						
-	if ($reportlimit) {echo "<b>Note : </b>You selected more than 8 reports to compare, only displaying the first 8 selected reports.\n"; }	
-	
-	echo "<center><div id='reportdiv'>";			
-	
-	sort($reportids, SORT_NUMERIC);
-		
-	// Gather device information (used in each compare table)
-	try {
-		$stmnt = DB::$connection->prepare(
-		"SELECT 
-			concat(VendorId(p.vendorid), ' ', p.devicename) as device,
-			concat(p.driverversion, ' (', p.apiversion, ')') as version,
-			concat(r.osname, ' ', r.osversion, ' (',  r.osarchitecture, ')') as os
-		from reports r
-		left join
-			deviceproperties p on (p.reportid = r.id)
-		where r.id in (" . implode(",", $reportids) . ")");
-		$stmnt->execute();
-	} catch (PDOException $e) {
-		die("Could not fetch report data!");
+	<?php
+	$views = [
+		'devices',
+		'features',
+		'properties',
+		'extensions',
+		'formats',
+		'queuefamilies',
+		'memory',
+		'surface'
+	];
+	foreach ($views as $index => $view) {
+		echo "<div id='$view' class='tab-pane fade ".($index == 0 ? "in active" : null)." reportdiv'>";
+			include "reportcompare/$view.php";
+		echo "</div>";
 	}
-	
-	$deviceinfo_captions = array();
-	$deviceinfo_data = array();
-	while($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-		$device_data = array();						
-		$colindex = 0;
-		foreach ($row as $data) {
-			$meta = $stmnt->getColumnMeta($colindex);
-			$caption = $meta["name"];
-			$device_data[] = $data;	  
-			$deviceinfo_captions[] = $caption;						
-			$colindex++;
-		} 					
-		$deviceinfo_data[] = $device_data; 					
-	}
-											
-	// Header
-	$colspan = count($reportids) + 1;	
 
-	$repids = implode(",", $reportids);   
-?>			
-							
-		<div id='tabs'>
-		<ul class='nav nav-tabs'>
-			<li class='active'><a data-toggle='tab' href='#tab-devices'>Devices</a></li>
-			<li><a data-toggle='tab' href='#tab-features'>Features</a></li>
-			<li><a data-toggle='tab' href='#tab-limits'>Limits</a></li>
-			<li><a data-toggle='tab' href='#tab-extensions'>Extensions</a></li>
-			<li><a data-toggle='tab' href='#tab-extended-features'>Ext.Features</a></li>
-			<li><a data-toggle='tab' href='#tab-extended-properties'>Ext.Props.</a></li>
-			<li><a data-toggle='tab' href='#tab-formats'>Formats</a></li>
-			<li><a data-toggle='tab' href='#tab-queues'>Queue families</a></li>
-			<li><a data-toggle='tab' href='#tab-memory'>Memory</a></li>
-			<li><a data-toggle='tab' href='#tab-surface'>Surface</a></li>
-		</ul>		
-		
-		<div class='tablediv tab-content' style='width:75%;'>		
-
-		<div id='tab-devices' class='tab-pane fade in active reportdiv'>
-
-		<!-- Devices -->		
-		<div id="overlay_devices"><center><h4>Fetching data...</h4><img src="./images/loading.gif"></center></div>
-			<table id='devices' width='100%' class='table table-striped table-bordered table-hover' >
-			<!-- style='display:none' -->
-				<?php include 'compare_devices.php'; ?>
-			</tbody></table>
-		</div>
-
-		
-		<!-- Features -->
-		<div id='tab-features' class='tab-pane fade reportdiv'>
-			<table id='features' width='100%' class='table table-striped table-bordered table-hover'>			
-				<?php include 'compare_features.php'; ?>
-			</tbody></table>
-		</div>
-		
-		<!-- Limits  -->
-		<div id='tab-limits' class='tab-pane fade reportdiv'>
-			<table id='limits' width='100%' class='table table-striped table-bordered table-hover'>			
-				<?php include 'compare_limits.php'; ?>
-			</tbody></table>
-		</div>
-		
-		<!-- Extensions -->
-		<div id='tab-extensions' class='tab-pane fade reportdiv'>
-			<table id='extensions' width='100%' class='table table-striped table-bordered table-hover'>
-				<?php include 'compare_extensions.php'; ?>
-			</tbody></table>
-		</div>
-
-		<!-- Extended features -->
-		<div id='tab-extended-features' class='tab-pane fade reportdiv'>
-			<table id='extended-features' width='100%' class='table table-striped table-bordered table-hover'>
-				<?php include 'compare_extended_features.php'; ?>
-			</tbody></table>
-		</div>	
-
-		<!-- Extended Properties -->
-		<div id='tab-extended-properties' class='tab-pane fade reportdiv'>
-			<table id='extended-properties' width='100%' class='table table-striped table-bordered table-hover'>
-				<?php include 'compare_extended_properties.php'; ?>
-			</tbody></table>
-		</div>	
-
-		<!-- Formats -->
-		<div id='tab-formats' class='tab-pane fade reportdiv'>
-			<?php include 'compare_formats.php'; ?>
-		</div>
-
-		<!-- Queues -->
-		<div id='tab-queues' class='tab-pane fade reportdiv'>
-			<?php include 'compare_queues.php'; ?>
-		</div>
-		
-		<!-- Memory -->
-		<div id='tab-memory' class='tab-pane fade reportdiv'>
-			<?php include 'compare_memory.php'; ?>
-		</div>
-
-		<!-- Surface -->
-		<div id='tab-surface' class='tab-pane fade reportdiv'>
-			<?php include 'compare_surface.php'; ?>
-		</div>
-
-<?php 			
-	if ($extDiffOnly) {
-		?>
-		<script>
-			$('.same').hide();
-		</script>
-		<?php
-	}
-			
 	if ($diff) {
-		?>
-		<script>
-			$('.same').hide();	
-		</script>
-		<?php
+		echo "<script>$('.same').hide();</script>";
 	}
 
 	DB::disconnect();
-?>
-		
+	?>
+
 	<script>
 		$(document).ready(function() {
-		
-			var tableNames = ['features', 'limits', 'extensions', 'extended-features', 'extended-properties', 'formats-0', 'formats-1', 'formats-2', 'surface-1', 'surface-2', 'surface-3'];
-			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++)
-			{
-					$('#'+tableNames[i]).dataTable(
-						{
-							"pageLength" : -1,
-							"paging" : false,
-							"order": [], 
-							"searchHighlight": true,
-							"sDom": 'flpt',
-							"deferRender": true,
-							"fixedHeader": {
-								"header": true,
-								"headerOffset": 50
-							},
-						}
-					);
-			}				
+
+			// Ungrouped tables
+			var tableNames = [
+				'surface-caps', 
+				'surface-formats', 
+				'table_features_core_10',
+				'table_features_core_11',
+				'table_features_core_12',
+				'table_properties_core_11',
+				'table_properties_core_12',
+			];
+			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
+				if (typeof $('#'+tableNames[i]) != undefined) {
+					$('#' + tableNames[i]).dataTable({
+						"pageLength": -1,
+						"paging": false,
+						"order": [],
+						"searchHighlight": true,
+						"sDom": 'flpt',
+						"deferRender": true,
+						"fixedHeader": {
+							"header": true,
+							"headerOffset": 50
+						},
+					});
+				}
+			}
+
+			// Grouped tables
+			tableNames = [
+				'comparedevices',
+				'compareextensions',
+				'table_queue_families',
+				'table_features_extensions',
+				'table_properties_core_10',
+				'table_properties_extensions',
+				'compare_extended_features',
+			];
 
 			// Device properties table with grouping
-			$('#devices').dataTable(
-				{
-					"pageLength" : -1,
-					"paging" : false,
-					"order": [], 
-					"columnDefs": [
-						{ "visible": false, "targets": 1 }
-					],				
-					"searchHighlight": true,
-					"bAutoWidth": false,
-					"sDom": 'flpt',
-					"deferRender": true,
-					"processing": true,
-					"fixedHeader": {
-						"header": true,
-        				"headerOffset": 50
-    				},
-					"drawCallback": function (settings) {
-						var api = this.api();
-						var rows = api.rows( {page:'current'} ).nodes();
-						var last = null;
-						api.column(1, {page:'current'} ).data().each( function ( group, i ) {
-							if ( last !== group ) {
-								$(rows).eq( i ).before(
-									'<tr><td colspan="'+api.columns().header().length+'" class="group">'+group+'</td></tr>'
-								);
-								last = group;
-							}
-						});
-					}
+			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
+				if (typeof $('#'+tableNames[i]) != undefined) {
+					$('#' + tableNames[i]).dataTable({
+						"pageLength": -1,
+						"paging": false,
+						"order": [],
+						"columnDefs": [{
+							"visible": false,
+							"targets": 1
+						}],
+						"searchHighlight": true,
+						"bAutoWidth": false,
+						"sDom": 'flpt',
+						"deferRender": true,
+						"processing": true,
+						"fixedHeader": {
+							"header": true,
+							"headerOffset": 50
+						},
+						"drawCallback": function(settings) {
+							var api = this.api();
+							var rows = api.rows({
+								page: 'current'
+							}).nodes();
+							var last = null;
+							api.column(1, {
+								page: 'current'
+							}).data().each(function(group, i) {
+								if (last !== group) {
+									$(rows).eq(i).before(
+										'<tr><td colspan="' + api.columns().header().length + '" class="group">' + group + '</td></tr>'
+									);
+									last = group;
+								}
+							});
+						}
+					});
 				}
-			);	
+			}
 
 			$('#devices').show();
 			$("#overlay_devices").hide();
 			$("#toggle-label").show();
-		} );	
+		});
 
 		$('#toggle-event').change(function() {
 			if ($(this).prop('checked')) {
 				$('.same').hide();
 				$('.sameCaps').hide();
 			} else {
-				$('.same').show();				
+				$('.same').show();
 				$('.sameCaps').show();
 			}
-		} );
+		});
 
-		$('a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
-        	$($.fn.dataTable.tables()).DataTable().fixedHeader.adjust();
-      	});
+		$('a[data-toggle="tab"]').on("shown.bs.tab", function(e) {
+			$($.fn.dataTable.tables()).DataTable().fixedHeader.adjust();
+		});
 
+		// Activate tab selected via anchor
+		$(function() {
+			var a = document.location.hash;
+			if (a) 
+			{
+				// Nested tabs, need to show parent tab too
+				if ((a === '#features_core') || (a === '#features_extensions')) {
+					$('.nav a[href=\\#features]').tab('show');
+				}
+				if ((a === '#properties_core') || (a === '#properties_extensions')) {
+					$('.nav a[href=\\#properties]').tab('show');
+				}
+				if ((a === '#formats_linear') || (a === '#formats_optimal') || (a === '#formats_buffer')) {
+					$('.nav a[href=\\#formats]').tab('show');
+				}
+				if ((a === '#instanceextensions') || (a === '#instancelayers')) {
+					$('.nav a[href=\\#instance]').tab('show');
+				}
+				if ((a === '#surfaceproperties') || (a === '#surfaceformats') || (a === '#presentmodes')) {
+					$('.nav a[href=\\#surface]').tab('show');
+				}
+				$('.nav a[href=\\'+a+']').tab('show');
+			}			
+			$('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+				window.location.hash = e.target.hash;
+			});
+		});
 	</script>
-		
-	</div>
 
-	<?php PageGenerator::footer(); ?>
+</div>
+
+<?php PageGenerator::footer(); ?>
 
 </body>
+
 </html>

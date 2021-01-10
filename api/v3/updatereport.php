@@ -29,7 +29,7 @@
     // @todo: log last update info in report
     // @todo: update report version
 
-    include './../../dbconfig.php';
+    include './../../database/database.class.php';
 
     function update_core_features($version, $json, $reportid, &$update_log) {
         $version_short = str_replace('.', '', $version);

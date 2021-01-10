@@ -90,6 +90,10 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 	color:#cc0000;
 }
 
+.unsupported-grey {
+	color: #9b9b9b;
+}
+
 .reportdiv {
 	/*width:85%;*/
 	/*width:85%;*/
@@ -99,10 +103,38 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 	max-width:800px;	*/
 }
 
+/* .nav-report {
+	width: 75%;
+} */
+
+.nav-level1 {
+    margin-left: -41px;
+    margin-right: -41px;
+	margin-top: -10px;
+	text-align: left !important;
+}
+
+.nav-level1 > li:first-child {
+    margin-left: 25px;
+}
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs, .nav-pills {
+    text-align:center;
+}
+
 .tablediv {
 	padding-top: 25px;
 	padding-left: 40px;
 	padding-right: 40px;
+    border: 1px solid #ddd;
+    border-top: 0px;	
 	/*max-width: 1024px;*/
 	/*width:auto;*/
 }
@@ -131,16 +163,7 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 	padding-right:5px;
 }
 
-.nav-tabs > li, .nav-pills > li {
-    float:none;
-    display:inline-block;
-    *display:inline; /* ie7 fix */
-     zoom:1; /* hasLayout ie7 trigger */
-}
 
-.nav-tabs, .nav-pills {
-    text-align:center;
-}
 
 .reportheader {
     height: 65px;
@@ -163,13 +186,6 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 
 .navbar-default .navbar-nav>li>a {
     color: #fff;
-}
-
-.nav-tabs > li, .nav-pills > li {
-    float:none;
-    display:inline-block;
-    *display:inline; /* ie7 fix */
-     zoom:1; /* hasLayout ie7 trigger */
 }
 
 .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
@@ -287,6 +303,9 @@ h4 {
 {
 	width:1px;
 	padding-left:25px !important;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;	
 }
 
 .value
@@ -475,8 +494,136 @@ h1 {
 	display: inline-block;
 }
 
-.nav-level1-center {
-    margin-left: -41px;
-    margin-right: -41px;
-	margin-top: -26px;
+.header-rotate {
+	transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3); 
+}
+
+/* From https://www.jimmybonney.com/articles/column_header_rotation_css/ */
+
+.table-header-rotated th.row-header{
+	width: auto;
+}
+  
+.table-header-rotated td{
+	width: 40px;
+	border-top: 1px solid rgb(221, 221, 221);
+	border-left: 1px solid rgb(221, 221, 221);
+	border-right: 1px solid rgb(221, 221, 221);
+	vertical-align: middle;
+	text-align: center;
+}
+
+.table-header-rotated th.rotate-45{
+	height: 200px;
+	width: 40px;
+	min-width: 40px;
+	max-width: 40px;
+	position: relative;
+	vertical-align: bottom;
+	padding: 0;
+	font-size: 10px;
+	border-left: 0px; 
+	border-right: 0px;	
+}
+
+.table-header-rotated th.rotate-45 > div{
+	position: relative;
+	top: 0px;
+	height: 100%;
+	overflow: hidden;
+	border-left: 1px solid rgb(221, 221, 221);
+	border-right: 1px solid rgb(221, 221, 221);
+	border-top: 1px solid rgb(221, 221, 221);
+	background-color: white;
+}
+
+.table-header-rotated th.rotate-45 span {
+	-ms-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	transform: rotate(-90deg);
+	position: absolute;
+	bottom: 20px;
+	/* left: -24px; */
+	display: inline-block;
+	width: 100%;
+	/* width: 85px; */
+	text-align: left;
+}
+
+.format-table {
+	table-layout: fixed !important;
+	/*width: auto; */
+	border-left: 0px;
+	border-top: 0px;
+}
+
+.format-table .format-name { 
+	border-left-width: 1px !important;
+	text-align: left;
+}
+
+.format-table-support {
+	width: 40px !important;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	vertical-align: middle !important;
+}
+
+.queue-family-table {
+	table-layout: fixed !important;
+	/*width: auto; */
+	border-left: 0px;
+	border-top: 0px;
+}
+
+.queue-family-table .queue-family-name {
+	border-left-width: 1px !important;
+	text-align: left;
+}
+
+
+.rotated-table-column {
+	width: 40px !important;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	vertical-align: middle !important;
+}
+
+.format-unsupported {
+	color: #9b9b9b;
+}
+
+.icon-pad-right {
+	padding-right: 5px;
+}
+
+.format-table-device
+{
+	text-align: left !important;
+	width:1px;
+	padding-left:25px !important;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;	
+}
+
+.format-table-format-name
+{
+	text-align: left !important;
+	color:#a31d21;
+	background-color: #f4f4f4 !important;	
+}
+
+.property-table
+{
+	width: auto;
+	display: inline-block;
+	padding-bottom: 15px;
 }

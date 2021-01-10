@@ -1,202 +1,208 @@
 <?php
-	/*
-	 *
-	 * Vulkan hardware capability database server implementation
-	 *	
-	 * Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
-	 *	
-	 * This code is free software, you can redistribute it and/or
-	 * modify it under the terms of the GNU Affero General Public
-	 * License version 3 as published by the Free Software Foundation.
-	 *	
-	 * Please review the following information to ensure the GNU Lesser
-	 * General Public License version 3 requirements will be met:
-	 * http://www.gnu.org/licenses/agpl-3.0.de.html
-	 *
-	 * The code is distributed WITHOUT ANY WARRANTY; without even the
-	 * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-	 * PURPOSE.  See the GNU AGPL 3.0 for more details.
-	 *
-	 */
 
-	include 'page_generator.php';
-	include './functions.php';
-	include './dbconfig.php';
+/**
+ *
+ * Vulkan hardware capability database server implementation
+ *	
+ * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ *	
+ * This code is free software, you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public
+ * License version 3 as published by the Free Software Foundation.
+ *	
+ * Please review the following information to ensure the GNU Lesser
+ * General Public License version 3 requirements will be met:
+ * http://www.gnu.org/licenses/agpl-3.0.de.html
+ *
+ * The code is distributed WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.
+ *
+ */
 
-	$platform = "all";
-	if (isset($_GET['platform'])) {
-		$platform = $_GET['platform'];
-	}
-	$negate = false;
-	if (isset($_GET['option'])) {
-		$negate = $_GET['option'] == 'not';
-	}
+include 'pagegenerator.php';
+include './includes/functions.php';
+include './database/database.class.php';
 
-	$caption = null;
-	$pageTitle = null;
-	$subcaption = null;
+$platform = "all";
+if (isset($_GET['platform'])) {
+	$platform = $_GET['platform'];
+}
+$negate = false;
+if (isset($_GET['option'])) {
+	$negate = $_GET['option'] == 'not';
+}
 
-	if (isset($_GET["extension"])) {
-		$caption = $negate ? 
-			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET["extension"]."</b>"
-			:
-			"Listing first known driver version support for <b>".$_GET["extension"]."</b>";
-		$pageTitle = $_GET["extension"];
-		// Check if extension has features2 or properties2
-		$ext = $_GET["extension"];
-		DB::connect();
-		try {
-			$stmnt = DB::$connection->prepare("SELECT
+$caption = null;
+$pageTitle = null;
+$subcaption = null;
+
+if (isset($_GET["extension"])) {
+	$caption = $negate ?
+		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET["extension"] . "</b>"
+		:
+		"Listing first known driver version support for <code>" . $_GET["extension"] . "</code>";
+	$pageTitle = $_GET["extension"];
+	// Check if extension has features2 or properties2
+	$ext = $_GET["extension"];
+	DB::connect();
+	try {
+		$stmnt = DB::$connection->prepare("SELECT
 				(SELECT COUNT(DISTINCT df2.name) FROM devicefeatures2 df2 WHERE (df2.extension = ext.name)) AS features2,
 				(SELECT COUNT(DISTINCT dp2.name) FROM deviceproperties2 dp2 WHERE (dp2.extension = ext.name)) AS properties2
 				FROM extensions ext where ext.name = :extension");
-			$stmnt->execute(['extension' => $ext]);
-			$res = $stmnt->fetch(PDO::FETCH_ASSOC);
-			if ($res) {
-				if ($res['features2'] > 0 || $res['properties2'] > 0) {
-					$arr = [];
-					if ($res['features2'] > 0) { $arr[] = 'Features'; }
-					if ($res['properties2'] > 0) { $arr[] = 'properties'; }
-					$linkTitle = implode(' and ', $arr);
-					$subcaption = "<div style='margin-top: 10px;'>This extension has additional <a href='displayextension.php?name=$ext'>$linkTitle</a></div>";
+		$stmnt->execute(['extension' => $ext]);
+		$res = $stmnt->fetch(PDO::FETCH_ASSOC);
+		if ($res) {
+			if ($res['features2'] > 0 || $res['properties2'] > 0) {
+				$links = [];
+				if ($res['features2'] > 0) {
+					$links[] = "<a href='listfeaturesextensions.php?search=$ext&platform=$platform'>features</a>";
 				}
+				if ($res['properties2'] > 0) {
+					$links[] = "<a href='listpropertiesextensions.php?search=$ext&platform=$platform'>properties</a>";
+				}
+				$linkInfo = implode(' and ', $links);
+				$subcaption = "<div style='margin-top: 10px;'>This extension has additional $linkInfo</div>";
 			}
-		} catch(Throwable $e) {
 		}
-		DB::disconnect();
+	} catch (Throwable $e) {
 	}
+	DB::disconnect();
+}
 
-	if (isset($_GET["feature"])) {
-		$info = "<code>".$_GET["feature"]."</code>";
-		$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting for $info" : "Listing first known driver version support for $info";
-		$pageTitle = $_GET["feature"];
-	}
+if (isset($_GET["feature"])) {
+	$info = "<code>" . $_GET["feature"] . "</code>";
+	$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting for $info" : "Listing first known driver version support for $info";
+	$pageTitle = $_GET["feature"];
+}
 
-	// Extension feature support
-	if (isset($_GET['extensionname']) && isset($_GET['extensionfeature'])) {
-		$ext_name = $_GET['extensionname'];
-		$ext_feature = $_GET['extensionfeature'];
-		$info = "<code>$ext_name ➞ $ext_feature</code>";
-		$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
-		$pageTitle = $ext_feature;
-	}
-	// Extension property support
-	if (isset($_GET['extensionname']) && isset($_GET['extensionproperty'])) {
-		$ext_name = $_GET['extensionname'];
-		$ext_property = $_GET['extensionproperty'];
-		$info = "<code>$ext_name ➞ $ext_property</code>";
-		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
-		$pageTitle = $ext_property;
-	}
-	// Core property support
-	if (isset($_GET['coreproperty'])) {
-		$property = $_GET['coreproperty'];
-		$info = "<code>$property</code>";
-		$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
-		$pageTitle = $property;
-	}
+// Extension feature support
+if (isset($_GET['extensionname']) && isset($_GET['extensionfeature'])) {
+	$ext_name = $_GET['extensionname'];
+	$ext_feature = $_GET['extensionfeature'];
+	$info = "<code>$ext_feature</code> for <code>$ext_name </code>";
+	$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+	$pageTitle = $ext_feature;
+}
+// Extension property support
+if (isset($_GET['extensionname']) && isset($_GET['extensionproperty'])) {
+	$ext_name = $_GET['extensionname'];
+	$ext_property = $_GET['extensionproperty'];
+	$ext_property_value = $_GET['extensionpropertyvalue'];
+	$info = "value <code>$ext_property_value</code> in <code>$ext_property</code> for <code>$ext_name</code>";
+	$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+	$pageTitle = $ext_property;
+}
+// Core property support
+if (isset($_GET['coreproperty'])) {
+	$property = $_GET['coreproperty'];
+	$info = "<code>$property</code>";
+	$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+	$pageTitle = $property;
+}
 
-	if (isset($_GET['linearformat'])) {
-		$caption = $negate ?
-			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['linearformat']."</b> for <b>linear tiling</b>"
-			:
-			"Listing first known driver version support for <b>".$_GET['linearformat']."</b> for <b>linear tiling</b>";
-		$pageTitle = "Linear format ".$_GET["linearformat"];
-	}
-	if (isset($_GET['optimalformat'])) {
-		$caption = $negate ?
-			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['optimalformat']."</b> for <b>optimal tiling</b>"
-			:
-			"Listing first known driver version support for <b>".$_GET['optimalformat']."</b> for <b>optimal tiling</b>";
-		$pageTitle = "Optimal format ".$_GET["optimalformat"];
-	}
-	if (isset($_GET['bufferformat'])) {
-		$caption = $negate ?
-			"Listing devices <span style='color:red;'>not</span> supporting <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>"
-			:
-			"Listing first known driver version support for <b>".$_GET['bufferformat']."</b> for <b>buffer usage</b>";
-		$pageTitle = "Buffer format ".$_GET["bufferformat"];
-	}
+if (isset($_GET['linearformat'])) {
+	$caption = $negate ?
+		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET['linearformat'] . "</b> for <b>linear tiling</b>"
+		:
+		"Listing first known driver version support for <b>" . $_GET['linearformat'] . "</b> for <b>linear tiling</b>";
+	$pageTitle = "Linear format " . $_GET["linearformat"];
+}
+if (isset($_GET['optimalformat'])) {
+	$caption = $negate ?
+		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET['optimalformat'] . "</b> for <b>optimal tiling</b>"
+		:
+		"Listing first known driver version support for <b>" . $_GET['optimalformat'] . "</b> for <b>optimal tiling</b>";
+	$pageTitle = "Optimal format " . $_GET["optimalformat"];
+}
+if (isset($_GET['bufferformat'])) {
+	$caption = $negate ?
+		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET['bufferformat'] . "</b> for <b>buffer usage</b>"
+		:
+		"Listing first known driver version support for <b>" . $_GET['bufferformat'] . "</b> for <b>buffer usage</b>";
+	$pageTitle = "Buffer format " . $_GET["bufferformat"];
+}
 
-	if (isset($_GET['memorytype'])) {
-		$memoryFlags = join(" | ", getMemoryTypeFlags($_GET['memorytype']));
-		if ($memoryFlags == "") $memoryFlags = "0";
+if (isset($_GET['memorytype'])) {
+	$memoryFlags = join(" | ", getMemoryTypeFlags($_GET['memorytype']));
+	if ($memoryFlags == "") $memoryFlags = "0";
 
-		$caption = $negate ?
-			"Listing devices <span style='color:red;'>not</span> supporting memory type <b>".$memoryFlags."</b>"
-			:
-			"Listing first known driver version support for memory type <b>".$memoryFlags."</b>";
-		$pageTitle = "Memory type ".$memoryFlags;
+	$caption = $negate ?
+		"Listing devices <span style='color:red;'>not</span> supporting memory type <b>" . $memoryFlags . "</b>"
+		:
+		"Listing first known driver version support for memory type <b>" . $memoryFlags . "</b>";
+	$pageTitle = "Memory type " . $memoryFlags;
+}
+
+if (isset($_GET['surfaceformat'])) {
+	$caption = $negate ?
+		"Listing devices <span style='color:red;'>not</span> supporting surface format <b>" . $_GET['surfaceformat'] . "</b>"
+		:
+		"Listing first known driver version support for surface format <b>" . $_GET['surfaceformat'] . "</b>";
+	$pageTitle = "Surface format " . $_GET["surfaceformat"];
+}
+
+if (isset($_GET['surfacepresentmode'])) {
+	$caption = $negate ?
+		"Listing devices <span style='color:red;'>not</span> supporting surface present mode <b>" . $_GET['surfacepresentmode'] . "</b>"
+		:
+		"Listing first known driver version support for surface present mode <b>" . $_GET['surfacepresentmode'] . "</b>";
+	$pageTitle = "Surface present mode " . $_GET["surfacepresentmode"];
+}
+
+if (isset($_GET["submitter"])) {
+	$caption .= "<br/>Devices submitted by " . $_GET["submitter"];
+	$pageTitle = "Devices by " . $_GET["submitter"];
+}
+
+if (isset($_GET['platform'])) {
+	$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+	if ($pageTitle) {
+		$pageTitle .= " on " . ucfirst($platform);
 	}
+}
 
-	if (isset($_GET['surfaceformat'])) {
-		$caption = $negate ?
-			"Listing devices <span style='color:red;'>not</span> supporting surface format <b>".$_GET['surfaceformat']."</b>"
-			:
-			"Listing first known driver version support for surface format <b>".$_GET['surfaceformat']."</b>";
-		$pageTitle = "Surface format ".$_GET["surfaceformat"];
-	}
-
-	if (isset($_GET['surfacepresentmode'])) {
-		$caption = $negate ?
-			"Listing devices <span style='color:red;'>not</span> supporting surface present mode <b>".$_GET['surfacepresentmode']."</b>"
-			:
-			"Listing first known driver version support for surface present mode <b>".$_GET['surfacepresentmode']."</b>";
-		$pageTitle = "Surface present mode ".$_GET["surfacepresentmode"];
-	}
-
-	if (isset($_GET["submitter"])) {
-		$caption .= "<br/>Devices submitted by ".$_GET["submitter"];
-		$pageTitle = "Devices by ".$_GET["submitter"];
-	}
-
-	if (isset($_GET['platform'])) {
-		$caption .= " on <img src='images/".$platform."logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform);
-		if ($pageTitle) {
-			$pageTitle .= " on ".ucfirst($platform);
-		}
-	}
-
-	PageGenerator::header($pageTitle);
+PageGenerator::header($pageTitle);
 ?>
 
 <center>
 
 	<div class='header'>
 		<h4>
-		<?php
+			<?php
 			echo $caption ? $caption : "Listing available devices";
 			echo $subcaption ? "<br>$subcaption" : "";
-		?>
+			?>
 		</h4>
 	</div>
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 
-	<div id='devices_div' class='tab-pane fade in active'>
-		<form method="get" action="compare.php">
-		<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
-			<thead>
-				<tr>
-					<th></th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<th></th>
-				</tr>
-				<tr>
-					<th>Device</th>
-					<th>Vendor</th>
-					<th>Driver <span title="First known driver version supporting this extension/feature" class="hint">[?]</span></th>
-					<th>Date</th>
-					<th><input type='submit' class='button' value='compare'></th>
-				</tr>
-			</thead>
-		</table>
-		<div id="errordiv" style="color:#D8000C;"></div>
-		</form>
+		<div id='devices_div' class='tab-pane fade in active'>
+			<form method="get" action="compare.php">
+				<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
+					<thead>
+						<tr>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+						<tr>
+							<th>Device</th>
+							<th>Vendor</th>
+							<th>Driver <span title="First known driver version supporting this extension/feature" class="hint">[?]</span></th>
+							<th>Date</th>
+							<th><input type='submit' class='button' value='compare'></th>
+						</tr>
+					</thead>
+				</table>
+				<div id="errordiv" style="color:#D8000C;"></div>
+			</form>
 
-	</div>
+		</div>
 </center>
 
 <script>
@@ -204,53 +210,72 @@
 		return event.keyCode != 13;
 	});
 
-	$( document ).ready(function() {
+	$(document).ready(function() {
 		var table = $('#devices').DataTable({
 			"processing": true,
 			"serverSide": true,
-			"paging" : true,
+			"paging": true,
 			"searching": true,
 			"lengthChange": true,
-			"lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+			"lengthMenu": [
+				[10, 25, 50, 100, -1],
+				[10, 25, 50, 100, "All"]
+			],
 			"dom": 'lrtip',
-			"pageLength" : 50,
-			"order": [[ 0, 'asc' ]],
-			"columnDefs": [{ "orderable": false, "targets": [ 4 ] }],
+			"pageLength": 50,
+			"order": [
+				[0, 'asc']
+			],
+			"columnDefs": [{
+				"orderable": false,
+				"targets": [4]
+			}],
 			"ajax": {
-				url :"responses/devices.php?platform=<?php echo $platform ?>&minversion=true",
+				url: "responses/devices.php?platform=<?php echo $platform ?>&minversion=true",
 				data: {
 					"filter": {
-						'extension' : '<?php echo $_GET["extension"] ?>' ,
-						'feature' : '<?php echo $_GET["feature"] ?>' ,
-						'submitter' : '<?php echo $_GET["submitter"] ?>',
-						'linearformat' : '<?php echo $_GET["linearformat"] ?>',
-						'optimalformat' : '<?php echo $_GET["optimalformat"] ?>',
-						'bufferformat' : '<?php echo $_GET["bufferformat"] ?>',
-						'devicelimit' : '<?php echo $_GET["limit"] ?>',
-						'memorytype' : '<?php echo $_GET["memorytype"] ?>',
-						'option' : '<?php echo $_GET["option"] ?>',
-						'surfaceformat' : '<?php echo $_GET["surfaceformat"] ?>',
-						'surfacepresentmode' : '<?php echo $_GET["surfacepresentmode"] ?>',
-						'devicename' : '<?php echo $_GET["devicename"] ?>',
-						'displayname' : '<?php echo $_GET["displayname"] ?>',
-						'extensionfeature_name': '<?=$_GET['extensionname']?>',
-						'extensionfeature_feature': '<?=$_GET['extensionfeature']?>',
-						'extensionproperty_name': '<?=$_GET['extensionname']?>',
-						'extensionproperty_property': '<?=$_GET['extensionproperty']?>',
-						'coreproperty': '<?=$_GET['coreproperty']?>',
+						'extension': '<?php echo $_GET["extension"] ?>',
+						'feature': '<?php echo $_GET["feature"] ?>',
+						'submitter': '<?php echo $_GET["submitter"] ?>',
+						'linearformat': '<?php echo $_GET["linearformat"] ?>',
+						'optimalformat': '<?php echo $_GET["optimalformat"] ?>',
+						'bufferformat': '<?php echo $_GET["bufferformat"] ?>',
+						'devicelimit': '<?php echo $_GET["limit"] ?>',
+						'memorytype': '<?php echo $_GET["memorytype"] ?>',
+						'option': '<?php echo $_GET["option"] ?>',
+						'surfaceformat': '<?php echo $_GET["surfaceformat"] ?>',
+						'surfacepresentmode': '<?php echo $_GET["surfacepresentmode"] ?>',
+						'devicename': '<?php echo $_GET["devicename"] ?>',
+						'displayname': '<?php echo $_GET["displayname"] ?>',
+						'extensionfeature_name': '<?= $_GET['extensionname'] ?>',
+						'extensionfeature_feature': '<?= $_GET['extensionfeature'] ?>',
+						'extensionproperty_name': '<?= $_GET['extensionname'] ?>',
+						'extensionproperty_property': '<?= $_GET['extensionproperty'] ?>',
+						'extensionproperty_value': '<?= $_GET['extensionpropertyvalue'] ?>',
+						'coreproperty': '<?= $_GET['coreproperty'] ?>',
+						'core': '<?= $_GET['core'] ?>'
 					}
 				},
-				error: function (xhr, error, thrown) {
+				error: function(xhr, error, thrown) {
 					$('#errordiv').html('Could not fetch data (' + error + ')');
 					$('#devices_processing').hide();
 				}
 			},
-			"columns": [
-				{ data: 'device' },
-				{ data: 'vendor' },
-				{ data: 'driver' },
-				{ data: 'submissiondate' },
-				{ data: 'compare' }
+			"columns": [{
+					data: 'device'
+				},
+				{
+					data: 'vendor'
+				},
+				{
+					data: 'driver'
+				},
+				{
+					data: 'submissiondate'
+				},
+				{
+					data: 'compare'
+				}
 			],
 			// Pass order by column information to server side script
 			fnServerParams: function(data) {
@@ -260,8 +285,7 @@
 			},
 		});
 
-		yadcf.init(table, [
-			{
+		yadcf.init(table, [{
 				column_number: 0,
 				filter_type: "text",
 				filter_delay: 500,
@@ -277,7 +301,9 @@
 				filter_type: "text",
 				filter_delay: 500
 			},
-		], { filters_tr_index: 0});
+		], {
+			filters_tr_index: 0
+		});
 
 	});
 </script>
@@ -285,4 +311,5 @@
 <?php PageGenerator::footer(); ?>
 
 </body>
+
 </html>

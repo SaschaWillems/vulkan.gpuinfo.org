@@ -19,8 +19,8 @@
 	 *
      */
 
-	include "./../../functions.php";
-	include './../../dbconfig.php';	
+	include "./../../includes/functions.php";
+	include './../../database/database.class.php';	
 	
 	// Check for valid file
 	$path='./';
