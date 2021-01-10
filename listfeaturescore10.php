@@ -89,7 +89,7 @@ PageGenerator::header("Features");
 
 					foreach ($features as $feature) {
 						$coverageLink = "listdevicescoverage.php?feature=" . $feature . "&platform=$platform";
-						$coverage = round($supportedCounts[$feature] / $deviceCounts[$platform] * 100, 1);
+						$coverage = ($deviceCounts[$platform] > 0) ? round($supportedCounts[$feature] / $deviceCounts[$platform] * 100, 1) : 0;
 						echo "<tr>";
 						echo "<td>" . $feature . "</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
