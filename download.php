@@ -34,23 +34,23 @@ PageGenerator::header('Download');
 		<div class="page-header">
 			<h3>Current stable release 3.0</h3>
 			<ul>
-				<li><a href="downloads/vulkancapsviewer_3_0_win64.zip">Windows x86-64 (zip)</a></li>
+				<li><a href="downloads/vulkancapsviewer_3.0_win64.zip">Windows x86-64 (zip)</a></li>
 				<li>Linux
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3_0_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
-						<li><a href="downloads/vulkancapsviewer_3_0_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_3.0_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_3.0_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
 					</ul>
 				</li>
 				<li>Android
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3_0_arm.apk">Android arm-v8 (apk)</a></li>
+						<li><a href="downloads/vulkancapsviewer_3.0_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
-				<li><a href="downloads/vulkancapsviewer_3_0_osx.dmg">Mac OSX (dmg)</a></li>
+				<li><a href="downloads/vulkancapsviewer_3.0_osx.dmg">Mac OSX (dmg)</a></li>
 			</ul>
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
-			<h4>3.0 - 2021-01-xx</h4>
+			<h4>3.0 - 2021-01-10</h4>
 			<ul>
 				<li>Added update mechanism for updating reports present in the database with data from newer application versions</li>
 				<li>Added dedicated Vulkan Core 1.1 and Core 1.2 features and properties (requires Vulkan 1.2+ implementation)</li>
