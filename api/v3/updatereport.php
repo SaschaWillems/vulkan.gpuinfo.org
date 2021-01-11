@@ -248,6 +248,36 @@
         $stmnt_update->execute($params);
         echo json_encode(['updated' => true, 'log' => $update_log]);
         DB::disconnect();
+
+        try {
+            $msgtitle = "Vulkan report updated for ".$report['properties']['deviceName']." (".$report['properties']['driverVersionText'].")";
+            if ($development_db) {
+                $msgtitle = "[DEVELOPMENT] ".$msgtitle;
+                $msg = "New Vulkan hardware report uploaded to the development database\n\n";
+                $msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
+            } else {
+                $msg = "New Vulkan hardware report uploaded to the database\n\n";
+                $msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
+            }
+            
+            $msg .= "Devicename = ".$report['properties']['deviceName']."\n";
+            $msg .= "Driver version = ".$report['properties']['driverVersionText']."\n";
+            $msg .= "API version = ".$report['properties']['apiVersionText']."\n";
+            $msg .= "OS = ".$report['environment']['name']."\n";
+            $msg .= "OS version = ".$report['environment']['version']."\n";
+            $msg .= "OS arch = ".$report['environment']['architecture']."\n";
+            $msg .= "Submitter = ".$report['environment']['submitter']."\n";
+            $msg .= "Comment = ".$report['environment']['comment']."\n";
+            $msg .= "Report version = ".$report['environment']['reportversion']."\n";
+
+            $msg .= "Updatelog:\n";
+            $msg .= implode('\n', $update_log);
+            
+            mail($mailto, $msgtitle, $msg);
+        } catch (Exception $e) {
+            // Failure to mail is not critical
+        }	
+
     } else {
         echo json_encode(['updated' => false]);
     }

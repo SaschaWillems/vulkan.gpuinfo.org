@@ -29,6 +29,10 @@ PageGenerator::header('Download');
 			<h2>Downloads</h2>
 		</div>
 		<div>
+			The database is populated using the Vulkan Hardware Capability Viewer application, available for multiple platforms. It reads and displays Vulkan related information for a selected implementation, and that data can then be uploaded to the database.
+			<!-- <div>
+				<a href="images/hardware_capability_viewer_3.0.png"><img src="images/hardware_capability_viewer_3.0.png" width="512px"></a>
+			</div> -->
 			The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">the repository</a>.<br>
 		</div>
 		<div class="page-header">
