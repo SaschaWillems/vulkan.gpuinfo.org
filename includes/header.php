@@ -54,6 +54,12 @@
 					'/' + $(this).find('a').attr('href') == window.location.pathname);
 			});
 		});
+		$(window).resize(function() {
+			$('body').css('padding-top', parseInt($('#main-navbar').css("height")));
+		});
+		$(window).load(function() {
+			$('body').css('padding-top', parseInt($('#main-navbar').css("height")));
+		});
 	</script>
 
 	<meta name="twitter:card" content="summary" />
@@ -69,7 +75,7 @@
 
 <body>
 	<!-- Bootstrap nav bar -->
-	<nav class="navbar navbar-default navbar-fixed-top" id="navbar">
+	<nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">

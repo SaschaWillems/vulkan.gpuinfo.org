@@ -1,6 +1,6 @@
 body {
 	font-family: Verdana, Helvetica, sans-serif;
-	padding-top: 45px;
+	padding-top: 50px;
 	background: #EEEEEE;
 	color: #5a5a5a;
 	/*	font-family:"Courier New",courier, monospace;*/
@@ -202,7 +202,7 @@ h4 {
 	background: #f2f2f2;
 	border-bottom: 1px solid #ddd;	
 	color:#000;
-	padding-top:15px;
+	padding-top:5px;
 	padding-bottom:5px;
 	text-align:center;
 	/*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
