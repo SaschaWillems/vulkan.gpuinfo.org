@@ -205,13 +205,10 @@ if ($memorytype != '') {
 				select ifnull(r.displayname, r.devicename)
 				from reports r
 				join devicememorytypes dmt on dmt.reportid = r.id
-				where dmt.propertyflags = :filter_memorytype " . ($ostype ? " and r.ostype = :ostype" : "") . "
+				where dmt.propertyflags = :filter_memorytype
 			)
 			and r.version >= '1.2'";
     $params['filter_memorytype'] = $memorytype;
-    if ($ostype !== null) {
-        $params['ostype'] = $ostype;
-    }
 }
 // Surface format	
 $surfaceformat = $_REQUEST['filter']['surfaceformat'];
@@ -223,13 +220,10 @@ if ($surfaceformat != '') {
                 from reports r
                 join devicesurfaceformats dsf on dsf.reportid = r.id	
                 join VkFormat f on dsf.format = f.value 
-                where f.name = :filter_surfaceformat " . ($ostype ? " and r.ostype = :ostype" : "") . "
+                where f.name = :filter_surfaceformat
             )
             and r.version >= '1.2'";
     $params['filter_surfaceformat'] = $surfaceformat;
-    if ($ostype !== null) {
-        $params['ostype'] = $ostype;
-    }
 }
 // Surface present mode	
 $surfacepresentmode = $_REQUEST['filter']['surfacepresentmode'];
@@ -241,13 +235,10 @@ if ($surfacepresentmode != '') {
                 from reports r
                 join devicesurfacemodes dsm on dsm.reportid = r.id	
                 join VkPresentMode m on dsm.presentmode = m.value 
-                where m.name = :filter_surfacepresentmode " . ($ostype ? " and r.ostype = :ostype" : "") . "
+                where m.name = :filter_surfacepresentmode
             )
             and r.version >= '1.2'";
     $params['filter_surfacepresentmode'] = $surfacepresentmode;
-    if ($ostype !== null) {
-        $params['ostype'] = $ostype;
-    }
 }
 // Limit
 $limit = $_REQUEST['filter']['devicelimit'];
