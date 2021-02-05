@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -559,7 +559,7 @@
 					$stmnt->execute(array(
 						":reportid" => $reportid, 
 						":devicelayerid" => $layerid, 
-						":name" => $layerext['extname'], 
+						":name" => $layerext['extensionName'], 
 						":specversion" => $layerext['specVersion']));				
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at device layer extension)');
@@ -883,7 +883,7 @@
 						$stmnt->execute(array(
 							":reportid" => $reportid, 
 							":devicelayerid" => $layerid, 
-							":name" => $layerext['extname'], 
+							":name" => $layerext['extensionName'], 
 							":specversion" => $layerext['specVersion']));				
 					} catch (Exception $e) {
 						die('Error while trying to upload report (error at instance layer extension)');
