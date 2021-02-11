@@ -50,6 +50,7 @@ PageGenerator::header('Download');
 						<li><a href="downloads/vulkancapsviewer_3.0_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
 				<li><a href="downloads/vulkancapsviewer_3.0_osx.dmg">Mac OSX (dmg)</a></li>
+				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store, provided by <a href="https://www.lunarg.com/">LunarG</a>)</a></li>
 			</ul>
 		</div>
 		<div class="page-header">
