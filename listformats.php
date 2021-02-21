@@ -20,9 +20,10 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.class.php';
+require './includes/functions.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
@@ -30,6 +31,7 @@ if (isset($_GET['platform'])) {
 }
 
 PageGenerator::header("Formats");
+$sql_repository = new SqlRepository($platform);
 ?>
 
 <div class='header'>
@@ -37,7 +39,10 @@ PageGenerator::header("Formats");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listformats.php', $platform); ?>
+	<?php
+	$sql_repository->filterHeader();
+	PageGenerator::platformNavigation('listformats.php', $platform);
+	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="formats" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -64,23 +69,13 @@ PageGenerator::header("Formats");
 			<tbody>
 				<?php
 				$formats = [];
+				DB::connect();
 				try {
-					DB::connect();
-					$deviceCount = getDeviceCount($platform);
+					$device_count = $sql_repository->deviceCount();
 					// Fetch formats into array as a base for creating the table
 					foreach (['lineartilingfeatures', 'optimaltilingfeatures', 'bufferfeatures'] as $target) {
-						$sql = "SELECT 
-							vkf.name as name, 
-							count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
-							from reports r
-							join deviceformats df on df.reportid = r.id and df.$target > 0
-							join VkFormat vkf on vkf.value = df.formatid
-							join deviceproperties dp on dp.reportid = r.id
-							where r.ostype = :ostype
-							group by name";
-						$stmnt = DB::$connection->prepare($sql);
-						$stmnt->execute(['ostype' => ostype($platform)]);
-						$result = $stmnt->fetchAll(PDO::FETCH_NUM);
+						$query = $sql_repository->formatList($target, ostype($platform), $database_settings);
+						$result = $query->fetchAll(PDO::FETCH_NUM);
 						foreach ($result as $row) {
 							$formats[$row[0]][$target] = $row[1];
 						}
@@ -97,7 +92,7 @@ PageGenerator::header("Formats");
 					$names = ['linearformat', 'optimalformat', 'bufferformat'];
 					foreach (['lineartilingfeatures', 'optimaltilingfeatures', 'bufferfeatures'] as $index => $target) {
 						$coverageLink = "listdevicescoverage.php?$names[$index]=$key&platform=$platform";
-						$coverage = $format[$target] / $deviceCount * 100.0;
+						$coverage = $format[$target] / $device_count * 100.0;
 						echo "<td class='value' align=center><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='value' align=center><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
 					}
