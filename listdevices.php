@@ -20,11 +20,13 @@
  *
  */
 
-include 'pagegenerator.php';
-include './includes/functions.php';
-include 'database/database.class.php';
+require 'pagegenerator.php';
+require './includes/functions.php';
+require './database/database.class.php';
+require './database/sqlrepository.class.php';
 
 PageGenerator::header("Devices");
+$sql_repository = new SqlRepository($platform);
 
 $platform = "all";
 if (isset($_GET['platform'])) {
@@ -75,6 +77,7 @@ if ($_GET['extensionproperty']) {
 			<?= $caption; ?>
 		</h4>
 	</div>
+	<?php $sql_repository->filterHeader(); ?>
 
 	<?php
 	if ($showTabs) {

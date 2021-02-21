@@ -21,9 +21,12 @@
  */
 
 include '../database/database.class.php';
+require '../database/sqlrepository.class.php';
 include '../includes/functions.php';
 
 DB::connect();
+
+$sql_repository = new SqlRepository($platform);
 
 $data = array();
 $params = array();
@@ -284,6 +287,13 @@ if (isset($_REQUEST["platform"])) {
         $ostype = ostype($platform);
         $whereClause .= "r.ostype = '" . $ostype . "'";
     }
+}
+
+// Limit listing to Vulkan version
+if ($sql_repository->vulkan_api_version != null) {
+    $whereClause .= ($whereClause == '') ? ' WHERE ' : ' AND ';
+    $whereClause .= " left(r.apiversion, 3) >= :settings_vulkan_api_version";
+    $params['settings_vulkan_api_version'] = $sql_repository->vulkan_api_version;
 }
 
 if ($minversion) {
