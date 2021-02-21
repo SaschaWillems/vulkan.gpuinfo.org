@@ -39,9 +39,13 @@ class SqlRepository
 
     // General
 
-    public function deviceCount()
+    public function deviceCount($min_report_version = null)
     {
         $sql = "SELECT count(DISTINCT displayname) from reports where ostype = :ostype";
+        if ($min_report_version)  {
+            $sql .= " AND version >= :report_version";
+            $params['report_version'] = $min_report_version;
+        }
         $params['ostype'] = $this->ostype;
         if ($this->vulkan_api_version != null) {
             $sql .= " AND left(apiversion, 3) >= :settings_vulkan_api_version";
@@ -218,6 +222,40 @@ class SqlRepository
         } catch (Exception $e) {
             throw $e;
         }        
+    }
+
+    public function getFeatureCoverageExtensions($extension)
+    {
+        $sql = "SELECT
+                    extension,
+                    name,
+                    COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
+                FROM
+                    devicefeatures2 df2
+                        JOIN
+                    reports r ON df2.reportid = r.id
+                        JOIN
+                    deviceproperties dp ON dp.reportid = r.id
+                WHERE
+                    supported = 1 AND r.ostype = :ostype";
+        $params['ostype'] = $this->ostype;
+        if ($extension) {
+            $sql .= " AND df2.extension = :extension";
+            $params['extension'] = $extension;
+        }
+        if ($this->vulkan_api_version != null) {
+            $sql .= " AND left(r.apiversion, 3) >= :settings_vulkan_api_version";
+            $params['settings_vulkan_api_version'] = $this->vulkan_api_version;
+        }
+        $sql .= " GROUP BY extension , name ORDER BY extension ASC , name ASC";
+        $query = DB::$connection->prepare($sql);
+        try {
+            $query->execute($params);
+            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (Exception $e) {
+            throw $e;
+        }     
     }
 
     // Misc. function

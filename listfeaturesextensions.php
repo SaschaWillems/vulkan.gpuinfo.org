@@ -20,10 +20,11 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.class.php';
 require './includes/constants.php';
-include './includes/functions.php';
+require './includes/functions.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
@@ -35,6 +36,7 @@ if (isset($_GET['extension'])) {
 	$extension = $_GET['extension'];
 }
 
+$sql_repository = new SqlRepository($platform);
 PageGenerator::header("Extension features listing");
 ?>
 
@@ -49,9 +51,11 @@ PageGenerator::header("Extension features listing");
 </div>
 
 <center>
-	<?php if (!$extension) {
+	<?php 
+	$sql_repository->filterHeader();	
+	if (!$extension) {
 		PageGenerator::platformNavigation('listfeaturesextensions.php', $platform);
-	}
+	}	
 	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
@@ -68,45 +72,20 @@ PageGenerator::header("Extension features listing");
 				<?php
 				DB::connect();
 				try {
-					$os_type = ostype($platform);
 					// Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
-					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.ostype = :ostype AND r.version >= '1.4'");
-					$stmnt->execute(['ostype' => $os_type]);
-					$device_count = $stmnt->fetchColumn();
-					$ext_filter = $extension ? 'AND df2.extension = :extension' : null;
-					$stmnt = DB::$connection->prepare("SELECT 
-								extension,
-								name,
-								COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
-							FROM
-								devicefeatures2 df2
-									JOIN
-								reports r ON df2.reportid = r.id
-									JOIN
-								deviceproperties dp ON dp.reportid = r.id
-							WHERE
-								supported = 1 AND r.ostype = :ostype $ext_filter
-						    GROUP BY extension , name
-							ORDER BY extension ASC , name ASC");
-					$params = ['ostype' => $os_type];
-					if ($extension) {
-						$params['extension'] = $extension;
+					$device_count = $sql_repository->deviceCount('1.4');
+					$features = $sql_repository->getFeatureCoverageExtensions($extension);
+					foreach ($features as $feature) {
+						$coverageLink = "listdevicescoverage.php?extensionname=" . $feature['extension'] . "&extensionfeature=" . $feature['name'] . "&platform=$platform";
+						$coverage = round($feature['supporteddevices'] / $device_count * 100, 1);
+						echo "<tr>";
+						echo "<td>" . $feature['extension'] . "</td>";
+						echo "<td class='subkey'>" . $feature['name'] . "</td>";
+						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "</tr>";						
 					}
-					$stmnt->execute($params);
-
-					if ($stmnt->rowCount() > 0) {
-						while ($feature = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-							$coverageLink = "listdevicescoverage.php?extensionname=" . $feature['extension'] . "&extensionfeature=" . $feature['name'] . "&platform=$platform";
-							$coverage = round($feature['supporteddevices'] / $device_count * 100, 1);
-							echo "<tr>";
-							echo "<td>" . $feature['extension'] . "</td>";
-							echo "<td class='subkey'>" . $feature['name'] . "</td>";
-							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "</tr>";
-						}
-					}
-				} catch (PDOException $e) {
+				} catch (Exception $e) {
 					echo "<b>Error while fetching data!</b><br>";
 				}
 				DB::disconnect();
