@@ -30,9 +30,13 @@ if (isset($_POST['vulkan_api_version']))
 }
 
 require 'pagegenerator.php';
-require 'database/database.settings.php';
 
-$database_settings = new DatabaseSettings();
+$vulkan_api_version = null;
+
+if ((isset($_COOKIE["vulkan_api_version"])) && ($_COOKIE["vulkan_api_version"] !== '')) {
+    // @todo: sanity check
+    $vulkan_api_version = $_COOKIE["vulkan_api_version"];
+}
 
 PageGenerator::header("Settings");
 ?>
@@ -53,9 +57,9 @@ PageGenerator::header("Settings");
         <label for="vulkan_api_version">Vulkan API version to display on the database</label>
         <p>Selecting a value other than "all" will limit all database queries to device reports with at least the selected version</p>
         <select class="form-control" id="vulkan_api_version" name="vulkan_api_version">
-            <option value="1.2" <?= ($database_settings->vulkan_api_version == "1.2" ? "selected" : null) ?>>Vulkan 1.2 and up</option>
-            <option value="1.1" <?= ($database_settings->vulkan_api_version == "1.1" ? "selected" : null) ?>>Vulkan 1.1 and up</option>
-            <option value="" <?= ($database_settings->vulkan_api_version == null ? "selected" : null) ?>>All Vulkan versions</option>
+            <option value="1.2" <?= ($vulkan_api_version == "1.2" ? "selected" : null) ?>>Vulkan 1.2 and up</option>
+            <option value="1.1" <?= ($vulkan_api_version == "1.1" ? "selected" : null) ?>>Vulkan 1.1 and up</option>
+            <option value="" <?= ($vulkan_api_version == null ? "selected" : null) ?>>All Vulkan versions</option>
         </select>
     </div>
 
