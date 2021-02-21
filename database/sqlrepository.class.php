@@ -37,6 +37,16 @@ class SqlRepository
         }
     }
 
+    // Misc. function
+
+    /** Insert a note for currently applied global filters */
+    public function filterHeader()
+    {
+        if ($this->vulkan_api_version !== null) {
+            echo "<div class=\"alert alert-warning\" style=\"margin-bottom: 0px;\">Only displaying data for devices with Vulkan version $this->vulkan_api_version and up (<a href='settings.php'>change settings</a>)</div>";
+        }
+    }
+
     // General
 
     public function deviceCount($min_report_version = null)
@@ -258,14 +268,28 @@ class SqlRepository
         }     
     }
 
-    // Misc. function
-
-    /** Insert a note for currently applied global filters */
-    public function filterHeader()
+    // Memory
+    public function getMemoryTypeCoverage()
     {
-        if ($this->vulkan_api_version !== null) {
-            echo "<div class=\"alert alert-warning\" style=\"margin-bottom: 0px;\">Only displaying data for devices with Vulkan version $this->vulkan_api_version and up (<a href='settings.php'>change settings</a>)</div>";
+        $sql = "SELECT
+            propertyflags as memtype, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
+            from devicememorytypes dmt
+            join reports r on r.id = dmt.reportid
+            join deviceproperties dp on dp.reportid = r.id
+            where ostype = :ostype";
+        $params['ostype'] = $this->ostype;
+        if ($this->vulkan_api_version != null) {
+            $sql .= " AND left(r.apiversion, 3) >= :settings_vulkan_api_version";
+            $params['settings_vulkan_api_version'] = $this->vulkan_api_version;
         }
+        $sql .= " GROUP BY memtype desc";
+        $query = DB::$connection->prepare($sql);
+        try {
+            $query->execute($params);
+            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (Exception $e) {
+            throw $e;
+        }     
     }
-
 }

@@ -19,9 +19,10 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.class.php';
+require './includes/functions.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
@@ -29,6 +30,7 @@ if (isset($_GET['platform'])) {
 }
 
 PageGenerator::header("Memory");
+$sql_repository = new SqlRepository($platform);
 ?>
 
 <div class='header'>
@@ -36,7 +38,10 @@ PageGenerator::header("Memory");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listmemory.php', $platform); ?>
+	<?php
+	$sql_repository->filterHeader();
+	PageGenerator::platformNavigation('listmemory.php', $platform);
+	?>
 
 	<div class="tablediv" style="width:auto; display: inline-block;">
 		<table id="limits" class="table table-striped table-bordered table-hover responsive" style="width:auto;">
@@ -51,21 +56,12 @@ PageGenerator::header("Memory");
 				<?php
 				try {
 					DB::connect();
-					$deviceCount = getDeviceCount($platform);
-					$sql = "SELECT
-						propertyflags as memtype, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
-						from devicememorytypes dmt
-						join reports r on r.id = dmt.reportid
-						join deviceproperties dp on dp.reportid = r.id
-						where ostype = :ostype
-						group by memtype desc";
-					$result = DB::$connection->prepare($sql);
-					$result->execute(['ostype' => ostype($platform)]);
-
-					foreach ($result as $row) {
-						$coverageLink = "listdevicescoverage.php?" . "memorytype=" . $row['memtype'] . "&platform=$platform";
-						$coverage = $row['coverage'] / $deviceCount * 100.0;
-						$memoryFlags = join("<br>", getMemoryTypeFlags($row['memtype']));
+					$device_count = $sql_repository->deviceCount();
+					$memory_types = $sql_repository->getMemoryTypeCoverage();
+					foreach ($memory_types as $memory_type) {
+						$coverageLink = "listdevicescoverage.php?" . "memorytype=" . $memory_type['memtype'] . "&platform=$platform";
+						$coverage = $memory_type['coverage'] / $device_count * 100.0;
+						$memoryFlags = join("<br>", getMemoryTypeFlags($memory_type['memtype']));
 						if ($memoryFlags == "") $memoryFlags = "0";
 						echo "<tr>";
 						echo "<td class='value'>$memoryFlags</td>";
@@ -73,8 +69,8 @@ PageGenerator::header("Memory");
 						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
-				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data: " . $e->getMessage() . "</b><br>";
+				} catch (Exception $e) {
+					echo "<b>Error while fetcthing data</b><br>";
 				}
 				DB::disconnect();
 				?>
