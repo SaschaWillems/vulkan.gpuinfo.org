@@ -20,10 +20,11 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/constants.php';
-include './includes/functions.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.class.php';
+require './includes/functions.php';
+require './includes/constants.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
@@ -31,6 +32,7 @@ if (isset($_GET['platform'])) {
 }
 
 PageGenerator::header("Features");
+$sql_repository = new SqlRepository($platform);
 ?>
 
 <div class='header'>
@@ -38,7 +40,10 @@ PageGenerator::header("Features");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listfeaturescore10.php', $platform); ?>
+	<?php 
+	$sql_repository->filterHeader();
+	PageGenerator::platformNavigation('listfeaturescore10.php', $platform); 
+	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -56,47 +61,18 @@ PageGenerator::header("Features");
 				<?php
 				DB::connect();
 				try {
-					$viewDeviceCount = DB::$connection->prepare("SELECT * from viewDeviceCount");
-					$viewDeviceCount->execute();
-					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);
-
-					// Collect feature column names
-					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures' and COLUMN_NAME not in ('reportid')";
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute();
-
-					$features = array();
-					$sqlColumns = "";
-					while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-						$features[] = $row[0];
-						$sqlColumns .= "max(" . $row[0] . ") as $row[0],";
-					}
-
-					$supportedCounts = [];
-					$stmnt = DB::$connection->prepare(
-						"SELECT ifnull(r.displayname, dp.devicename) as device, "
-							. substr($sqlColumns, 0, -1) .
-							" FROM devicefeatures df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = " . ostype($platform) . " group by device"
-					);
-					$stmnt->execute();
-					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-						foreach ($row as $key => $value) {
-							if (strcasecmp($key, 'device') != 0) {
-								$supportedCounts[$key] += $value;
-							}
-						}
-					}
-
-					foreach ($features as $feature) {
-						$coverageLink = "listdevicescoverage.php?feature=" . $feature . "&platform=$platform";
-						$coverage = ($deviceCounts[$platform] > 0) ? round($supportedCounts[$feature] / $deviceCounts[$platform] * 100, 1) : 0;
+					$device_count = $sql_repository->getFeatureCoverageDeviceCount(VK_API_VERSION_1_0);
+					$coverages = $sql_repository->getFeatureCoverageCore(VK_API_VERSION_1_0);
+					foreach ($coverages as $feature => $coverage) {
+						$link = "listdevicescoverage.php?feature=$feature&platform=$platform";
+						$value = ($device_count > 0) ? round($coverage / $device_count * 100, 1) : 0;
 						echo "<tr>";
-						echo "<td>" . $feature . "</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td>$feature</td>";
+						echo "<td class='text-center'><a class='supported' href=\"$link\">$value<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$link&option=not\">" . round(100 - $value, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
-				} catch (PDOException $e) {
+				} catch (Exception $e) {
 					echo "<b>Error while fetching data!</b><br>";
 				}
 				DB::disconnect();

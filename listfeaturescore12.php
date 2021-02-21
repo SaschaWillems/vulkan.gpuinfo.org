@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2020 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,7 @@
 
 require 'pagegenerator.php';
 require './database/database.class.php';
+require './database/sqlrepository.class.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
@@ -31,6 +32,7 @@ if (isset($_GET['platform'])) {
 }
 
 PageGenerator::header("Core 1.2 features");
+$sql_repository = new SqlRepository($platform);
 ?>
 
 <div class='header'>
@@ -41,7 +43,10 @@ PageGenerator::header("Core 1.2 features");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listfeaturescore12.php', $platform); ?>
+	<?php 
+	$sql_repository->filterHeader();
+	PageGenerator::platformNavigation('listfeaturescore12.php', $platform); 
+	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -59,43 +64,18 @@ PageGenerator::header("Core 1.2 features");
 				<?php
 				DB::connect();
 				try {
-					$deviceCount = DB::getCount("SELECT count(distinct(displayname)) from reports join devicefeatures12 dp on dp.reportid = id where ostype = :platform", ['platform' => ostype($platform)]);
-
-					// Collect feature column names
-					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures12' and COLUMN_NAME not in ('reportid')";
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute();
-
-					$features = [];
-					$columns = [];
-					while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-						$features[] = $row[0];
-						$columns[] = "max(" . $row[0] . ") as $row[0]";
-					}
-
-					$supportedCounts = [];
-					$stmnt = DB::$connection->prepare(
-						"SELECT r.displayname as device, " . implode(',', $columns) . " FROM devicefeatures12 df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = " . ostype($platform) . " group by device"
-					);
-					$stmnt->execute();
-					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-						foreach ($row as $key => $value) {
-							if (strcasecmp($key, 'device') != 0) {
-								$supportedCounts[$key] += $value;
-							}
-						}
-					}
-
-					foreach ($features as $feature) {
-						$coverageLink = "listdevicescoverage.php?core=1.2&feature=" . $feature . "&platform=$platform";
-						$coverage = $deviceCount > 0 ? round($supportedCounts[$feature] / $deviceCount * 100, 1) : 0;
+					$device_count = $sql_repository->getFeatureCoverageDeviceCount(VK_API_VERSION_1_2);
+					$coverages = $sql_repository->getFeatureCoverageCore(VK_API_VERSION_1_2);
+					foreach ($coverages as $feature => $coverage) {
+				 		$link = "listdevicescoverage.php?core=1.2&feature=$feature&platform=$platform";
+						$value = ($device_count > 0) ? round($coverage / $device_count * 100, 1) : 0;
 						echo "<tr>";
-						echo "<td>" . $feature . "</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td>$feature</td>";
+						echo "<td class='text-center'><a class='supported' href=\"$link\">$value<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$link&option=not\">" . round(100 - $value, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
-				} catch (PDOException $e) {
+				} catch (Exception $e) {
 					echo "<b>Error while fetching data!</b><br>";
 				}
 				DB::disconnect();
