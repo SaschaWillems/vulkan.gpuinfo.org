@@ -20,10 +20,13 @@
  *
  */
 
-include '../database/database.class.php';
-include '../includes/functions.php';
+require '../database/database.class.php';
+require '../database/sqlrepository.class.php';
+require '../includes/functions.php';
 
 DB::connect();
+
+$sql_repository = new SqlRepository($platform);
 
 $data = array();
 $params = array();
@@ -237,6 +240,13 @@ $orderBy = "order by " . $orderByColumn . " " . $orderByDir;
 
 if ($orderByColumn == "api") {
     $orderBy = "order by length(" . $orderByColumn . ") " . $orderByDir . ", " . $orderByColumn . " " . $orderByDir;
+}
+
+// Limit listing to Vulkan version
+if ($sql_repository->vulkan_api_version != null) {
+    $whereClause .= ($whereClause == '') ? ' WHERE ' : ' AND ';
+    $whereClause .= " left(r.apiversion, 3) >= :settings_vulkan_api_version";
+    $params['settings_vulkan_api_version'] = $sql_repository->vulkan_api_version;
 }
 
 $sql = "SELECT 

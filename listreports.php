@@ -23,9 +23,10 @@
 include 'pagegenerator.php';
 include './includes/functions.php';
 include './database/database.class.php';
-?>
+require './database/sqlrepository.class.php';
 
-<?php
+$sql_repository = new SqlRepository($platform);
+
 // Header
 $defaultHeader = true;
 $pageTitle = null;
@@ -226,6 +227,7 @@ if ($defaultHeader) {
 		echo $caption ? $caption : "Listing available devices";
 		echo "</h4></div>";
 	}
+	$sql_repository->filterHeader();
 
 	if ($showTabs) {
 		PageGenerator::platformNavigation('listreports.php', $platform, true);
