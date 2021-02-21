@@ -22,6 +22,7 @@
 
 require 'pagegenerator.php';
 require './database/database.class.php';
+require './database/sqlrepository.class.php';
 require './includes/functions.php';
 
 $platform = "windows";
@@ -30,14 +31,18 @@ if (isset($_GET['platform'])) {
 }
 
 PageGenerator::header("Extensions");
+$sql_repository = new SqlRepository($platform);
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Extension coverage for ".PageGenerator::platformInfo($platform) ?>
+	<?php echo "<h4>Extension coverage for " . PageGenerator::platformInfo($platform) ?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listextensions.php', $platform); ?>
+	<?php
+	$sql_repository->filterHeader();
+	PageGenerator::platformNavigation('listextensions.php', $platform);
+	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -59,47 +64,32 @@ PageGenerator::header("Extensions");
 				<?php
 				DB::connect();
 				try {
-					$viewDeviceCount = DB::$connection->prepare("SELECT count(DISTINCT displayname) from reports where ostype = :ostype");
-					$viewDeviceCount->execute(['ostype' => ostype($platform)]);
-					$deviceCount = $viewDeviceCount->fetch(PDO::FETCH_COLUMN);
+					$device_count = $sql_repository->deviceCount();
+					$extension_features = $sql_repository->extensionDeviceFeatures2List();
+					$extension_properties = $sql_repository->extensionDeviceProperties2List();
+					$extension_list = $sql_repository->extensionList();
 
-					// Fetch extension features and properties to highlight extensions with a detail page
-					$stmnt = DB::$connection->prepare("SELECT distinct(extension) FROM devicefeatures2");
-					$stmnt->execute(['ostype' => ostype($platform)]);
-					$extensionFeatures = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
-					$stmnt = DB::$connection->prepare("SELECT distinct(extension) FROM deviceproperties2");
-					$stmnt->execute(['ostype' => ostype($platform)]);
-					$extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
-
-					$stmnt = DB::$connection->prepare(
-						"SELECT e.name, count(distinct displayname) as coverage from extensions e 
-						join deviceextensions de on de.extensionid = e.id 
-						join reports r on r.id = de.reportid 
-						where ostype = :ostype
-						group by name"
-					);
-					$stmnt->execute(['ostype' => ostype($platform)]);
-					$extensions = $stmnt->fetchAll(PDO::FETCH_ASSOC);
-
-					foreach ($extensions as $extension) {
-						$coverageLink = "listdevicescoverage.php?extension=" . $extension['name'] . "&platform=$platform";
-						$coverage = round($extension['coverage'] / $deviceCount * 100, 1);
-						$ext = $extension['name'];
-						$feature_link = null;
-						if (in_array($extension['name'], $extensionFeatures) != false) {
-							$feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
+					if ($device_count > 0) {
+						foreach ($extension_list as $extension) {
+							$coverageLink = "listdevicescoverage.php?extension=" . $extension['name'] . "&platform=$platform";
+							$coverage = round($extension['coverage'] / $device_count * 100, 1);
+							$ext = $extension['name'];
+							$feature_link = null;
+							if (in_array($extension['name'], $extension_features) != false) {
+								$feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
+							}
+							$property_link = null;
+							if (in_array($extension['name'], $extension_properties) != false) {
+								$property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
+							}
+							echo "<tr>";
+							echo "<td>$ext</td>";
+							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center' style='vertical-align: middle'>$feature_link</td>";
+							echo "<td class='text-center' style='vertical-align: middle'>$property_link</td>";
+							echo "</tr>";
 						}
-						$property_link = null;
-						if (in_array($extension['name'], $extensionProperties) != false) {
-							$property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
-						}
-						echo "<tr>";
-						echo "<td>$ext</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center' style='vertical-align: middle'>$feature_link</td>";
-						echo "<td class='text-center' style='vertical-align: middle'>$property_link</td>";
-						echo "</tr>";
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetcthing data!</b><br>";
