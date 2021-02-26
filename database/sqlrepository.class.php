@@ -293,4 +293,56 @@ class SqlRepository
             throw $e;
         }     
     }
+
+    // Surface
+    public function getSurfaceFormats()
+    {
+        $sql = "SELECT
+            VkFormat(dsf.format) as format,
+            count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
+            from reports r
+            join devicesurfaceformats dsf on dsf.reportid = r.id
+            join deviceproperties dp on dp.reportid = r.id
+            where ostype = :ostype";
+        $params['ostype'] = $this->ostype;
+        if ($this->vulkan_api_version != null) {
+            $sql .= " AND left(r.apiversion, 3) >= :settings_vulkan_api_version";
+            $params['settings_vulkan_api_version'] = $this->vulkan_api_version;
+        }
+        $sql .= " GROUP BY format";
+        $query = DB::$connection->prepare($sql);
+        try {
+            $query->execute($params);
+            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (Exception $e) {
+            throw $e;
+        }          
+    }
+
+    public function getSurfacePresentModes()
+    {
+        $sql = "SELECT
+            vkpm.name as mode,
+            count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
+            from devicesurfacemodes dsm
+            join reports r on r.id = dsm.reportid
+            join VkPresentMode vkpm on vkpm.value = dsm.presentmode
+            join deviceproperties dp on dp.reportid = r.id						
+            where ostype = :ostype";
+        $params['ostype'] = $this->ostype;
+        if ($this->vulkan_api_version != null) {
+            $sql .= " AND left(r.apiversion, 3) >= :settings_vulkan_api_version";
+            $params['settings_vulkan_api_version'] = $this->vulkan_api_version;
+        }
+        $sql .= " GROUP BY mode";
+        $query = DB::$connection->prepare($sql);
+        try {
+            $query->execute($params);
+            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (Exception $e) {
+            throw $e;
+        }          
+    }
 }

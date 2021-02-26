@@ -20,9 +20,10 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.class.php';
+require './includes/functions.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
@@ -30,14 +31,14 @@ if (isset($_GET['platform'])) {
 }
 
 PageGenerator::header("Surface formats");
+$sql_repository = new SqlRepository($platform);
 ?>
 
-<div class='header'>
-	<?php echo "<h4>Surface format support on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
-</div>
-
 <center>
-	<?php PageGenerator::platformNavigation('listsurfaceformats.php', $platform); ?>
+	<?php 
+	$sql_repository->filterHeader();
+	PageGenerator::platformNavigation('listsurfaceformats.php', $platform);
+	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
@@ -55,22 +56,13 @@ PageGenerator::header("Surface formats");
 				<?php
 				try {
 					DB::connect();
-					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
-					$sql = "SELECT
-						VkFormat(dsf.format) as format,
-						count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
-						from reports r
-						join devicesurfaceformats dsf on dsf.reportid = r.id
-						join deviceproperties dp on dp.reportid = r.id
-						where ostype = :ostype
-						group by format";
-					$result = DB::$connection->prepare($sql);
-					$result->execute(['ostype' => ostype($platform)]);
-					foreach ($result as $row) {
-						$coverageLink = "listdevicescoverage.php?" . $type . "surfaceformat=" . $row['format'] . "&platform=$platform";
-						$coverage = $row['coverage'] / $deviceCount * 100.0;
+					$device_count = $sql_repository->deviceCount('1.2');
+					$surface_formats = $sql_repository->getSurfaceFormats();
+					foreach ($surface_formats as $surface_format) {
+						$coverageLink = "listdevicescoverage.php?" . $type . "surfaceformat=" . $surface_format['format'] . "&platform=$platform";
+						$coverage = $surface_format['coverage'] / $device_count * 100.0;
 						echo "<tr>";
-						echo "<td class='value'>" . $row['format'] . "</td>";
+						echo "<td class='value'>" . $surface_format['format'] . "</td>";
 						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";

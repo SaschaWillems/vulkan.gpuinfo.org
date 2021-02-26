@@ -20,9 +20,10 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.class.php';
+require './includes/functions.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
@@ -30,14 +31,14 @@ if (isset($_GET['platform'])) {
 }
 
 PageGenerator::header("Surface present modes");
+$sql_repository = new SqlRepository($platform);
 ?>
 
-<div class='header'>
-	<?php echo "<h4>Surface present mode support on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
-</div>
-
 <center>
-	<?php PageGenerator::platformNavigation('listsurfacepresentmodes.php', $platform); ?>
+	<?php
+	$sql_repository->filterHeader();
+	PageGenerator::platformNavigation('listsurfacepresentmodes.php', $platform);
+	?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
@@ -55,23 +56,13 @@ PageGenerator::header("Surface present modes");
 				<?php
 				try {
 					DB::connect();
-					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
-					$sql = "SELECT
-						vkpm.name as mode,
-						count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
-						from devicesurfacemodes dsm
-						join reports r on r.id = dsm.reportid
-						join VkPresentMode vkpm on vkpm.value = dsm.presentmode
-						join deviceproperties dp on dp.reportid = r.id						
-						where ostype = :ostype
-						group by mode";
-					$result = DB::$connection->prepare($sql);
-					$result->execute(['ostype' => ostype($platform)]);
-					foreach ($result as $row) {
-						$coverageLink = "listdevicescoverage.php?" . $type . "surfacepresentmode=" . $row['mode'] . "&platform=$platform";
-						$coverage = $row['coverage'] / $deviceCount * 100.0;
+					$device_count = $sql_repository->deviceCount('1.2');
+					$surface_present_modes = $sql_repository->getSurfacePresentModes();
+					foreach ($surface_present_modes as $surface_present_mode) {
+						$coverageLink = "listdevicescoverage.php?" . $type . "surfacepresentmode=" . $surface_present_mode['mode'] . "&platform=$platform";
+						$coverage = $surface_present_mode['coverage'] / $device_count * 100.0;
 						echo "<tr>";
-						echo "<td class='value'>" . $row['mode'] . "</td>";
+						echo "<td class='value'>" . $surface_present_mode['mode'] . "</td>";
 						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
