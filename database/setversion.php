@@ -29,7 +29,7 @@ if (isset($_GET['version'])) {
         exit();
     }
     if ($version == 'all') {
-        unset($_SESSIOn['api_version']);
+        unset($_SESSION['api_version']);
     } else {
         $_SESSION['api_version'] = $version;
     }
