@@ -134,9 +134,11 @@
 						</ul>
 					</li>
 					<li class="dropdown">
-						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Version
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Settings
 							<span class="caret"></span></a>
 							<ul class="dropdown-menu">
+								<li class="dropdown-header">Limit result display to api version</li>
+								<li role="separator" class="divider"></li>
 								<li><a href="database/setversion.php?version=all">All</a></li>
 								<li><a href="database/setversion.php?version=1.1">1.1 and up</a></li>
 								<li><a href="database/setversion.php?version=1.2">1.2 and up</a></li>
