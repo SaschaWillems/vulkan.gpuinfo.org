@@ -133,6 +133,15 @@
 							<li><a href="listinstancelayers.php">Layers</a></li>
 						</ul>
 					</li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Version
+							<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="database/setversion.php?version=all">All</a></li>
+								<li><a href="database/setversion.php?version=1.1">1.1 and up</a></li>
+								<li><a href="database/setversion.php?version=1.2">1.2 and up</a></li>
+							</ul>
+					</li>
 					<li><a href="download.php">Download</a></li>
 					<li><a href="about.php">About</a></li>
 				</ul>

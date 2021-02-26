@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 /**
  *
  * Vulkan hardware capability database server implementation
@@ -31,9 +33,8 @@ class SqlRepository
     function __construct($platform)
     {
         $this->ostype = ostype($platform);
-        if ((isset($_COOKIE["vulkan_api_version"])) && ($_COOKIE["vulkan_api_version"] !== '')) {
-            // @todo: sanity check
-            $this->vulkan_api_version = $_COOKIE["vulkan_api_version"];
+        if (isset($_SESSION['api_version'])) {
+            $this->vulkan_api_version = $_SESSION['api_version'];
         }
     }
 
@@ -43,7 +44,7 @@ class SqlRepository
     public function filterHeader()
     {
         if ($this->vulkan_api_version !== null) {
-            echo "<div class=\"alert alert-warning\" style=\"margin-bottom: 0px;\">Only displaying data for devices with Vulkan version $this->vulkan_api_version and up (<a href='settings.php'>change settings</a>)</div>";
+            echo "<div class=\"alert alert-warning\" style=\"margin-bottom: 0px;\">Only displaying data for reports with Vulkan version $this->vulkan_api_version and up</div>";
         }
     }
 
