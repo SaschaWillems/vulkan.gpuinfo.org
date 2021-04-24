@@ -36,25 +36,41 @@ PageGenerator::header('Download');
 			The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">the repository</a>.<br>
 		</div>
 		<div class="page-header">
-			<h3>Current stable release 3.0</h3>
+			<h3>Current stable release 3.01</h3>
 			<ul>
-				<li><a href="downloads/vulkancapsviewer_3.0_win64.zip">Windows x86-64 (zip)</a></li>
+				<li><a href="downloads/vulkancapsviewer_3.01_win64.zip">Windows x86-64 (zip)</a></li>
 				<li>Linux
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.0_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
-						<li><a href="downloads/vulkancapsviewer_3.0_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_3.01_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_3.01_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
 					</ul>
 				</li>
 				<li>Android
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.0_arm.apk">Android arm-v8 (apk)</a></li>
+						<li><a href="downloads/vulkancapsviewer_3.01_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
-				<li><a href="downloads/vulkancapsviewer_3.0_osx.dmg">Mac OSX (dmg)</a></li>
+				<li><a href="downloads/vulkancapsviewer_3.01_osx.dmg">Mac OSX (dmg)</a></li>
 				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store, provided by <a href="https://www.lunarg.com/">LunarG</a>)</a></li>
 			</ul>
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.01 - 2021-04-24</h4>
+			<ul>
+				<li>Added VK_KHR_video_queue encode and decode flags to queue family display</li>
+				<li>Restructured memory heaps and types display</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_ycbcr_2plane_444_formats</li>
+						<li>VK_EXT_vertex_input_dynamic_state</li>
+						<li>VK_EXT_color_write_enable</li>
+						<li>VK_KHR_synchronization2</li>
+						<li>VK_KHR_zero_initialize_workgroup_memory</li>
+						<li>VK_KHR_workgroup_memory_explicit_layout</li>
+						<li>VK_NV_inherited_viewport_scissor</li>
+					</ul>					
+				</li>
+			</ul>
 			<h4>3.0 - 2021-01-10</h4>
 			<ul>
 				<li>Added update mechanism for updating reports present in the database with data from newer application versions</li>
