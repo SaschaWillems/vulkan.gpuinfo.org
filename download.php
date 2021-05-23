@@ -37,8 +37,13 @@ PageGenerator::header('Download');
 		</div>
 		<div class="page-header">
 			<h3>Current stable release 3.01</h3>
-			<ul>
-				<li><a href="downloads/vulkancapsviewer_3.01_win64.zip">Windows x86-64 (zip)</a></li>
+			<ul>		
+				<li>Windows
+					<ul>
+						<li><a href="downloads/vulkancapsviewer_3.01_win64.zip">Windows 64-bit (zip)</a></li>
+						<li><a href="downloads/vulkancapsviewer_3.01_x86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some 32-bit Vulkan implementations may not expose all hardware capabilites.</li>
+					</ul>
+				</li>
 				<li>Linux
 					<ul>
 						<li><a href="downloads/vulkancapsviewer_3.01_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
