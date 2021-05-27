@@ -177,11 +177,15 @@ function listSubgroupFeatureFlags($flag)
 		//0x0100 => "PARTITIONED_BIT_NV"
 	);
 
+	if ($flag === null) {
+		return "<span class='na'>n/a</span>";
+	}
+	
 	$res = null;
 	$arr_values = array_values($flags);
 	$index = 0;
 	foreach ($flags as $i => $value) {
-		$class = ($flag & $i) ? "supported" : "unsupported";
+		$class = ($flag & $i) ? "supported" : "na";
 		$res .= "<span class='" . $class . "'>" . strtolower($arr_values[$index]) . "</span><br>";
 		$index++;
 	}
@@ -200,14 +204,18 @@ function listSubgroupStageFlags($flag)
 		0x001F => "ALL GRAPHICS",
 	);
 
+	if ($flag === null) {
+		return "<span class='na'>n/a</span>";
+	}
+
 	$res = null;
 	$arr_values = array_values($flags);
 	$index = 0;
 	foreach ($flags as $i => $value) {
 		if ($i == 0x001F) {
-			$class = (($flag & $i) == $i) ? "supported" : "unsupported";
+			$class = (($flag & $i) == $i) ? "supported" : "na";
 		} else {
-			$class = ($flag & $i) ? "supported" : "unsupported";
+			$class = ($flag & $i) ? "supported" : "na";
 		}
 		$res .= "<span class='" . $class . "'>" . strtolower($arr_values[$index]) . "</span><br>";
 		$index++;
@@ -561,6 +569,7 @@ function getPropertyDisplayValue($key, $value)
 			break;
 		case 'deviceLUIDValid':
 		case 'subgroupQuadOperationsInAllStages':
+		case 'subgroupProperties.subgroupQuadOperationsInAllStages':
 		case 'protectedNoFault':
 			$displayvalue = displayBool($value);
 			break;
@@ -568,9 +577,11 @@ function getPropertyDisplayValue($key, $value)
 			$displayvalue = getPointClippingBehavior($value);
 			break;
 		case 'subgroupSupportedStages':
+		case 'subgroupProperties.supportedStages':
 			$displayvalue = listSubgroupStageFlags($value);
 			break;
 		case 'subgroupSupportedOperations':
+		case 'subgroupProperties.supportedOperations':
 			$displayvalue = listSubgroupFeatureFlags($value);
 			break;
 		case 'framebufferColorSampleCounts':

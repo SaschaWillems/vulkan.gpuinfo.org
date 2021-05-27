@@ -119,7 +119,11 @@ if (isset($_GET['platform'])) {
 						$value = getPropertyDisplayValue($name, $cap['value']);
 						echo "<tr>";
 						echo "<td>".($cap['displayvalue'] !== null ? $cap['displayvalue'] : $value)."</td>";
-						echo "<td><a href='$link'>" . $cap["reports"] . "</a></td>";
+						if ($cap['value'] != null) {
+							echo "<td><a href='$link'>" . $cap["reports"] . "</a></td>";
+						} else {
+							echo "<td class='na'>".$cap["reports"]."</td>";
+						}
 						echo "</tr>";
 					}
 					DB::disconnect();
@@ -154,7 +158,9 @@ if (isset($_GET['platform'])) {
 			$result->execute();
 			$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 			foreach ($rows as $row) {
-				echo "['" . $row['value'] . "'," . $row['reports'] . "],";
+				if ($row['value'] != null) {
+					echo "['" . $row['value'] . "'," . $row['reports'] . "],";
+				}
 			}
 			DB::disconnect();
 			?>
