@@ -26,7 +26,7 @@ require './includes/functions.php';
 
 $platform = "windows";
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Extensions");
@@ -82,6 +82,9 @@ PageGenerator::header("Extensions");
 					$extensions = $stmnt->fetchAll(PDO::FETCH_ASSOC);
 
 					foreach ($extensions as $extension) {
+						if (trim($extension['name']) == '') {
+							continue;
+						}
 						$coverageLink = "listdevicescoverage.php?extension=" . $extension['name'] . "&platform=$platform";
 						$coverage = round($extension['coverage'] / $deviceCount * 100, 1);
 						$ext = $extension['name'];
