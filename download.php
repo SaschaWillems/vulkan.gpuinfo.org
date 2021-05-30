@@ -41,7 +41,7 @@ PageGenerator::header('Download');
 				<li>Windows
 					<ul>
 						<li><a href="downloads/vulkancapsviewer_3.01_win64.zip">Windows 64-bit (zip)</a></li>
-						<li><a href="downloads/vulkancapsviewer_3.01_x86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some 32-bit Vulkan implementations may not expose all hardware capabilites.</li>
+						<li><a href="downloads/vulkancapsviewer_3.01_x86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some Vulkan implementations may not expose all hardware capabilities when run under 32 bits.</li>
 					</ul>
 				</li>
 				<li>Linux
