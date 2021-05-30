@@ -46,7 +46,6 @@ if (isset($_GET['platform'])) {
 $extension = $_GET['extension'];
 if ($extension != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $extension . "</b>";
 	$caption .= " (<a href='listreports.php?extension=" . $extension . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 }
@@ -54,7 +53,6 @@ if ($extension != '') {
 $feature = $_GET['feature'];
 if ($feature != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $feature . "</b>";
 	$caption .= " (<a href='listreports.php?feature=" . $feature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 }
@@ -62,28 +60,24 @@ if ($feature != '') {
 $submitter = $_GET['submitter'];
 if ($submitter != '') {
 	$defaultHeader = false;
-	$headerClass = "header-blue";
 	$caption = "Reports submitted by <b>" . $submitter . "</b>";
 }
 // Format support
 $linearformatfeature = $_GET['linearformat'];
 if ($linearformatfeature != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $linearformatfeature . "</b> for <b>linear tiling</b>";
 	$caption .= " (<a href='listreports.php?linearformat=" . $linearformatfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 }
 $optimalformatfeature = $_GET['optimalformat'];
 if ($optimalformatfeature != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $optimalformatfeature . "</b> for <b>optimal tiling</b>";
 	$caption .= " (<a href='listreports.php?optimalformat=" . $optimalformatfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 }
 $bufferformatfeature = $_GET['bufferformat'];
 if ($bufferformatfeature != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $bufferformatfeature . "</b> for <b>buffer usage</b>";
 	$caption .= " (<a href='listreports.php?bufferformat=" . $bufferformatfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 }
@@ -92,7 +86,6 @@ $limit = $_GET['limit'];
 $limitvalue = null;
 if ($limit != '') {
 	$defaultHeader = false;
-	$headerClass = "header-green";
 	$caption = "Listing limits for <b>" . $limit . "</b>";
 	// Check if a limit requirement rule has to be applied (see Table 36. of the specs)
 	DB::connect();
@@ -115,7 +108,6 @@ if ($limit != '') {
 $surfaceformat = $_GET['surfaceformat'];
 if ($surfaceformat != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting surface format <b>" . $surfaceformat . "</b>";
 	$alertText = "<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)";
 	$caption .= " (<a href='listreports.php?surfaceformat=" . $surfaceformat . ($negate ? "" : "&option=not") . "'>toggle</a>)";
@@ -124,7 +116,6 @@ if ($surfaceformat != '') {
 $surfacepresentmode = $_GET['surfacepresentmode'];
 if ($surfacepresentmode != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting surface present mode <b>" . getPresentMode($surfacepresentmode) . "</b>";
 	$alertText = "<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)";
 	$caption .= " (<a href='listreports.php?surfacepresentmode=" . $surfacepresentmode . ($negate ? "" : "&option=not") . "'>toggle</a>)";
@@ -133,21 +124,18 @@ if ($surfacepresentmode != '') {
 $devicename = $_GET['devicename'];
 if ($devicename != '') {
 	$defaultHeader = false;
-	$headerClass = "header-blue";
 	$caption = "Reports for <b>" . $devicename . "</b>";
 }
 // Display name (Android devices)
 $displayname = $_GET['displayname'];
 if ($displayname != '') {
 	$defaultHeader = false;
-	$headerClass = "header-blue";
 	$caption = "Reports for <b>" . $displayname . "</b>";
 }
 // Instance extension
 $instanceextension = $_GET['instanceextension'];
 if ($instanceextension != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting instance extension <b>" . $instanceextension . "</b>";
 	$caption .= " (<a href='listreports.php?instanceextension=" . $instanceextension . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 	$pageTitle = $instanceextension;
@@ -156,7 +144,6 @@ if ($instanceextension != '') {
 $instancelayer = $_GET['instancelayer'];
 if ($instancelayer != '') {
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting instance layer <b>" . $instancelayer . "</b>";
 	$caption .= " (<a href='listreports.php?instancelayer=" . $instancelayer . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 	$pageTitle = $instancelayer;
@@ -175,7 +162,6 @@ if ($extensionproperty != '') {
 	DB::disconnect();
 	$extensionpropertyvalue = $_GET['value'];
 	$defaultHeader = false;
-	$headerClass = "header-green";
 	$extensionpropertyvalue = $_GET['value'];
 	$link = "displayextensionproperty.php?name=" . $extensionproperty;
 	$caption = "Reports with <a href=" . $link . ">" . $extensionproperty . "</a> (" . $extname . ") = " . $extensionpropertyvalue;
@@ -190,7 +176,6 @@ if (isset($_GET['extensionfeature']) && ($_GET['extensionfeature'] != '')) {
 	$extname = $stmnt->fetchColumn();
 	DB::disconnect();
 	$defaultHeader = false;
-	$headerClass = $negate ? "header-red" : "header-green";
 	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting extension feature <b>" . $extensionfeature . "</b> ($extname)";
 	$caption .= " (<a href='listreports.php?extensionfeature=" . $extensionfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
 }
@@ -221,7 +206,6 @@ if ($defaultHeader) {
 <center>
 	<?php
 	if (!$defaultHeader) {
-		// echo "<caption class='".$headerClass." header-span'>".$caption."</caption>";
 		echo "<div class='header'><h4>";
 		echo $caption ? $caption : "Listing available devices";
 		echo "</h4></div>";
