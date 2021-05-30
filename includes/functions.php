@@ -655,3 +655,19 @@ function getPropertyDisplayValue($key, $value)
 	}
 	return $displayvalue;
 }
+
+function sanitize($value)
+{
+	return htmlentities($value, ENT_QUOTES);
+}
+
+/**
+ * Return a sanitized $_GET value to avoid XSS
+ */
+function GET_sanitized($name)
+{
+	if (isset($_GET[$name]) ) {
+		return sanitize($_GET[$name]);
+	};
+	return null;
+}
