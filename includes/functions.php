@@ -136,6 +136,8 @@ function getQueueFlags($flag)
 		0x0004 => "TRANSFER_BIT",
 		0x0008 => "SPARSE_BINDING_BIT",
 		0x0010 => "PROTECTED_BIT",
+		0x0020 => "VIDEO_DECODE_BIT_KHR",
+		0x0040 => "VIDEO_ENCODE_BIT_KHR",
 	);
 	return getFlags($flags, $flag);
 }
