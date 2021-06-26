@@ -3,13 +3,13 @@
 /**
  *
  * Vulkan hardware capability database server implementation
- *	
+ *
  * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
- *	
+ *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
  * License version 3 as published by the Free Software Foundation.
- *	
+ *
  * Please review the following information to ensure the GNU Lesser
  * General Public License version 3 requirements will be met:
  * http://www.gnu.org/licenses/agpl-3.0.de.html
@@ -24,27 +24,80 @@ include 'pagegenerator.php';
 include './includes/functions.php';
 include './database/database.class.php';
 
-$platform = "all";
-if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
-}
-$negate = false;
-if (isset($_GET['option'])) {
-	$negate = $_GET['option'] == 'not';
+class FilterList {
+
+	public $filters = [];
+
+	function __construct($filters) {
+		foreach ($filters as $filter ) {
+			$this->addFilter($filter);
+		}
+	}
+
+	function addFilter($name) {
+		$value = GET_sanitized($name);
+		if (($value !== null) && (trim($value) != '')) {
+			$this->filters[$name] = $value;
+		}
+	}
+
+	function getFilter($name) {
+		if (key_exists($name, $this->filters)) {
+			$value = $this->filters[$name];
+			if (trim($value) != '') {
+				return $value;
+			}
+		}
+		return null;
+	}
+
+	function hasFilter($name) {
+		return (key_exists($name, $this->filters));
+	}
+
+	function hasFilters() {
+		return (count($this->filters) > 0);
+	}
 }
 
+// Supported filter values
+$filters = [
+	'platform',
+	'submitter',
+	'devicename',
+	'displayname',
+	'feature',
+	'limit',
+	'extension',
+	'extensionname',
+	'extensionfeature',
+	'extensionproperty',
+	'extensionpropertyvalue',
+	'core',
+	'coreproperty',
+	'linearformat',
+	'optimalformat',
+	'bufferformat',
+	'memorytype',
+	'surfaceformat',
+	'surfacepresentmode',
+	'option'
+];
+$filter_list = new FilterList($filters);
+
+$platform = "all";
 $caption = null;
 $pageTitle = null;
 $subcaption = null;
 
-if (isset($_GET["extension"])) {
-	$caption = $negate ?
-		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET["extension"] . "</b>"
-		:
-		"Listing first known driver version support for <code>" . $_GET["extension"] . "</code>";
-	$pageTitle = $_GET["extension"];
+// Invert
+$inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
+// Extension support
+if ($filter_list->hasFilter('extension')) {
+	$ext = $filter_list->getFilter('extension');
+	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting <b>$ext</b>" : "Listing first known driver version support for <code>$ext</code>";
+	$pageTitle = $ext;
 	// Check if extension has features2 or properties2
-	$ext = $_GET["extension"];
 	DB::connect();
 	try {
 		$stmnt = DB::$connection->prepare("SELECT
@@ -70,93 +123,99 @@ if (isset($_GET["extension"])) {
 	}
 	DB::disconnect();
 }
-
-if (isset($_GET["feature"])) {
-	$info = "<code>" . $_GET["feature"] . "</code>";
-	$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting for $info" : "Listing first known driver version support for $info";
-	$pageTitle = $_GET["feature"];
+// Feature support
+if ($filter_list->hasFilter('feature')) {
+	$feature = $filter_list->getFilter('feature');
+	$info = "<code>$feature</code>";
+	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting for $info" : "Listing first known driver version support for $info";
+	$pageTitle = $feature;
 }
-
 // Extension feature support
-if (isset($_GET['extensionname']) && isset($_GET['extensionfeature'])) {
-	$ext_name = $_GET['extensionname'];
-	$ext_feature = $_GET['extensionfeature'];
+if ($filter_list->hasFilter('extensionname') && $filter_list->hasFilter('extensionfeature')) {
+	$ext_name = $filter_list->getFilter('extensionname');
+	$ext_feature = $filter_list->getFilter('extensionfeature');
 	$info = "<code>$ext_feature</code> for <code>$ext_name </code>";
-	$caption = $negate ? "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 	$pageTitle = $ext_feature;
 }
 // Extension property support
-if (isset($_GET['extensionname']) && isset($_GET['extensionproperty'])) {
-	$ext_name = $_GET['extensionname'];
-	$ext_property = $_GET['extensionproperty'];
-	$ext_property_value = $_GET['extensionpropertyvalue'];
+if ($filter_list->hasFilter('extensionname') && $filter_list->hasFilter('extensionproperty')) {
+	$ext_name =  $filter_list->getFilter('extensionname');
+	$ext_property =  $filter_list->getFilter('extensionproperty');
+	$ext_property_value =  $filter_list->getFilter('extensionpropertyvalue');
 	$info = "value <code>$ext_property_value</code> in <code>$ext_property</code> for <code>$ext_name</code>";
-	$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+	$caption = $inverted ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 	$pageTitle = $ext_property;
 }
 // Core property support
-if (isset($_GET['coreproperty'])) {
-	$property = $_GET['coreproperty'];
+if ($filter_list->hasFilter('coreproperty')) {
+	$property = $filter_list->getFilter('coreproperty');
 	$info = "<code>$property</code>";
-	$caption = $negate ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
+	$caption = $inverted ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 	$pageTitle = $property;
 }
-
-if (isset($_GET['linearformat'])) {
-	$caption = $negate ?
-		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET['linearformat'] . "</b> for <b>linear tiling</b>"
+// Image and buffer format suppt
+if ($filter_list->hasFilter('linearformat')) {
+	$linear_format = $filter_list->getFilter('linearformat');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting <code>$linear_format</code> for <b>linear tiling</b>"
 		:
-		"Listing first known driver version support for <b>" . $_GET['linearformat'] . "</b> for <b>linear tiling</b>";
-	$pageTitle = "Linear format " . $_GET["linearformat"];
+		"Listing first known driver version support for <code>$linear_format</code> for <b>linear tiling</b>";
+	$pageTitle = "Linear format $linear_format";
 }
-if (isset($_GET['optimalformat'])) {
-	$caption = $negate ?
-		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET['optimalformat'] . "</b> for <b>optimal tiling</b>"
+if ($filter_list->hasFilter('optimalformat')) {
+	$optimal_format = $filter_list->getFilter('optimalformat');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting <code>$optimal_format</code> for <b>optimal tiling</b>"
 		:
-		"Listing first known driver version support for <b>" . $_GET['optimalformat'] . "</b> for <b>optimal tiling</b>";
-	$pageTitle = "Optimal format " . $_GET["optimalformat"];
+		"Listing first known driver version support for <code>$optimal_format</code> for <b>optimal tiling</b>";
+	$pageTitle = "Optimal format $optimal_format";
 }
-if (isset($_GET['bufferformat'])) {
-	$caption = $negate ?
-		"Listing devices <span style='color:red;'>not</span> supporting <b>" . $_GET['bufferformat'] . "</b> for <b>buffer usage</b>"
+if ($filter_list->hasFilter('bufferformat')) {
+	$buffer_format = $filter_list->getFilter('bufferformat');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting <code>$buffer_format</code> for <b>buffer usage</b>"
 		:
-		"Listing first known driver version support for <b>" . $_GET['bufferformat'] . "</b> for <b>buffer usage</b>";
-	$pageTitle = "Buffer format " . $_GET["bufferformat"];
+		"Listing first known driver version support for <code>$buffer_format</code> for <b>buffer usage</b>";
+	$pageTitle = "Buffer format $buffer_format";
 }
-
-if (isset($_GET['memorytype'])) {
-	$memoryFlags = join(" | ", getMemoryTypeFlags($_GET['memorytype']));
+// Memory type
+if ($filter_list->hasFilter('memorytype')) {
+	$memoryFlags = join(" | ", getMemoryTypeFlags($filter_list->getFilter('memorytype')));
 	if ($memoryFlags == "") $memoryFlags = "0";
-
-	$caption = $negate ?
-		"Listing devices <span style='color:red;'>not</span> supporting memory type <b>" . $memoryFlags . "</b>"
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting memory type <code>$memoryFlags</code>"
 		:
-		"Listing first known driver version support for memory type <b>" . $memoryFlags . "</b>";
-	$pageTitle = "Memory type " . $memoryFlags;
+		"Listing first known driver version support for memory type <code>$memoryFlags</code>";
+	$pageTitle = "Memory type $memoryFlags";
 }
-
-if (isset($_GET['surfaceformat'])) {
-	$caption = $negate ?
-		"Listing devices <span style='color:red;'>not</span> supporting surface format <b>" . $_GET['surfaceformat'] . "</b>"
+// Surface format
+if ($filter_list->hasFilter('surfaceformat')) {
+	$surface_format = $filter_list->getFilter('surfaceformat');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting surface format <code>$surface_format</code>"
 		:
-		"Listing first known driver version support for surface format <b>" . $_GET['surfaceformat'] . "</b>";
-	$pageTitle = "Surface format " . $_GET["surfaceformat"];
+		"Listing first known driver version support for surface format <code>$surface_format</code>";
+	$pageTitle = "Surface format $surface_format";
 }
-
-if (isset($_GET['surfacepresentmode'])) {
-	$caption = $negate ?
-		"Listing devices <span style='color:red;'>not</span> supporting surface present mode <b>" . $_GET['surfacepresentmode'] . "</b>"
+// Surface present mode
+if ($filter_list->hasFilter('surfacepresentmode')) {
+	$surface_present_mode = $filter_list->getFilter('surfacepresentmode');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting surface present mode <code>$surface_present_mode</code>"
 		:
-		"Listing first known driver version support for surface present mode <b>" . $_GET['surfacepresentmode'] . "</b>";
-	$pageTitle = "Surface present mode " . $_GET["surfacepresentmode"];
+		"Listing first known driver version support for surface present mode <code>$surface_present_mode</code>";
+	$pageTitle = "Surface present mode $surface_present_mode";
 }
-
-if (isset($_GET["submitter"])) {
-	$caption .= "<br/>Devices submitted by " . $_GET["submitter"];
-	$pageTitle = "Devices by " . $_GET["submitter"];
+// Submitter
+if ($filter_list->hasFilter('submitter')) {
+	$submitter = $filter_list->getFilter('submitter');
+	$caption .= "<br/>Devices submitted by $submitter";
+	$pageTitle = "Devices by $submitter";
 }
-
-if (isset($_GET['platform'])) {
+// Platform
+if ($filter_list->hasFilter('platform')) {
+	$platform = $filter_list->getFilter('platform');
 	$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	if ($pageTitle) {
 		$pageTitle .= " on " . ucfirst($platform);
@@ -176,6 +235,7 @@ PageGenerator::header($pageTitle);
 			?>
 		</h4>
 	</div>
+	<?php PageGenerator::platformNavigation('listdevicescoverage.php', $platform, true, $filter_list->filters); ?>
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 
@@ -201,7 +261,6 @@ PageGenerator::header($pageTitle);
 				</table>
 				<div id="errordiv" style="color:#D8000C;"></div>
 			</form>
-
 		</div>
 </center>
 
@@ -234,26 +293,26 @@ PageGenerator::header($pageTitle);
 				url: "responses/devices.php?platform=<?php echo $platform ?>&minversion=true",
 				data: {
 					"filter": {
-						'extension': '<?php echo $_GET["extension"] ?>',
-						'feature': '<?php echo $_GET["feature"] ?>',
-						'submitter': '<?php echo $_GET["submitter"] ?>',
-						'linearformat': '<?php echo $_GET["linearformat"] ?>',
-						'optimalformat': '<?php echo $_GET["optimalformat"] ?>',
-						'bufferformat': '<?php echo $_GET["bufferformat"] ?>',
-						'devicelimit': '<?php echo $_GET["limit"] ?>',
-						'memorytype': '<?php echo $_GET["memorytype"] ?>',
-						'option': '<?php echo $_GET["option"] ?>',
-						'surfaceformat': '<?php echo $_GET["surfaceformat"] ?>',
-						'surfacepresentmode': '<?php echo $_GET["surfacepresentmode"] ?>',
-						'devicename': '<?php echo $_GET["devicename"] ?>',
-						'displayname': '<?php echo $_GET["displayname"] ?>',
-						'extensionfeature_name': '<?= $_GET['extensionname'] ?>',
-						'extensionfeature_feature': '<?= $_GET['extensionfeature'] ?>',
-						'extensionproperty_name': '<?= $_GET['extensionname'] ?>',
-						'extensionproperty_property': '<?= $_GET['extensionproperty'] ?>',
-						'extensionproperty_value': '<?= $_GET['extensionpropertyvalue'] ?>',
-						'coreproperty': '<?= $_GET['coreproperty'] ?>',
-						'core': '<?= $_GET['core'] ?>'
+						'extension': 					'<?= $filter_list->getFilter('extension') ?>',
+						'feature': 						'<?= $filter_list->getFilter('feature') ?>',
+						'submitter': 					'<?= $filter_list->getFilter('submitter') ?>',
+						'linearformat': 				'<?= $filter_list->getFilter('linearformat') ?>',
+						'optimalformat': 				'<?= $filter_list->getFilter('optimalformat') ?>',
+						'bufferformat': 				'<?= $filter_list->getFilter('bufferformat') ?>',
+						'devicelimit': 					'<?= $filter_list->getFilter('limit') ?>',
+						'memorytype': 					'<?= $filter_list->getFilter('memorytype') ?>',
+						'option': 						'<?= $filter_list->getFilter('option') ?>',
+						'surfaceformat': 				'<?= $filter_list->getFilter('surfaceformat') ?>',
+						'surfacepresentmode': 			'<?= $filter_list->getFilter('surfacepresentmode') ?>',
+						'devicename': 					'<?= $filter_list->getFilter('devicename') ?>',
+						'displayname': 					'<?= $filter_list->getFilter('displayname') ?>',
+						'extensionfeature_name': 		'<?= $filter_list->getFilter('extensionname') ?>',
+						'extensionfeature_feature': 	'<?= $filter_list->getFilter('extensionfeature') ?>',
+						'extensionproperty_name': 		'<?= $filter_list->getFilter('extensionname') ?>',
+						'extensionproperty_property': 	'<?= $filter_list->getFilter('extensionproperty') ?>',
+						'extensionproperty_value': 		'<?= $filter_list->getFilter('extensionpropertyvalue') ?>',
+						'coreproperty': 				'<?= $filter_list->getFilter('coreproperty') ?>',
+						'core': 						'<?= $filter_list->getFilter('core') ?>'
 					}
 				},
 				error: function(xhr, error, thrown) {
