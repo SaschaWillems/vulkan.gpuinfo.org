@@ -22,45 +22,10 @@
 
 include 'pagegenerator.php';
 include './includes/functions.php';
+include './includes/filterlist.class.php';
 include './database/database.class.php';
 
-class FilterList {
-
-	public $filters = [];
-
-	function __construct($filters) {
-		foreach ($filters as $filter ) {
-			$this->addFilter($filter);
-		}
-	}
-
-	function addFilter($name) {
-		$value = GET_sanitized($name);
-		if (($value !== null) && (trim($value) != '')) {
-			$this->filters[$name] = $value;
-		}
-	}
-
-	function getFilter($name) {
-		if (key_exists($name, $this->filters)) {
-			$value = $this->filters[$name];
-			if (trim($value) != '') {
-				return $value;
-			}
-		}
-		return null;
-	}
-
-	function hasFilter($name) {
-		return (key_exists($name, $this->filters));
-	}
-
-	function hasFilters() {
-		return (count($this->filters) > 0);
-	}
-}
-
-// Supported filter values
+// Supported filter values for this listing
 $filters = [
 	'platform',
 	'submitter',
