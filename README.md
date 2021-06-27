@@ -1,4 +1,4 @@
-# Vulkan hardware capability database web front-end
+# Vulkan hardware capability database
 
 ![Vulkan](./images/vulkanlogo.png)<br><br>
 
