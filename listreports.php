@@ -22,71 +22,42 @@
 
 include 'pagegenerator.php';
 include './includes/functions.php';
+include './includes/filterlist.class.php';
 include './database/database.class.php';
-?>
 
-<?php
-// Header
+$filters = [
+	'platform',
+	'submitter',
+	'devicename',
+	'displayname',
+	'limit',
+	'property',
+	'core',
+	'value',
+	'instanceextension',
+	'instancelayer',
+	'option'
+];
+$filter_list = new FilterList($filters);
+
 $defaultHeader = true;
 $pageTitle = null;
-$alertText = null;
-$negate = false;
-$showTabs = true;
-if (isset($_GET['option'])) {
-	if ($_GET['option'] == 'not') {
-		$negate = true;
-	}
-}
+$inverted = false;
 $platform = "all";
-if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
-}
 
-// Extension
-$extension = $_GET['extension'];
-if ($extension != '') {
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $extension . "</b>";
-	$caption .= " (<a href='listreports.php?extension=" . $extension . ($negate ? "" : "&option=not") . "'>toggle</a>)";
-}
-// Feature
-$feature = $_GET['feature'];
-if ($feature != '') {
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $feature . "</b>";
-	$caption .= " (<a href='listreports.php?feature=" . $feature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
-}
+// Invert
+$inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
 // Submitter
-$submitter = $_GET['submitter'];
-if ($submitter != '') {
+if ($filter_list->hasFilter('submitter')) {
 	$defaultHeader = false;
-	$caption = "Reports submitted by <b>" . $submitter . "</b>";
-}
-// Format support
-$linearformatfeature = $_GET['linearformat'];
-if ($linearformatfeature != '') {
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $linearformatfeature . "</b> for <b>linear tiling</b>";
-	$caption .= " (<a href='listreports.php?linearformat=" . $linearformatfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
-}
-$optimalformatfeature = $_GET['optimalformat'];
-if ($optimalformatfeature != '') {
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $optimalformatfeature . "</b> for <b>optimal tiling</b>";
-	$caption .= " (<a href='listreports.php?optimalformat=" . $optimalformatfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
-}
-$bufferformatfeature = $_GET['bufferformat'];
-if ($bufferformatfeature != '') {
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting <b>" . $bufferformatfeature . "</b> for <b>buffer usage</b>";
-	$caption .= " (<a href='listreports.php?bufferformat=" . $bufferformatfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
+	$caption = "Reports submitted by <code>".$filter_list->getFilter('submitter')."</code>";
 }
 // List (and order) by limit
-$limit = $_GET['limit'];
+$limit = $filter_list->getFilter('limit');
 $limitvalue = null;
 if ($limit != '') {
 	$defaultHeader = false;
-	$caption = "Listing limits for <b>" . $limit . "</b>";
+	$caption = "Listing limits for <code>$limit</code>";
 	// Check if a limit requirement rule has to be applied (see Table 36. of the specs)
 	DB::connect();
 	$sql = "select feature from limitrequirements where limitname = :limit";
@@ -96,101 +67,53 @@ if ($limit != '') {
 		$req = $reqs->fetch();
 		$caption .= "<br>(Feature requirement " . $req["feature"] . " is applied)";
 	}
-	if (isset($_GET['value'])) {
-		$limitvalue = $_GET['value'];
+	if ($filter_list->hasFilter('value')) {
+		$limitvalue = $filter_list->getFilter('value');
 		$link = "displaydevicelimit.php?name=" . $limit;
 		$caption = "Reports with <a href=" . $link . ">" . $limit . "</a> = " . $limitvalue;
 		$pageTitle = $limit . " = " . $limitvalue;
 	}
 	DB::disconnect();
 }
-// Surface format	
-$surfaceformat = $_GET['surfaceformat'];
-if ($surfaceformat != '') {
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting surface format <b>" . $surfaceformat . "</b>";
-	$alertText = "<b>Note:</b> Surface format data only available for reports with version 1.2 (or higher)";
-	$caption .= " (<a href='listreports.php?surfaceformat=" . $surfaceformat . ($negate ? "" : "&option=not") . "'>toggle</a>)";
-}
-// Surface present mode	
-$surfacepresentmode = $_GET['surfacepresentmode'];
-if ($surfacepresentmode != '') {
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting surface present mode <b>" . getPresentMode($surfacepresentmode) . "</b>";
-	$alertText = "<b>Note:</b> Surface present mode data only available for reports with version 1.2 (or higher)";
-	$caption .= " (<a href='listreports.php?surfacepresentmode=" . $surfacepresentmode . ($negate ? "" : "&option=not") . "'>toggle</a>)";
-}
 // Device name
-$devicename = $_GET['devicename'];
-if ($devicename != '') {
+if ($filter_list->hasFilter('devicename')) {
 	$defaultHeader = false;
-	$caption = "Reports for <b>" . $devicename . "</b>";
+	$caption = "Reports for <code>".$filter_list->getFilter('devicename')."</code>";
 }
 // Display name (Android devices)
-$displayname = $_GET['displayname'];
-if ($displayname != '') {
+if ($filter_list->hasFilter('displayname')) {
 	$defaultHeader = false;
-	$caption = "Reports for <b>" . $displayname . "</b>";
+	$caption = "Reports for <code>".$filter_list->getFilter('displayname')."</code>";
 }
 // Instance extension
-$instanceextension = $_GET['instanceextension'];
-if ($instanceextension != '') {
+if ($filter_list->hasFilter('instanceextension')) {
+	$instanceextension = $filter_list->getFilter('instanceextension');
 	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting instance extension <b>" . $instanceextension . "</b>";
-	$caption .= " (<a href='listreports.php?instanceextension=" . $instanceextension . ($negate ? "" : "&option=not") . "'>toggle</a>)";
+	$caption = "Reports " . ($inverted ? "<b>not</b>" : "") . " supporting instance extension <code>$instanceextension</code>";
+	$caption .= " (<a href='listreports.php?instanceextension=" . $instanceextension . ($inverted ? "" : "&option=not") . "'>toggle</a>)";
 	$pageTitle = $instanceextension;
 }
 // Instance layer
-$instancelayer = $_GET['instancelayer'];
-if ($instancelayer != '') {
+if ($filter_list->hasFilter('instancelayer')) {
+	$instancelayer = $filter_list->getFilter('instancelayer');
 	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting instance layer <b>" . $instancelayer . "</b>";
-	$caption .= " (<a href='listreports.php?instancelayer=" . $instancelayer . ($negate ? "" : "&option=not") . "'>toggle</a>)";
+	$caption = "Reports " . ($inverted ? "<b>not</b>" : "") . " supporting instance layer <code>$instancelayer</code>";
+	$caption .= " (<a href='listreports.php?instancelayer=" . $instancelayer . ($inverted ? "" : "&option=not") . "'>toggle</a>)";
 	$pageTitle = $instancelayer;
 }
-// Extension property value
-$extensionproperty = $_GET['extensionproperty'];
-$extensionpropertyvalue = null;
-if ($extensionproperty != '') {
-	if (!isset($_GET['value'])) {
-		die('No value specified!');
-	}
-	DB::connect();
-	$stmnt = DB::$connection->prepare("SELECT extension from deviceproperties2 where name = :name");
-	$stmnt->execute([":name" => $extensionproperty]);
-	$extname = $stmnt->fetchColumn();
-	DB::disconnect();
-	$extensionpropertyvalue = $_GET['value'];
-	$defaultHeader = false;
-	$extensionpropertyvalue = $_GET['value'];
-	$link = "displayextensionproperty.php?name=" . $extensionproperty;
-	$caption = "Reports with <a href=" . $link . ">" . $extensionproperty . "</a> (" . $extname . ") = " . $extensionpropertyvalue;
-}
-// Extension feature
-$extensionfeature = null;
-if (isset($_GET['extensionfeature']) && ($_GET['extensionfeature'] != '')) {
-	$extensionfeature = $_GET['extensionfeature'];
-	DB::connect();
-	$stmnt = DB::$connection->prepare("SELECT extension from devicefeatures2 where name = :name");
-	$stmnt->execute([":name" => $extensionfeature]);
-	$extname = $stmnt->fetchColumn();
-	DB::disconnect();
-	$defaultHeader = false;
-	$caption = "Reports " . ($negate ? "<b>not</b>" : "") . " supporting extension feature <b>" . $extensionfeature . "</b> ($extname)";
-	$caption .= " (<a href='listreports.php?extensionfeature=" . $extensionfeature . ($negate ? "" : "&option=not") . "'>toggle</a>)";
-}
 // Core property
-$coreproperty = $_GET['property'];
+$coreproperty = $filter_list->getFilter('property');
 $corepropertyvalue = null;
-$coreversion = $_GET['core'];
+$coreversion = $filter_list->getFilter('core');
 if (isset($coreproperty) && ($coreproperty != '')) {
 	$defaultHeader = false;
-	$corepropertyvalue = $_GET['value'];
+	$corepropertyvalue = $filter_list->getFilter('value');
 	$displayvalue = getPropertyDisplayValue($coreproperty, $corepropertyvalue);
 	$caption = "Reports with <code>$coreproperty</code> = $displayvalue";
 }
 // Platform (os)
-if ($platform && $platform !== 'all') {
+if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !== 'all') {
+	$platform = $filter_list->getFilter('platform');
 	$caption = "Listing " . ($caption ? lcfirst($caption) : "reports") . " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	$defaultHeader = false;
 }
@@ -211,9 +134,7 @@ if ($defaultHeader) {
 		echo "</h4></div>";
 	}
 
-	if ($showTabs) {
-		PageGenerator::platformNavigation('listreports.php', $platform, true);
-	}
+	PageGenerator::platformNavigation('listreports.php', $platform, true, $filter_list->filters);
 	?>
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 		<form method="get" action="compare.php?compare">
@@ -280,42 +201,18 @@ if ($defaultHeader) {
 				url: "responses/listreports.php",
 				data: {
 					"filter": {
-						'extension': '<?php echo $_GET["extension"] ?>',
-						'feature': '<?php echo $_GET["feature"] ?>',
-						'submitter': '<?php echo $_GET["submitter"] ?>',
-						'linearformat': '<?php echo $_GET["linearformat"] ?>',
-						'optimalformat': '<?php echo $_GET["optimalformat"] ?>',
-						'bufferformat': '<?php echo $_GET["bufferformat"] ?>',
-						'devicelimit': '<?php echo $_GET["limit"] ?>',
-						<?php if (!is_null($limitvalue)) {
-							echo "'devicelimitvalue' : '" . $limitvalue . "' ,";
-						} ?>
-						<?php if ($extensionproperty) {
-							echo "'extensionproperty' : '" . $extensionproperty . "' ,";
-						} ?>
-						<?php if (!is_null($extensionpropertyvalue)) {
-							echo "'extensionpropertyvalue' : '" . $extensionpropertyvalue . "' ,";
-						} ?>
-						<?php if ($extensionfeature) {
-							echo "'extensionfeature' : '" . $extensionfeature . "' ,";
-						} ?> 'option': '<?php echo $_GET["option"] ?>',
-						'surfaceformat': '<?php echo $_GET["surfaceformat"] ?>',
-						'surfacepresentmode': '<?php echo $_GET["surfacepresentmode"] ?>',
-						'devicename': '<?php echo $_GET["devicename"] ?>',
-						'displayname': '<?php echo $_GET["displayname"] ?>',
-						'instanceextension': '<?php echo $_GET["instanceextension"] ?>',
-						'instancelayer': '<?php echo $_GET["instancelayer"] ?>',
-						'platform': '<?php echo $_GET["platform"] ?>',
-						<?php if ($coreproperty) {
-							echo "'coreproperty' : '" . $coreproperty . "' ,";
-						} ?>
-						<?php if (!is_null($corepropertyvalue)) {
-							echo "'corepropertyvalue' : '" . $corepropertyvalue . "' ,";
-						} ?>
-						<?php if ($coreversion) {
-							echo "'core' : '" . $coreversion . "' ,";
-						} ?>
-
+						'submitter': 			'<?= $filter_list->getFilter("submitter") ?>',
+						'devicelimit': 			'<?= $filter_list->getFilter('limit') ?>',
+						'devicelimitvalue' : 	'<?= $filter_list->getFilter('value') ?>',
+						'devicename': 			'<?= $filter_list->getFilter('devicename') ?>',
+						'displayname': 			'<?= $filter_list->getFilter('displayname') ?>',
+						'instanceextension': 	'<?= $filter_list->getFilter('instanceextension') ?>',
+						'instancelayer': 		'<?= $filter_list->getFilter('instancelayer') ?>',
+						'platform':				'<?= $filter_list->getFilter('platform') ?>',
+						'coreproperty': 		'<?= $filter_list->getFilter('property') ?>',
+						'corepropertyvalue': 	'<?= $filter_list->getFilter('value') ?>',
+						'core':					'<?= $filter_list->getFilter('core') ?>',
+						'option': 				'<?= $filter_list->getFilter('option') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {
