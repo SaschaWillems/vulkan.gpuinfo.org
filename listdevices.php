@@ -22,49 +22,33 @@
 
 include 'pagegenerator.php';
 include './includes/functions.php';
+include './includes/filterlist.class.php';
 include 'database/database.class.php';
+
+$filters = [
+	'platform',
+	'extension',
+	'submitter',
+];
+$filter_list = new FilterList($filters);
 
 PageGenerator::header("Devices");
 
 $platform = "all";
-if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
-	// TODO: Check valid platforms
-}
-
 $caption = 'Listing all devices';
 $showTabs = true;
 
-if (isset($_GET['platform'])) {
-	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform) . " devices";
+if ($filter_list->hasFilter('platform')) {
+	$platform = $filter_list->getFilter('platform');
+	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform)." devices";
 }
-if (isset($_GET["extension"])) {
-	$caption .= " supporting " . $_GET["extension"];
+if ($filter_list->hasFilter('extension')) {
+	$caption .= " supporting ".$filter_list->getFilter('extension');
 	$showTabs = false;
 }
-if (isset($_GET["submitter"])) {
-	$caption .= "Devices submitted by " . $_GET["submitter"];
+if ($filter_list->hasFilter('submitter')) {
+	$caption .= "Devices submitted by ".$filter_list->getFilter('submitter');
 	$showTabs = false;
-}
-// Extension property value
-$extensionproperty = null;
-$extensionpropertyvalue = null;
-if ($_GET['extensionproperty']) {
-	$extensionproperty = $_GET['extensionproperty'];
-	if (!isset($_GET['value'])) {
-		die('No value specified!');
-	}
-	DB::connect();
-	$stmnt = DB::$connection->prepare("SELECT extension from deviceproperties2 where name = :name");
-	$stmnt->execute([":name" => $extensionproperty]);
-	$extname = $stmnt->fetchColumn();
-	DB::disconnect();
-	$extensionpropertyvalue = $_GET['value'];
-	$defaultHeader = false;
-	$headerClass = "header-green";
-	$extensionpropertyvalue = $_GET['value'];
-	$link = "displayextensionproperty.php?name=" . $extensionproperty;
-	$caption = "Reports with <a href=" . $link . ">" . $extensionproperty . "</a> (" . $extname . ") = " . $extensionpropertyvalue;
 }
 ?>
 
@@ -138,18 +122,8 @@ if ($_GET['extensionproperty']) {
 				url: "responses/devices.php?platform=<?php echo $platform ?>",
 				data: {
 					"filter": {
-						'extension': '<?php echo $_GET["extension"] ?>',
-						'feature': '<?php echo $_GET["feature"] ?>',
-						'submitter': '<?php echo $_GET["submitter"] ?>',
-						'linearformat': '<?php echo $_GET["linearformat"] ?>',
-						'optimalformat': '<?php echo $_GET["optimalformat"] ?>',
-						'bufferformat': '<?php echo $_GET["bufferformat"] ?>',
-						'devicelimit': '<?php echo $_GET["limit"] ?>',
-						'option': '<?php echo $_GET["option"] ?>',
-						'surfaceformat': '<?php echo $_GET["surfaceformat"] ?>',
-						'surfacepresentmode': '<?php echo $_GET["surfacepresentmode"] ?>',
-						'devicename': '<?php echo $_GET["devicename"] ?>',
-						'displayname': '<?php echo $_GET["displayname"] ?>',
+						'extension': 	'<?= $filter_list->getFilter('extension') ?>',
+						'submitter':	'<?= $filter_list->getFilter('submitter') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {
