@@ -2,7 +2,7 @@
 
 ![Vulkan](./images/vulkanlogo.png)<br><br>
 
-PHP web front-end for the Vulkan hardware capability database located at http://vulkan.gpuinfo.org
+This is the repository for the front- and back-end of the Hardware capability database for Vulkan located at https://vulkan.gpuinfo.org
 
 # Note
 Some security and database related files are obviously not included
