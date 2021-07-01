@@ -58,6 +58,9 @@ class PageGenerator
 
 	public static function platformInfo($platform)
 	{
+		if ($platform == 'all') {
+			return " all platforms";
+		}
 		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	}
 

@@ -181,9 +181,9 @@ if ($filter_list->hasFilter('submitter')) {
 // Platform
 if ($filter_list->hasFilter('platform')) {
 	$platform = $filter_list->getFilter('platform');
-	$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+	$caption .= " on " . PageGenerator::platformInfo($platform);
 	if ($pageTitle) {
-		$pageTitle .= " on " . ucfirst($platform);
+		$pageTitle .= " on " . PageGenerator::platformInfo($platform);
 	}
 }
 
