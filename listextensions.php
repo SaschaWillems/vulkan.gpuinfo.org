@@ -24,7 +24,7 @@ require 'pagegenerator.php';
 require './database/database.class.php';
 require './includes/functions.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
@@ -37,7 +37,7 @@ PageGenerator::header("Extensions");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listextensions.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listextensions.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -59,8 +59,17 @@ PageGenerator::header("Extensions");
 				<?php
 				DB::connect();
 				try {
-					$viewDeviceCount = DB::$connection->prepare("SELECT count(DISTINCT displayname) from reports where ostype = :ostype");
-					$viewDeviceCount->execute(['ostype' => ostype($platform)]);
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+					}
+					
+					$sql = "SELECT count(DISTINCT displayname) from reports";
+					if ($platform !== 'all') {
+						$sql .= " where ostype = :ostype";
+					}
+					$viewDeviceCount = DB::$connection->prepare($sql);
+					$viewDeviceCount->execute($params);
 					$deviceCount = $viewDeviceCount->fetch(PDO::FETCH_COLUMN);
 
 					// Fetch extension features and properties to highlight extensions with a detail page
@@ -71,14 +80,16 @@ PageGenerator::header("Extensions");
 					$stmnt->execute(['ostype' => ostype($platform)]);
 					$extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
 
-					$stmnt = DB::$connection->prepare(
-						"SELECT e.name, count(distinct displayname) as coverage from extensions e 
+					$sql ="SELECT e.name, count(distinct displayname) as coverage from extensions e 
 						join deviceextensions de on de.extensionid = e.id 
-						join reports r on r.id = de.reportid 
-						where ostype = :ostype
-						group by name"
-					);
-					$stmnt->execute(['ostype' => ostype($platform)]);
+						join reports r on r.id = de.reportid";
+					if ($platform !== 'all') {
+						$sql .= " where ostype = :ostype";
+					}
+					$sql .= " group by name";
+
+					$stmnt = DB::$connection->prepare($sql);
+					$stmnt->execute($params);
 					$extensions = $stmnt->fetchAll(PDO::FETCH_ASSOC);
 
 					foreach ($extensions as $extension) {
