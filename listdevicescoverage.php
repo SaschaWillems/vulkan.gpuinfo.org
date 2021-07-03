@@ -45,6 +45,7 @@ $filters = [
 	'bufferformat',
 	'memorytype',
 	'surfaceformat',
+	'surfaceformatcolorspace',
 	'surfacepresentmode',
 	'option'
 ];
@@ -162,6 +163,12 @@ if ($filter_list->hasFilter('surfaceformat')) {
 		:
 		"Listing first known driver version support for surface format <code>$surface_format</code>";
 	$pageTitle = "Surface format $surface_format";
+	// Color space for the surface format
+	if ($filter_list->hasFilter('surfaceformatcolorspace')) {
+		$surface_format_colorspace = $filter_list->getFilter('surfaceformatcolorspace');
+		$caption .= " and color space <code>".getColorSpace($surface_format_colorspace)."</code>";
+		$pageTitle .= " color space ".getColorSpace($surface_format_colorspace);
+	}
 }
 // Surface present mode
 if ($filter_list->hasFilter('surfacepresentmode')) {
@@ -268,6 +275,7 @@ PageGenerator::header($pageTitle);
 						'memorytype': 					'<?= $filter_list->getFilter('memorytype') ?>',
 						'option': 						'<?= $filter_list->getFilter('option') ?>',
 						'surfaceformat': 				'<?= $filter_list->getFilter('surfaceformat') ?>',
+						'surfaceformatcolorspace':		'<?= $filter_list->getFilter('surfaceformatcolorspace') ?>',
 						'surfacepresentmode': 			'<?= $filter_list->getFilter('surfacepresentmode') ?>',
 						'devicename': 					'<?= $filter_list->getFilter('devicename') ?>',
 						'displayname': 					'<?= $filter_list->getFilter('displayname') ?>',

@@ -43,10 +43,12 @@ PageGenerator::header("Surface formats");
 		<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
 			<thead>
 				<tr>
+				<th></th>
 					<th></th>
 					<th colspan=2 style="text-align: center;">Device coverage</th>
 				</tr>
 				<th>Format</th>
+				<th>Colorspace</th>
 				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
 				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
 				</th>
@@ -58,19 +60,21 @@ PageGenerator::header("Surface formats");
 					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
 					$sql = "SELECT
 						VkFormat(dsf.format) as format,
+						dsf.colorSpace,
 						count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
 						from reports r
 						join devicesurfaceformats dsf on dsf.reportid = r.id
 						join deviceproperties dp on dp.reportid = r.id
 						where ostype = :ostype
-						group by format";
+						group by format, colorSpace";
 					$result = DB::$connection->prepare($sql);
 					$result->execute(['ostype' => ostype($platform)]);
 					foreach ($result as $row) {
-						$coverageLink = "listdevicescoverage.php?" . $type . "surfaceformat=" . $row['format'] . "&platform=$platform";
+						$coverageLink = "listdevicescoverage.php?surfaceformat=".$row['format']."&surfaceformatcolorspace=".$row['colorSpace']."&platform=$platform";
 						$coverage = $row['coverage'] / $deviceCount * 100.0;
 						echo "<tr>";
-						echo "<td class='value'>" . $row['format'] . "</td>";
+						echo "<td class='value'>".$row['format']."</td>";
+						echo "<td class='value'>".getColorSpace($row['colorSpace'])."</td>";
 						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
@@ -94,7 +98,7 @@ PageGenerator::header("Surface formats");
 				"dom": 'f',
 				"bInfo": false,
 				"order": [
-					[1, "desc"]
+					[0, "asc"]
 				]
 			});
 

@@ -212,6 +212,7 @@ if ($memorytype != '') {
 }
 // Surface format	
 $surfaceformat = $_REQUEST['filter']['surfaceformat'];
+$surfaceformat_colorspace = $_REQUEST['filter']['surfaceformatcolorspace'];
 if ($surfaceformat != '') {
     $whereClause =
         "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
@@ -219,10 +220,13 @@ if ($surfaceformat != '') {
                 SELECT ifnull(r.displayname, r.devicename)
                 from reports r
                 join devicesurfaceformats dsf on dsf.reportid = r.id	
-                join VkFormat f on dsf.format = f.value 
-                where f.name = :filter_surfaceformat
-            )
-            and r.version >= '1.2'";
+                join VkFormat f on dsf.format = f.value
+                where f.name = :filter_surfaceformat";
+    if ($surfaceformat_colorspace !== null) {
+        $whereClause .= " and dsf.colorspace = :filter_surfacecolorspace";
+        $params['filter_surfacecolorspace'] = $surfaceformat_colorspace;
+    }                           
+    $whereClause .= ") and r.version >= '1.2'";
     $params['filter_surfaceformat'] = $surfaceformat;
 }
 // Surface present mode	
