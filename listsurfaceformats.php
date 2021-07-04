@@ -24,7 +24,7 @@ include 'pagegenerator.php';
 include './database/database.class.php';
 include './includes/functions.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
 	$platform = $_GET['platform'];
 }
@@ -37,7 +37,7 @@ PageGenerator::header("Surface formats");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listsurfaceformats.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listsurfaceformats.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
@@ -56,6 +56,12 @@ PageGenerator::header("Surface formats");
 			<tbody>
 				<?php
 				try {
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'WHERE r.ostype = :ostype';
+					}					
 					DB::connect();
 					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
 					$sql = "SELECT
@@ -65,10 +71,10 @@ PageGenerator::header("Surface formats");
 						from reports r
 						join devicesurfaceformats dsf on dsf.reportid = r.id
 						join deviceproperties dp on dp.reportid = r.id
-						where ostype = :ostype
+						$os_filter
 						group by format, colorSpace";
 					$result = DB::$connection->prepare($sql);
-					$result->execute(['ostype' => ostype($platform)]);
+					$result->execute($params);
 					foreach ($result as $row) {
 						$coverageLink = "listdevicescoverage.php?surfaceformat=".$row['format']."&surfaceformatcolorspace=".$row['colorSpace']."&platform=$platform";
 						$coverage = $row['coverage'] / $deviceCount * 100.0;

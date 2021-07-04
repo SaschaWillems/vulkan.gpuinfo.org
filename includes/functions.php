@@ -506,6 +506,16 @@ function _format_json($json, $html = false)
 
 function getDeviceCount($platform, $andWhere = null)
 {
+	if (strcasecmp($platform, 'all') == 0) {
+		$sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id";
+		if ($andWhere) {
+			if (strpos($andWhere, 'and ') === 0) {
+				$andWhere = str_replace('and ', '', $andWhere);
+			}
+			$sql .= " where $andWhere";
+		}
+		return DB::getCount($sql, null);
+	}
 	return DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype $andWhere", ['ostype' => ostype($platform)]);
 }
 
