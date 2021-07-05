@@ -49,10 +49,7 @@ PageGenerator::header("Extension properties listing");
 </div>
 
 <center>
-	<?php if (!$extension) {
-		PageGenerator::platformNavigation('listpropertiesextensions.php', $platform);
-	}
-	?>
+	<?php PageGenerator::platformNavigation('listpropertiesextensions.php', $platform); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="properties" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
@@ -68,12 +65,22 @@ PageGenerator::header("Extension properties listing");
 				<?php
 				DB::connect();
 				try {
-					$os_type = ostype($platform);
+					$ext_filter = null;
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'AND r.ostype = :ostype';
+					}
+					if ($extension) {
+						$params['extension'] = $extension;
+						$ext_filter = 'AND d2.extension = :extension';
+					}
 					// Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
-					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.ostype = :ostype AND r.version >= '1.4'");
-					$stmnt->execute(['ostype' => $os_type]);
+					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.version >= '1.4' $os_filter");
+					$stmnt->execute($params);
 					$device_count = $stmnt->fetchColumn();
-					$ext_filter = $extension ? 'AND d2.extension = :extension' : null;
+					// Get property coverage
 					$stmnt = DB::$connection->prepare(
 						"SELECT extension, name, type, sum(supporteddevices) as supporteddevices FROM
 							(
@@ -89,7 +96,9 @@ PageGenerator::header("Extension properties listing");
 									JOIN
 								deviceproperties dp ON dp.reportid = r.id
 							WHERE
-								r.ostype = :ostype and value = 'true' $ext_filter
+								value = 'true' 
+								$ext_filter
+								$os_filter
 							GROUP BY extension , name
 							
 							UNION
@@ -106,7 +115,9 @@ PageGenerator::header("Extension properties listing");
 									JOIN
 								deviceproperties dp ON dp.reportid = r.id
 							WHERE
-								r.ostype = :ostype and value = 'false' $ext_filter
+								value = 'false' 
+								$ext_filter
+								$os_filter
 							GROUP BY extension , name
 							
 							
@@ -124,16 +135,14 @@ PageGenerator::header("Extension properties listing");
 									JOIN
 								deviceproperties dp ON dp.reportid = r.id
 							WHERE
-								r.ostype = :ostype and value not in ('true', 'false') $ext_filter
+								value not in ('true', 'false') 
+								$ext_filter
+								$os_filter
 							GROUP BY extension , name
 							) tbl
 							GROUP BY extension, name, type
 							ORDER BY extension ASC , name ASC"
 					);
-					$params = ['ostype' => $os_type];
-					if ($extension) {
-						$params['extension'] = $extension;
-					}
 					$stmnt->execute($params);
 
 					if ($stmnt->rowCount() > 0) {

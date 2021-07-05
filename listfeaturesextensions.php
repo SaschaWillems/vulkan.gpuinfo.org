@@ -25,14 +25,14 @@ include './database/database.class.php';
 require './includes/constants.php';
 include './includes/functions.php';
 
-$platform = "windows";
+$platform = "all";
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 $extension = null;
 if (isset($_GET['extension'])) {
-	$extension = $_GET['extension'];
+	$extension = GET_sanitized('extension');
 }
 
 PageGenerator::header("Extension features listing");
@@ -68,30 +68,40 @@ PageGenerator::header("Extension features listing");
 				<?php
 				DB::connect();
 				try {
-					$os_type = ostype($platform);
-					// Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
-					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.ostype = :ostype AND r.version >= '1.4'");
-					$stmnt->execute(['ostype' => $os_type]);
-					$device_count = $stmnt->fetchColumn();
-					$ext_filter = $extension ? 'AND df2.extension = :extension' : null;
-					$stmnt = DB::$connection->prepare("SELECT 
-								extension,
-								name,
-								COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
-							FROM
-								devicefeatures2 df2
-									JOIN
-								reports r ON df2.reportid = r.id
-									JOIN
-								deviceproperties dp ON dp.reportid = r.id
-							WHERE
-								supported = 1 AND r.ostype = :ostype $ext_filter
-						    GROUP BY extension , name
-							ORDER BY extension ASC , name ASC");
-					$params = ['ostype' => $os_type];
+					$ext_filter = null;
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'AND r.ostype = :ostype';
+					}
 					if ($extension) {
 						$params['extension'] = $extension;
+						$ext_filter = 'AND df2.extension = :extension';
 					}
+					// Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
+					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.version >= '1.4' $os_filter");
+					$stmnt->execute($params);
+					$device_count = $stmnt->fetchColumn();
+					// Get feature coverage
+					$sql = 
+						"SELECT 
+							extension,
+							name,
+							COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
+						FROM
+							devicefeatures2 df2
+								JOIN
+							reports r ON df2.reportid = r.id
+								JOIN
+							deviceproperties dp ON dp.reportid = r.id
+						WHERE
+							supported = 1
+							$ext_filter
+							$os_filter
+						GROUP BY extension , name 
+						ORDER BY extension ASC , name ASC";
+					$stmnt = DB::$connection->prepare($sql);
 					$stmnt->execute($params);
 
 					if ($stmnt->rowCount() > 0) {
