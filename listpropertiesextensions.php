@@ -152,11 +152,11 @@ PageGenerator::header("Extension properties listing");
 							echo "<td class='subkey'>" . $property['name'] . "</td>";
 							echo "<td class='text-center'>" . ucfirst($property['type']) . "</td>";
 							if ($property['type'] == 'coverage') {
-								$coverageLink = "listdevicescoverage.php?extensionname=" . $property['extension'] . "&extensionproperty=" . $property['name'] . "&platform=$platform";
+								$coverageLink = "listdevicescoverage.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform";
 								$coverage = round($property['supporteddevices'] / $device_count * 100, 1);
 								echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 							} else {
-								$link = "<a href='displayextensionproperty.php?name=" . $property['name'] . "&platform=$platform'>";
+								$link = "<a href='displayextensionproperty.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform'>";
 								echo "<td class='text-center'>" . $link . "Listing</a></td>";
 							}
 							echo "</tr>";

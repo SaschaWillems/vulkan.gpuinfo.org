@@ -27,29 +27,33 @@
 require './pagegenerator.php';
 require './database/database.class.php';
 require './includes/functions.php';
+include './includes/filterlist.class.php';
 
-$name = null;
-if (isset($_GET['name'])) {
-	$name = $_GET['name'];
+$filters = ['platform', 'extensionname', 'extensionproperty'];
+$filter_list = new FilterList($filters);
+if ((!$filter_list->hasFilter('extensionname')) || (!$filter_list->hasFilter('extensionproperty'))) {
+	PageGenerator::errorMessage("This is not the <strike>droid</strike> extension property you are looking for!</strong><br><br>You did not specify all required parameters.");
 }
 
+$ext_name = $filter_list->getFilter('extensionname');
+$property_name = $filter_list->getFilter('extensionproperty');
+
 DB::connect();
-$result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name");
-$result->execute([":name" => $name]);
+$result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name and extension = :extension");
+$result->execute([":name" => $property_name, ":extension" => $ext_name]);
 $row = $result->fetch(PDO::FETCH_ASSOC);
-$extname = $row["extension"];
 if ($result->rowCount() == 0) {
 	PageGenerator::errorMessage("This is not the <strike>droid</strike> extension property you are looking for!</strong><br><br>You may have passed a wrong extension property name.");
 }
 DB::disconnect();
 
-$caption = "Value distribution for <code>$name</code> property of <code>$extname</code>";
+$caption = "Value distribution for <code>$property_name</code> property of <code>$ext_name</code>";
 
-$sql = 'SELECT value, count(distinct(r.displayname)) as `count` from deviceproperties2 dp2 join reports r on dp2.reportid = r.id where name = :name';
+$sql = 'SELECT value, count(distinct(r.displayname)) as `count` from deviceproperties2 dp2 join reports r on dp2.reportid = r.id where name = :name and extension = :extension';
 
 $platform = null;
-if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+if ($filter_list->hasFilter('platform')) {
+	$platform = $filter_list->getFilter('platform');
 	$ostype = ostype($platform);
 	if ($ostype !== null) {
 		$sql .= " and r.ostype = $ostype";
@@ -59,7 +63,7 @@ if (isset($_GET['platform'])) {
 
 $sql .= ' group by value';
 
-PageGenerator::header($name);
+PageGenerator::header($property_name);
 ?>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
@@ -97,7 +101,7 @@ PageGenerator::header($name);
 					<?php
 					DB::connect();
 					$result = DB::$connection->prepare("$sql order by 1");
-					$result->execute([":name" => $name]);
+					$result->execute([":name" => $property_name, ":extension" => $ext_name]);
 					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 					foreach ($rows as $row) {
 						$value = $row['value'];
@@ -106,7 +110,7 @@ PageGenerator::header($name);
 							$value = unserialize($value);
 							$value = '[' . implode(',', $value) . ']';
 						}
-						$link = "listdevicescoverage.php?extensionname=$extname&extensionproperty=$name&extensionpropertyvalue=$value";
+						$link = "listdevicescoverage.php?extensionname=$ext_name&extensionproperty=$property_name&extensionpropertyvalue=$value";
 						if ($platform) {
 							$link .= "&platform=$platform";
 						}
@@ -137,7 +141,7 @@ PageGenerator::header($name);
 			<?php
 			DB::connect();
 			$result = DB::$connection->prepare("$sql order by 2 desc");
-			$result->execute([":name" => $name]);
+			$result->execute([":name" => $property_name, ":extension" => $ext_name]);
 			$rows = $result->fetchAll(PDO::FETCH_ASSOC);
 			foreach ($rows as $row) {
 				$value = $row['value'];
