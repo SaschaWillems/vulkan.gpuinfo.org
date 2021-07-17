@@ -26,7 +26,7 @@ include './includes/functions.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Surface formats");
