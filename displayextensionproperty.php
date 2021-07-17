@@ -57,9 +57,9 @@ if ($filter_list->hasFilter('platform')) {
 	$ostype = ostype($platform);
 	if ($ostype !== null) {
 		$sql .= " and r.ostype = $ostype";
-		$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	}
 }
+$caption .= " for ".PageGenerator::platformInfo($platform);
 
 $sql .= ' group by value';
 
