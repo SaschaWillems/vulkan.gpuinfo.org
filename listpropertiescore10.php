@@ -41,7 +41,7 @@ PageGenerator::header("Core 1.0 properties");
 	<?php PageGenerator::platformNavigation('listpropertiescore10.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-seelction">
+		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				</tr>
 				<th>Property</th>
@@ -70,6 +70,14 @@ PageGenerator::header("Core 1.0 properties");
 				DB::connect();
 				try {
 					$deviceCount = getDeviceCount($platform);
+					
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'WHERE r.ostype = :ostype';
+					}
+			
 
 					// Collect coverage numbers
 					$sqlColumns = '';
@@ -81,9 +89,9 @@ PageGenerator::header("Core 1.0 properties");
 					$stmnt = DB::$connection->prepare(
 						"SELECT ifnull(r.displayname, dp.devicename) as device, "
 							. substr($sqlColumns, 0, -1) .
-							" FROM deviceproperties dp join reports r on r.id = dp.reportid where r.ostype = :ostype group by device"
+							" FROM deviceproperties dp join reports r on r.id = dp.reportid $os_filter group by device"
 					);
-					$stmnt->execute(['ostype' => ostype($platform)]);
+					$stmnt->execute($params);
 					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
 						foreach ($row as $key => $value) {
 							if (strcasecmp($key, 'device') != 0) {

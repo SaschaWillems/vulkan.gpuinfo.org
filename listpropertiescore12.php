@@ -44,7 +44,7 @@ PageGenerator::header("Core 1.2 properties");
 	<?php PageGenerator::platformNavigation('listpropertiescore12.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-seelction">
+		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				</tr>
 				<th>Property</th>
@@ -92,8 +92,8 @@ PageGenerator::header("Core 1.2 properties");
 						$os_filter = 'WHERE r.ostype = :ostype';
 					}					
 
-					$count = DB::getCount("SELECT count(*) from reports r join deviceproperties12 dp on dp.reportid = id $os_filter", $params);
-					if ($count > 0) {
+					$deviceCount = DB::getCount("SELECT count(distinct(displayname)) from reports r join deviceproperties12 dp on dp.reportid = id $os_filter", $params);
+					if ($deviceCount > 0) {
 						// Collect coverage numbers
 						$columns = [];
 						foreach ($coverage_columns as $column) {
@@ -112,8 +112,6 @@ PageGenerator::header("Core 1.2 properties");
 								}
 							}
 						}
-
-						$deviceCount = DB::getCount("SELECT count(distinct(displayname)) from reports r join deviceproperties12 dp on dp.reportid = id $os_filter", $params);
 
 						// Collect properties from column names
 						$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'deviceproperties12' and COLUMN_NAME not in ('reportid')";

@@ -55,7 +55,7 @@ PageGenerator::header("Extension properties listing");
 	<?php PageGenerator::platformNavigation('listpropertiesextensions.php', $platform, true, $filter_list->filters); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-seelction">
+		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
 					<th></th>
