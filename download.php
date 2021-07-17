@@ -36,30 +36,50 @@ PageGenerator::header('Download');
 			The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">the repository</a>.<br>
 		</div>
 		<div class="page-header">
-			<h3>Current stable release 3.01</h3>
+			<h3>Current stable release 3.02</h3>
 			<ul>		
 				<li>Windows
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.01_win64.zip">Windows 64-bit (zip)</a></li>
-						<li><a href="downloads/vulkancapsviewer_3.01_x86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some Vulkan implementations may not expose all hardware capabilities when run under 32 bits.</li>
+						<li><a href="downloads/vulkancapsviewer_3.02_win64.zip">Windows 64-bit (zip)</a></li>
+						<li><a href="downloads/vulkancapsviewer_3.02_winx86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some Vulkan implementations may not expose all hardware capabilities when run under 32 bits.</li>
 					</ul>
 				</li>
 				<li>Linux
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.01_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
-						<li><a href="downloads/vulkancapsviewer_3.01_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_3.02_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
+						<li><a href="downloads/vulkancapsviewer_3.02_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
 					</ul>
 				</li>
 				<li>Android
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.01_arm.apk">Android arm-v8 (apk)</a></li>
+						<li><a href="downloads/vulkancapsviewer_3.02_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
-				<li><a href="downloads/vulkancapsviewer_3.01_osx.dmg">Mac OSX (dmg)</a></li>
+				<li><a href="downloads/vulkancapsviewer_3.02_osx.dmg">Mac OSX (dmg)</a></li>
 				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store, provided by <a href="https://www.lunarg.com/">LunarG</a>)</a></li>
 			</ul>
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.02 - 2021-08-07</h4>
+			<ul>
+				<li>Fixed queue family present support info on Linux</li>
+				<li>Added filtering on nested values</li>
+				<li>Report upload no longer requires file-access</li>
+				<li>Added 32 bit Windows build</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_physical_device_drm</li>
+						<li>VK_EXT_multi_draw</li>
+						<li>VK_EXT_global_priority_query</li>
+						<li>VK_KHR_shader_subgroup_uniform_control_flow</li>
+						<li>VK_HUAWEI_subpass_shading</li>
+						<li>VK_NV_ray_tracing_motion_blur</li>
+						<li>VK_NV_external_memory_rdma</li>
+						<li>VK_EXT_provoking_vertex</li>
+						<li>VK_EXT_extended_dynamic_state2</li>
+					</ul>					
+				</li>
+			</ul>			
 			<h4>3.01 - 2021-04-24</h4>
 			<ul>
 				<li>Added VK_KHR_video_queue encode and decode flags to queue family display</li>
