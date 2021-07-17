@@ -33,7 +33,7 @@ PageGenerator::header("Surface formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Surface format support on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php echo "<h4>Surface format support for ".PageGenerator::platformInfo($platform) ?>
 </div>
 
 <center>
