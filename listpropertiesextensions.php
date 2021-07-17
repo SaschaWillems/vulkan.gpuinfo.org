@@ -24,15 +24,18 @@ require 'pagegenerator.php';
 require './database/database.class.php';
 require './includes/constants.php';
 require './includes/functions.php';
+include './includes/filterlist.class.php';
 
-$platform = "windows";
-if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+$filters = ['platform', 'extension'];
+$filter_list = new FilterList($filters);
+
+if (!$filter_list->hasFilter('extension')) {
+	PageGenerator::errorMessage("This is not the <strike>droid</strike> extension you are looking for!</strong><br><br>You did not specify all required parameters.");
 }
-
-$extension = null;
-if (isset($_GET['extension'])) {
-	$extension = $_GET['extension'];
+$extension = $filter_list->getFilter('extension');
+$platform = 'all';
+if ($filter_list->hasFilter('platform')) {
+	$platform = $filter_list->getFilter('platform');
 }
 
 PageGenerator::header("Extension properties listing");
@@ -43,16 +46,16 @@ PageGenerator::header("Extension properties listing");
 	if ($extension) {
 		echo "<h4>Available extension properties for <code>$extension</code> on " . PageGenerator::platformInfo($platform);
 	} else {
-		echo "<h4>Extension device properties on " . PageGenerator::platformInfo($platform);
+		echo "<h4>Extension device properties for " . PageGenerator::platformInfo($platform);
 	}
 	?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listpropertiesextensions.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listpropertiesextensions.php', $platform, true, $filter_list->filters); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="properties" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-seelction">
 			<thead>
 				<tr>
 					<th></th>
@@ -72,15 +75,15 @@ PageGenerator::header("Extension properties listing");
 						$params['ostype'] = ostype($platform);
 						$os_filter = 'AND r.ostype = :ostype';
 					}
-					if ($extension) {
-						$params['extension'] = $extension;
-						$ext_filter = 'AND d2.extension = :extension';
-					}
 					// Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
 					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.version >= '1.4' $os_filter");
 					$stmnt->execute($params);
 					$device_count = $stmnt->fetchColumn();
 					// Get property coverage
+					if ($extension) {
+						$params['extension'] = $extension;
+						$ext_filter = 'AND d2.extension = :extension';
+					}
 					$stmnt = DB::$connection->prepare(
 						"SELECT extension, name, type, sum(supporteddevices) as supporteddevices FROM
 							(
