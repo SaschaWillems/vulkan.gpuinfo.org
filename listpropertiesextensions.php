@@ -29,9 +29,6 @@ include './includes/filterlist.class.php';
 $filters = ['platform', 'extension'];
 $filter_list = new FilterList($filters);
 
-if (!$filter_list->hasFilter('extension')) {
-	PageGenerator::errorMessage("This is not the <strike>droid</strike> extension you are looking for!</strong><br><br>You did not specify all required parameters.");
-}
 $extension = $filter_list->getFilter('extension');
 $platform = 'all';
 if ($filter_list->hasFilter('platform')) {
