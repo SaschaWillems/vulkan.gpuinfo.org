@@ -25,9 +25,9 @@ require './database/database.class.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Core 1.0 properties");
@@ -38,10 +38,10 @@ PageGenerator::header("Core 1.0 properties");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listpropertiescore10.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listpropertiescore10.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-seelction">
 			<thead>
 				</tr>
 				<th>Property</th>
@@ -69,9 +69,7 @@ PageGenerator::header("Core 1.0 properties");
 				];
 				DB::connect();
 				try {
-					$viewDeviceCount = DB::$connection->prepare("SELECT * from viewDeviceCount");
-					$viewDeviceCount->execute();
-					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);
+					$deviceCount = getDeviceCount($platform);
 
 					// Collect coverage numbers
 					$sqlColumns = '';
@@ -111,7 +109,7 @@ PageGenerator::header("Core 1.0 properties");
 						echo "<td class='text-center'>" . ($has_coverage ? 'Coverage' : 'Values') . "</td>";
 						if ($has_coverage) {
 							$coverageLink = "listdevicescoverage.php?coreproperty=" . $row[0] . "&platform=$platform";
-							$coverage = ($deviceCounts[$platform] > 0) ? round($supportedCounts[$row[0]] / $deviceCounts[$platform] * 100, 1) : 0;
+							$coverage = ($deviceCount > 0) ? round($supportedCounts[$row[0]] / $deviceCount * 100, 1) : 0;
 							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {
 							echo "<td class='text-center'>" . $link . "Listing</a></td>";
