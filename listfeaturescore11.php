@@ -25,26 +25,26 @@ require './database/database.class.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Core 1.1 features");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.1 feature coverage for".PageGenerator::platformInfo($platform) ?>
+	<?php echo "<h4>Core 1.1 feature coverage on ".PageGenerator::platformInfo($platform) ?>
 </div>
 <div class="alert alert-info" role="alert" style="text-align: center">
 	<b>Note:</b> Data is based on reports submitted or updated with version 3.0 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listfeaturescore11.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listfeaturescore11.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
 					<th></th>
@@ -59,41 +59,48 @@ PageGenerator::header("Core 1.1 features");
 				<?php
 				DB::connect();
 				try {
-					$deviceCount = DB::getCount("SELECT count(distinct(displayname)) from reports join devicefeatures11 dp on dp.reportid = id where ostype = :platform", ['platform' => ostype($platform)]);
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'WHERE r.ostype = :ostype';
+					}					
+					$deviceCount = DB::getCount("SELECT count(distinct(displayname)) from reports r join devicefeatures11 dp on dp.reportid = id $os_filter", $params);
+					if ($deviceCount > 0) {
+						// Collect feature column names
+						$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures11' and COLUMN_NAME not in ('reportid')";
+						$stmnt = DB::$connection->prepare($sql);
+						$stmnt->execute();
 
-					// Collect feature column names
-					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures11' and COLUMN_NAME not in ('reportid')";
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute();
+						$features = [];
+						$columns = [];
+						while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
+							$features[] = $row[0];
+							$columns[] = "max(" . $row[0] . ") as $row[0]";
+						}
 
-					$features = [];
-					$columns = [];
-					while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-						$features[] = $row[0];
-						$columns[] = "max(" . $row[0] . ") as $row[0]";
-					}
-
-					$supportedCounts = [];
-					$stmnt = DB::$connection->prepare(
-						"SELECT r.displayname as device, " . implode(',', $columns) . " FROM devicefeatures11 df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = " . ostype($platform) . " group by device"
-					);
-					$stmnt->execute();
-					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-						foreach ($row as $key => $value) {
-							if (strcasecmp($key, 'device') != 0) {
-								$supportedCounts[$key] += $value;
+						$supportedCounts = [];
+						$stmnt = DB::$connection->prepare(
+							"SELECT r.displayname as device, " . implode(',', $columns) . " FROM devicefeatures11 df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid $os_filter group by device"
+						);
+						$stmnt->execute($params);
+						while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+							foreach ($row as $key => $value) {
+								if (strcasecmp($key, 'device') != 0) {
+									$supportedCounts[$key] += $value;
+								}
 							}
 						}
-					}
 
-					foreach ($features as $feature) {
-						$coverageLink = "listdevicescoverage.php?core=1.1&feature=" . $feature . "&platform=$platform";
-						$coverage = $deviceCount > 0 ? round($supportedCounts[$feature] / $deviceCount * 100, 1) : 0;
-						echo "<tr>";
-						echo "<td>" . $feature . "</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "</tr>";
+						foreach ($features as $feature) {
+							$coverageLink = "listdevicescoverage.php?core=1.1&feature=" . $feature . "&platform=$platform";
+							$coverage = $deviceCount > 0 ? round($supportedCounts[$feature] / $deviceCount * 100, 1) : 0;
+							echo "<tr>";
+							echo "<td>" . $feature . "</td>";
+							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "</tr>";
+						}
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";

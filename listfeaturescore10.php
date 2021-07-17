@@ -25,9 +25,9 @@ include './database/database.class.php';
 include './includes/constants.php';
 include './includes/functions.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Features");
@@ -38,10 +38,10 @@ PageGenerator::header("Features");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listfeaturescore10.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listfeaturescore10.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="features" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
 					<th></th>
@@ -56,9 +56,14 @@ PageGenerator::header("Features");
 				<?php
 				DB::connect();
 				try {
-					$viewDeviceCount = DB::$connection->prepare("SELECT * from viewDeviceCount");
-					$viewDeviceCount->execute();
-					$deviceCounts = $viewDeviceCount->fetch(PDO::FETCH_ASSOC);
+					$deviceCount = getDeviceCount($platform);
+
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'WHERE r.ostype = :ostype';
+					}
 
 					// Collect feature column names
 					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures' and COLUMN_NAME not in ('reportid')";
@@ -76,9 +81,9 @@ PageGenerator::header("Features");
 					$stmnt = DB::$connection->prepare(
 						"SELECT ifnull(r.displayname, dp.devicename) as device, "
 							. substr($sqlColumns, 0, -1) .
-							" FROM devicefeatures df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid where r.ostype = " . ostype($platform) . " group by device"
+							" FROM devicefeatures df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid $os_filter group by device"
 					);
-					$stmnt->execute();
+					$stmnt->execute($params);
 					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
 						foreach ($row as $key => $value) {
 							if (strcasecmp($key, 'device') != 0) {
@@ -89,7 +94,7 @@ PageGenerator::header("Features");
 
 					foreach ($features as $feature) {
 						$coverageLink = "listdevicescoverage.php?feature=" . $feature . "&platform=$platform";
-						$coverage = ($deviceCounts[$platform] > 0) ? round($supportedCounts[$feature] / $deviceCounts[$platform] * 100, 1) : 0;
+						$coverage = ($deviceCount> 0) ? round($supportedCounts[$feature] / $deviceCount * 100, 1) : 0;
 						echo "<tr>";
 						echo "<td>" . $feature . "</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
