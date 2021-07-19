@@ -23,23 +23,23 @@ include 'pagegenerator.php';
 include './database/database.class.php';
 include './includes/functions.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Memory");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Memory types for <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php echo "<h4>Memory types for " . PageGenerator::platformInfo($platform)?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listmemory.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listmemory.php', $platform, true); ?>
 
 	<div class="tablediv" style="width:auto; display: inline-block;">
-		<table id="limits" class="table table-striped table-bordered table-hover responsive" style="width:auto;">
+		<table id="limits" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
 					<th>Memory type</th>
@@ -50,6 +50,12 @@ PageGenerator::header("Memory");
 			<tbody>
 				<?php
 				try {
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'WHERE r.ostype = :ostype';
+					}					
 					DB::connect();
 					$deviceCount = getDeviceCount($platform);
 					$sql = "SELECT
@@ -57,10 +63,10 @@ PageGenerator::header("Memory");
 						from devicememorytypes dmt
 						join reports r on r.id = dmt.reportid
 						join deviceproperties dp on dp.reportid = r.id
-						where ostype = :ostype
+						$os_filter
 						group by memtype desc";
 					$result = DB::$connection->prepare($sql);
-					$result->execute(['ostype' => ostype($platform)]);
+					$result->execute($params);
 
 					foreach ($result as $row) {
 						$coverageLink = "listdevicescoverage.php?" . "memorytype=" . $row['memtype'] . "&platform=$platform";
