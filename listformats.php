@@ -24,23 +24,23 @@ include 'pagegenerator.php';
 include './database/database.class.php';
 include './includes/functions.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Image and buffer format support on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php echo "<h4>Image and buffer format support on ".PageGenerator::platformInfo($platform); ?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listformats.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listformats.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="formats" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<table id="formats" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
 					<th></th>
@@ -65,6 +65,12 @@ PageGenerator::header("Formats");
 				<?php
 				$formats = [];
 				try {
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'WHERE r.ostype = :ostype';
+					}
 					DB::connect();
 					$deviceCount = getDeviceCount($platform);
 					// Fetch formats into array as a base for creating the table
@@ -76,10 +82,10 @@ PageGenerator::header("Formats");
 							join deviceformats df on df.reportid = r.id and df.$target > 0
 							join VkFormat vkf on vkf.value = df.formatid
 							join deviceproperties dp on dp.reportid = r.id
-							where r.ostype = :ostype
+							$os_filter
 							group by name";
 						$stmnt = DB::$connection->prepare($sql);
-						$stmnt->execute(['ostype' => ostype($platform)]);
+						$stmnt->execute($params);
 						$result = $stmnt->fetchAll(PDO::FETCH_NUM);
 						foreach ($result as $row) {
 							$formats[$row[0]][$target] = $row[1];
