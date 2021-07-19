@@ -24,23 +24,23 @@ include 'pagegenerator.php';
 include './database/database.class.php';
 include './includes/functions.php';
 
-$platform = "windows";
+$platform = 'all';
 if (isset($_GET['platform'])) {
-	$platform = $_GET['platform'];
+	$platform = GET_sanitized('platform');
 }
 
 PageGenerator::header("Surface present modes");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Surface present mode support on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform); ?>
+	<?php echo "<h4>Surface present mode support on ".PageGenerator::platformInfo($platform); ?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listsurfacepresentmodes.php', $platform); ?>
+	<?php PageGenerator::platformNavigation('listsurfacepresentmodes.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
+		<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
 			<thead>
 				<tr>
 					<th></th>
@@ -54,6 +54,12 @@ PageGenerator::header("Surface present modes");
 			<tbody>
 				<?php
 				try {
+					$os_filter = null;
+					$params = [];
+					if ($platform !== 'all') {
+						$params['ostype'] = ostype($platform);
+						$os_filter = 'WHERE r.ostype = :ostype';
+					}					
 					DB::connect();
 					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
 					$sql = "SELECT
@@ -63,10 +69,10 @@ PageGenerator::header("Surface present modes");
 						join reports r on r.id = dsm.reportid
 						join VkPresentMode vkpm on vkpm.value = dsm.presentmode
 						join deviceproperties dp on dp.reportid = r.id						
-						where ostype = :ostype
+						$os_filter
 						group by mode";
 					$result = DB::$connection->prepare($sql);
-					$result->execute(['ostype' => ostype($platform)]);
+					$result->execute($params);
 					foreach ($result as $row) {
 						$coverageLink = "listdevicescoverage.php?" . $type . "surfacepresentmode=" . $row['mode'] . "&platform=$platform";
 						$coverage = $row['coverage'] / $deviceCount * 100.0;

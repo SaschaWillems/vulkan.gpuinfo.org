@@ -33,14 +33,14 @@ PageGenerator::header("Surface formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Surface format support for ".PageGenerator::platformInfo($platform) ?>
+	<?php echo "<h4>Surface format support on ".PageGenerator::platformInfo($platform); ?>
 </div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listsurfaceformats.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive" style='width:auto;'>
+		<table id="surfaceformats" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
 			<thead>
 				<tr>
 				<th></th>
@@ -61,7 +61,7 @@ PageGenerator::header("Surface formats");
 					if ($platform !== 'all') {
 						$params['ostype'] = ostype($platform);
 						$os_filter = 'WHERE r.ostype = :ostype';
-					}					
+					}				
 					DB::connect();
 					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
 					$sql = "SELECT
