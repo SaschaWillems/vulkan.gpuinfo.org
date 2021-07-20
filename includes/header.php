@@ -115,7 +115,15 @@
 					</li>
 
 					<li><a href="listextensions.php">Extensions</a></li>
-					<li><a href="listformats.php">Formats</a></li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Formats
+							<span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="listlineartilingformats.php">Linear tiling</a></li>
+							<li><a href="listoptimaltilingformats.php">Optimal tiling</a></li>
+							<li><a href="listbufferformats.php">Buffer</a></li>
+						</ul>
+					</li>
 					<li><a href="listmemory.php">Memory</a></li>
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Surface
