@@ -22,7 +22,6 @@
 
 class PageGenerator
 {
-	// @todo: Add ios once app supports it
 	private static $platform_list = ['windows', 'linux', 'android', 'macos', 'ios'];
 
 	public static function header($title = null)

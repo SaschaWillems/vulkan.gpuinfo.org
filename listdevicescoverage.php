@@ -22,6 +22,7 @@
 
 include 'pagegenerator.php';
 include './includes/functions.php';
+include './includes/constants.php';
 include './includes/filterlist.class.php';
 include './database/database.class.php';
 
@@ -42,12 +43,16 @@ $filters = [
 	'coreproperty',
 	'linearformat',
 	'optimalformat',
-	'bufferformat',
+	// 'bufferformat',
 	'memorytype',
 	'surfaceformat',
 	'surfaceformatcolorspace',
 	'surfacepresentmode',
-	'option'
+	'option',
+	'lineartilingformat',
+	'optimaltilingformat',
+	'bufferformat',
+	'featureflagbit'
 ];
 $filter_list = new FilterList($filters);
 
@@ -120,30 +125,21 @@ if ($filter_list->hasFilter('coreproperty')) {
 	$caption = $inverted ?  "Listing devices <span style='color:red;'>not</span> supporting $info" : "Listing first known driver version support for $info";
 	$pageTitle = $property;
 }
-// Image and buffer format suppt
-if ($filter_list->hasFilter('linearformat')) {
-	$linear_format = $filter_list->getFilter('linearformat');
-	$caption = $inverted ?
-		"Listing devices <span style='color:red;'>not</span> supporting <code>$linear_format</code> for <b>linear tiling</b>"
-		:
-		"Listing first known driver version support for <code>$linear_format</code> for <b>linear tiling</b>";
-	$pageTitle = "Linear format $linear_format";
+// Image and buffer format flag support
+if ($filter_list->hasFilter('lineartilingformat')) {
+	$format_feature_flag_bit = $filter_list->getFilter('featureflagbit');
+	$format_name = $filter_list->getFilter('lineartilingformat');
+	$caption = "Listing first known driver version for <code>$format_feature_flag_bit</code> support on linear tiling format <code>$format_name</code>";
 }
-if ($filter_list->hasFilter('optimalformat')) {
-	$optimal_format = $filter_list->getFilter('optimalformat');
-	$caption = $inverted ?
-		"Listing devices <span style='color:red;'>not</span> supporting <code>$optimal_format</code> for <b>optimal tiling</b>"
-		:
-		"Listing first known driver version support for <code>$optimal_format</code> for <b>optimal tiling</b>";
-	$pageTitle = "Optimal format $optimal_format";
+if ($filter_list->hasFilter('optimaltilingformat')) {
+	$format_feature_flag_bit = $filter_list->getFilter('featureflagbit');
+	$format_name = $filter_list->getFilter('optimaltilingformat');
+	$caption = "Listing first known driver version for <code>$format_feature_flag_bit</code> support on optimal tiling format <code>$format_name</code>";
 }
 if ($filter_list->hasFilter('bufferformat')) {
-	$buffer_format = $filter_list->getFilter('bufferformat');
-	$caption = $inverted ?
-		"Listing devices <span style='color:red;'>not</span> supporting <code>$buffer_format</code> for <b>buffer usage</b>"
-		:
-		"Listing first known driver version support for <code>$buffer_format</code> for <b>buffer usage</b>";
-	$pageTitle = "Buffer format $buffer_format";
+	$format_feature_flag_bit = $filter_list->getFilter('featureflagbit');
+	$format_name = $filter_list->getFilter('bufferformat');
+	$caption = "Listing first known driver version for <code>$format_feature_flag_bit</code> support on buffer format <code>$format_name</code>";
 }
 // Memory type
 if ($filter_list->hasFilter('memorytype')) {
@@ -285,7 +281,11 @@ PageGenerator::header($pageTitle);
 						'extensionproperty_property': 	'<?= $filter_list->getFilter('extensionproperty') ?>',
 						'extensionproperty_value': 		'<?= $filter_list->getFilter('extensionpropertyvalue') ?>',
 						'coreproperty': 				'<?= $filter_list->getFilter('coreproperty') ?>',
-						'core': 						'<?= $filter_list->getFilter('core') ?>'
+						'core': 						'<?= $filter_list->getFilter('core') ?>',
+						'lineartilingformat':			'<?= $filter_list->getFilter('lineartilingformat') ?>',
+						'optimaltilingformat':			'<?= $filter_list->getFilter('optimaltilingformat') ?>',
+						'bufferformat':					'<?= $filter_list->getFilter('bufferformat') ?>',
+						'featureflagbit':				'<?= $filter_list->getFilter('featureflagbit') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {

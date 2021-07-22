@@ -20,6 +20,8 @@
  *
  */
 
+//@todo: Show hint that this view has been deprecated and link to the new explicit views
+
 include 'pagegenerator.php';
 include './database/database.class.php';
 include './includes/functions.php';
@@ -37,104 +39,16 @@ PageGenerator::header("Formats");
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listformats.php', $platform, true); ?>
-
-	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="formats" class="table table-striped table-bordered table-hover responsive with-platform-selection">
-			<thead>
-				<tr>
-					<th></th>
-					<th colspan=7 style="text-align: center;">Device coverage</th>
-				</tr>
-				<tr>
-					<th></th>
-					<th colspan=2 style="text-align: center;">Linear</th>
-					<th colspan=2 style="text-align: center;">Optimal</th>
-					<th colspan=2 style="text-align: center;">Buffer</th>
-				</tr>
-				<th>Format</th>
-				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				$formats = [];
-				try {
-					$os_filter = null;
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-						$os_filter = 'WHERE r.ostype = :ostype';
-					}
-					DB::connect();
-					$deviceCount = getDeviceCount($platform);
-					// Fetch formats into array as a base for creating the table
-					foreach (['lineartilingfeatures', 'optimaltilingfeatures', 'bufferfeatures'] as $target) {
-						$sql = "SELECT 
-							vkf.name as name, 
-							count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
-							from reports r
-							join deviceformats df on df.reportid = r.id and df.$target > 0
-							join VkFormat vkf on vkf.value = df.formatid
-							join deviceproperties dp on dp.reportid = r.id
-							$os_filter
-							group by name";
-						$stmnt = DB::$connection->prepare($sql);
-						$stmnt->execute($params);
-						$result = $stmnt->fetchAll(PDO::FETCH_NUM);
-						foreach ($result as $row) {
-							$formats[$row[0]][$target] = $row[1];
-						}
-					}
-				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data!</b><br>";
-				}
-				DB::disconnect();
-
-				// Build table
-				foreach ($formats as $key => $format) {
-					echo "<tr>";
-					echo "<td class='value'>" . $key . "</td>";
-					$names = ['linearformat', 'optimalformat', 'bufferformat'];
-					foreach (['lineartilingfeatures', 'optimaltilingfeatures', 'bufferfeatures'] as $index => $target) {
-						$coverageLink = "listdevicescoverage.php?$names[$index]=$key&platform=$platform";
-						$coverage = $format[$target] / $deviceCount * 100.0;
-						echo "<td class='value' align=center><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='value' align=center><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-					}
-					echo "</tr>";
-				}
-				?>
-			</tbody>
-		</table>
-	</div>
-
-	<script>
-		$(document).ready(function() {
-			var table = $('#formats').DataTable({
-				"pageLength": -1,
-				"paging": false,
-				"stateSave": false,
-				"searchHighlight": true,
-				"dom": 'f',
-				"bInfo": false,
-				"order": [
-					[0, "asc"]
-				]
-			});
-
-			$("#searchbox").on("keyup search input paste cut", function() {
-				table.search(this.value).draw();
-			});
-
-		});
-	</script>
-
+	<div class="div-h-center">
+		<div class="div-alert alert alert-danger error">
+			This listing has been deprecated in favour of dedicated listings for different format types:
+			<ul style="list-style-type:none;">
+				<li><a href="listlineartilingformats.php">Linear image tiling format support</a></li>
+				<li><a href="listoptimaltilingformats.php">Optimal image tiling format support</a></li>
+				<li><a href="listbufferformats.php">Buffer format support</a></li>
+			</ul>
+		</div>
+	</div>	
 	<?php PageGenerator::footer(); ?>
 </center>
 </body>

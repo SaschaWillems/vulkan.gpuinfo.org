@@ -22,6 +22,7 @@
 
 include '../database/database.class.php';
 include '../includes/functions.php';
+include '../includes/constants.php';
 
 DB::connect();
 
@@ -76,6 +77,7 @@ for ($i = 0; $i < count($_REQUEST['columns']); $i++) {
         $params['filter_' . $i] = '%' . $column['search']['value'] . '%';
     }
 }
+$searchClause = null;
 if (sizeof($filters) > 0) {
     $searchClause = 'having ' . implode(' and ', $filters);
 }
@@ -166,35 +168,45 @@ if (isset($_REQUEST['filter']['submitter'])) {
         $params['filter_submitter'] = $submitter;
     }
 }
-// Format support
-$linearformatfeature = $_REQUEST['filter']['linearformat'];
-$optimalformatfeature = $_REQUEST['filter']['optimalformat'];
-$bufferformatfeature = $_REQUEST['filter']['bufferformat'];
-if ($linearformatfeature != '' || $optimalformatfeature != '' || $bufferformatfeature != '') {
-    $formatColumn = null;
-    if ($linearformatfeature != '') {
-        $formatColumn = 'lineartilingfeatures';
-        $params['filter_formatfeature'] = $linearformatfeature;
+// Image format and buffer format flag support
+$linear_tiling_format = $_REQUEST['filter']['lineartilingformat'];
+$optimal_tiling_format = $_REQUEST['filter']['optimaltilingformat'];
+$buffer_format = $_REQUEST['filter']['bufferformat'];
+if ($linear_tiling_format != '' || $optimal_tiling_format != '' || $buffer_format != '') {
+    $format_column = null;
+
+    $featureflag = null;
+    $featureflagbit = $_REQUEST['filter']['featureflagbit'];
+    if (in_array($featureflagbit, $device_format_flags_tiling)) {
+        $featureflag = array_search($featureflagbit , $device_format_flags_tiling);
     }
-    if ($optimalformatfeature != '') {
-        $formatColumn = 'optimaltilingfeatures';
-        $params['filter_formatfeature'] = $optimalformatfeature;
+    if (!$featureFlag) {
+        $featureflag = array_search($featureflagbit , $device_format_flags_buffer);
     }
-    if ($bufferformatfeature != '') {
-        $formatColumn = 'bufferfeatures';
-        $params['filter_formatfeature'] = $bufferformatfeature;
+    assert($featureflag != null);
+
+    if ($linear_tiling_format != '') {
+        $format_column = 'lineartilingfeatures';
+        $params['filter_format_name'] = $linear_tiling_format;
     }
-    if ($formatColumn) {
-        $whereClause = "
-                where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
-                (
-                    select ifnull(r.displayname, r.devicename)
-                    from reports r
-                    join deviceformats df on df.reportid = r.id
-                    join VkFormat vf on vf.value = df.formatid where 
-                    vf.name = :filter_formatfeature and df.$formatColumn > 0
-                )";
+    if ($optimal_tiling_format != '') {
+        $format_column = 'optimaltilingfeatures';
+        $params['filter_format_name'] = $optimal_tiling_format;
     }
+    if ($buffer_format != '') {
+        $format_column = 'bufferfeatures';
+        $params['filter_format_name'] = $buffer_format;
+    }
+
+    $whereClause = "
+        where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
+        (
+            select ifnull(r.displayname, r.devicename)
+            from reports r
+            join deviceformats df on df.reportid = r.id
+            join VkFormat vf on vf.value = df.formatid where 
+            vf.name = :filter_format_name and df.$format_column & $featureflag = $featureflag
+        )";    
 }
 // Memory type support
 $memorytype = $_REQUEST['filter']['memorytype'];

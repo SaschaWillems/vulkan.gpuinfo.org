@@ -28,7 +28,7 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 	<table id='<?= $id ?>' class='table table-striped table-bordered table-hover table-header-rotated format-table'>
 		<thead>
 			<tr>
-				<th class='caption' style='border-right: 0px;'>Format</th>
+				<th>Format</th>
 				<?php
 				foreach ($flags as $key => $value) {
 					echo "<th class='caption rotate-45'><div><span>$value</span></div></th>";
