@@ -52,7 +52,8 @@ $filters = [
 	'lineartilingformat',
 	'optimaltilingformat',
 	'bufferformat',
-	'featureflagbit'
+	'featureflagbit',
+	'surfaceusageflag'
 ];
 $filter_list = new FilterList($filters);
 
@@ -175,6 +176,15 @@ if ($filter_list->hasFilter('surfacepresentmode')) {
 		"Listing first known driver version support for surface present mode <code>$surface_present_mode</code>";
 	$pageTitle = "Surface present mode $surface_present_mode";
 }
+// Surface usage flag
+if ($filter_list->hasFilter('surfaceusageflag')) {
+	$surface_usage_flag = $filter_list->getFilter('surfaceusageflag');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting surface usage flag <code>$surface_usage_flag</code>"
+		:
+		"Listing first known driver version support for surface usage flag <code>$surface_usage_flag</code>";
+	$pageTitle = "Surface present mode $surface_usage_flag";
+}
 // Submitter
 if ($filter_list->hasFilter('submitter')) {
 	$submitter = $filter_list->getFilter('submitter');
@@ -286,6 +296,7 @@ PageGenerator::header($pageTitle);
 						'optimaltilingformat':			'<?= $filter_list->getFilter('optimaltilingformat') ?>',
 						'bufferformat':					'<?= $filter_list->getFilter('bufferformat') ?>',
 						'featureflagbit':				'<?= $filter_list->getFilter('featureflagbit') ?>',
+						'surfaceusageflag':				'<?= $filter_list->getFilter('surfaceusageflag') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {

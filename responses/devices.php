@@ -256,6 +256,21 @@ if ($surfacepresentmode != '') {
             and r.version >= '1.2'";
     $params['filter_surfacepresentmode'] = $surfacepresentmode;
 }
+// Surface usage flag
+$surface_usage_flag = $_REQUEST['filter']['surfaceusageflag'];
+if ($surface_usage_flag != '') {
+    $surface_usage_flag_value = array_search($surface_usage_flag , $surface_usage_flags);
+    $whereClause =
+        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
+            (
+                select ifnull(r.displayname, r.devicename)
+                from reports r
+                join devicesurfacecapabilities dsf on dsf.reportid = r.id
+                where dsf.supportedUsageFlags & :filter_surface_usage_flag = :filter_surface_usage_flag
+            )
+            and r.version >= '1.2'";
+    $params['filter_surface_usage_flag'] = $surface_usage_flag_value;
+}
 // Limit
 $limit = $_REQUEST['filter']['devicelimit'];
 if ($limit != '') {

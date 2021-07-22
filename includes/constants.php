@@ -36,7 +36,6 @@ $queue_flag_bits = [
 
 $platforms = ['windows', 'linux', 'android'];
 
-// @todo: move to constants
 $device_format_flags_tiling = [
     0x0001 => "SAMPLED_IMAGE",
     0x0002 => "STORAGE_IMAGE",
@@ -56,4 +55,15 @@ $device_format_flags_buffer = [
     0x0010 => "STORAGE_TEXEL_BUFFER",
     0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC",
     0x0040 => "VERTEX_BUFFER",
+];
+
+$surface_usage_flags = [
+    0x0001 => "TRANSFER_SRC_BIT",
+    0x0002 => "TRANSFER_DST_BIT",
+    0x0004 => "SAMPLED_BIT",
+    0x0008 => "STORAGE_BIT",
+    0x0010 => "COLOR_ATTACHMENT_BIT",
+    0x0020 => "DEPTH_STENCIL_ATTACHMENT_BIT",
+    0x0040 => "TRANSIENT_ATTACHMENT_BIT",
+    0x0080 => "INPUT_ATTACHMENT_BIT",
 ];

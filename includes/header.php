@@ -131,6 +131,7 @@
 						<ul class="dropdown-menu">
 							<li><a href="listsurfaceformats.php">Formats</a></li>
 							<li><a href="listsurfacepresentmodes.php">Present modes</a></li>
+							<li><a href="listsurfaceusageflags.php">Usage flags</a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
