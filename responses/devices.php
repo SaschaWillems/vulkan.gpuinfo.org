@@ -180,7 +180,7 @@ if ($linear_tiling_format != '' || $optimal_tiling_format != '' || $buffer_forma
     if (in_array($featureflagbit, $device_format_flags_tiling)) {
         $featureflag = array_search($featureflagbit , $device_format_flags_tiling);
     }
-    if (!$featureFlag) {
+    if (!$featureflag) {
         $featureflag = array_search($featureflagbit , $device_format_flags_buffer);
     }
     assert($featureflag != null);
