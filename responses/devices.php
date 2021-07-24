@@ -263,6 +263,7 @@ if ($surfacepresentmode != '') {
                 join devicesurfacemodes dsm on dsm.reportid = r.id	
                 join VkPresentMode m on dsm.presentmode = m.value 
                 where m.name = :filter_surfacepresentmode
+                $os_and_clause
             )
             and r.version >= '1.2'";
     $params['filter_surfacepresentmode'] = $surfacepresentmode;
