@@ -249,7 +249,7 @@ if ($surfaceformat != '') {
         $whereClause .= " and dsf.colorspace = :filter_surfacecolorspace";
         $params['filter_surfacecolorspace'] = $surfaceformat_colorspace;
     }                           
-    $whereClause .= ") and r.version >= '1.2'";
+    $whereClause .= " $os_and_clause) and r.version >= '1.2'";
     $params['filter_surfaceformat'] = $surfaceformat;
 }
 // Surface present mode	
