@@ -229,6 +229,7 @@ if ($memorytype != '') {
 				from reports r
 				join devicememorytypes dmt on dmt.reportid = r.id
 				where dmt.propertyflags = :filter_memorytype
+                $os_and_clause
 			)
 			and r.version >= '1.2'";
     $params['filter_memorytype'] = $memorytype;
