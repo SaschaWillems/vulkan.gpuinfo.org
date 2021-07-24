@@ -90,6 +90,17 @@ if (isset($_REQUEST['filter']['option'])) {
         $negate = true;
     }
 }
+
+// Operating system
+// @todo: use in all places
+$os_and_clause = null;
+if (isset($_REQUEST["platform"])) {
+    $platform = GET_sanitized('platform');
+    if ($platform !== "all") {
+        $os_and_clause = "AND r.ostype = '".ostype($platform)."'";
+    }
+}
+
 // Filters
 // Extension
 if (isset($_REQUEST['filter']['extension'])) {
@@ -267,6 +278,7 @@ if ($surface_usage_flag != '') {
                 from reports r
                 join devicesurfacecapabilities dsf on dsf.reportid = r.id
                 where dsf.supportedUsageFlags & :filter_surface_usage_flag = :filter_surface_usage_flag
+                $os_and_clause
             )
             and r.version >= '1.2'";
     $params['filter_surface_usage_flag'] = $surface_usage_flag_value;
