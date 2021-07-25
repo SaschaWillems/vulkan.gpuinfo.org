@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database server implementation
 	*	
-	* Copyright (C) 2011-2015 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -21,7 +21,7 @@
 
 	// Return list of all available reports as json
 	
-	include './../../database/database.class.php';
+	include './../../../database/database.class.php';
 	
 	/**
 	 * Formats a JSON string for pretty printing
@@ -94,7 +94,7 @@
 			r.osarchitecture,
 			r.headerversion,
 			r.version as reportversion,
-			concat('http://vulkan.gpuinfo.org/services/getreportjson.php?id=', dp.reportid) as url
+			concat('https://vulkan.gpuinfo.org/api/v2/devsim/getreport.php?id=', dp.reportid) as url
 			from deviceproperties dp
 			join reports r on r.id = dp.reportid
 			where r.version >= '1.4'
@@ -103,9 +103,7 @@
 		$stmnt = DB::$connection->prepare($sql);
 		$stmnt->execute();
 	
-		if ($stmnt->rowCount() > 0) {
-			header('Content-Type: application/json');
-			
+		if ($stmnt->rowCount() > 0) {		
 			$rows = array();
 
 			while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
@@ -113,7 +111,8 @@
 			}
 
 			header('Content-type:application/json;charset=utf-8');
-			echo _format_json(json_encode($rows), false);			
+			//echo _format_json(json_encode($rows), false);			
+			echo json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 		} 
 		else {
 			header('HTTP/ 404 empty_response');
