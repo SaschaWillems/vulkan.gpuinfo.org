@@ -69,9 +69,6 @@ switch ($format_listing_type) {
             $stmnt->execute();
             $format_names = $stmnt->fetchAll(PDO::FETCH_KEY_PAIR);
             $formats = [];
-            
-            $start = microtime(true);
-
             $deviceCount = getDeviceCount($platform);
             $sql = "SELECT formatid as name, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
                     where df.$column > 0 and df.$column & :value > 0                    
@@ -87,10 +84,6 @@ switch ($format_listing_type) {
                     $formats[$row['name']][$format_name] = $row['coverage'];
                 }
             }
-
-            $end = microtime(true);
-            echo sprintf("SQL took %f", $end - $start);
-
             DB::disconnect();
             foreach ($formats as $format_id => $format_coverage) {
                 echo "<tr>";
