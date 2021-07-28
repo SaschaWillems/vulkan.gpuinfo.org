@@ -69,20 +69,28 @@ switch ($format_listing_type) {
             $stmnt->execute();
             $format_names = $stmnt->fetchAll(PDO::FETCH_KEY_PAIR);
             $formats = [];
+            
+            $start = microtime(true);
+
             $deviceCount = getDeviceCount($platform);
+            $sql = "SELECT formatid as name, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
+                    where df.$column > 0 and df.$column & :value > 0                    
+                    $os_filter
+                    group by formatid
+                    order by formatid asc";
+            $stmnt = DB::$connection->prepare($sql);
             foreach ($format_flags as $key => $format_name) {
-                $sql = "SELECT formatid as name, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
-                        where df.$column & $key > 0
-                        $os_filter
-                        group by formatid
-                        order by formatid asc";
-                $stmnt = DB::$connection->prepare($sql);
+                $params['value'] = $key;
                 $stmnt->execute($params);
                 $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($result as $row) {
                     $formats[$row['name']][$format_name] = $row['coverage'];
                 }
             }
+
+            $end = microtime(true);
+            echo sprintf("SQL took %f", $end - $start);
+
             DB::disconnect();
             foreach ($formats as $format_id => $format_coverage) {
                 echo "<tr>";
