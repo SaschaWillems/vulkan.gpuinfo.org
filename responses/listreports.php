@@ -49,6 +49,7 @@ if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
 }
 
 // Filtering
+$searchClause = null;
 $searchColumns = array('id');
 
 // Dynamic limit column
@@ -228,9 +229,10 @@ if (isset($_REQUEST['filter']['portability'])) {
 // Platform (os)
 if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
     $platform = $_REQUEST['filter']['platform'];
-    $ostype = ostype($platform);
-    $whereClause .= (($whereClause != '') ? ' and ' : ' where ') . 'r.ostype = :ostype';
-    $params['ostype'] = $ostype;
+    if ($platform !== "all") {
+        $whereClause .= (($whereClause != '') ? ' and ' : ' where ') . 'r.ostype = :ostype';
+        $params['ostype'] = ostype($platform);
+    }
 }
 
 $orderBy = "order by " . $orderByColumn . " " . $orderByDir;
