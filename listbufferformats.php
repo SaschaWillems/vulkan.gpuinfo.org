@@ -40,11 +40,41 @@ PageGenerator::header("Formats");
 <center>
 	<?php 
 		PageGenerator::platformNavigation('listbufferformats.php', $platform, true);
-		$format_listing_type = 'buffer';
-		include './includes/formatlisting.php';		
+		include "./static/bufferformat_$platform.html";
 		PageGenerator::footer();
 	?>
 </center>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#formats').DataTable({
+            pageLength: -1,
+            paging: false,
+            stateSave: false,
+            searchHighlight: true,
+            dom: 'f',
+            bInfo: false,
+            order: [
+                [0, "asc"]
+            ],
+            columnDefs: [{
+                    orderable: true,
+                    targets: 0
+                },
+                {
+                    orderable: false,
+                    targets: '_all'
+                }
+            ]
+        });
+
+        $("#searchbox").on("keyup search input paste cut", function() {
+            table.search(this.value).draw();
+        });
+
+    });
+</script>
+
 </body>
 
 </html>
