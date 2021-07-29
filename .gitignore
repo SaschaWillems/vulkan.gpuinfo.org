@@ -3,3 +3,4 @@ database.config.php
 external/
 xdebug.log
 .vscode/
+static/*.html
