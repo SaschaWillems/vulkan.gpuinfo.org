@@ -586,6 +586,10 @@ h1 {
 	vertical-align: middle !important;
 }
 
+.format-table th {
+	padding: 0px !important;
+}
+
 .queue-family-table {
 	table-layout: fixed !important;
 	/*width: auto; */

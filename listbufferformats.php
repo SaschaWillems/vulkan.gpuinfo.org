@@ -60,10 +60,6 @@ PageGenerator::header("Formats");
             columnDefs: [{
                     orderable: true,
                     targets: 0
-                },
-                {
-                    orderable: false,
-                    targets: '_all'
                 }
             ]
         });
