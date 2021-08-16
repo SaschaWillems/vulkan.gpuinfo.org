@@ -22,18 +22,20 @@
 
 include './../../database/database.class.php';
 
+if (in_array(strtolower($_SERVER['HTTP_ORIGIN']), ['https://gpuinfo.org', 'https://www.gpuinfo.org', 'http://gpuinfo.org', 'http://www.gpuinfo.org', 'http://localhost:8000'])) {
+	header("Access-Control-Allow-Origin: *");
+	header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+	header("Access-Control-Allow-Credentials: true");
+	header("Vary: Origin");
+}
+
 DB::connect();
 try {
 	$stmnt = DB::$connection->prepare("SELECT count(*) from reports");
 	$stmnt->execute([]);
-	$http_origin = strtolower($_SERVER['HTTP_ORIGIN']);
-	if (in_array($http_origin, ['https://www.gpuinfo.org', 'http://www.gpuinfo.org', 'http://localhost:8000'])) {
-		header("Access-Control-Allow-Origin: $http_origin");
-	}
 	echo json_encode(['count' => $stmnt->fetchColumn()]);
 } catch (PDOException $e) {
 	header('HTTP/ 500 server error');
 	echo 'Server error: Could not get report count!';
 }
 DB::disconnect();
-?>
