@@ -21,6 +21,8 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
+$release = '3.05';
+$filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
 <div class="panel panel-default">
@@ -36,30 +38,68 @@ PageGenerator::header('Download');
 			The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">the repository</a>.<br>
 		</div>
 		<div class="page-header">
-			<h3>Current stable release 3.02</h3>
+			<h3>Current stable release <?=$release?></h3>
 			<ul>		
 				<li>Windows
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.02_win64.zip">Windows 64-bit (zip)</a></li>
-						<li><a href="downloads/vulkancapsviewer_3.02_winx86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some Vulkan implementations may not expose all hardware capabilities when run under 32 bits.</li>
+						<li><a href="<?=$filename_prefix?>_win64.zip">Windows 64-bit (zip)</a></li>
+						<li><a href="<?=$filename_prefix?>_winx86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some Vulkan implementations may not expose all hardware capabilities when run under 32 bits.</li>
 					</ul>
 				</li>
 				<li>Linux
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.02_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
-						<li><a href="downloads/vulkancapsviewer_3.02_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
+						<li><a href="<?=$filename_prefix?>_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
+						<li><a href="<?=$filename_prefix?>_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
 					</ul>
 				</li>
 				<li>Android
 					<ul>
-						<li><a href="downloads/vulkancapsviewer_3.02_arm.apk">Android arm-v8 (apk)</a></li>
+						<li><a href="<?=$filename_prefix?>_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
-				<li><a href="downloads/vulkancapsviewer_3.02_osx.dmg">Mac OSX (dmg)</a></li>
+				<li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li>
 				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store, provided by <a href="https://www.lunarg.com/">LunarG</a>)</a></li>
 			</ul>
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.05 - 2021-11-27</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_ARM_rasterization_order_attachment_access</li>
+						<li>VK_KHR_dynamic_rendering</li>
+						<li>VK_EXT_border_color_swizzle</li>
+						<li>VK_EXT_image_view_min_lod</li>
+						<li>VK_EXT_depth_clip_control</li>
+					</ul>
+				</li>
+				<li>Fixed proxy settings not being properly applied and changed proxy type to http.	</li>
+			</ul>			
+			<h4>3.04 - 2021-10-12</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_KHR_maintenance4</li>
+						<li>VK_EXT_rgba10x6_formats</li>
+						<li>VK_KHR_shader_integer_dot_product</li>
+						<li>VK_EXT_primitive_topology_list_restart</li>
+						<li>VK_EXT_pageable_device_local_memory</li>
+						<li>VK_KHR_shader_integer_dot_product</li>
+					</ul>
+				</li>
+				<li>Added support for PowerVR image formats</li>
+			</ul>			
+			<h4>3.03 - 2021-08-22</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_shader_atomic_float2</li>
+						<li>VK_HUAWEI_invocation_mask</li>
+						<li>VK_KHR_present_wait</li>
+						<li>VK_KHR_present_id</li>
+					</ul>					
+				</li>
+			</ul>				
 			<h4>3.02 - 2021-08-07</h4>
 			<ul>
 				<li>Fixed queue family present support info on Linux</li>
