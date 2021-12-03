@@ -158,6 +158,37 @@
         }        
     }
 
+    function update_extensions($json, $reportid, &$update_log) {
+        $extensions_report = $json['extensions'];
+        $stmnt = DB::$connection->prepare("SELECT name from deviceextensions de join extensions e on e.id = de.extensionid where reportid = :reportid");
+        $stmnt->execute(['reportid' => $reportid]);
+        $extensions_db = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
+        foreach ($extensions_report as $ext_report) {
+            if (!in_array($ext_report['extensionName'], $extensions_db)) {
+                // Extension is missing, insert
+                // Add to global mapping table (if not already present)
+                $sql = "INSERT IGNORE INTO extensions (name) VALUES (:name)";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute(array(":name" => $ext_report['extensionName']));	
+                // Device
+                // Get extension id
+                $sql = "SELECT id FROM extensions WHERE name = :name";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute(array(":name" => $ext_report['extensionName']));
+                $extensionid = $stmnt->fetchColumn();
+                // Insert
+                $sql = "INSERT INTO deviceextensions (reportid, extensionid, specversion) VALUES (:reportid, :extensionid, :specversion)";
+                try {
+                    $stmnt = DB::$connection->prepare($sql);
+                    $stmnt->execute(array(":reportid" => $reportid, ":extensionid" => $extensionid, ":specversion" => $ext_report['specVersion']));
+                } catch (Exception $e) {
+                    die('Error while trying to upload report (error at device extensions)');
+                }
+                $update_log[] = sprintf('Extension %s added', $ext_report['extensionName']);
+            }
+        }
+    }
+
     if (!isset($_GET['reportid'])) {
 		header('HTTP/1.1 400 No report id set');
 		exit();
@@ -230,6 +261,7 @@
         update_core_properties("1.1", $report, $reportid, $update_log);
         update_core_properties("1.2", $report, $reportid, $update_log);
         update_extended_data($report, $reportid, $update_log);
+        update_extensions($report, $reportid, $update_log);
     } finally {
         DB::disconnect();
     }
@@ -253,10 +285,10 @@
             $msgtitle = "Vulkan report updated for ".$report['properties']['deviceName']." (".$report['properties']['driverVersionText'].")";
             if ($development_db) {
                 $msgtitle = "[DEVELOPMENT] ".$msgtitle;
-                $msg = "New Vulkan hardware report uploaded to the development database\n\n";
+                $msg = "Existing Vulkan hardware report updated (development database)\n\n";
                 $msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
             } else {
-                $msg = "New Vulkan hardware report uploaded to the database\n\n";
+                $msg = "Existing Vulkan hardware report updated\n\n";
                 $msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
             }
             
@@ -276,27 +308,7 @@
             mail($mailto, $msgtitle, $msg);
         } catch (Exception $e) {
             // Failure to mail is not critical
-        }	
-
+        }
     } else {
         echo json_encode(['updated' => false]);
     }
-
-	try {
-		if (array_key_exists('displayName', $report['properties'])) {
-            $display_name = $report['properties']['displayName'];
-        } else {
-            $display_name = $report['properties']['deviceName'];
-        }
-        $msgtitle = "Vulkan report updated for ".$display_name." (".$report['properties']['driverVersionText'].")";
-        $msg = "Vulkan hardware report has been updated\n\n";
-        $msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
-        $msg .= "Devicename = ".$report['properties']['deviceName']."\n";
-        $msg .= "Updated data:\n";
-        foreach ($update_log as $log) {
-            $msg .= $log."\n";
-        }
-		mail($mailto, $msgtitle, $msg);
-	} catch (Exception $e) {
-		// Failure to mail is not critical
-	}	    
