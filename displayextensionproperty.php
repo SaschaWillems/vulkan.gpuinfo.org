@@ -28,6 +28,7 @@ require './pagegenerator.php';
 require './database/database.class.php';
 require './includes/functions.php';
 include './includes/filterlist.class.php';
+require './includes/chart.php';
 
 $filters = ['platform', 'extensionname', 'extensionproperty'];
 $filter_list = new FilterList($filters);
@@ -63,25 +64,27 @@ $caption .= " for ".PageGenerator::platformInfo($platform);
 
 $sql .= ' group by value';
 
+// Gather data
+$values = [];
+$counts = [];
+DB::connect();
+$result = DB::$connection->prepare("$sql order by 1");
+$result->execute([":name" => $property_name, ":extension" => $ext_name]);
+$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+foreach ($rows as $row) {
+	$value = $row['value'];
+	// Some values are stored as serialized arrays and need to be unserialized
+	if (substr($value, 0, 2) == 'a:') {
+		$value = unserialize($value);
+		$value = '[' . implode(',', $value) . ']';
+	}
+	$values[] = $value; 
+	$counts[] = $row['count'];
+}
+DB::disconnect();
+
 PageGenerator::header($property_name);
 ?>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script>
-	$(document).ready(function() {
-		var table = $('#values').DataTable({
-			"pageLength": -1,
-			"paging": false,
-			"stateSave": false,
-			"searchHighlight": true,
-			"dom": 'f',
-			"bInfo": false,
-			"order": [
-				[0, "asc"]
-			]
-		});
-	});
-</script>
-
 <div class='header'>
 	<h4 class='headercaption'><?=$caption?></h4>
 </div>
@@ -99,27 +102,18 @@ PageGenerator::header($property_name);
 				</thead>
 				<tbody>
 					<?php
-					DB::connect();
-					$result = DB::$connection->prepare("$sql order by 1");
-					$result->execute([":name" => $property_name, ":extension" => $ext_name]);
-					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-					foreach ($rows as $row) {
-						$value = $row['value'];
-						// Some values are stored as serialized arrays and need to be unserialized
-						if (substr($value, 0, 2) == 'a:') {
-							$value = unserialize($value);
-							$value = '[' . implode(',', $value) . ']';
-						}
-						$link = "listdevicescoverage.php?extensionname=$ext_name&extensionproperty=$property_name&extensionpropertyvalue=$value";
-						if ($platform) {
-							$link .= "&platform=$platform";
-						}
+					for ($i = 0; $i < count($values); $i++) {
+						$color_style = "style='border-left: ".Chart::getColor($i)." 3px solid'";
+						$link = "listdevicescoverage.php?extensionname=$ext_name&extensionproperty=$property_name&extensionpropertyvalue=".$values[$i].($platform ? "&platform=$platform" : "");
 						echo "<tr>";
-						echo "<td>$value</td>";
-						echo "<td><a href='$link'>" . $row['count'] . "</a></td>";
+						echo "<td $color_style>".$values[$i]."</td>";
+						if ($values[$i] != null) {
+							echo "<td><a href='$link'>".$counts[$i]."</a></td>";
+						} else {
+							echo "<td class='na'>".$counts[$i]."</td>";
+						}
 						echo "</tr>";
 					}
-					DB::disconnect();
 					?>
 				</tbody>
 			</table>
@@ -129,49 +123,22 @@ PageGenerator::header($property_name);
 </center>
 
 <script type="text/javascript">
-	google.charts.load('current', {
-		'packages': ['corechart']
-	});
-	google.charts.setOnLoadCallback(drawChart);
-
-	function drawChart() {
-
-		var data = google.visualization.arrayToDataTable([
-			['Value', 'Reports'],
-			<?php
-			DB::connect();
-			$result = DB::$connection->prepare("$sql order by 2 desc");
-			$result->execute([":name" => $property_name, ":extension" => $ext_name]);
-			$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-			foreach ($rows as $row) {
-				$value = $row['value'];
-				// Some values are stored as serialized arrays and need to be unserialized
-				if (substr($value, 0, 2) == 'a:') {
-					$value = unserialize($value);
-					$value = '[' . implode(',', $value) . ']';
-				}
-				echo "['$value'," . $row['count'] . "],";
-			}
-			DB::disconnect();
-			?>
-		]);
-
-		var options = {
-			legend: {
-				position: 'bottom'
-			},
-			chartArea: {
-				width: "80%",
-				height: "80%"
-			},
-			height: 500,
-			width: 500
-		};
-
-		var chart = new google.visualization.PieChart(document.getElementById('chart'));
-
-		chart.draw(data, options);
-	}
+	$(document).ready(function() {
+		var table = $('#values').DataTable({
+			"pageLength": -1,
+			"paging": false,
+			"stateSave": false,
+			"searchHighlight": true,
+			"dom": '',
+			"bInfo": false,
+			"order": [
+				[0, "asc"]
+			]
+		});
+	});	
+	<?php
+		Chart::draw($values, $counts);
+	?>
 </script>
 
 <?php

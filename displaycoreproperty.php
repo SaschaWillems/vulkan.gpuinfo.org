@@ -23,6 +23,7 @@
 require 'pagegenerator.php';
 require 'database/database.class.php';
 require './includes/functions.php';
+require './includes/chart.php';
 
 $name = null;
 if (isset($_GET['name'])) {
@@ -65,32 +66,37 @@ if (isset($_GET['platform'])) {
 	}
 }
 
+// Gather data
+$values = [];
+$displayvalues = [];
+$counts = [];
+DB::connect();
+switch ($name) {
+	case 'vendorid':
+		$sql = "SELECT `$name`as value, VendorId(vendorid) as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 3 desc";
+		break;
+	default:
+		$sql = "SELECT `$name` as value, null as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 3 desc";
+}
+$result = DB::$connection->prepare($sql);
+$result->execute();
+$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+foreach ($rows as $row) {
+	$values[] = $row['value'];
+	$displayvalues[] = ($row['displayvalue'] !== null) ? $row['displayvalue'] : getPropertyDisplayValue($name, $row['value']);
+	$counts[] = $row['reports'];
+}
+DB::disconnect();
 ?>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script>
-	$(document).ready(function() {
-		var table = $('#extensions').DataTable({
-			"pageLength": -1,
-			"paging": false,
-			"stateSave": false,
-			"searchHighlight": true,
-			"dom": 'f',
-			"bInfo": false,
-			"order": [
-				[0, "asc"]
-			]
-		});
-	});
-</script>
 
 <div class='header'>
 	<h4 class='headercaption'><?php echo $caption; ?></h4>
 </div>
 
 <center>
-	<div class='parentdiv'>
+	<div class='chart-div'>
 		<div id="chart"></div>
-		<div class='tablediv' style='width:auto; display: inline-block; border: 0px;'>
+		<div class='chart-table-div'>
 			<table id="extensions" class="table table-striped table-bordered table-hover reporttable">
 				<thead>
 					<tr>
@@ -100,33 +106,21 @@ if (isset($_GET['platform'])) {
 				</thead>
 				<tbody>
 					<?php
-					DB::connect();
-					switch ($name) {
-						case 'vendorid':
-							$sql = "SELECT `$name`as value, VendorId(vendorid) as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 1";
-							break;
-						default:
-							$sql = "SELECT `$name` as value, null as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 1";
-					}
-					$result = DB::$connection->prepare($sql);
-					$result->execute();
-					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-					foreach ($rows as $cap) {
-						$link = "listreports.php?property=$name&value=" . $cap["value"] . ($platform ? "&platform=$platform" : "");
+					for ($i = 0; $i < count($values); $i++) {
+						$color_style = "style='border-left: ".Chart::getColor($i)." 3px solid'";
+						$link = "listreports.php?property=$name&value=".$values[$i].($platform ? "&platform=$platform" : "");
 						if ($core) {
 							$link .= "&core=$core";
 						}
-						$value = getPropertyDisplayValue($name, $cap['value']);
 						echo "<tr>";
-						echo "<td>".($cap['displayvalue'] !== null ? $cap['displayvalue'] : $value)."</td>";
-						if ($cap['value'] != null) {
-							echo "<td><a href='$link'>" . $cap["reports"] . "</a></td>";
+						echo "<td $color_style>".$displayvalues[$i]."</td>";
+						if ($values[$i] != null) {
+							echo "<td><a href='$link'>".$counts[$i]."</a></td>";
 						} else {
-							echo "<td class='na'>".$cap["reports"]."</td>";
+							echo "<td class='na'>".$counts[$i]."</td>";
 						}
 						echo "</tr>";
 					}
-					DB::disconnect();
 					?>
 				</tbody>
 			</table>
@@ -136,52 +130,22 @@ if (isset($_GET['platform'])) {
 </center>
 
 <script type="text/javascript">
-	google.charts.load('current', {
-		'packages': ['corechart']
+	$(document).ready(function() {
+		var table = $('#extensions').DataTable({
+			"pageLength": -1,
+			"paging": false,
+			"stateSave": false,
+			"searchHighlight": true,
+			"dom": '',
+			"bInfo": false,
+			"order": [
+				[0, "asc"]
+			]
+		});
 	});
-	google.charts.setOnLoadCallback(drawChart);
-
-	function drawChart() {
-
-		var data = google.visualization.arrayToDataTable([
-			['Value', 'Reports'],
-			<?php
-			DB::connect();
-			switch ($name) {
-				case 'vendorid':
-					$sql = "SELECT VendorId(vendorid) as value, count(0) as reports from $tablename $filter group by 1 order by 2";
-					break;
-				default:
-					$sql = "SELECT `$name` as value, count(0) as reports from $tablename $filter group by 1 order by 2";
-			}
-			$result = DB::$connection->prepare($sql);
-			$result->execute();
-			$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-			foreach ($rows as $row) {
-				if ($row['value'] != null) {
-					echo "['" . $row['value'] . "'," . $row['reports'] . "],";
-				}
-			}
-			DB::disconnect();
-			?>
-		]);
-
-		var options = {
-			legend: {
-				position: 'bottom'
-			},
-			chartArea: {
-				width: "80%",
-				height: "80%"
-			},
-			height: 500,
-			width: 500
-		};
-
-		var chart = new google.visualization.PieChart(document.getElementById('chart'));
-
-		chart.draw(data, options);
-	}
+	<?php
+		Chart::draw($values, $counts);
+	?>
 </script>
 
 <?php PageGenerator::footer(); ?>

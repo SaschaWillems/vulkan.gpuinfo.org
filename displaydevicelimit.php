@@ -22,6 +22,7 @@
 
 require 'pagegenerator.php';
 require 'database/database.class.php';
+require './includes/chart.php';
 
 $name = null;
 if (isset($_GET['name'])) {
@@ -77,9 +78,54 @@ if (isset($_GET['platform'])) {
 	}
 }
 
+// Gather data
+$values = [];
+$counts = [];
+DB::connect();
+$result = DB::$connection->prepare("SELECT `$name` as value, count(0) as reports from devicelimits $filter group by 1 order by 2 desc");
+$result->execute();
+$rows = $result->fetchAll(PDO::FETCH_ASSOC);
+foreach ($rows as $row) {
+	$values[] = $row['value'];
+	$counts[] = $row['reports'];
+}
+DB::disconnect();
 ?>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script>
+
+<div class='header'>
+	<h4 class='headercaption'><?php echo $caption; ?></h4>
+</div>
+
+<center>
+	<div class='chart-div'>
+		<div id="chart"></div>
+		<div class='chart-table-div'>
+			<table id="extensions" class="table table-striped table-bordered table-hover reporttable">
+				<thead>
+					<tr>
+						<th>Value</th>
+						<th>Reports</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					for ($i = 0; $i < count($values); $i++) {
+						$color_style = "style='border-left: ".Chart::getColor($i)." 3px solid'";
+						$link = "listreports.php?limit=$name&value=".$values[$i].($platform ? "&platform=$platform" : "");
+						echo "<tr>";
+						echo "<td $color_style>".$values[$i]."</td>";
+						echo "<td><a href='$link'>".$counts[$i]."</a></td>";
+						echo "</tr>";
+					}
+					?>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+</center>
+
+<script type="text/javascript">
 	$(document).ready(function() {
 		var table = $('#extensions').DataTable({
 			"pageLength": -1,
@@ -93,83 +139,9 @@ if (isset($_GET['platform'])) {
 			]
 		});
 	});
-</script>
-
-<div class='header'>
-	<h4 class='headercaption'><?php echo $caption; ?></h4>
-</div>
-
-<center>
-	<div class='parentdiv'>
-		<div id="chart"></div>
-		<div class='tablediv' style='width:auto; display: inline-block;'>
-			<table id="extensions" class="table table-striped table-bordered table-hover reporttable">
-				<thead>
-					<tr>
-						<th>Value</th>
-						<th>Reports</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php
-					DB::connect();
-					$result = DB::$connection->prepare("SELECT `$name` as value, count(0) as reports from devicelimits $filter group by 1 order by 1");
-					$result->execute();
-					$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-					foreach ($rows as $cap) {
-						$link = "listreports.php?limit=$name&value=" . $cap["value"] . ($platform ? "&platform=$platform" : "");
-						echo "<tr>";
-						echo "<td>" . $cap["value"] . "</td>";
-						echo "<td><a href='$link'>" . $cap["reports"] . "</a></td>";
-						echo "</tr>";
-					}
-					DB::disconnect();
-					?>
-				</tbody>
-			</table>
-
-		</div>
-	</div>
-</center>
-
-<script type="text/javascript">
-	google.charts.load('current', {
-		'packages': ['corechart']
-	});
-	google.charts.setOnLoadCallback(drawChart);
-
-	function drawChart() {
-
-		var data = google.visualization.arrayToDataTable([
-			['Value', 'Reports'],
-			<?php
-			DB::connect();
-			$result = DB::$connection->prepare("SELECT `$name` as value, count(0) as reports from devicelimits $filter group by 1 order by 2 desc");
-			$result->execute();
-			$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-			foreach ($rows as $row) {
-				echo "['" . $row['value'] . "'," . $row['reports'] . "],";
-			}
-			DB::disconnect();
-			?>
-		]);
-
-		var options = {
-			legend: {
-				position: 'bottom'
-			},
-			chartArea: {
-				width: "80%",
-				height: "80%"
-			},
-			height: 500,
-			width: 500
-		};
-
-		var chart = new google.visualization.PieChart(document.getElementById('chart'));
-
-		chart.draw(data, options);
-	}
+	<?php
+		Chart::draw($values, $counts);
+	?>	
 </script>
 
 <?php PageGenerator::footer(); ?>

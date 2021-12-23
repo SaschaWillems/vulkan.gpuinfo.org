@@ -44,6 +44,8 @@
 	<script type="text/javascript" src="external/bootstrap-toggle.min.js"></script>
 	<script type="text/javascript" src="external/dataTables.fixedHeader.min.js"></script>
 
+	<script src="external/apexcharts/apexcharts.js"></script>
+
 	<!--	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script> -->
 	<script type="text/javascript" src="external/responsive.bootstrap.min.js"></script>
 
