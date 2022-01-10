@@ -154,6 +154,7 @@
 						<ul class="dropdown-menu">
 							<li><a href="https://opengl.gpuinfo.org">OpenGL</a></li>
 							<li><a href="https://opengles.gpuinfo.org">OpenGL ES</a></li>
+							<li><a href="https://opencl.gpuinfo.org">OpenCL</a></li>
 							<li><a href="https://vulkan.gpuinfo.org">Vulkan</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="https://android.gpuinfo.org">Android</a></li>
