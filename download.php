@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.05';
+$release = '3.1';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -62,6 +62,17 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.1 - 2022-01-25</h4>
+			<ul>
+				<li>Added support for Vulkan 1.3 core features and properties</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_QCOM_fragment_density_map_offset</li>
+						<li>VK_KHR_global_priority</li>
+						<li>VK_NV_linear_color_attachment</li>
+					</ul>
+				</li>
+			</ul>			
 			<h4>3.05 - 2021-11-27</h4>
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
