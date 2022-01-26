@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -76,8 +76,13 @@ function insertCoreProperties($report, $version)
 			if ($key == 'reportid') {
 				continue;
 			}
-			$displayvalue = getPropertyDisplayValue($key, $value);
-			echo "<tr><td class='subkey'>$key</td>";
+			// @todo: comment why the alias
+			$display_key = $key;
+			if (substr($key, 0, 3) == 'idp') {
+				$display_key = 'integerDotProduct'.substr($display_key, 3);
+			}
+			$displayvalue = getPropertyDisplayValue($display_key, $value);
+			echo "<tr><td class='subkey'>$display_key</td>";
 			echo "<td>$displayvalue</td>";
 			echo "</tr>";
 		}
@@ -134,6 +139,9 @@ if ($display_tabs) {
 	if ($report->flags->has_vulkan_1_2_properties) {
 		echo "<li><a data-toggle='tab' href='#properties_core_12'>Core 1.2</a></li>";
 	}
+	if ($report->flags->has_vulkan_1_3_properties) {
+		echo "<li><a data-toggle='tab' href='#properties_core_13'>Core 1.3</a></li>";
+	}
 	if ($report->flags->has_extended_properties) {
 		echo "<li><a data-toggle='tab' href='#properties_extensions'>Extensions</a></li>";
 	}
@@ -148,6 +156,9 @@ if ($report->flags->has_vulkan_1_1_properties) {
 }
 if ($report->flags->has_vulkan_1_2_properties) {
 	insertCoreProperties($report, '1.2');
+}
+if ($report->flags->has_vulkan_1_3_properties) {
+	insertCoreProperties($report, '1.3');
 }
 if ($report->flags->has_extended_properties) {
 	insertExtensionProperties($report);

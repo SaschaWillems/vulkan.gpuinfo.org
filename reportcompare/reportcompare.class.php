@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -30,6 +30,8 @@ class ReportCompareFlags
     public $has_vulkan_1_1_properties = false;
     public $has_vulkan_1_2_features = false;
     public $has_vulkan_1_2_properties = false;
+    public $has_vulkan_1_3_features = false;
+    public $has_vulkan_1_3_properties = false;
 }
 
 class ReportCompareDeviceInfo
@@ -95,6 +97,8 @@ class ReportCompare
         $this->flags->has_vulkan_1_1_properties = DB::getCount("SELECT count(*) from deviceproperties11 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
         $this->flags->has_vulkan_1_2_features = DB::getCount("SELECT count(*) from devicefeatures12 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
         $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
+        $this->flags->has_vulkan_1_3_features = DB::getCount("SELECT count(*) from devicefeatures13 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
+        $this->flags->has_vulkan_1_3_properties = DB::getCount("SELECT count(*) from deviceproperties13 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
         // DB::disconnect();
         // Fetch descriptions for devices to be compared
         try {
@@ -237,6 +241,9 @@ class ReportCompare
             case '1.2':
                 $table = 'devicefeatures12';
                 break;
+            case '1.3':
+                $table = 'devicefeatures13';
+                break;
         }
         if (!$table) {
             return null;
@@ -295,6 +302,9 @@ class ReportCompare
                 break;
             case '1.2':
                 $table = 'deviceproperties12';
+                break;
+            case '1.3':
+                $table = 'deviceproperties13';
                 break;
         }
         if (!$table) {

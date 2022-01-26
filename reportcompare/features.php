@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -109,6 +109,9 @@ if ($display_tabs) {
 	if ($report_compare->flags->has_vulkan_1_2_features) {
 		echo "<li><a data-toggle='tab' href='#features_core_12'>Core 1.2</a></li>";
 	}
+	if ($report_compare->flags->has_vulkan_1_3_features) {
+		echo "<li><a data-toggle='tab' href='#features_core_13'>Core 1.3</a></li>";
+	}
 	if ($report_compare->flags->has_extended_features) {
 		echo "<li><a data-toggle='tab' href='#features_extensions'>Extensions</a></li>";
 	}
@@ -123,6 +126,9 @@ if ($report_compare->flags->has_vulkan_1_1_features) {
 }
 if ($report_compare->flags->has_vulkan_1_2_features) {
 	insertCoreFeatures($report_compare, '1.2');
+}
+if ($report_compare->flags->has_vulkan_1_3_features) {
+	insertCoreFeatures($report_compare, '1.3');
 }
 
 if ($report_compare->flags->has_extended_features) {

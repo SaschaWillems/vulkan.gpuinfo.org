@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -102,6 +102,10 @@ function insertCoreProperties($report_compare, $version)
 				break;
 			}
 		}
+		// @todo: comment
+		if ($version = '1.3') {
+			$compare_properties->captions[$i] = getFullFieldName($compare_properties->captions[$i]);
+		}
 		$row_class = $differing_values ? "" : "class='sameCaps'";
 		echo "<tr $row_class>";
 		echo "<td class='subkey'>" . ($differing_values ? $report_compare->getDiffIcon() : "") . $compare_properties->captions[$i] . "</td>";
@@ -177,6 +181,9 @@ if ($display_tabs) {
 	if ($report_compare->flags->has_vulkan_1_2_properties) {
 		echo "<li><a data-toggle='tab' href='#properties_core_12'>Core 1.2</a></li>";
 	}
+	if ($report_compare->flags->has_vulkan_1_3_properties) {
+		echo "<li><a data-toggle='tab' href='#properties_core_13'>Core 1.3</a></li>";
+	}
 	if ($report_compare->flags->has_extended_properties) {
 		echo "<li><a data-toggle='tab' href='#properties_extensions'>Extensions</a></li>";
 	}
@@ -191,6 +198,9 @@ if ($report_compare->flags->has_vulkan_1_1_properties) {
 }
 if ($report_compare->flags->has_vulkan_1_2_properties) {
 	insertCoreProperties($report_compare, '1.2');
+}
+if ($report_compare->flags->has_vulkan_1_3_properties) {
+	insertCoreProperties($report_compare, '1.3');
 }
 
 if ($report_compare->flags->has_extended_properties) {

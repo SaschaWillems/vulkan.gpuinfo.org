@@ -131,8 +131,10 @@ echo "</div>";
 					'table_features_core_10',
 					'table_features_core_11',
 					'table_features_core_12',
+					'table_features_core_13',
 					'table_properties_core_11',
-					'table_properties_core_12'
+					'table_properties_core_12',
+					'table_properties_core_13'
 				];
 				for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
 					if (typeof $('#' + tableNames[i]) != undefined) {
@@ -313,6 +315,7 @@ echo "</div>";
 				if ((a === '#surfaceproperties') || (a === '#surfaceformats') || (a === '#presentmodes')) {
 					$('.nav a[href=\\#surface]').tab('show');
 				}
+				// @todo: jump to feature/props table (e.g. 1.3)
 				$('.nav a[href=\\' + a + ']').tab('show');
 			}
 

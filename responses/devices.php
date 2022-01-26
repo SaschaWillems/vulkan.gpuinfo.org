@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -125,6 +125,9 @@ if (isset($_REQUEST['filter']['feature'])) {
             case '1.2':
                 $tablename = 'devicefeatures12';
                 break;
+            case '1.3':
+                $tablename = 'devicefeatures13';
+                break;
             default:
                 $tablename = 'devicefeatures';
         }
@@ -163,6 +166,10 @@ if (isset($_REQUEST['filter']['coreproperty'])) {
                 break;
             case '1.2':
                 $tablename = 'deviceproperties12';
+                break;
+            case '1.3':
+                $tablename = 'deviceproperties13';
+                $property = getShortFieldName($property);
                 break;
             default:
                 $tablename = 'deviceproperties';
