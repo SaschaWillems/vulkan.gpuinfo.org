@@ -19,6 +19,8 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.		
  *
  */
+
+session_start();
 ?>
 <html>
 
@@ -100,6 +102,7 @@
 							<li><a href="listpropertiescore10.php">Core 1.0</a></li>
 							<li><a href="listpropertiescore11.php">Core 1.1</a></li>
 							<li><a href="listpropertiescore12.php">Core 1.2</a></li>
+							<li><a href="listpropertiescore13.php">Core 1.3</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="listpropertiesextensions.php">Extensions</a></li>
 						</ul>
@@ -111,6 +114,7 @@
 							<li><a href="listfeaturescore10.php">Core 1.0</a></li>
 							<li><a href="listfeaturescore11.php">Core 1.1</a></li>
 							<li><a href="listfeaturescore12.php">Core 1.2</a></li>
+							<li><a href="listfeaturescore13.php">Core 1.3</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="listfeaturesextensions.php">Extensions</a></li>
 						</ul>
@@ -154,7 +158,6 @@
 						<ul class="dropdown-menu">
 							<li><a href="https://opengl.gpuinfo.org">OpenGL</a></li>
 							<li><a href="https://opengles.gpuinfo.org">OpenGL ES</a></li>
-							<li><a href="https://opencl.gpuinfo.org">OpenCL</a></li>
 							<li><a href="https://vulkan.gpuinfo.org">Vulkan</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="https://android.gpuinfo.org">Android</a></li>
