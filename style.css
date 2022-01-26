@@ -685,3 +685,7 @@ h1 {
 	display: inline-block;
 	padding-bottom: 10px;
 }
+
+code {
+	background-color: inherit;
+}
