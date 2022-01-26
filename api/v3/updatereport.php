@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2020 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2020-2022 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -23,6 +23,7 @@
      * Implements report update logic for:
      *  - Core 1.1 features and properties
      *  - Core 1.2 features and properties
+     *  - Core 1.3 features and properties
      *  - Extension features and properties
      */
 
@@ -30,6 +31,7 @@
     // @todo: update report version
 
     include './../../database/database.class.php';
+    include './../../includes/functions.php';
 
     function update_core_features($version, $json, $reportid, &$update_log) {
         $version_short = str_replace('.', '', $version);
@@ -77,7 +79,11 @@
                 $params = [':reportid'];
                 $values = [':reportid' => $reportid];
                 foreach($jsonnode as $key => $value) {
-                    $columns[] = $key;
+                    if ($version == '1.3') {
+                        $columns[] = getShortFieldName($key);
+                    } else {
+                        $columns[] = $key;
+                    }
                     $params[] = ":$key";
                     if (is_array($value)) {
                         // UUIDs etc. need to be serialized
@@ -222,7 +228,7 @@
 	$file_name = uniqid('update_report').'json';
 	move_uploaded_file($_FILES['data']['tmp_name'], $path.$file_name) or die('');
 	$json_file_contents = file_get_contents($file_name);
-    $report = json_decode($json_file_contents, true);
+    $report = json_decode($json_file_contents, true, 512, JSON_BIGINT_AS_STRING);
     unlink($file_name);
     
 	// Check if reports match
@@ -258,8 +264,10 @@
     try {
         update_core_features("1.1", $report, $reportid, $update_log);
         update_core_features("1.2", $report, $reportid, $update_log);
+        update_core_features("1.3", $report, $reportid, $update_log);
         update_core_properties("1.1", $report, $reportid, $update_log);
         update_core_properties("1.2", $report, $reportid, $update_log);
+        update_core_properties("1.3", $report, $reportid, $update_log);
         update_extended_data($report, $reportid, $update_log);
         update_extensions($report, $reportid, $update_log);
     } finally {
@@ -281,33 +289,27 @@
         echo json_encode(['updated' => true, 'log' => $update_log]);
         DB::disconnect();
 
-        try {
-            $msgtitle = "Vulkan report updated for ".$report['properties']['deviceName']." (".$report['properties']['driverVersionText'].")";
-            if ($development_db) {
-                $msgtitle = "[DEVELOPMENT] ".$msgtitle;
-                $msg = "Existing Vulkan hardware report updated (development database)\n\n";
-                $msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
-            } else {
+        $localhost = ($_SERVER['HTTP_ORIGIN'] == 'http://localhost:8000');
+        if (!$localhost) {
+            try {
+                $msgtitle = "Vulkan report updated for ".$report['properties']['deviceName']." (".$report['properties']['driverVersionText'].")";
                 $msg = "Existing Vulkan hardware report updated\n\n";
                 $msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
+                $msg .= "Devicename = ".$report['properties']['deviceName']."\n";
+                $msg .= "Driver version = ".$report['properties']['driverVersionText']."\n";
+                $msg .= "API version = ".$report['properties']['apiVersionText']."\n";
+                $msg .= "OS = ".$report['environment']['name']."\n";
+                $msg .= "OS version = ".$report['environment']['version']."\n";
+                $msg .= "OS arch = ".$report['environment']['architecture']."\n";
+                $msg .= "Submitter = ".$report['environment']['submitter']."\n";
+                $msg .= "Comment = ".$report['environment']['comment']."\n";
+                $msg .= "Report version = ".$report['environment']['reportversion']."\n";
+                $msg .= "Updatelog:\n";
+                $msg .= implode('\n', $update_log);                
+                mail($mailto, $msgtitle, $msg);
+            } catch (Exception $e) {
+                // Failure to mail is not critical
             }
-            
-            $msg .= "Devicename = ".$report['properties']['deviceName']."\n";
-            $msg .= "Driver version = ".$report['properties']['driverVersionText']."\n";
-            $msg .= "API version = ".$report['properties']['apiVersionText']."\n";
-            $msg .= "OS = ".$report['environment']['name']."\n";
-            $msg .= "OS version = ".$report['environment']['version']."\n";
-            $msg .= "OS arch = ".$report['environment']['architecture']."\n";
-            $msg .= "Submitter = ".$report['environment']['submitter']."\n";
-            $msg .= "Comment = ".$report['environment']['comment']."\n";
-            $msg .= "Report version = ".$report['environment']['reportversion']."\n";
-
-            $msg .= "Updatelog:\n";
-            $msg .= implode('\n', $update_log);
-            
-            mail($mailto, $msgtitle, $msg);
-        } catch (Exception $e) {
-            // Failure to mail is not critical
         }
     } else {
         echo json_encode(['updated' => false]);
