@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -111,7 +111,7 @@
 	}
 
 	function importCore12Data($json, $reportid) {
-		if (!array_key_exists('core11', $json)) {
+		if (!array_key_exists('core12', $json)) {
 			return;
 		}
 		// Features
@@ -159,10 +159,64 @@
 		}
 	}
 
+	function importCore13Data($json, $reportid) {
+		if (!array_key_exists('core11', $json)) {
+			return;
+		}
+		// Features
+		if (array_key_exists('features', $json['core13'])) {
+			$jsonnode = $json['core13']['features'];
+			$columns = ['reportid'];
+			$params = [':reportid'];
+			$values = [':reportid' => $reportid];
+			foreach($jsonnode as $key => $value) {
+				$columns[] = $key;
+				$params[] = ":$key";
+				$values[":$key"] = $value;
+			}
+			$sql = sprintf("INSERT INTO devicefeatures13 (%s) VALUES (%s)", implode(",", $columns), implode(",", $params));
+			try {
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute($values);	
+			} catch (Exception $e) {
+				die('Error while trying to upload report (error at core 1.3 device features)');
+			}
+		}
+		// Properties
+		if (array_key_exists('features', $json['core13'])) {
+			$jsonnode = $json['core13']['properties'];
+			$columns = ['reportid'];
+			$params = [':reportid'];
+			$values = [':reportid' => $reportid];
+			foreach($jsonnode as $key => $value) {
+				// MySQL column names can be 64 chars at max, so some properties starting with integerDotProduct have to be shortened
+				if (strpos($key, 'integerDotProduct') == 0) {				
+					$columns[] = str_replace('integerDotProduct', 'idp', $key);
+				} else {
+					$columns[] = $key;
+				}
+				$params[] = ":$key";
+				if (is_array($value)) {
+					// UUIDs etc. need to be serialized
+					$values[":$key"] = serialize($value);
+				} else {
+					$values[":$key"] = $value;
+				}
+			}
+			$sql = sprintf("INSERT INTO deviceproperties13 (%s) VALUES (%s)", implode(",", $columns), implode(",", $params));
+			try {
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute($values);	
+			} catch (Exception $e) {
+				die('Error while trying to upload report (error at core 1.3 device properties)');
+			}
+		}
+	}
+
 	DB::connect();
 	
 	$jsonFile = file_get_contents($file);
-	$json = json_decode($jsonFile, true);
+	$json = json_decode($jsonFile, true, 512, JSON_BIGINT_AS_STRING);
 	$display_name = null;
 	
 	// Check report version
@@ -813,6 +867,7 @@
 	// Core features
 	importCore11Data($json, $reportid);
 	importCore12Data($json, $reportid);
+	importCore13Data($json, $reportid);
 
 	/*
 		Instance
@@ -900,7 +955,7 @@
 
 	try {
 		$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
-		if ($development_db) {
+		if (false) {
 			$msgtitle = "[DEVELOPMENT] ".$msgtitle;
 			$msg = "New Vulkan hardware report uploaded to the development database\n\n";
 			$msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";

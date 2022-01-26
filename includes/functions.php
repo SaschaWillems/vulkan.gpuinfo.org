@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -654,6 +654,41 @@ function getPropertyDisplayValue($key, $value)
 		case 'sampleLocationSampleCounts':
 			$displayvalue = listSampleCountFlags($value);
 			break;
+		// Core 1.3
+		case 'integerDotProduct8BitUnsignedAccelerated':
+		case 'integerDotProduct8BitSignedAccelerated':
+		case 'integerDotProduct8BitMixedSignednessAccelerated':
+		case 'integerDotProduct4x8BitPackedUnsignedAccelerated':
+		case 'integerDotProduct4x8BitPackedSignedAccelerated':
+		case 'integerDotProduct4x8BitPackedMixedSignednessAccelerated':
+		case 'integerDotProduct16BitUnsignedAccelerated':
+		case 'integerDotProduct16BitSignedAccelerated':
+		case 'integerDotProduct16BitMixedSignednessAccelerated':
+		case 'integerDotProduct32BitUnsignedAccelerated':
+		case 'integerDotProduct32BitSignedAccelerated':
+		case 'integerDotProduct32BitMixedSignednessAccelerated':
+		case 'integerDotProduct64BitUnsignedAccelerated':
+		case 'integerDotProduct64BitSignedAccelerated':
+		case 'integerDotProduct64BitMixedSignednessAccelerated':
+		case 'integerDotProductAccumulatingSaturating8BitUnsignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating8BitSignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated':
+		case 'integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated':
+		case 'integerDotProductAccumulatingSaturating16BitUnsignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating16BitSignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated':
+		case 'integerDotProductAccumulatingSaturating32BitUnsignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating32BitSignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated':
+		case 'integerDotProductAccumulatingSaturating64BitUnsignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating64BitSignedAccelerated':
+		case 'integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated':
+		case 'storageTexelBufferOffsetSingleTexelAlignment':
+		case 'uniformTexelBufferOffsetSingleTexelAlignment':
+			$displayvalue = displayBool($value);
+			break;			
 		default:
 			// Serialized arrays
 			if (is_string($value) && (substr($value, 0, 2) == "a:") && (strpos($value, '{') !== false)) {
@@ -682,4 +717,86 @@ function GET_sanitized($name)
 		return sanitize($_GET[$name]);
 	};
 	return null;
+}
+
+/** Some Vulkan names are so long they'd break MySQL's 64 chracter limit for column names, so we need to alias */
+function getFullFieldName($short_name) 
+{
+	$aliases = [
+		'idp8BitUnsignedAccelerated' => 'integerDotProduct8BitUnsignedAccelerated',
+		'idp8BitSignedAccelerated' => 'integerDotProduct8BitSignedAccelerated',
+		'idp8BitMixedSignednessAccelerated' => 'integerDotProduct8BitMixedSignednessAccelerated',
+		'idp4x8BitPackedUnsignedAccelerated' => 'integerDotProduct4x8BitPackedUnsignedAccelerated',
+		'idp4x8BitPackedSignedAccelerated' => 'integerDotProduct4x8BitPackedSignedAccelerated',
+		'idp4x8BitPackedMixedSignednessAccelerated' => 'integerDotProduct4x8BitPackedMixedSignednessAccelerated',
+		'idp16BitUnsignedAccelerated' => 'integerDotProduct16BitUnsignedAccelerated',
+		'idp16BitSignedAccelerated' => 'integerDotProduct16BitSignedAccelerated',
+		'idp16BitMixedSignednessAccelerated' => 'integerDotProduct16BitMixedSignednessAccelerated',
+		'idp32BitUnsignedAccelerated' => 'integerDotProduct32BitUnsignedAccelerated',
+		'idp32BitSignedAccelerated' => 'integerDotProduct32BitSignedAccelerated',
+		'idp32BitMixedSignednessAccelerated' => 'integerDotProduct32BitMixedSignednessAccelerated',
+		'idp64BitUnsignedAccelerated' => 'integerDotProduct64BitUnsignedAccelerated',
+		'idp64BitSignedAccelerated' => 'integerDotProduct64BitSignedAccelerated',
+		'idp64BitMixedSignednessAccelerated' => 'integerDotProduct64BitMixedSignednessAccelerated',
+		'idpAccumulatingSaturating8BitUnsignedAccelerated' => 'integerDotProductAccumulatingSaturating8BitUnsignedAccelerated',
+		'idpAccumulatingSaturating8BitSignedAccelerated' => 'integerDotProductAccumulatingSaturating8BitSignedAccelerated',
+		'idpAccumulatingSaturating8BitMixedSignednessAccelerated' => 'integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated',
+		'idpAccumulatingSaturating4x8BitPackedUnsignedAccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated',
+		'idpAccumulatingSaturating4x8BitPackedSignedAccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated',
+		'idpAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated',
+		'idpAccumulatingSaturating16BitUnsignedAccelerated' => 'integerDotProductAccumulatingSaturating16BitUnsignedAccelerated',
+		'idpAccumulatingSaturating16BitSignedAccelerated' => 'integerDotProductAccumulatingSaturating16BitSignedAccelerated',
+		'idpAccumulatingSaturating16BitMixedSignednessAccelerated' => 'integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated',
+		'idpAccumulatingSaturating32BitUnsignedAccelerated' => 'integerDotProductAccumulatingSaturating32BitUnsignedAccelerated',
+		'idpAccumulatingSaturating32BitSignedAccelerated' => 'integerDotProductAccumulatingSaturating32BitSignedAccelerated',
+		'idpAccumulatingSaturating32BitMixedSignednessAccelerated' => 'integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated',
+		'idpAccumulatingSaturating64BitUnsignedAccelerated' => 'integerDotProductAccumulatingSaturating64BitUnsignedAccelerated',
+		'idpAccumulatingSaturating64BitSignedAccelerated' => 'integerDotProductAccumulatingSaturating64BitSignedAccelerated',
+		'idpAccumulatingSaturating64BitMixedSignednessAccelerated' => 'integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated',
+	];
+	if (key_exists($short_name, $aliases)) {
+		return $aliases[$short_name];
+	}
+	return $short_name;
+}
+
+/** Some Vulkan names are so long they'd break MySQL's 64 chracter limit for column names, so we need to alias */
+function getShortFieldName($full_name) 
+{
+	$aliases = [
+		'integerDotProduct8BitUnsignedAccelerated' => 'idp8BitUnsignedAccelerated',
+		'integerDotProduct8BitSignedAccelerated' => 'idp8BitSignedAccelerated',
+		'integerDotProduct8BitMixedSignednessAccelerated' => 'idp8BitMixedSignednessAccelerated',
+		'integerDotProduct4x8BitPackedUnsignedAccelerated' => 'idp4x8BitPackedUnsignedAccelerated',
+		'integerDotProduct4x8BitPackedSignedAccelerated' => 'idp4x8BitPackedSignedAccelerated',
+		'integerDotProduct4x8BitPackedMixedSignednessAccelerated' => 'idp4x8BitPackedMixedSignednessAccelerated',
+		'integerDotProduct16BitUnsignedAccelerated' => 'idp16BitUnsignedAccelerated',
+		'integerDotProduct16BitSignedAccelerated' => 'idp16BitSignedAccelerated',
+		'integerDotProduct16BitMixedSignednessAccelerated' => 'idp16BitMixedSignednessAccelerated',
+		'integerDotProduct32BitUnsignedAccelerated' => 'idp32BitUnsignedAccelerated',
+		'integerDotProduct32BitSignedAccelerated' => 'idp32BitSignedAccelerated',
+		'integerDotProduct32BitMixedSignednessAccelerated' => 'idp32BitMixedSignednessAccelerated',
+		'integerDotProduct64BitUnsignedAccelerated' => 'idp64BitUnsignedAccelerated',
+		'integerDotProduct64BitSignedAccelerated' => 'idp64BitSignedAccelerated',
+		'integerDotProduct64BitMixedSignednessAccelerated' => 'idp64BitMixedSignednessAccelerated',
+		'integerDotProductAccumulatingSaturating8BitUnsignedAccelerated' => 'idpAccumulatingSaturating8BitUnsignedAccelerated',
+		'integerDotProductAccumulatingSaturating8BitSignedAccelerated' => 'idpAccumulatingSaturating8BitSignedAccelerated',
+		'integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated' => 'idpAccumulatingSaturating8BitMixedSignednessAccelerated',
+		'integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated' => 'idpAccumulatingSaturating4x8BitPackedUnsignedAccelerated',
+		'integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated' => 'idpAccumulatingSaturating4x8BitPackedSignedAccelerated',
+		'integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated' => 'idpAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated',
+		'integerDotProductAccumulatingSaturating16BitUnsignedAccelerated' => 'idpAccumulatingSaturating16BitUnsignedAccelerated',
+		'integerDotProductAccumulatingSaturating16BitSignedAccelerated' => 'idpAccumulatingSaturating16BitSignedAccelerated',
+		'integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated' => 'idpAccumulatingSaturating16BitMixedSignednessAccelerated',
+		'integerDotProductAccumulatingSaturating32BitUnsignedAccelerated' => 'idpAccumulatingSaturating32BitUnsignedAccelerated',
+		'integerDotProductAccumulatingSaturating32BitSignedAccelerated' => 'idpAccumulatingSaturating32BitSignedAccelerated',
+		'integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated' => 'idpAccumulatingSaturating32BitMixedSignednessAccelerated',
+		'integerDotProductAccumulatingSaturating64BitUnsignedAccelerated' => 'idpAccumulatingSaturating64BitUnsignedAccelerated',
+		'integerDotProductAccumulatingSaturating64BitSignedAccelerated' => 'idpAccumulatingSaturating64BitSignedAccelerated',
+		'integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated' => 'idpAccumulatingSaturating64BitMixedSignednessAccelerated',
+	];
+	if (key_exists($full_name, $aliases)) {
+		return $aliases[$full_name];
+	}
+	return $full_name;
 }
