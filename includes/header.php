@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -148,6 +148,23 @@ session_start();
 							<li><a href="listinstancelayers.php">Layers</a></li>
 						</ul>
 					</li>
+					<!-- Global version selection -->
+					<li class="dropdown">
+						<?php
+							$selected_version = "Version selection";
+							if (isset($_SESSION['minversion'])) {
+								$selected_version = "Core ".$_SESSION['minversion']." (and up)";
+							}
+							echo "<a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">$selected_version<span class=\"caret\"></span></a>";
+						?>
+						<ul class="dropdown-menu">
+							<li><a href="database/setapiversion.php?version=all">All versions</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="database/setapiversion.php?version=1.1">Core 1.1 (and up)</a></li>
+							<li><a href="database/setapiversion.php?version=1.2">Core 1.2 (and up)</a></li>
+							<li><a href="database/setapiversion.php?version=1.3">Core 1.3 (and up)</a></li>
+						</ul>
+					</li>					
 					<li><a href="download.php">Download</a></li>
 					<li><a href="about.php">About</a></li>
 				</ul>
@@ -158,6 +175,7 @@ session_start();
 						<ul class="dropdown-menu">
 							<li><a href="https://opengl.gpuinfo.org">OpenGL</a></li>
 							<li><a href="https://opengles.gpuinfo.org">OpenGL ES</a></li>
+							<li><a href="https://opencl.gpuinfo.org">OpenCL</a></li>
 							<li><a href="https://vulkan.gpuinfo.org">Vulkan</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="https://android.gpuinfo.org">Android</a></li>
