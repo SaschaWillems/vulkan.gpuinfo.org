@@ -33,7 +33,7 @@ error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 
 $start = microtime(true);
 
-$total_count = 0;
+$statement_count = 0;
 
 DB::connect();
 
@@ -77,6 +77,7 @@ try {
         }
 
         $formats = [];
+        $formats_combined = [];
         $os_types = [];
         $sql = "SELECT formatid as name, r.ostype as ostype, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
                 where df.$column > 0 and df.$column & :value > 0 and r.ostype > -1
@@ -95,15 +96,37 @@ try {
                 }
                 $formats[$format_os][$row['name']][$format_name] = $row['coverage'];
             }
-            $total_count++;
+            $statement_count++;
         }
+        // Combined
+        $sql = "SELECT formatid as name, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
+                where df.$column > 0 and df.$column & :value > 0 and r.ostype > -1
+                $api_version_filter                    
+                group by formatid
+                order by formatid asc";
+        $stmnt = DB::$connection->prepare($sql);
+        foreach ($format_flags as $key => $format_name) {
+            $params['value'] = $key;
+            $stmnt->execute($params);
+            $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($result as $row) {
+                $formats_combined[$row['name']][$format_name] = $row['coverage'];
+            }
+            $statement_count++;
+        }
+
+        $os_types[] = 'all';
 
         // Generate html pages for each operating system
         foreach ($os_types as $ostype) {
-            $platform = platformname($ostype);
-            // @todo: apiversion
-            $sql_count = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype";
-            $sql_count_params = ['ostype' => $ostype];
+            $sql_count = "SELECT count(distinct(r.displayname)) from reports r join deviceproperties dp on dp.reportid = r.id";
+            if ($ostype !== 'all') {
+                $platform = platformname($ostype);
+                $sql_count .= ' where r.ostype = :ostype';
+                $sql_count_params = ['ostype' => $ostype];
+            } else {
+                $platform = 'all';
+            }
             if ($api_version_filter) {
                 $sql_count .= " " . $api_version_filter;
                 $sql_count_params['apiversion'] = $apiversion;
@@ -124,9 +147,18 @@ try {
             echo "</thead>";
             echo "<tbody>";
                     
-            foreach ($formats[$ostype] as $format_id => $format_coverage) {
+            if ($ostype == 'all') {
+                $source = $formats_combined;
+            } else {
+                $source = $formats[$ostype];
+            }
+
+            foreach ($source as $format_id => $format_coverage) {
                 echo "<tr>";
                 $format_name = $format_names[$format_id];
+                if ($format_name == '') {
+                    $format_name = $format_id;
+                }
                 echo "<td class='format-name'>" . $format_name . "</td>";
                 foreach ($format_flags as $k => $v) {
                     $coverage = 0;
@@ -141,7 +173,10 @@ try {
                     } elseif ($coverage > 0.0) {
                         $class .= ' format-coverage-low';
                     }
-                    $link = "listdevicescoverage.php?$parameter_name=$format_name&featureflagbit=$v&platform=$platform";
+                    $link = "listdevicescoverage.php?$parameter_name=$format_name&featureflagbit=$v";
+                    if ($ostype !== 'all') {
+                        $link .= "&platform=$platform";
+                    }
                     echo "<td><a href='$link' class='$class'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
                 }
                 echo "</tr>";
@@ -170,5 +205,5 @@ DB::disconnect();
 
 $end = microtime(true);
 echo "success".PHP_EOL;
-echo sprintf("Format listing generated: %d queries took %f seconds", $total_count, $end-$start);
+echo sprintf("Format listing generated: %d queries took %f seconds", $statement_count, $end-$start);
 
