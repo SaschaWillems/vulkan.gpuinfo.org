@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,7 @@
 
 require 'pagegenerator.php';
 require './database/database.class.php';
+require './database/sqlrepository.php';
 require './includes/functions.php';
 
 $platform = 'all';
@@ -33,7 +34,7 @@ PageGenerator::header("Extensions");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Extension coverage for ".PageGenerator::platformInfo($platform) ?>
+	<?php echo "<h4>Extension coverage for ".PageGenerator::filterInfo() ?>
 </div>
 
 <center>
@@ -62,15 +63,7 @@ PageGenerator::header("Extensions");
 					$params = [];
 					if ($platform !== 'all') {
 						$params['ostype'] = ostype($platform);
-					}
-					
-					$sql = "SELECT count(DISTINCT displayname) from reports";
-					if ($platform !== 'all') {
-						$sql .= " where ostype = :ostype";
-					}
-					$viewDeviceCount = DB::$connection->prepare($sql);
-					$viewDeviceCount->execute($params);
-					$deviceCount = $viewDeviceCount->fetch(PDO::FETCH_COLUMN);
+					}			
 
 					// Fetch extension features and properties to highlight extensions with a detail page
 					$stmnt = DB::$connection->prepare("SELECT distinct(extension) FROM devicefeatures2");
@@ -80,17 +73,8 @@ PageGenerator::header("Extensions");
 					$stmnt->execute(['ostype' => ostype($platform)]);
 					$extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
 
-					$sql ="SELECT e.name, count(distinct displayname) as coverage from extensions e 
-						join deviceextensions de on de.extensionid = e.id 
-						join reports r on r.id = de.reportid";
-					if ($platform !== 'all') {
-						$sql .= " where ostype = :ostype";
-					}
-					$sql .= " group by name";
-
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute($params);
-					$extensions = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+					$deviceCount = SqlRepository::deviceCount();
+					$extensions = SqlRepository::listExtensions();
 
 					foreach ($extensions as $extension) {
 						if (trim($extension['name']) == '') {

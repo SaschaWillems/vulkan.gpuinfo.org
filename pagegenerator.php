@@ -63,6 +63,29 @@ class PageGenerator
 		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 	}
 
+	public static function filterInfo()
+	{
+		$platform = null;
+		if (isset($_GET['platform'])) {
+			$platform = GET_sanitized('platform');
+		}
+		// @todo: also take from $_GET
+		$apiversion = null;
+		if (isset($_SESSION['minversion'])) {
+			$apiversion = sanitize($_SESSION['minversion']);
+		}
+		$info = '';
+		if ($platform) {
+			$info = "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+		} else {
+			$info = " all platforms";
+		}
+		if ($apiversion) {
+			$info .= " Vulkan $apiversion (and up)";
+		}
+		return $info;
+	}
+
 	/**
 	 * Inserts a set of platform navigation tabs
 	 * 

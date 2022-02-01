@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2021 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2022 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -34,13 +34,17 @@ PageGenerator::header("Formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Linear image tiling format support on ".PageGenerator::platformInfo($platform); ?>
+	<?php echo "<h4>Linear image tiling format support on ".PageGenerator::filterInfo(); ?>
 </div>
 
 <center>
 	<?php 
 		PageGenerator::platformNavigation('listlineartilingformats.php', $platform, true);
-		include "./static/lineartilingformat_$platform.html";
+        $includefile = "lineartilingformat_$platform";
+        if (isset($_SESSION['minversion'])) {
+            $includefile .= "_".str_replace('.', '_', $_SESSION['minversion']);
+        }
+		include "./static/$includefile.html";
 		PageGenerator::footer();
 	?>
 </center>
