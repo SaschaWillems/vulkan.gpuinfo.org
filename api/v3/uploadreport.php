@@ -213,6 +213,26 @@
 		}
 	}
 
+	function importProfiles($json, $reportid) {
+		if (!array_key_exists('profiles', $json)) {
+			return;
+		}
+		// Features
+		$jsonnode = $json['profiles'];
+		foreach ($jsonnode as $profile) {
+
+			// Insert
+			$sql = "INSERT INTO deviceprofiles (reportid, name, specversion, supported) VALUES (:reportid, :name, :specversion, :supported)";
+			try {
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute([":reportid" => $reportid, ":name" => $profile['profileName'], ":specversion" => $profile['specVersion'], ":supported" => $profile['supported']]);
+			} catch (Exception $e) {
+				mailError("Error at device profiles: ".$e->getMessage(), $json);
+				die('Error while trying to upload report (error at devie profiles)');
+			}															
+		}	
+	}
+
 	DB::connect();
 	
 	$jsonFile = file_get_contents($file);
@@ -868,6 +888,8 @@
 	importCore11Data($json, $reportid);
 	importCore12Data($json, $reportid);
 	importCore13Data($json, $reportid);
+
+	importProfiles($json, $reportid);
 
 	/*
 		Instance
