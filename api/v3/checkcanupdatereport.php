@@ -27,6 +27,7 @@
      *  - If the newer report has Core 1.2 features and/or properties that the old report is lacking
      *  - If the newer report has Core 1.3 features and/or properties that the old report is lacking
      *  - If the newer report has extension features and/or properties that the old report is lacking
+	 *  - If the newer report has profiles that the old report is lacking
      */
 
 	include './../../database/database.class.php';
@@ -169,6 +170,28 @@
 		return false;
 	}
 
+	function check_profiles_updatable($report, $compare_id, &$updatable) {
+		if (array_key_exists('profiles', $report)) {
+			$stmnt = DB::$connection->prepare("SELECT name from deviceprofiles where reportid = :reportid");
+			$stmnt->execute(['reportid' => $compare_id]);
+			$profiles_database = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
+			// Check if at least one profile is missing
+			$jsonnode = $report['profiles'];
+			$profile_missing = false;
+			foreach ($jsonnode as $profile) {
+				if (!in_array($profile['profileName'], $profiles_database)) {
+					$profile_missing = true;
+					break;
+				}
+			}
+			if ($profile_missing) {
+			 	$updatable[] = 'Vulkan profiles';
+				return true;
+			}
+		}
+		return false;
+	}
+
 	if (!isset($_GET['reportid'])) {
 		header('HTTP/1.1 400 No report id set');
 		exit();
@@ -241,6 +264,7 @@
 		check_core13_data_updatable($report, $reportid, $updatable);
 		check_extension_features_updatable($report, $reportid, $updatable);
 		check_extension_properties_updatable($report, $reportid, $updatable);
+		check_profiles_updatable($report, $reportid, $updatable);
 		DB::disconnect();
 		$can_update = count($updatable) > 0;
 		if ($can_update) {			
