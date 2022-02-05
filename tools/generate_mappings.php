@@ -106,6 +106,7 @@ class Extension
     public $group;
     public $features2 = null;
     public $properties2 = null;
+    public $promotedto = null;
 }
 
 class ExtensionContainer
@@ -117,7 +118,7 @@ class ExtensionContainer
         foreach ($xml->extensions->extension as $ext_node) {
             $features2_node = null;
             $properties2_node = null;
-            // We're only interested in extensions with property or feature types                
+            // We're interested in extensions with property or feature types                
             foreach ($ext_node->require as $require) {
                 foreach ($require as $requirement) {
                     if (strcasecmp($requirement->getName, 'type')) {
@@ -132,14 +133,16 @@ class ExtensionContainer
                     }
                 }
             }
-            if ($features2_node || $properties2_node) {
-                $ext = new Extension();
-                $ext->name = (string)$ext_node['name'];
-                $ext->group = substr($ext->name, 3, strpos($ext->name, '_', 3) - 3);
-                $ext->features2 = $features2_node;
-                $ext->properties2 = $properties2_node;
-                $this->extensions[] = $ext;
+            $ext = new Extension();
+            $ext->name = (string)$ext_node['name'];
+            $ext->group = substr($ext->name, 3, strpos($ext->name, '_', 3) - 3);
+            $ext->features2 = $features2_node;
+            $ext->properties2 = $properties2_node;
+            // Has the extension been promoted into core?
+            if ($ext_node['promotedto']) {
+                $ext->promotedto = (string)$ext_node['promotedto'];
             }
+            $this->extensions[] = $ext;
         }
     }
 }
@@ -162,17 +165,13 @@ $type_container = new TypeContainer($xml);
 $extension_container = new ExtensionContainer($xml, $type_container);
 ob_start();
 foreach ($extension_container->extensions as $extension) {
-    $struct_type_pyshical_device_features = null;
-    $struct_type_pyshical_device_properties = null;
-    if ($extension->features2) {
-        $struct_type_pyshical_device_features = $extension->features2['name'];
-    }
-    if ($extension->properties2) {
-        $struct_type_pyshical_device_properties = $extension->properties2['name'];
-    }
+    $struct_type_pyhsical_device_features = $extension->features2['name'] ? ("'".$extension->features2['name']."'") : 'null';
+    $struct_type_physical_device_properties = $extension->properties2['name'] ? ("'".$extension->properties2['name']."'") : 'null';
+    $promoted_to = $extension->promotedto ? ("'".$extension->promotedto."'") : 'null';
     echo "  '".$extension->name."' => [".PHP_EOL;
-    echo "      'struct_type_physical_device_features' => '".($struct_type_pyshical_device_features ?? null)."',".PHP_EOL;
-    echo "      'struct_type_physical_device_properties' => '".($struct_type_pyshical_device_properties ?? null)."',".PHP_EOL;
+    echo "      'struct_type_physical_device_features' => ".$struct_type_pyhsical_device_features.",".PHP_EOL;
+    echo "      'struct_type_physical_device_properties' => ".$struct_type_physical_device_properties.",".PHP_EOL;
+    echo "      'promoted_to' => ".$promoted_to.",".PHP_EOL;
     echo "  ],".PHP_EOL;
 }
 $output = ob_get_contents();
