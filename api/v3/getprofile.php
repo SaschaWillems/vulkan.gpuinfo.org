@@ -477,6 +477,18 @@ function convertFieldValue($name, $value) {
             ];
             $ret_val = getVkFlags($flags, $value);
             return $ret_val;            
+        case 'queueflags':
+            $flags = [
+                0x00000001 => 'VK_QUEUE_GRAPHICS_BIT',
+                0x00000002 => 'VK_QUEUE_COMPUTE_BIT',
+                0x00000004 => 'VK_QUEUE_TRANSFER_BIT',
+                0x00000008 => 'VK_QUEUE_SPARSE_BINDING_BIT',
+                0x00000010 => 'VK_QUEUE_PROTECTED_BIT',
+                0x00000020 => 'VK_QUEUE_VIDEO_DECODE_BIT_KHR',
+                0x00000040 => 'VK_QUEUE_VIDEO_ENCODE_BIT_KHR',
+            ];
+            $ret_val = getVkFlags($flags, $value);
+            return $ret_val;            
     }
     return $value;
 }
@@ -615,12 +627,37 @@ function insertDeviceProperties($version, $reportid, &$cap_node) {
     $cap_node[$req_name]['properties'][$struct_name] = $features_node;
 }
 
+function insertQueueFamiliesProperties($reportid, &$profile_queues) {
+    $stmnt = DB::$connection->prepare("SELECT * from devicequeues where reportid = :reportid");
+    $stmnt->execute([":reportid" => $reportid]);
+    while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+        $profile_queue_family = [
+            'VkQueueFamilyProperties' => [
+                'queueFlags' => convertFieldValue('queueFlags', $row['flags']),
+                'queueCount' => intval($row['count']),
+                'timestampValidBits' => intval($row['timestampValidBits']),
+                'minImageTransferGranularity' => [
+                    'width' => intval($row['minImageTransferGranularity.width']),
+                    'height' => intval($row['minImageTransferGranularity.height']),
+                    'depth' => intval($row['minImageTransferGranularity.depth']),
+                ]
+            ]
+        ];
+        $profile_queues[] = $profile_queue_family;
+    }
+   
+}
+
 $versions = ['1.0', '1.1', '1.2', '1.3'];
 
 foreach ($versions as $version) {
     insertDeviceFeatures($version, $reportid, $profile_caps);
     insertDeviceProperties($version, $reportid, $profile_caps);
 }
+
+$profile_queues = null;
+insertQueueFamiliesProperties($reportid, $profile_queues);
+$profile_caps['baseline']['queueFamiliesProperties'] = $profile_queues;
 
 // Extensions
 $stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
