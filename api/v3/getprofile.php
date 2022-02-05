@@ -136,6 +136,10 @@ function getVkFlags($flags, $flag) {
 	return $supported_flags;
 }
 
+function getVkValue($lookup, $value) {
+    return (in_array($value, $lookup) ? array_search($value, $lookup) : null);    
+}
+
 function convertFieldValue($name, $value) {
     switch (strtolower($name)) {
         case 'vendorid':
@@ -280,6 +284,52 @@ function convertFieldValue($name, $value) {
             ];
             $ret_val = getVkFlags($flags, $value);
             return $ret_val;
+        case 'denormbehaviorindependence':
+        case 'roundingmodeindependence':
+            $lookup = [
+                'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY' => 0,
+                'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL' => 1,
+                'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE' => 2,
+            ];          
+            $ret_val = getVkValue($lookup, $value);
+            return $ret_val;
+        case 'driverid':
+            $lookup = [
+                'VK_DRIVER_ID_AMD_PROPRIETARY' => 1,
+                'VK_DRIVER_ID_AMD_OPEN_SOURCE' => 2,
+                'VK_DRIVER_ID_MESA_RADV' => 3,
+                'VK_DRIVER_ID_NVIDIA_PROPRIETARY' => 4,
+                'VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS' => 5,
+                'VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA' => 6,
+                'VK_DRIVER_ID_IMAGINATION_PROPRIETARY' => 7,
+                'VK_DRIVER_ID_QUALCOMM_PROPRIETARY' => 8,
+                'VK_DRIVER_ID_ARM_PROPRIETARY' => 9,
+                'VK_DRIVER_ID_GOOGLE_SWIFTSHADER' => 10,
+                'VK_DRIVER_ID_GGP_PROPRIETARY' => 11,
+                'VK_DRIVER_ID_BROADCOM_PROPRIETARY' => 12,
+                'VK_DRIVER_ID_MESA_LLVMPIPE' => 13,
+                'VK_DRIVER_ID_MOLTENVK' => 14,
+                'VK_DRIVER_ID_COREAVI_PROPRIETARY' => 15,
+                'VK_DRIVER_ID_JUICE_PROPRIETARY' => 16,
+                'VK_DRIVER_ID_VERISILICON_PROPRIETARY' => 17,
+                'VK_DRIVER_ID_MESA_TURNIP' => 18,
+                'VK_DRIVER_ID_MESA_V3DV' => 19,
+                'VK_DRIVER_ID_MESA_PANVK' => 20,
+            ];
+            $ret_val = getVkValue($lookup, $value);
+            return $ret_val;
+        case 'framebufferintegercolorsamplecounts':
+            $flags = [
+                0x00000001 => 'VK_SAMPLE_COUNT_1_BIT',
+                0x00000002 => 'VK_SAMPLE_COUNT_2_BIT',
+                0x00000004 => 'VK_SAMPLE_COUNT_4_BIT',
+                0x00000008 => 'VK_SAMPLE_COUNT_8_BIT',
+                0x00000010 => 'VK_SAMPLE_COUNT_16_BIT',
+                0x00000020 => 'VK_SAMPLE_COUNT_32_BIT',
+                0x00000040 => 'VK_SAMPLE_COUNT_64_BIT',
+            ];
+            $ret_val = getVkFlags($flags, $value);
+            return $ret_val;            
     }
     return $value;
 }
