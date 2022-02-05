@@ -19,8 +19,9 @@
 *
 */
 
-include './../../database/database.class.php';
-include './../../includes/functions.php';
+require './../../database/database.class.php';
+require './../../includes/functions.php';
+require './../../includes/mappings.php';
 	
 if (!isset($_GET['id'])) {
     header('HTTP/ 400 missing_or');
@@ -530,6 +531,26 @@ function insertDeviceFeatures($version, $reportid, &$cap_node) {
     $cap_node[$req_name]['features'][$struct_name] = $features_node;
 }
 
+function insertDeviceExtensionFeatures($reportid, &$cap_node) {
+    $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
+    $stmnt->execute([":reportid" => $reportid]);
+    $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
+    foreach ($result as $key => $values) {
+        if (!array_key_exists($key, Mappings::$extensions)) {
+            continue;
+        }
+        $feature_node = null;
+        $ext = Mappings::$extensions[$key];
+        if ($ext['struct_type_physical_device_features'] == '') {
+            continue;
+        }
+        foreach ($values as $value) {
+            $feature_node[$value['name']] = boolval($value['supported']);
+        }
+        $cap_node['vulkan11requirements']['features'][$ext['struct_type_physical_device_features']] = $feature_node;
+    }
+}
+
 function insertDeviceLimits($reportid, &$json_node) {
     $limit_stmnt = DB::$connection->prepare('SELECT * from devicelimits where reportid = :reportid');
     $limit_stmnt->execute([":reportid" => $reportid]);
@@ -654,6 +675,7 @@ foreach ($versions as $version) {
     insertDeviceFeatures($version, $reportid, $profile_caps);
     insertDeviceProperties($version, $reportid, $profile_caps);
 }
+insertDeviceExtensionFeatures($reportid, $profile_caps);
 
 $profile_queues = null;
 insertQueueFamiliesProperties($reportid, $profile_queues);
