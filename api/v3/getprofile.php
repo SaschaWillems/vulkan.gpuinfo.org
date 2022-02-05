@@ -66,19 +66,45 @@ $profile_caps['baseline'] = [
     'queueFamiliesProperties' => []
 ];
 
-function skipField($name) {
+function skipField($name, $version) {
     $skip_fields = [
         'reportid',
         'headerversion',
         'productModel',
         'productManufacturer',
-        'apiversionraw',
         'deviceid',
         'devicename',
         'devicetype',
         'driverversion',
         'driverversionraw',
     ];
+    if ($version == '1.0') {
+        $skip_fields = array_merge($skip_fields, [
+            'residencyAlignedMipSize',
+            'residencyNonResidentStrict',
+            'residencyStandard2DBlockShape',
+            'residencyStandard2DMultisampleBlockShape',
+            'residencyStandard3DBlockShape',
+            'subgroupProperties.subgroupSize',
+            'subgroupProperties.supportedStages',
+            'subgroupProperties.supportedOperations',
+            'subgroupProperties.quadOperationsInAllStages',
+            'maxComputeWorkGroupCount[0]',
+            'maxComputeWorkGroupCount[1]',
+            'maxComputeWorkGroupCount[2]',
+            'maxComputeWorkGroupSize[0]',
+            'maxComputeWorkGroupSize[1]',
+            'maxComputeWorkGroupSize[2]',
+            'maxViewportDimensions[0]',
+            'maxViewportDimensions[1]',
+            'pointSizeRange[0]',
+            'pointSizeRange[1]',
+            'viewportBoundsRange[0]',
+            'viewportBoundsRange[1]',
+            'lineWidthRange[0]',
+            'lineWidthRange[1]',
+        ]);
+    }
     return in_array($name, $skip_fields);
 }
 
@@ -143,6 +169,7 @@ function getVkValue($lookup, $value) {
 function convertFieldValue($name, $value) {
     switch (strtolower($name)) {
         case 'vendorid':
+        case 'apiversion':
         case 'maxmultiviewviewcount':
         case 'maxmultiviewinstanceindex':
         case 'devicenodemask':
@@ -173,12 +200,98 @@ function convertFieldValue($name, $value) {
         case 'maxdescriptorsetinlineuniformblocks':
         case 'maxdescriptorsetupdateafterbindinlineuniformblocks':
         case 'maxinlineuniformtotalsize':
+        case 'mintexelgatheroffset':
+        case 'mintexeloffset':
+        case 'minmemorymapalignment':
+        case 'discretequeuepriorities':
+        case 'maxbounddescriptorsets':
+        case 'maxclipdistances':
+        case 'maxcolorattachments':
+        case 'maxcombinedclipandculldistances':
+        case 'maxcomputesharedmemorysize':
+        case 'maxcomputeworkgroupcount[3]':
+        case 'maxcomputeworkgroupinvocations':
+        case 'maxcomputeworkgroupsize[3]':
+        case 'maxculldistances':
+        case 'maxdescriptorsetinputattachments':
+        case 'maxdescriptorsetsampledimages':
+        case 'maxdescriptorsetsamplers':
+        case 'maxdescriptorsetstoragebuffers':
+        case 'maxdescriptorsetstoragebuffersdynamic':
+        case 'maxdescriptorsetstorageimages':
+        case 'maxdescriptorsetuniformbuffers':
+        case 'maxdescriptorsetuniformbuffersdynamic':
+        case 'maxdrawindexedindexvalue':
+        case 'maxdrawindirectcount':
+        case 'maxfragmentcombinedoutputresources':
+        case 'maxfragmentdualsrcattachments':
+        case 'maxfragmentinputcomponents':
+        case 'maxfragmentoutputattachments':
+        case 'maxframebufferheight':
+        case 'maxframebufferlayers':
+        case 'maxframebufferwidth':
+        case 'maxgeometryinputcomponents':
+        case 'maxgeometryoutputcomponents':
+        case 'maxgeometryoutputvertices':
+        case 'maxgeometryshaderinvocations':
+        case 'maxgeometrytotaloutputcomponents':
+        case 'maximagearraylayers':
+        case 'maximagedimension1d':
+        case 'maximagedimension2d':
+        case 'maximagedimension3d':
+        case 'maximagedimensioncube':
+        case 'maxmemoryallocationcount':
+        case 'maxperstagedescriptorinputattachments':
+        case 'maxperstagedescriptorsampledimages':
+        case 'maxperstagedescriptorsamplers':
+        case 'maxperstagedescriptorstoragebuffers':
+        case 'maxperstagedescriptorstorageimages':
+        case 'maxperstagedescriptoruniformbuffers':
+        case 'maxperstageresources':
+        case 'maxpushconstantssize':
+        case 'maxsamplemaskwords':
+        case 'maxsamplerallocationcount':
+        case 'maxstoragebufferrange':
+        case 'maxtessellationcontrolperpatchoutputcomponents':
+        case 'maxtessellationcontrolpervertexinputcomponents':
+        case 'maxtessellationcontrolpervertexoutputcomponents':
+        case 'maxtessellationcontroltotaloutputcomponents':
+        case 'maxtessellationevaluationinputcomponents':
+        case 'maxtessellationevaluationoutputcomponents':
+        case 'maxtessellationgenerationlevel':
+        case 'maxtessellationpatchsize':
+        case 'maxtexelbufferelements':
+        case 'maxtexelgatheroffset':
+        case 'maxtexeloffset':
+        case 'maxuniformbufferrange':
+        case 'maxvertexinputattributeoffset':
+        case 'maxvertexinputattributes':
+        case 'maxvertexinputbindings':
+        case 'maxvertexinputbindingstride':
+        case 'maxvertexoutputcomponents':
+        case 'maxviewportdimensions[2]':
+        case 'maxviewports':
+        case 'mipmapprecisionbits':
+        case 'subpixelinterpolationoffsetbits':
+        case 'subpixelprecisionbits':
+        case 'subtexelprecisionbits':
+        case 'viewportsubpixelbits':
             return intval($value);
+        // Float
+        case 'maxsamplerlodbias':
+        case 'maxsampleranisotropy':
+        case 'mininterpolationoffset':
+        case 'maxinterpolationoffset':
+        case 'timestampperiod':
+        case 'pointsizegranularity':
+        case 'linewidthgranularity':
+            return floatval($value);
         case 'pipelinecacheuuid':
         case 'deviceuuid':
         case 'driveruuid':
         case 'deviceluid':
             return unserialize($value);
+        // Boolean
         case 'deviceluidvalid':
         case 'protectednofault':
         case 'subgroupquadoperationsinallstages':
@@ -240,6 +353,9 @@ function convertFieldValue($name, $value) {
         case 'idpaccumulatingsaturating64bitmixedsignednessaccelerated':
         case 'storagetexelbufferoffsetsingletexelalignment':
         case 'uniformtexelbufferoffsetsingletexelalignment':            
+        case 'timestampcomputeandgraphics':
+        case 'strictlines':
+        case 'standardsamplelocations':
             return boolval($value);
         case 'conformanceversion':
             $parts = explode('.', $value);
@@ -319,6 +435,15 @@ function convertFieldValue($name, $value) {
             $ret_val = getVkValue($lookup, $value);
             return $ret_val;
         case 'framebufferintegercolorsamplecounts':
+        case 'framebuffercolorsamplecounts':
+        case 'framebufferdepthsamplecounts':
+        case 'framebufferstencilsamplecounts':
+        case 'framebuffernoattachmentssamplecounts':
+        case 'sampledimagecolorsamplecounts':
+        case 'sampledimageintegersamplecounts':
+        case 'sampledimagedepthsamplecounts':
+        case 'sampledimagestencilsamplecounts':
+        case 'storageimagesamplecounts':
             $flags = [
                 0x00000001 => 'VK_SAMPLE_COUNT_1_BIT',
                 0x00000002 => 'VK_SAMPLE_COUNT_2_BIT',
@@ -363,12 +488,47 @@ function insertDeviceFeatures($version, $reportid, &$cap_node) {
     }
     $features_node = [];
     foreach ($result as $key => $value) {
-        if (skipField($key)) {
+        if (skipField($key, $version)) {
             continue;
         }
         $features_node[$key] = boolval($value);
     }
     $cap_node[$req_name]['features'][$struct_name] = $features_node;
+}
+
+function insertDeviceLimits($reportid, &$json_node) {
+    $limit_stmnt = DB::$connection->prepare('SELECT * from devicelimits where reportid = :reportid');
+    $limit_stmnt->execute([":reportid" => $reportid]);
+    $limit_result = $limit_stmnt->fetch(PDO::FETCH_ASSOC);
+    foreach ($limit_result as $limit_key => $limit_value) {
+        if (skipField($limit_key, '1.0')) {
+            continue;
+        }
+        $limit_properties[$limit_key] = convertFieldValue($limit_key, $limit_value);
+    }
+
+    $limitToArray = function($name, $dim, $type) use ($limit_result) {
+        $values = [];
+        for ($i = 0; $i < $dim; $i++) {
+            if ($type == 'int') {
+                $values[] = intval($limit_result[$name.'['.$i.']']);
+            };
+            if ($type == 'float') {
+                $values[] = floatval($limit_result[$name.'['.$i.']']);
+            };
+        }
+        return $values;
+    };
+
+    // Multi-dimensional arrays 
+   
+    $limit_properties['maxComputeWorkGroupCount'] = $limitToArray('maxComputeWorkGroupCount', 3, 'int');
+    $limit_properties['maxViewportDimensions'] = $limitToArray('maxViewportDimensions', 2, 'int');
+    $limit_properties['pointSizeRange'] = $limitToArray('pointSizeRange', 2, 'float');
+    $limit_properties['viewportBoundsRange'] = $limitToArray('viewportBoundsRange', 2, 'float');
+    $limit_properties['lineWidthRange'] = $limitToArray('lineWidthRange', 2, 'float');
+
+    $json_node['limits'] = $limit_properties;
 }
 
 function insertDeviceProperties($version, $reportid, &$cap_node) {
@@ -402,11 +562,33 @@ function insertDeviceProperties($version, $reportid, &$cap_node) {
     }
     $features_node = [];
     foreach ($result as $key => $value) {
-        if (skipField($key)) {
+        if (skipField($key, $version)) {
             continue;
         }
-        $converted_value = convertFieldValue($key, $value);
-        $features_node[capitalizeFieldName($key)] = $converted_value;
+        $key_name = $key;
+        if ($version == '1.0') {
+            // Use non-human readable api version
+            if ($key == 'apiversion') {
+                continue;
+            }
+            if ($key == 'apiversionraw') {
+                $key_name = 'apiversion';
+            }
+        }
+        $converted_value = convertFieldValue($key_name, $value);
+        $features_node[capitalizeFieldName($key_name)] = $converted_value;
+    }
+    if ($version == '1.0') {
+        // Remap sparse properties into struct
+        $sparse_stmnt = DB::$connection->prepare('SELECT residencyAlignedMipSize, residencyNonResidentStrict, residencyStandard2DBlockShape, residencyStandard2DMultisampleBlockShape, residencyStandard3DBlockShape from deviceproperties where reportid = :reportid');
+        $sparse_stmnt->execute([":reportid" => $reportid]);
+        $sparse_result = $sparse_stmnt->fetch(PDO::FETCH_ASSOC);
+        foreach ($sparse_result as $sparse_key => $sparse_value) {
+            $sparse_properties[$sparse_key] = boolval($sparse_value);
+        }
+        $features_node['sparseProperties'] = $sparse_properties;
+        // Append limits
+        insertDeviceLimits($reportid, $features_node);
     }
     $cap_node[$req_name]['properties'][$struct_name] = $features_node;
 }
