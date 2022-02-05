@@ -85,10 +85,40 @@ function skipField($name) {
 function capitalizeFieldName($name) {
     $spelling = [
         'vendorid' => 'vendorID',
-        'apiversion' => 'apiVersion'
+        'apiversion' => 'apiVersion',
+		'idp8bitunsignedaccelerated' => 'integerDotProduct8BitUnsignedAccelerated',
+		'idp8bitsignedaccelerated' => 'integerDotProduct8BitSignedAccelerated',
+		'idp8bitmixedsignednessaccelerated' => 'integerDotProduct8BitMixedSignednessAccelerated',
+		'idp4x8bitpackedunsignedaccelerated' => 'integerDotProduct4x8BitPackedUnsignedAccelerated',
+		'idp4x8bitpackedsignedaccelerated' => 'integerDotProduct4x8BitPackedSignedAccelerated',
+		'idp4x8bitpackedmixedsignednessaccelerated' => 'integerDotProduct4x8BitPackedMixedSignednessAccelerated',
+		'idp16bitunsignedaccelerated' => 'integerDotProduct16BitUnsignedAccelerated',
+		'idp16bitsignedaccelerated' => 'integerDotProduct16BitSignedAccelerated',
+		'idp16bitmixedsignednessaccelerated' => 'integerDotProduct16BitMixedSignednessAccelerated',
+		'idp32bitunsignedaccelerated' => 'integerDotProduct32BitUnsignedAccelerated',
+		'idp32bitsignedaccelerated' => 'integerDotProduct32BitSignedAccelerated',
+		'idp32bitmixedsignednessaccelerated' => 'integerDotProduct32BitMixedSignednessAccelerated',
+		'idp64bitunsignedaccelerated' => 'integerDotProduct64BitUnsignedAccelerated',
+		'idp64bitsignedaccelerated' => 'integerDotProduct64BitSignedAccelerated',
+		'idp64bitmixedsignednessaccelerated' => 'integerDotProduct64BitMixedSignednessAccelerated',
+		'idpaccumulatingsaturating8bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating8BitUnsignedAccelerated',
+		'idpaccumulatingsaturating8bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating8BitSignedAccelerated',
+		'idpaccumulatingsaturating8bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated',
+		'idpaccumulatingsaturating4x8bitpackedunsignedaccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated',
+		'idpaccumulatingsaturating4x8bitpackedsignedaccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated',
+		'idpaccumulatingsaturating4x8bitpackedmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated',
+		'idpaccumulatingsaturating16bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating16BitUnsignedAccelerated',
+		'idpaccumulatingsaturating16bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating16BitSignedAccelerated',
+		'idpaccumulatingsaturating16bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated',
+		'idpaccumulatingsaturating32bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating32BitUnsignedAccelerated',
+		'idpaccumulatingsaturating32bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating32BitSignedAccelerated',
+		'idpaccumulatingsaturating32bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated',
+		'idpaccumulatingsaturating64bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating64BitUnsignedAccelerated',
+		'idpaccumulatingsaturating64bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating64BitSignedAccelerated',
+		'idpaccumulatingsaturating64bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated'
     ];
     if (array_key_exists(strtolower($name), $spelling)) {
-        return $spelling[$name];
+        return $spelling[strtolower($name)];
     }
     return $name;
 }
@@ -98,6 +128,35 @@ function convertFieldValue($name, $value) {
         case 'vendorid':
         case 'maxmultiviewviewcount':
         case 'maxmultiviewinstanceindex':
+        case 'devicenodemask':
+        case 'subgroupsize':
+        case 'maxpersetdescriptors':
+        case 'maxperstagedescriptorupdateafterbindsamplers':
+        case 'maxperstagedescriptorupdateafterbinduniformbuffers':
+        case 'maxperstagedescriptorupdateafterbindstoragebuffers':
+        case 'maxperstagedescriptorupdateafterbindsampledimages':
+        case 'maxperstagedescriptorupdateafterbindstorageimages':
+        case 'maxperstagedescriptorupdateafterbindinputattachments':
+        case 'maxperstageupdateafterbindresources':
+        case 'maxdescriptorsetupdateafterbindsamplers':
+        case 'maxdescriptorsetupdateafterbinduniformbuffers':
+        case 'maxdescriptorsetupdateafterbinduniformbuffersdynamic':
+        case 'maxdescriptorsetupdateafterbindstoragebuffers':
+        case 'maxdescriptorsetupdateafterbindstoragebuffersdynamic':
+        case 'maxdescriptorsetupdateafterbindsampledimages':
+        case 'maxdescriptorsetupdateafterbindstorageimages':
+        case 'maxdescriptorsetupdateafterbindinputattachments':
+        case 'maxupdateafterbinddescriptorsinallpools':
+        case 'framebufferintegercolorsamplecounts':
+        case 'minsubgroupsize':
+        case 'maxsubgroupsize':
+        case 'maxcomputeworkgroupsubgroups':
+        case 'maxinlineuniformblocksize':
+        case 'maxperstagedescriptorinlineuniformblocks':
+        case 'maxperstagedescriptorupdateafterbindinlineuniformblocks':
+        case 'maxdescriptorsetinlineuniformblocks':
+        case 'maxdescriptorsetupdateafterbindinlineuniformblocks':
+        case 'maxinlineuniformtotalsize':
             return intval($value);
         case 'pipelinecacheuuid':
         case 'deviceuuid':
@@ -107,6 +166,64 @@ function convertFieldValue($name, $value) {
         case 'deviceluidvalid':
         case 'protectednofault':
         case 'subgroupquadoperationsinallstages':
+        case 'shadersignedzeroinfnanpreservefloat16':
+        case 'shadersignedzeroinfnanpreservefloat32':
+        case 'shadersignedzeroinfnanpreservefloat64':
+        case 'shaderdenormpreservefloat16':
+        case 'shaderdenormpreservefloat32':
+        case 'shaderdenormpreservefloat64':
+        case 'shaderdenormflushtozerofloat16':
+        case 'shaderdenormflushtozerofloat32':
+        case 'shaderdenormflushtozerofloat64':
+        case 'shaderroundingmodertefloat16':
+        case 'shaderroundingmodertefloat32':
+        case 'shaderroundingmodertefloat64':
+        case 'shaderroundingmodertzfloat16':
+        case 'shaderroundingmodertzfloat32':
+        case 'shaderroundingmodertzfloat64':
+        case 'shaderuniformbufferarraynonuniformindexingnative':
+        case 'shadersampledimagearraynonuniformindexingnative':
+        case 'shaderstoragebufferarraynonuniformindexingnative':
+        case 'shaderstorageimagearraynonuniformindexingnative':
+        case 'shaderinputattachmentarraynonuniformindexingnative':
+        case 'robustbufferaccessupdateafterbind':
+        case 'quaddivergentimplicitlod':
+        case 'independentresolvenone':
+        case 'independentresolve':
+        case 'filterminmaxsinglecomponentformats':
+        case 'filterminmaximagecomponentmapping':
+        case 'idp8bitunsignedaccelerated':
+        case 'idp8bitsignedaccelerated':
+        case 'idp8bitmixedsignednessaccelerated':
+        case 'idp4x8bitpackedunsignedaccelerated':
+        case 'idp4x8bitpackedsignedaccelerated':
+        case 'idp4x8bitpackedmixedsignednessaccelerated':
+        case 'idp16bitunsignedaccelerated':
+        case 'idp16bitsignedaccelerated':
+        case 'idp16bitmixedsignednessaccelerated':
+        case 'idp32bitunsignedaccelerated':
+        case 'idp32bitsignedaccelerated':
+        case 'idp32bitmixedsignednessaccelerated':
+        case 'idp64bitunsignedaccelerated':
+        case 'idp64bitsignedaccelerated':
+        case 'idp64bitmixedsignednessaccelerated':
+        case 'idpaccumulatingsaturating8bitunsignedaccelerated':
+        case 'idpaccumulatingsaturating8bitsignedaccelerated':
+        case 'idpaccumulatingsaturating8bitmixedsignednessaccelerated':
+        case 'idpaccumulatingsaturating4x8bitpackedunsignedaccelerated':
+        case 'idpaccumulatingsaturating4x8bitpackedsignedaccelerated':
+        case 'idpaccumulatingsaturating4x8bitpackedmixedsignednessaccelerated':
+        case 'idpaccumulatingsaturating16bitunsignedaccelerated':
+        case 'idpaccumulatingsaturating16bitsignedaccelerated':
+        case 'idpaccumulatingsaturating16bitmixedsignednessaccelerated':
+        case 'idpaccumulatingsaturating32bitunsignedaccelerated':
+        case 'idpaccumulatingsaturating32bitsignedaccelerated':
+        case 'idpaccumulatingsaturating32bitmixedsignednessaccelerated':
+        case 'idpaccumulatingsaturating64bitunsignedaccelerated':
+        case 'idpaccumulatingsaturating64bitsignedaccelerated':
+        case 'idpaccumulatingsaturating64bitmixedsignednessaccelerated':
+        case 'storagetexelbufferoffsetsingletexelalignment':
+        case 'uniformtexelbufferoffsetsingletexelalignment':            
             return boolval($value);
     }
     return $value;
