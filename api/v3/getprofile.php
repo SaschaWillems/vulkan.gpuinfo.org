@@ -289,8 +289,9 @@ function convertFieldValue($name, $value) {
         case 'pipelinecacheuuid':
         case 'deviceuuid':
         case 'driveruuid':
-        case 'deviceluid':
             return unserialize($value);
+        case 'deviceluid':
+            return array_slice(unserialize($value), 0, 8);
         // Boolean
         case 'deviceluidvalid':
         case 'protectednofault':
@@ -408,6 +409,27 @@ function convertFieldValue($name, $value) {
                 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE' => 2,
             ];          
             $ret_val = getVkValue($lookup, $value);
+            return $ret_val;
+        case 'pointclippingbehavior':
+            $lookup = [
+                'VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES' => 0,
+                'VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY' => 1,
+            ];          
+            $ret_val = getVkValue($lookup, $value);
+            return $ret_val;
+        case 'subgroupsupportedoperations':
+            $flags = [
+                0x00000001 => 'VK_SUBGROUP_FEATURE_BASIC_BIT',
+                0x00000002 => 'VK_SUBGROUP_FEATURE_VOTE_BIT',
+                0x00000004 => 'VK_SUBGROUP_FEATURE_ARITHMETIC_BIT',
+                0x00000008 => 'VK_SUBGROUP_FEATURE_BALLOT_BIT',
+                0x00000010 => 'VK_SUBGROUP_FEATURE_SHUFFLE_BIT',
+                0x00000020 => 'VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT',
+                0x00000040 => 'VK_SUBGROUP_FEATURE_CLUSTERED_BIT',
+                0x00000080 => 'VK_SUBGROUP_FEATURE_QUAD_BIT',
+                0x00000100 => 'VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV',
+            ];          
+            $ret_val = getVkFlags($flags, $value);
             return $ret_val;
         case 'driverid':
             $lookup = [
