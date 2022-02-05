@@ -123,6 +123,19 @@ function capitalizeFieldName($name) {
     return $name;
 }
 
+function getVkFlags($flags, $flag) {
+	$flag_values = array_values($flags);
+    $supported_flags = [];
+	$index = 0;
+	foreach ($flags as $i => $value) {
+		if ($flag & $i) {
+			$supported_flags[] = $flag_values[$index];
+		}
+		$index++;
+	}
+	return $supported_flags;
+}
+
 function convertFieldValue($name, $value) {
     switch (strtolower($name)) {
         case 'vendorid':
@@ -147,7 +160,6 @@ function convertFieldValue($name, $value) {
         case 'maxdescriptorsetupdateafterbindstorageimages':
         case 'maxdescriptorsetupdateafterbindinputattachments':
         case 'maxupdateafterbinddescriptorsinallpools':
-        case 'framebufferintegercolorsamplecounts':
         case 'minsubgroupsize':
         case 'maxsubgroupsize':
         case 'maxcomputeworkgroupsubgroups':
@@ -225,6 +237,49 @@ function convertFieldValue($name, $value) {
         case 'storagetexelbufferoffsetsingletexelalignment':
         case 'uniformtexelbufferoffsetsingletexelalignment':            
             return boolval($value);
+        case 'conformanceversion':
+            $parts = explode('.', $value);
+            $ret_val = [
+                'major' => intval($parts[0]),
+                'minor' => intval($parts[1]),
+                'patch' => intval($parts[2]),
+                'subminor' => intval($parts[3]),
+            ];
+            return $ret_val;
+        case 'requiredsubgroupsizestages':
+        case 'subgroupsupportedstages':
+            $flags = [
+                0x00000001 => 'VK_SHADER_STAGE_VERTEX_BIT',
+                0x00000002 => 'VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT',
+                0x00000004 => 'VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT',
+                0x00000008 => 'VK_SHADER_STAGE_GEOMETRY_BIT',
+                0x00000010 => 'VK_SHADER_STAGE_FRAGMENT_BIT',
+                0x00000020 => 'VK_SHADER_STAGE_COMPUTE_BIT',
+                0x0000001F => 'VK_SHADER_STAGE_ALL_GRAPHICS',
+                0x7FFFFFFF => 'VK_SHADER_STAGE_ALL',
+                0x00000100 => 'VK_SHADER_STAGE_RAYGEN_BIT_KHR',
+                0x00000200 => 'VK_SHADER_STAGE_ANY_HIT_BIT_KHR',
+                0x00000400 => 'VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR',
+                0x00000800 => 'VK_SHADER_STAGE_MISS_BIT_KHR',
+                0x00001000 => 'VK_SHADER_STAGE_INTERSECTION_BIT_KHR',
+                0x00002000 => 'VK_SHADER_STAGE_CALLABLE_BIT_KHR',
+                0x00000040 => 'VK_SHADER_STAGE_TASK_BIT_NV',
+                0x00000080 => 'VK_SHADER_STAGE_MESH_BIT_NV',
+                0x00004000 => 'VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI'
+            ];
+            $ret_val = getVkFlags($flags, $value);
+            return $ret_val;
+        case 'supporteddepthresolvemodes':
+        case 'supportedstencilresolvemodes':
+            $flags = [
+                0 => 'VK_RESOLVE_MODE_NONE',
+                0x00000001 => 'VK_RESOLVE_MODE_SAMPLE_ZERO_BIT',
+                0x00000002 => 'VK_RESOLVE_MODE_AVERAGE_BIT',
+                0x00000004 => 'VK_RESOLVE_MODE_MIN_BIT',
+                0x00000008 => 'VK_RESOLVE_MODE_MAX_BIT',
+            ];
+            $ret_val = getVkFlags($flags, $value);
+            return $ret_val;
     }
     return $value;
 }
