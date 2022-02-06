@@ -468,27 +468,6 @@ function convertFieldValue($name, $value) {
     return $value;
 }
 
-// @todo: unsure on this
-function insertDeviceExtensionFeatures($reportid, &$cap_node) {
-    $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
-    $stmnt->execute([":reportid" => $reportid]);
-    $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
-    foreach ($result as $key => $values) {
-        if (!array_key_exists($key, Mappings::$extensions)) {
-            continue;
-        }
-        $feature_node = null;
-        $ext = Mappings::$extensions[$key];
-        if ($ext['struct_type_physical_device_features'] == '') {
-            continue;
-        }
-        foreach ($values as $value) {
-            $feature_node[$value['name']] = boolval($value['supported']);
-        }
-        $cap_node['vulkan11requirements']['features'][$ext['struct_type_physical_device_features']] = $feature_node;
-    }
-}
-
 function getVkFormatFlags($flag) {
 	$flag_values = [
 		0x0001 => "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
@@ -525,6 +504,7 @@ class VulkanProfile {
     private $formats = [];
     private $extensions = [];
     private $features = [];
+    private $extension_features = [];
     private $properties = [];
 
     private $profile_name = 'device';
@@ -644,6 +624,48 @@ class VulkanProfile {
         return $properties;        
     }
 
+    function readExtensionFeatures() {
+        // Build list of core api versions to skip based on device's api level
+        $api_version_skip_list = [];
+        $api_major = explode('.', $this->api_version)[0];
+        $api_minor = explode('.', $this->api_version)[1];
+        if ($api_minor >= 1) {
+            $api_version_skip_list[] = 'VK_VERSION_1_1';
+        }
+        if ($api_minor >= 2) {
+            $api_version_skip_list[] = 'VK_VERSION_1_2';
+        }
+        if ($api_minor >= 3) {
+            $api_version_skip_list[] = 'VK_VERSION_1_3';
+        }
+        $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
+        $stmnt->execute([":reportid" => $this->reportid]);
+        $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
+        foreach ($result as $key => $values) {
+            if (!array_key_exists($key, Mappings::$extensions)) {
+                continue;
+            }
+            $ext = Mappings::$extensions[$key];
+            if ($ext['struct_type_physical_device_features'] == '') {
+                continue;
+            }            
+            // Skip feature structs that have been promoted to a core version supported by the device
+            if ($ext['promoted_to'] !== '') {
+                if (stripos($ext['promoted_to'], 'VK_VERSION') !== false) {
+                    if (in_array($ext['promoted_to'], $api_version_skip_list)) {
+                        continue;
+                    }
+                }
+            }
+            // @todo: only include those not part of the reports api version (promotedto)
+            $feature = null;
+            foreach ($values as $value) {
+                $feature[$value['name']] = boolval($value['supported']);
+            }
+            $this->extension_features[$ext['struct_type_physical_device_features']] = $feature;
+        }
+    }    
+
     private function readExtensions() {
         $this->extensions = [];
         $stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
@@ -712,6 +734,7 @@ class VulkanProfile {
             $this->features[$version] = $this->readFeatures($version);
             $this->properties[$version] = $this->readProperties($version);
         }
+        $this->readExtensionFeatures();
         $this->readFormats();
         $this->readQueueFamilies();
         DB::disconnect();
@@ -740,6 +763,9 @@ class VulkanProfile {
             if (array_key_exists($version, $this->features) && count($this->features[$version]) > 0) {
                 $this->json['capabilities'][$node_names[$version]['requirement']]['features'][$node_names[$version]['struct']] = $this->features[$version];
             }
+        }
+        if (count($this->extension_features) > 0) {
+            $this->json['capabilities'][$this->profile_name]['features'] = $this->extension_features;
         }
 
         // Properties   
