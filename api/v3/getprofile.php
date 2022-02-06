@@ -531,6 +531,14 @@ function insertDeviceFeatures($version, $reportid, &$cap_node) {
     $cap_node[$req_name]['features'][$struct_name] = $features_node;
 }
 
+function insertDeviceExtensions($reportid, &$cap_node) {
+    $stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
+    $stmnt->execute([":reportid" => $reportid]);
+    while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+        $cap_node['baseline']['extensions'][$row['name']] = intval($row['specversion']);
+    }
+}
+
 function insertDeviceExtensionFeatures($reportid, &$cap_node) {
     $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
     $stmnt->execute([":reportid" => $reportid]);
@@ -665,8 +673,52 @@ function insertQueueFamiliesProperties($reportid, &$profile_queues) {
             ]
         ];
         $profile_queues[] = $profile_queue_family;
-    }
-   
+    }   
+}
+
+function getVkFormatFlags($flag) {
+	$flag_values = [
+		0x0001 => "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
+		0x0002 => "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
+		0x0004 => "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
+		0x0008 => "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
+		0x0010 => "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
+		0x0020 => "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
+		0x0040 => "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT",
+		0x0080 => "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
+		0x0100 => "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
+		0x0200 => "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT",
+		0x0400 => "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
+		0x0800 => "VK_FORMAT_FEATURE_BLIT_DST_BIT",
+		0x1000 => "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
+		0x4000 => "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
+		0x8000 => "VK_FORMAT_FEATURE_TRANSFER_DST_BIT",
+    ];
+    $array_values = array_values($flag_values);
+    $supported_flags = [];
+	$index = 0;
+	foreach ($flag_values as $i => $value) {
+		if ($flag & $i) {
+			$supported_flags[] = $array_values[$index];
+		}
+		$index++;
+	}
+	return $supported_flags;
+}
+
+function insertFormats($reportid, &$profile_formats_node) {
+    $stmnt = DB::$connection->prepare("SELECT name, lineartilingfeatures, optimaltilingfeatures, bufferfeatures from deviceformats df join VkFormat vf on df.formatid = vf.value where reportid = :reportid and supported = 1 order by name asc");    
+    $stmnt->execute([":reportid" => $reportid]);
+    while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+        $format = [
+            'VkFormatProperties' => [
+                'linearTilingFeatures' => getVkFormatFlags($row['lineartilingfeatures']),
+                'optimalTilingFeatures' => getVkFormatFlags($row['optimaltilingfeatures']),
+                'bufferFeatures' => getVkFormatFlags($row['bufferfeatures'])
+            ]
+        ];
+        $profile_formats_node["VK_FORMAT_".$row['name']] = $format;
+    }    
 }
 
 $versions = ['1.0', '1.1', '1.2', '1.3'];
@@ -681,12 +733,11 @@ $profile_queues = null;
 insertQueueFamiliesProperties($reportid, $profile_queues);
 $profile_caps['baseline']['queueFamiliesProperties'] = $profile_queues;
 
-// Extensions
-$stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
-$stmnt->execute([":reportid" => $reportid]);
-while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-    $profile_caps['baseline']['extensions'][$row['name']] = intval($row['specversion']);
-}
+insertDeviceExtensions($reportid, $profile_caps);
+
+$profile_formats = null;
+insertFormats($reportid, $profile_formats);
+$profile_caps['baseline']['formats'] = $profile_formats;
 
 $profile['$schema'] = 'https://schema.khronos.org/vulkan/profiles-1.3.204.json#';
 $profile['profiles'] = $profile_info;
