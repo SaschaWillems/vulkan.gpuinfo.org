@@ -30,10 +30,7 @@ if (!isset($_GET['id'])) {
 }
 
 DB::connect();
-
 $reportid = $_GET['id'];	
-$json_data = null;
-
 $stmnt = DB::$connection->prepare("SELECT * from reports where id = :reportid");
 $stmnt->execute([":reportid" => $reportid]);
 if ($stmnt->rowCount() == 0) {
@@ -43,29 +40,6 @@ if ($stmnt->rowCount() == 0) {
     die();
 }
 $row = $stmnt->fetch(PDO::FETCH_ASSOC);
-$device_name = $row['devicename'];
-$api_version = $row['apiversion'];
-
-$capabilities = [];
-$profile_info = [];
-
-$profile_info['GPUINFO_Exported_Profile'] = [
-    "version" => 1,
-    "api-version" => $api_version,
-    "label" => "$device_name",
-    "description" => "Exported from https://vulkan.gpuinfo.org",
-    "contributors" => [],
-    "history" => [],
-    "capabilities" => ["baseline"]
-];
-
-$profile_caps['baseline'] = [
-    'extensions' => [],
-    'features' => (object)null,
-    'properties' => (object)null,
-    'formats' => (object)null,
-    'queueFamiliesProperties' => []
-];
 
 function skipField($name, $version) {
     $skip_fields = [
@@ -494,51 +468,7 @@ function convertFieldValue($name, $value) {
     return $value;
 }
 
-function insertDeviceFeatures($version, $reportid, &$cap_node) {
-    $table = 'devicefeatures';
-    $req_name = 'vulkan10requirements';
-    $struct_name = 'VkPhysicalDeviceFeatures';
-    switch ($version) {
-        case '1.1':
-            $table = 'devicefeatures11';
-            $req_name = 'vulkan11requirements';
-            $struct_name = 'VkPhysicalDeviceVulkan11Features';
-            break;
-        case '1.2':
-            $table = 'devicefeatures12';
-            $req_name = 'vulkan12requirements';
-            $struct_name = 'VkPhysicalDeviceVulkan12Features';
-            break;
-        case '1.3':
-            $table = 'devicefeatures13';
-            $req_name = 'vulkan13requirements';
-            $struct_name = 'VkPhysicalDeviceVulkan13Features';
-            break;
-    }
-    $stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
-    $stmnt->execute([":reportid" => $reportid]);
-    $result = $stmnt->fetch(PDO::FETCH_ASSOC);
-    if ($stmnt->rowCount() == 0) {
-        return;
-    }
-    $features_node = [];
-    foreach ($result as $key => $value) {
-        if (skipField($key, $version)) {
-            continue;
-        }
-        $features_node[$key] = boolval($value);
-    }
-    $cap_node[$req_name]['features'][$struct_name] = $features_node;
-}
-
-function insertDeviceExtensions($reportid, &$cap_node) {
-    $stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
-    $stmnt->execute([":reportid" => $reportid]);
-    while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-        $cap_node['baseline']['extensions'][$row['name']] = intval($row['specversion']);
-    }
-}
-
+// @todo: unsure on this
 function insertDeviceExtensionFeatures($reportid, &$cap_node) {
     $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
     $stmnt->execute([":reportid" => $reportid]);
@@ -557,123 +487,6 @@ function insertDeviceExtensionFeatures($reportid, &$cap_node) {
         }
         $cap_node['vulkan11requirements']['features'][$ext['struct_type_physical_device_features']] = $feature_node;
     }
-}
-
-function insertDeviceLimits($reportid, &$json_node) {
-    $limit_stmnt = DB::$connection->prepare('SELECT * from devicelimits where reportid = :reportid');
-    $limit_stmnt->execute([":reportid" => $reportid]);
-    $limit_result = $limit_stmnt->fetch(PDO::FETCH_ASSOC);
-    foreach ($limit_result as $limit_key => $limit_value) {
-        if (skipField($limit_key, '1.0')) {
-            continue;
-        }
-        $limit_properties[$limit_key] = convertFieldValue($limit_key, $limit_value);
-    }
-
-    $limitToArray = function($name, $dim, $type) use ($limit_result) {
-        $values = [];
-        for ($i = 0; $i < $dim; $i++) {
-            if ($type == 'int') {
-                $values[] = intval($limit_result[$name.'['.$i.']']);
-            };
-            if ($type == 'float') {
-                $values[] = floatval($limit_result[$name.'['.$i.']']);
-            };
-        }
-        return $values;
-    };
-
-    // Multi-dimensional arrays 
-   
-    $limit_properties['maxComputeWorkGroupCount'] = $limitToArray('maxComputeWorkGroupCount', 3, 'int');
-    $limit_properties['maxViewportDimensions'] = $limitToArray('maxViewportDimensions', 2, 'int');
-    $limit_properties['pointSizeRange'] = $limitToArray('pointSizeRange', 2, 'float');
-    $limit_properties['viewportBoundsRange'] = $limitToArray('viewportBoundsRange', 2, 'float');
-    $limit_properties['lineWidthRange'] = $limitToArray('lineWidthRange', 2, 'float');
-
-    $json_node['limits'] = $limit_properties;
-}
-
-function insertDeviceProperties($version, $reportid, &$cap_node) {
-    // @todo: limits for vk1.0
-    // @todo: sparse properties for vk1.0
-    $table = 'deviceproperties';
-    $req_name = 'vulkan10requirements';
-    $struct_name = 'VkPhysicalDeviceProperties';
-    switch ($version) {
-        case '1.1':
-            $table = 'deviceproperties11';
-            $req_name = 'vulkan11requirements';
-            $struct_name = 'VkPhysicalDeviceVulkan11Properties';
-            break;
-        case '1.2':
-            $table = 'deviceproperties12';
-            $req_name = 'vulkan12requirements';
-            $struct_name = 'VkPhysicalDeviceVulkan12Properties';
-            break;
-        case '1.3':
-            $table = 'deviceproperties13';
-            $req_name = 'vulkan13requirements';
-            $struct_name = 'VkPhysicalDeviceVulkan13Properties';
-            break;
-    }
-    $stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
-    $stmnt->execute([":reportid" => $reportid]);
-    $result = $stmnt->fetch(PDO::FETCH_ASSOC);
-    if ($stmnt->rowCount() == 0) {
-        return;
-    }
-    $features_node = [];
-    foreach ($result as $key => $value) {
-        if (skipField($key, $version)) {
-            continue;
-        }
-        $key_name = $key;
-        if ($version == '1.0') {
-            // Use non-human readable api version
-            if ($key == 'apiversion') {
-                continue;
-            }
-            if ($key == 'apiversionraw') {
-                $key_name = 'apiversion';
-            }
-        }
-        $converted_value = convertFieldValue($key_name, $value);
-        $features_node[capitalizeFieldName($key_name)] = $converted_value;
-    }
-    if ($version == '1.0') {
-        // Remap sparse properties into struct
-        $sparse_stmnt = DB::$connection->prepare('SELECT residencyAlignedMipSize, residencyNonResidentStrict, residencyStandard2DBlockShape, residencyStandard2DMultisampleBlockShape, residencyStandard3DBlockShape from deviceproperties where reportid = :reportid');
-        $sparse_stmnt->execute([":reportid" => $reportid]);
-        $sparse_result = $sparse_stmnt->fetch(PDO::FETCH_ASSOC);
-        foreach ($sparse_result as $sparse_key => $sparse_value) {
-            $sparse_properties[$sparse_key] = boolval($sparse_value);
-        }
-        $features_node['sparseProperties'] = $sparse_properties;
-        // Append limits
-        insertDeviceLimits($reportid, $features_node);
-    }
-    $cap_node[$req_name]['properties'][$struct_name] = $features_node;
-}
-
-function insertQueueFamiliesProperties($reportid, &$profile_queues) {
-    $stmnt = DB::$connection->prepare("SELECT * from devicequeues where reportid = :reportid");
-    $stmnt->execute([":reportid" => $reportid]);
-    while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-        $profile_queue_family = [
-            'VkQueueFamilyProperties' => [
-                'queueFlags' => convertFieldValue('queueFlags', $row['flags']),
-                'queueCount' => intval($row['count']),
-                'timestampValidBits' => intval($row['timestampValidBits']),
-                'minImageTransferGranularity' => [
-                    'width' => intval($row['minImageTransferGranularity.width']),
-                    'height' => intval($row['minImageTransferGranularity.height']),
-                    'depth' => intval($row['minImageTransferGranularity.depth']),
-                ]
-            ]
-        ];
-        $profile_queues[] = $profile_queue_family;
-    }   
 }
 
 function getVkFormatFlags($flag) {
@@ -706,42 +519,265 @@ function getVkFormatFlags($flag) {
 	return $supported_flags;
 }
 
-function insertFormats($reportid, &$profile_formats_node) {
-    $stmnt = DB::$connection->prepare("SELECT name, lineartilingfeatures, optimaltilingfeatures, bufferfeatures from deviceformats df join VkFormat vf on df.formatid = vf.value where reportid = :reportid and supported = 1 order by name asc");    
-    $stmnt->execute([":reportid" => $reportid]);
-    while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-        $format = [
-            'VkFormatProperties' => [
-                'linearTilingFeatures' => getVkFormatFlags($row['lineartilingfeatures']),
-                'optimalTilingFeatures' => getVkFormatFlags($row['optimaltilingfeatures']),
-                'bufferFeatures' => getVkFormatFlags($row['bufferfeatures'])
+class VulkanProfile {
+    private $reportid = null;
+    private $queue_families = [];
+    private $formats = [];
+    private $extensions = [];
+    private $features = [];
+    private $properties = [];
+
+    private $profile_name = 'device';
+    private $profile_version = 1;
+    private $device_name = null;
+    private $api_version = null;
+    
+    public $json = null;
+
+    function __construct($reportid) {
+        $this->reportid = $reportid;
+    }
+
+    private function readFeatures($version) {
+        $table_names = [
+            '1.0' => 'devicefeatures',
+            '1.1' => 'devicefeatures11',
+            '1.2' => 'devicefeatures12',
+            '1.3' => 'devicefeatures13',
+        ];
+        $table = $table_names[$version];
+        $stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
+        $stmnt->execute([":reportid" => $this->reportid]);
+        $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+        if ($stmnt->rowCount() == 0) {
+            return null;
+        }
+        $features = [];
+        foreach ($result as $key => $value) {
+            if (skipField($key, $version)) {
+                continue;
+            }
+            $features[$key] = boolval($value);
+        }
+        return count($features) > 0 ? $features : null;
+    }
+
+    /** Vulkan 1.0 device limits */
+    private function readDeviceLimits() {
+        $limit_stmnt = DB::$connection->prepare('SELECT * from devicelimits where reportid = :reportid');
+        $limit_stmnt->execute([":reportid" => $this->reportid]);
+        $limit_result = $limit_stmnt->fetch(PDO::FETCH_ASSOC);
+        foreach ($limit_result as $limit_key => $limit_value) {
+            if (skipField($limit_key, '1.0')) {
+                continue;
+            }
+            $limits[$limit_key] = convertFieldValue($limit_key, $limit_value);
+        }    
+        
+        $limitToArray = function($name, $dim, $type) use ($limit_result) {
+            $values = [];
+            for ($i = 0; $i < $dim; $i++) {
+                if ($type == 'int') {
+                    $values[] = intval($limit_result[$name.'['.$i.']']);
+                };
+                if ($type == 'float') {
+                    $values[] = floatval($limit_result[$name.'['.$i.']']);
+                };
+            }
+            return $values;
+        };
+    
+        // Multi-dimensional arrays are stored as single columns in the database and need to be remapped        
+        $limit_properties['maxComputeWorkGroupCount'] = $limitToArray('maxComputeWorkGroupCount', 3, 'int');
+        $limit_properties['maxViewportDimensions'] = $limitToArray('maxViewportDimensions', 2, 'int');
+        $limit_properties['pointSizeRange'] = $limitToArray('pointSizeRange', 2, 'float');
+        $limit_properties['viewportBoundsRange'] = $limitToArray('viewportBoundsRange', 2, 'float');
+        $limit_properties['lineWidthRange'] = $limitToArray('lineWidthRange', 2, 'float');
+    
+        return $limits;
+    }
+
+    private function readProperties($version) {
+        $table_names = [
+            '1.0' => 'deviceproperties',
+            '1.1' => 'deviceproperties11',
+            '1.2' => 'deviceproperties12',
+            '1.3' => 'deviceproperties13',
+        ];
+        $table = $table_names[$version];
+        $stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
+        $stmnt->execute([":reportid" => $this->reportid]);
+        $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+        if ($stmnt->rowCount() == 0) {
+            return null;
+        }
+        $properties = [];
+        foreach ($result as $key => $value) {
+            if (skipField($key, $version)) {
+                continue;
+            }
+            $key_name = $key;
+            if ($version == '1.0') {
+                // Use non-human readable api version
+                if ($key == 'apiversion') {
+                    continue;
+                }
+                if ($key == 'apiversionraw') {
+                    $key_name = 'apiversion';
+                }
+            }
+            $converted_value = convertFieldValue($key_name, $value);
+            $properties[capitalizeFieldName($key_name)] = $converted_value;
+        }
+        if ($version == '1.0') {
+            // Remap sparse properties into struct
+            $sparse_stmnt = DB::$connection->prepare('SELECT residencyAlignedMipSize, residencyNonResidentStrict, residencyStandard2DBlockShape, residencyStandard2DMultisampleBlockShape, residencyStandard3DBlockShape from deviceproperties where reportid = :reportid');
+            $sparse_stmnt->execute([":reportid" => $this->reportid]);
+            $sparse_result = $sparse_stmnt->fetch(PDO::FETCH_ASSOC);
+            foreach ($sparse_result as $sparse_key => $sparse_value) {
+                $sparse_properties[$sparse_key] = boolval($sparse_value);
+            }
+            $properties['sparseProperties'] = $sparse_properties;
+            // Append VK1.0 limits
+            $properties['limits'] = $this->readDeviceLimits();
+        }
+        return $properties;        
+    }
+
+    private function readExtensions() {
+        $this->extensions = [];
+        $stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
+        $stmnt->execute([":reportid" => $this->reportid]);
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+           $this->extensions[$row['name']] = intval($row['specversion']);
+        }
+    }
+
+    private function readFormats() {
+        $this->formats = [];
+        $stmnt = DB::$connection->prepare("SELECT name, lineartilingfeatures, optimaltilingfeatures, bufferfeatures from deviceformats df join VkFormat vf on df.formatid = vf.value where reportid = :reportid and supported = 1 order by name asc");    
+        $stmnt->execute([":reportid" => $this->reportid]);
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+            $format = [
+                'VkFormatProperties' => [
+                    'linearTilingFeatures' => getVkFormatFlags($row['lineartilingfeatures']),
+                    'optimalTilingFeatures' => getVkFormatFlags($row['optimaltilingfeatures']),
+                    'bufferFeatures' => getVkFormatFlags($row['bufferfeatures'])
+                ]
+            ];
+            $this->formats["VK_FORMAT_".$row['name']] = $format;
+        }    
+    }
+
+    private function readQueueFamilies() {
+        $this->queue_families = [];
+        $stmnt = DB::$connection->prepare("SELECT * from devicequeues where reportid = :reportid");
+        $stmnt->execute([":reportid" => $this->reportid]);
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
+            $profile_queue_family = [
+                'VkQueueFamilyProperties' => [
+                    'queueFlags' => convertFieldValue('queueFlags', $row['flags']),
+                    'queueCount' => intval($row['count']),
+                    'timestampValidBits' => intval($row['timestampValidBits']),
+                    'minImageTransferGranularity' => [
+                        'width' => intval($row['minImageTransferGranularity.width']),
+                        'height' => intval($row['minImageTransferGranularity.height']),
+                        'depth' => intval($row['minImageTransferGranularity.depth']),
+                    ]
+                ]
+            ];
+            $this->queue_families[] = $profile_queue_family;
+        }   
+    }
+
+    private function readDeviceInfo() {
+        $stmnt = DB::$connection->prepare("SELECT * from reports where id = :reportid");
+        $stmnt->execute([":reportid" => $this->reportid]);
+        if ($stmnt->rowCount() == 0) {
+            header('HTTP/ 400 missing_or');
+            exit("Could not find report");
+        }
+        $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+        $this->device_name = $row['devicename'];
+        $this->api_version = $row['apiversion'];
+    }
+
+    function generateJSON() {
+        $api_versions =  ['1.0', '1.1', '1.2', '1.3'];
+
+        DB::connect();
+        $this->readDeviceInfo();
+        $this->readExtensions();
+        foreach ($api_versions as $version) {
+            $this->features[$version] = $this->readFeatures($version);
+            $this->properties[$version] = $this->readProperties($version);
+        }
+        $this->readFormats();
+        $this->readQueueFamilies();
+        DB::disconnect();
+
+        $this->json['$schema'] = 'https://schema.khronos.org/vulkan/profiles-1.3.204.json#';        
+        $this->json['profiles'] = [
+            'GPUINFO_Exported_Profile' => [
+                "version" => $this->profile_version,
+                "api-version" => $this->api_version,
+                "label" => "$this->device_name",
+                "description" => "Exported from https://vulkan.gpuinfo.org",
+                "contributors" => [],
+                "history" => [],
+                "capabilities" => [$this->profile_name]
             ]
         ];
-        $profile_formats_node["VK_FORMAT_".$row['name']] = $format;
-    }    
+
+        // Features
+        foreach ($api_versions as $version) {
+            $node_names = [
+                '1.0' => ['requirement' => 'vulkan10requirements', 'struct' => 'VkPhysicalDeviceFeatures'],
+                '1.1' => ['requirement' => 'vulkan11requirements', 'struct' => 'VkPhysicalDeviceVulkan11Features'],
+                '1.2' => ['requirement' => 'vulkan12requirements', 'struct' => 'VkPhysicalDeviceVulkan12Features'],
+                '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Features'],
+            ];
+            if (array_key_exists($version, $this->features) && count($this->features[$version]) > 0) {
+                $this->json['capabilities'][$node_names[$version]['requirement']]['features'][$node_names[$version]['struct']] = $this->features[$version];
+            }
+        }
+
+        // Properties   
+        foreach ($api_versions as $version) {
+            $node_names = [
+                '1.0' => ['requirement' => 'vulkan10requirements', 'struct' => 'VkPhysicalDeviceProperties'],
+                '1.1' => ['requirement' => 'vulkan11requirements', 'struct' => 'VkPhysicalDeviceVulkan11Properties'],
+                '1.2' => ['requirement' => 'vulkan12requirements', 'struct' => 'VkPhysicalDeviceVulkan12Properties'],
+                '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Properties'],
+            ];
+            if (array_key_exists($version, $this->properties) && count($this->properties[$version]) > 0) {
+                $this->json['capabilities'][$node_names[$version]['requirement']]['properties'][$node_names[$version]['struct']] = $this->properties[$version];
+            }
+        }
+
+        if ($this->extensions && (count($this->extensions) > 0)) {
+            $this->json['capabilities'][$this->profile_name]['extensions'] = $this->extensions;
+        } else {
+            $this->json['capabilities'][$this->profile_name]['extensions'] = (object)null;
+        }
+
+        if ($this->formats && (count($this->formats) > 0)) {
+            $this->json['capabilities'][$this->profile_name]['formats'] = $this->formats;
+        } else {
+            $this->json['capabilities'][$this->profile_name]['formats'] = (object)null;
+        }
+
+        if ($this->queue_families && (count($this->queue_families) > 0)) {
+            $this->json['capabilities'][$this->profile_name]['queueFamiliesProperties'] = $this->queue_families;
+        } else {
+            $this->json['capabilities'][$this->profile_name]['queueFamiliesProperties'] = (object)null;
+        }
+    }
 }
+// Profile generation
 
-$versions = ['1.0', '1.1', '1.2', '1.3'];
-
-foreach ($versions as $version) {
-    insertDeviceFeatures($version, $reportid, $profile_caps);
-    insertDeviceProperties($version, $reportid, $profile_caps);
-}
-insertDeviceExtensionFeatures($reportid, $profile_caps);
-
-$profile_queues = null;
-insertQueueFamiliesProperties($reportid, $profile_queues);
-$profile_caps['baseline']['queueFamiliesProperties'] = $profile_queues;
-
-insertDeviceExtensions($reportid, $profile_caps);
-
-$profile_formats = null;
-insertFormats($reportid, $profile_formats);
-$profile_caps['baseline']['formats'] = $profile_formats;
-
-$profile['$schema'] = 'https://schema.khronos.org/vulkan/profiles-1.3.204.json#';
-$profile['profiles'] = $profile_info;
-$profile['capabilities'] = $profile_caps;
+$profile = new VulkanProfile($reportid);
+$profile->generateJSON();
 
 $filename = $device_name;
 $filename = preg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
@@ -750,7 +786,9 @@ $filename .= ".json";
 
 header("Content-type: application/json");
 // header("Content-Disposition: attachment; filename=".strtolower($filename));
+echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-echo json_encode($profile, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+// @todo
+//  insertDeviceExtensionFeatures($reportid, $profile_caps);
 
 DB::disconnect();
