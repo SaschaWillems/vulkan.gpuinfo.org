@@ -761,11 +761,13 @@ class VulkanProfile {
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Features'],
             ];
             if (array_key_exists($version, $this->features) && count($this->features[$version]) > 0) {
-                $this->json['capabilities'][$node_names[$version]['requirement']]['features'][$node_names[$version]['struct']] = $this->features[$version];
+                $this->json['capabilities'][$this->profile_name]['features'][$node_names[$version]['struct']] = $this->features[$version];
             }
         }
         if (count($this->extension_features) > 0) {
-            $this->json['capabilities'][$this->profile_name]['features'] = $this->extension_features;
+            foreach ($this->extension_features as $ext => $features) {
+                $this->json['capabilities'][$this->profile_name]['features'][$ext] = $features;
+            }
         }
 
         // Properties   
@@ -777,7 +779,7 @@ class VulkanProfile {
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Properties'],
             ];
             if (array_key_exists($version, $this->properties) && count($this->properties[$version]) > 0) {
-                $this->json['capabilities'][$node_names[$version]['requirement']]['properties'][$node_names[$version]['struct']] = $this->properties[$version];
+                $this->json['capabilities'][$this->profile_name]['properties'][$node_names[$version]['struct']] = $this->properties[$version];
             }
         }
 
