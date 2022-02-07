@@ -513,9 +513,15 @@ class VulkanProfile {
     private $api_version = null;
     
     public $json = null;
+    private $json_schema = null;
 
     function __construct($reportid) {
         $this->reportid = $reportid;
+    }
+
+    private function loadSchema() {
+        $file = file_get_contents('profile_schema.json');
+        $this->json_schema = json_decode($file, true);
     }
 
     private function readFeatures($version) {
@@ -670,8 +676,13 @@ class VulkanProfile {
         $this->extensions = [];
         $stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
         $stmnt->execute([":reportid" => $this->reportid]);
+        $schema_extension_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["extensions"]["properties"];
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-           $this->extensions[$row['name']] = intval($row['specversion']);
+            // Only export extensions supported by the current version of the schema
+            if (!key_exists($row['name'], $schema_extension_list)) {
+                continue;
+            }
+            $this->extensions[$row['name']] = intval($row['specversion']);
         }
     }
 
@@ -728,6 +739,7 @@ class VulkanProfile {
         $api_versions =  ['1.0', '1.1', '1.2', '1.3'];
 
         DB::connect();
+        $this->loadSchema();
         $this->readDeviceInfo();
         $this->readExtensions();
         foreach ($api_versions as $version) {
