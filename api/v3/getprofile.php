@@ -647,6 +647,7 @@ class VulkanProfile {
         $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
         $stmnt->execute([":reportid" => $this->reportid]);
         $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
+        $schema_features_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["features"]["properties"];
         foreach ($result as $key => $values) {
             if (!array_key_exists($key, Mappings::$extensions)) {
                 continue;
@@ -655,6 +656,10 @@ class VulkanProfile {
             if ($ext['struct_type_physical_device_features'] == '') {
                 continue;
             }            
+            // Skip extensions that are not defined in the current schema
+            if (!key_exists($ext['struct_type_physical_device_features'], $schema_features_list)) {
+                continue;
+            }
             // Skip feature structs that have been promoted to a core version supported by the device
             if ($ext['promoted_to'] !== '') {
                 if (stripos($ext['promoted_to'], 'VK_VERSION') !== false) {
