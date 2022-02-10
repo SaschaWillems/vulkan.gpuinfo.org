@@ -336,15 +336,6 @@ function convertFieldValue($name, $value) {
         case 'strictlines':
         case 'standardsamplelocations':
             return boolval($value);
-        case 'conformanceversion':
-            $parts = explode('.', $value);
-            $ret_val = [
-                'major' => intval($parts[0]),
-                'minor' => intval($parts[1]),
-                'patch' => intval($parts[2]),
-                'subminor' => intval($parts[3]),
-            ];
-            return $ret_val;
         case 'requiredsubgroupsizestages':
         case 'subgroupsupportedstages':
             $flags = [
@@ -367,72 +358,6 @@ function convertFieldValue($name, $value) {
                 0x00004000 => 'VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI'
             ];
             $ret_val = getVkFlags($flags, $value);
-            return $ret_val;
-        case 'supporteddepthresolvemodes':
-        case 'supportedstencilresolvemodes':
-            $flags = [
-                0 => 'VK_RESOLVE_MODE_NONE',
-                0x00000001 => 'VK_RESOLVE_MODE_SAMPLE_ZERO_BIT',
-                0x00000002 => 'VK_RESOLVE_MODE_AVERAGE_BIT',
-                0x00000004 => 'VK_RESOLVE_MODE_MIN_BIT',
-                0x00000008 => 'VK_RESOLVE_MODE_MAX_BIT',
-            ];
-            $ret_val = getVkFlags($flags, $value);
-            return $ret_val;
-        case 'denormbehaviorindependence':
-        case 'roundingmodeindependence':
-            $lookup = [
-                'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY' => 0,
-                'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL' => 1,
-                'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE' => 2,
-            ];          
-            $ret_val = getVkValue($lookup, $value);
-            return $ret_val;
-        case 'pointclippingbehavior':
-            $lookup = [
-                'VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES' => 0,
-                'VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY' => 1,
-            ];          
-            $ret_val = getVkValue($lookup, $value);
-            return $ret_val;
-        case 'subgroupsupportedoperations':
-            $flags = [
-                0x00000001 => 'VK_SUBGROUP_FEATURE_BASIC_BIT',
-                0x00000002 => 'VK_SUBGROUP_FEATURE_VOTE_BIT',
-                0x00000004 => 'VK_SUBGROUP_FEATURE_ARITHMETIC_BIT',
-                0x00000008 => 'VK_SUBGROUP_FEATURE_BALLOT_BIT',
-                0x00000010 => 'VK_SUBGROUP_FEATURE_SHUFFLE_BIT',
-                0x00000020 => 'VK_SUBGROUP_FEATURE_SHUFFLE_RELATIVE_BIT',
-                0x00000040 => 'VK_SUBGROUP_FEATURE_CLUSTERED_BIT',
-                0x00000080 => 'VK_SUBGROUP_FEATURE_QUAD_BIT',
-                0x00000100 => 'VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV',
-            ];          
-            $ret_val = getVkFlags($flags, $value);
-            return $ret_val;
-        case 'driverid':
-            $lookup = [
-                'VK_DRIVER_ID_AMD_PROPRIETARY' => 1,
-                'VK_DRIVER_ID_AMD_OPEN_SOURCE' => 2,
-                'VK_DRIVER_ID_MESA_RADV' => 3,
-                'VK_DRIVER_ID_NVIDIA_PROPRIETARY' => 4,
-                'VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS' => 5,
-                'VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA' => 6,
-                'VK_DRIVER_ID_IMAGINATION_PROPRIETARY' => 7,
-                'VK_DRIVER_ID_QUALCOMM_PROPRIETARY' => 8,
-                'VK_DRIVER_ID_ARM_PROPRIETARY' => 9,
-                'VK_DRIVER_ID_GOOGLE_SWIFTSHADER' => 10,
-                'VK_DRIVER_ID_GGP_PROPRIETARY' => 11,
-                'VK_DRIVER_ID_BROADCOM_PROPRIETARY' => 12,
-                'VK_DRIVER_ID_MESA_LLVMPIPE' => 13,
-                'VK_DRIVER_ID_MOLTENVK' => 14,
-                'VK_DRIVER_ID_COREAVI_PROPRIETARY' => 15,
-                'VK_DRIVER_ID_JUICE_PROPRIETARY' => 16,
-                'VK_DRIVER_ID_VERISILICON_PROPRIETARY' => 17,
-                'VK_DRIVER_ID_MESA_TURNIP' => 18,
-                'VK_DRIVER_ID_MESA_V3DV' => 19,
-                'VK_DRIVER_ID_MESA_PANVK' => 20,
-            ];
-            $ret_val = getVkValue($lookup, $value);
             return $ret_val;
         case 'framebufferintegercolorsamplecounts':
         case 'framebuffercolorsamplecounts':
@@ -469,36 +394,6 @@ function convertFieldValue($name, $value) {
             return $ret_val;            
     }
     return $value;
-}
-
-function getVkFormatFlags($flag) {
-	$flag_values = [
-		0x0001 => "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
-		0x0002 => "VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT",
-		0x0004 => "VK_FORMAT_FEATURE_STORAGE_IMAGE_ATOMIC_BIT",
-		0x0008 => "VK_FORMAT_FEATURE_UNIFORM_TEXEL_BUFFER_BIT",
-		0x0010 => "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_BIT",
-		0x0020 => "VK_FORMAT_FEATURE_STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
-		0x0040 => "VK_FORMAT_FEATURE_VERTEX_BUFFER_BIT",
-		0x0080 => "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT",
-		0x0100 => "VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BLEND_BIT",
-		0x0200 => "VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT",
-		0x0400 => "VK_FORMAT_FEATURE_BLIT_SRC_BIT",
-		0x0800 => "VK_FORMAT_FEATURE_BLIT_DST_BIT",
-		0x1000 => "VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT",
-		0x4000 => "VK_FORMAT_FEATURE_TRANSFER_SRC_BIT",
-		0x8000 => "VK_FORMAT_FEATURE_TRANSFER_DST_BIT",
-    ];
-    $array_values = array_values($flag_values);
-    $supported_flags = [];
-	$index = 0;
-	foreach ($flag_values as $i => $value) {
-		if ($flag & $i) {
-			$supported_flags[] = $array_values[$index];
-		}
-		$index++;
-	}
-	return $supported_flags;
 }
 
 class VulkanProfile {
@@ -616,8 +511,17 @@ class VulkanProfile {
                     $key_name = 'apiversion';
                 }
             }
-            $converted_value = convertFieldValue($key_name, $value);
-            $properties[capitalizeFieldName($key_name)] = $converted_value;
+            // @todo            
+            if ($table == 'deviceproperties11') {
+                $type = Mappings::$VkPhysicalDeviceVulkan11Properties[$key_name];
+                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type);
+            } elseif ($table == 'deviceproperties12') {
+                $type = Mappings::$VkPhysicalDeviceVulkan12Properties[$key_name];
+                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type);
+            } else {
+                $converted_value = convertFieldValue($key_name, $value);
+                $properties[capitalizeFieldName($key_name)] = $converted_value;
+            }
         }
         if ($version == '1.0') {
             // Remap sparse properties into struct
@@ -685,6 +589,8 @@ class VulkanProfile {
     function convertValue($value, $type) {
         $convert = function($value, $type) {
             switch($type) {
+                case 'uint8_t':
+                case 'uint16_t':
                 case 'uint32_t':
                     return intval($value);
                 case 'float':
@@ -697,6 +603,18 @@ class VulkanProfile {
                     return VkTypes::VkShaderStageFlags($value);
                 case 'VkSampleCountFlagBits':
                     return VkTypes::VkSampleCountFlagBits($value);
+                case 'VkPointClippingBehavior':
+                    return VkTypes::VkPointClippingBehavior($value);
+                case 'VkSubgroupFeatureFlags':
+                    return VkTypes::VkSubgroupFeatureFlags($value);
+                case 'VkDriverId':
+                    return VkTypes::VkDriverId($value);
+                case 'VkConformanceVersion':
+                    return VkTypes::VkConformanceVersion($value);
+                case 'VkResolveModeFlags':
+                    return VkTypes::VkResolveModeFlags($value);
+                case 'VkShaderFloatControlsIndependence':
+                    return VkTypes::VkShaderFloatControlsIndependence($value);
                 case 'VkExtent2D':
                     $arr = unserialize($value);                
                     return ['width' => $arr[0], 'height' => $arr[1]];
@@ -782,9 +700,9 @@ class VulkanProfile {
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
             $format = [
                 'VkFormatProperties' => [
-                    'linearTilingFeatures' => getVkFormatFlags($row['lineartilingfeatures']),
-                    'optimalTilingFeatures' => getVkFormatFlags($row['optimaltilingfeatures']),
-                    'bufferFeatures' => getVkFormatFlags($row['bufferfeatures'])
+                    'linearTilingFeatures' => VkTypes::VkFormatFeatureFlags($row['lineartilingfeatures']),
+                    'optimalTilingFeatures' => VkTypes::VkFormatFeatureFlags($row['optimaltilingfeatures']),
+                    'bufferFeatures' => VkTypes::VkFormatFeatureFlags($row['bufferfeatures'])
                 ]
             ];
             $this->formats["VK_FORMAT_".$row['name']] = $format;
