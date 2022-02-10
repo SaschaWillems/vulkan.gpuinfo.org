@@ -21,6 +21,8 @@
 
 /** Generate mappings used by the database from the Vulkan XML registry */
 
+error_reporting(E_ERROR | E_PARSE);
+
 class TypeContainer
 {
 
@@ -107,6 +109,7 @@ class Extension
     public $features2 = null;
     public $properties2 = null;
     public $promotedto = null;
+    public $types = [];
 }
 
 class ExtensionContainer
@@ -168,10 +171,30 @@ foreach ($extension_container->extensions as $extension) {
     $struct_type_pyhsical_device_features = $extension->features2['name'] ? ("'".$extension->features2['name']."'") : 'null';
     $struct_type_physical_device_properties = $extension->properties2['name'] ? ("'".$extension->properties2['name']."'") : 'null';
     $promoted_to = $extension->promotedto ? ("'".$extension->promotedto."'") : 'null';
+    $property_types = [];
+    if ($extension->properties2 && (count($extension->properties2->member) > 0)) {
+        foreach ($extension->properties2->member as $member) {
+            if ($member->type) {
+                $property_types[(string)$member->name] = (string)$member->type;
+            }
+        }
+    }
     echo "  '".$extension->name."' => [".PHP_EOL;
     echo "      'struct_type_physical_device_features' => ".$struct_type_pyhsical_device_features.",".PHP_EOL;
     echo "      'struct_type_physical_device_properties' => ".$struct_type_physical_device_properties.",".PHP_EOL;
     echo "      'promoted_to' => ".$promoted_to.",".PHP_EOL;
+    if (count($property_types) > 0) {
+        echo "      'property_types' => [";
+        foreach($property_types as $key => $value) {
+            if (in_array($key, ['sType', 'pNext'])) {
+                continue;
+            }
+            echo "'$key' => '$value',".PHP_EOL;
+        }
+        echo "]".PHP_EOL;
+    } else {
+        echo "      'property_types' => []".PHP_EOL;
+    }
     echo "  ],".PHP_EOL;
 }
 $output = ob_get_contents();

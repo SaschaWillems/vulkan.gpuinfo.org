@@ -124,6 +124,8 @@ function capitalizeFieldName($name) {
     return $name;
 }
 
+// @todo: move to utils folder outside of api
+
 function getVkFlags($flags, $flag) {
 	$flag_values = array_values($flags);
     $supported_flags = [];
@@ -139,6 +141,44 @@ function getVkFlags($flags, $flag) {
 
 function getVkValue($lookup, $value) {
     return (in_array($value, $lookup) ? array_search($value, $lookup) : null);    
+}
+
+function convertVkSampleCountFlags($value) {
+    $flags = [
+        0x00000001 => 'VK_SAMPLE_COUNT_1_BIT',
+        0x00000002 => 'VK_SAMPLE_COUNT_2_BIT',
+        0x00000004 => 'VK_SAMPLE_COUNT_4_BIT',
+        0x00000008 => 'VK_SAMPLE_COUNT_8_BIT',
+        0x00000010 => 'VK_SAMPLE_COUNT_16_BIT',
+        0x00000020 => 'VK_SAMPLE_COUNT_32_BIT',
+        0x00000040 => 'VK_SAMPLE_COUNT_64_BIT',
+    ];
+    $ret_val = getVkFlags($flags, $value);
+    return $ret_val;
+}
+
+function convertVkShaderStageFlags($value) {
+    $flags = [
+        0x00000001 => 'VK_SHADER_STAGE_VERTEX_BIT',
+        0x00000002 => 'VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT',
+        0x00000004 => 'VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT',
+        0x00000008 => 'VK_SHADER_STAGE_GEOMETRY_BIT',
+        0x00000010 => 'VK_SHADER_STAGE_FRAGMENT_BIT',
+        0x00000020 => 'VK_SHADER_STAGE_COMPUTE_BIT',
+        0x0000001F => 'VK_SHADER_STAGE_ALL_GRAPHICS',
+        0x7FFFFFFF => 'VK_SHADER_STAGE_ALL',
+        0x00000100 => 'VK_SHADER_STAGE_RAYGEN_BIT_KHR',
+        0x00000200 => 'VK_SHADER_STAGE_ANY_HIT_BIT_KHR',
+        0x00000400 => 'VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR',
+        0x00000800 => 'VK_SHADER_STAGE_MISS_BIT_KHR',
+        0x00001000 => 'VK_SHADER_STAGE_INTERSECTION_BIT_KHR',
+        0x00002000 => 'VK_SHADER_STAGE_CALLABLE_BIT_KHR',
+        0x00000040 => 'VK_SHADER_STAGE_TASK_BIT_NV',
+        0x00000080 => 'VK_SHADER_STAGE_MESH_BIT_NV',
+        0x00004000 => 'VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI'
+    ];
+    $ret_val = getVkFlags($flags, $value);
+    return $ret_val;
 }
 
 function convertFieldValue($name, $value) {
@@ -506,6 +546,7 @@ class VulkanProfile {
     private $features = [];
     private $extension_features = [];
     private $properties = [];
+    private $extension_properties = [];
 
     private $profile_name = 'device';
     private $profile_version = 1;
@@ -649,6 +690,7 @@ class VulkanProfile {
         $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
         $schema_features_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["features"]["properties"];
         foreach ($result as $key => $values) {
+            // @todo: comment
             if (!array_key_exists($key, Mappings::$extensions)) {
                 continue;
             }
@@ -675,7 +717,84 @@ class VulkanProfile {
             }
             $this->extension_features[$ext['struct_type_physical_device_features']] = $feature;
         }
-    }    
+    }
+
+    function convertValue($value, $type) {
+        $convert = function($value, $type) {
+            switch($type) {
+                case 'uint32_t':
+                    return intval($value);
+                case 'float':
+                    return floatval($value);
+                case 'VkBool32':
+                    return boolval($value);
+                case 'VkSampleCountFlags':
+                    return convertVkSampleCountFlags($value);
+                case 'VkShaderStageFlags':
+                    return convertVkShaderStageFlags($value);
+                case 'VkExtent2D':
+                    $arr = unserialize($value);                
+                    return ['width' => $arr[0], 'height' => $arr[1]];
+            }
+            return $value;
+        };
+        if (!in_array($type, ['VkExtent2D', 'VkExtent3D']) && substr($value, 0, 2) == 'a:') {
+            $arr = unserialize($value);
+            $values = [];
+            foreach($arr as $value) {
+                $values[] = $convert($value, $type);
+            }
+            return $values;
+        } else {
+            return $convert($value, $type);
+        }
+    }
+
+    function readExtensionProperties() {
+        // Build list of core api versions to skip based on device's api level
+        $api_version_skip_list = [];
+        $api_major = explode('.', $this->api_version)[0];
+        $api_minor = explode('.', $this->api_version)[1];
+        if ($api_minor >= 1) {
+            $api_version_skip_list[] = 'VK_VERSION_1_1';
+        }
+        if ($api_minor >= 2) {
+            $api_version_skip_list[] = 'VK_VERSION_1_2';
+        }
+        if ($api_minor >= 3) {
+            $api_version_skip_list[] = 'VK_VERSION_1_3';
+        }
+        $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid");
+        $stmnt->execute([":reportid" => $this->reportid]);
+        $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
+        foreach ($result as $key => $values) {
+            if (!array_key_exists($key, Mappings::$extensions)) {
+                continue;
+            }
+            $ext = Mappings::$extensions[$key];
+            if ($ext['struct_type_physical_device_properties'] == '') {
+                continue;
+            }            
+            // Skip property structs that have been promoted to a core version supported by the device
+            if ($ext['promoted_to'] !== '') {
+                if (stripos($ext['promoted_to'], 'VK_VERSION') !== false) {
+                    if (in_array($ext['promoted_to'], $api_version_skip_list)) {
+                        continue;
+                    }
+                }
+            }
+            // @todo: get types for properties struct from schema
+            $property = null;
+            foreach ($values as $value) {
+                $type = null;
+                if (array_key_exists($value['name'], $ext['property_types'])) {
+                    $type = $ext['property_types'][$value['name']];
+                }
+                $property[$value['name']] = $this->convertValue($value['value'], $type);
+            }
+            $this->extension_properties[$ext['struct_type_physical_device_properties']] = $property;
+        }
+    }        
 
     private function readExtensions() {
         $this->extensions = [];
@@ -683,7 +802,7 @@ class VulkanProfile {
         $stmnt->execute([":reportid" => $this->reportid]);
         $schema_extension_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["extensions"]["properties"];
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-            // Only export extensions supported by the current version of the schema
+            // Skip extensions that are not defined in the current schema
             if (!key_exists($row['name'], $schema_extension_list)) {
                 continue;
             }
@@ -752,6 +871,7 @@ class VulkanProfile {
             $this->properties[$version] = $this->readProperties($version);
         }
         $this->readExtensionFeatures();
+        $this->readExtensionProperties();
         $this->readFormats();
         $this->readQueueFamilies();
         DB::disconnect();
@@ -797,6 +917,11 @@ class VulkanProfile {
             ];
             if (array_key_exists($version, $this->properties) && count($this->properties[$version]) > 0) {
                 $this->json['capabilities'][$this->profile_name]['properties'][$node_names[$version]['struct']] = $this->properties[$version];
+            }
+        }
+        if (count($this->extension_properties) > 0) {
+            foreach ($this->extension_properties as $ext => $features) {
+                $this->json['capabilities'][$this->profile_name]['properties'][$ext] = $features;
             }
         }
 
