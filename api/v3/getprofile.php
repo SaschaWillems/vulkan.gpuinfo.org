@@ -57,6 +57,7 @@ class VulkanProfile {
     private $profile_name = 'device';
     private $profile_version = 1;
     private $device_name = null;
+    private $report_label = null;
     private $api_version = null;
     
     public $json = null;
@@ -466,6 +467,7 @@ class VulkanProfile {
         $row = $stmnt->fetch(PDO::FETCH_ASSOC);
         $this->device_name = $row['devicename'];
         $this->api_version = $row['apiversion'];
+        $this->report_label = $row['devicename']." driver ".$row['driverversion']." on ".ucfirst($row['osname']). " ".$row['osversion'];
     }
 
     function generateJSON() {
@@ -490,7 +492,7 @@ class VulkanProfile {
             'GPUINFO_Exported_Profile' => [
                 "version" => $this->profile_version,
                 "api-version" => $this->api_version,
-                "label" => "$this->device_name",
+                "label" => "$this->report_label",
                 "description" => "Exported from https://vulkan.gpuinfo.org",
                 "contributors" => [],
                 "history" => [],
