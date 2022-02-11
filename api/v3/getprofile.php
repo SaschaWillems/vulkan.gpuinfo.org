@@ -340,7 +340,11 @@ class VulkanProfile {
             }
             return $values;
         } else {
-            return $convert($value, $type);
+            $val = $convert($value, $type);
+            if (($val == null) && (in_array($name, ['sparseAddressSpaceSize']))) {
+                return 0;
+            }
+            return $val;
         }
     }
 
