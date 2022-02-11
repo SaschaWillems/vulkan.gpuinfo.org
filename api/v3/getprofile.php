@@ -19,6 +19,8 @@
 *
 */
 
+/** Generate a Vulkan Profile schema compliant JSON for device simulation */
+
 require './../../database/database.class.php';
 require './../../includes/functions.php';
 require './../../includes/mappings.php';
@@ -514,10 +516,10 @@ class VulkanProfile {
             // @todo            
             if ($table == 'deviceproperties11') {
                 $type = Mappings::$VkPhysicalDeviceVulkan11Properties[$key_name];
-                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type);
+                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type, $key_name);
             } elseif ($table == 'deviceproperties12') {
                 $type = Mappings::$VkPhysicalDeviceVulkan12Properties[$key_name];
-                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type);
+                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type, $key_name);
             } else {
                 $converted_value = convertFieldValue($key_name, $value);
                 $properties[capitalizeFieldName($key_name)] = $converted_value;
@@ -586,7 +588,7 @@ class VulkanProfile {
         }
     }
 
-    function convertValue($value, $type) {
+    function convertValue($value, $type, $name = null) {
         $convert = function($value, $type) {
             switch($type) {
                 case 'uint8_t':
@@ -626,6 +628,9 @@ class VulkanProfile {
             $values = [];
             foreach($arr as $value) {
                 $values[] = $convert($value, $type);
+            }
+            if ($name == "deviceLUID") {
+                $values = array_slice($values, 0, 8);
             }
             return $values;
         } else {
@@ -780,7 +785,7 @@ class VulkanProfile {
                 '1.2' => ['requirement' => 'vulkan12requirements', 'struct' => 'VkPhysicalDeviceVulkan12Features'],
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Features'],
             ];
-            if (array_key_exists($version, $this->features) && count($this->features[$version]) > 0) {
+            if (array_key_exists($version, $this->features) && ($this->features[$version] !== null) && count($this->features[$version]) > 0) {
                 $this->json['capabilities'][$this->profile_name]['features'][$node_names[$version]['struct']] = $this->features[$version];
             }
         }
@@ -798,7 +803,7 @@ class VulkanProfile {
                 '1.2' => ['requirement' => 'vulkan12requirements', 'struct' => 'VkPhysicalDeviceVulkan12Properties'],
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Properties'],
             ];
-            if (array_key_exists($version, $this->properties) && count($this->properties[$version]) > 0) {
+            if (array_key_exists($version, $this->properties) && ($this->properties[$version] !== null) && count($this->properties[$version]) > 0) {
                 $this->json['capabilities'][$this->profile_name]['properties'][$node_names[$version]['struct']] = $this->properties[$version];
             }
         }
