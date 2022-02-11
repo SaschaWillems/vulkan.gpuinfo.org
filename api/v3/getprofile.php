@@ -86,47 +86,6 @@ function skipField($name, $version) {
     return in_array($name, $skip_fields);
 }
 
-function capitalizeFieldName($name) {
-    $spelling = [
-        'vendorid' => 'vendorID',
-        'apiversion' => 'apiVersion',
-		'idp8bitunsignedaccelerated' => 'integerDotProduct8BitUnsignedAccelerated',
-		'idp8bitsignedaccelerated' => 'integerDotProduct8BitSignedAccelerated',
-		'idp8bitmixedsignednessaccelerated' => 'integerDotProduct8BitMixedSignednessAccelerated',
-		'idp4x8bitpackedunsignedaccelerated' => 'integerDotProduct4x8BitPackedUnsignedAccelerated',
-		'idp4x8bitpackedsignedaccelerated' => 'integerDotProduct4x8BitPackedSignedAccelerated',
-		'idp4x8bitpackedmixedsignednessaccelerated' => 'integerDotProduct4x8BitPackedMixedSignednessAccelerated',
-		'idp16bitunsignedaccelerated' => 'integerDotProduct16BitUnsignedAccelerated',
-		'idp16bitsignedaccelerated' => 'integerDotProduct16BitSignedAccelerated',
-		'idp16bitmixedsignednessaccelerated' => 'integerDotProduct16BitMixedSignednessAccelerated',
-		'idp32bitunsignedaccelerated' => 'integerDotProduct32BitUnsignedAccelerated',
-		'idp32bitsignedaccelerated' => 'integerDotProduct32BitSignedAccelerated',
-		'idp32bitmixedsignednessaccelerated' => 'integerDotProduct32BitMixedSignednessAccelerated',
-		'idp64bitunsignedaccelerated' => 'integerDotProduct64BitUnsignedAccelerated',
-		'idp64bitsignedaccelerated' => 'integerDotProduct64BitSignedAccelerated',
-		'idp64bitmixedsignednessaccelerated' => 'integerDotProduct64BitMixedSignednessAccelerated',
-		'idpaccumulatingsaturating8bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating8BitUnsignedAccelerated',
-		'idpaccumulatingsaturating8bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating8BitSignedAccelerated',
-		'idpaccumulatingsaturating8bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated',
-		'idpaccumulatingsaturating4x8bitpackedunsignedaccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated',
-		'idpaccumulatingsaturating4x8bitpackedsignedaccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated',
-		'idpaccumulatingsaturating4x8bitpackedmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated',
-		'idpaccumulatingsaturating16bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating16BitUnsignedAccelerated',
-		'idpaccumulatingsaturating16bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating16BitSignedAccelerated',
-		'idpaccumulatingsaturating16bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated',
-		'idpaccumulatingsaturating32bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating32BitUnsignedAccelerated',
-		'idpaccumulatingsaturating32bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating32BitSignedAccelerated',
-		'idpaccumulatingsaturating32bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated',
-		'idpaccumulatingsaturating64bitunsignedaccelerated' => 'integerDotProductAccumulatingSaturating64BitUnsignedAccelerated',
-		'idpaccumulatingsaturating64bitsignedaccelerated' => 'integerDotProductAccumulatingSaturating64BitSignedAccelerated',
-		'idpaccumulatingsaturating64bitmixedsignednessaccelerated' => 'integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated'
-    ];
-    if (array_key_exists(strtolower($name), $spelling)) {
-        return $spelling[strtolower($name)];
-    }
-    return $name;
-}
-
 // @todo: move to utils folder outside of api
 
 function getVkFlags($flags, $flag) {
@@ -302,36 +261,6 @@ function convertFieldValue($name, $value) {
         case 'independentresolve':
         case 'filterminmaxsinglecomponentformats':
         case 'filterminmaximagecomponentmapping':
-        case 'idp8bitunsignedaccelerated':
-        case 'idp8bitsignedaccelerated':
-        case 'idp8bitmixedsignednessaccelerated':
-        case 'idp4x8bitpackedunsignedaccelerated':
-        case 'idp4x8bitpackedsignedaccelerated':
-        case 'idp4x8bitpackedmixedsignednessaccelerated':
-        case 'idp16bitunsignedaccelerated':
-        case 'idp16bitsignedaccelerated':
-        case 'idp16bitmixedsignednessaccelerated':
-        case 'idp32bitunsignedaccelerated':
-        case 'idp32bitsignedaccelerated':
-        case 'idp32bitmixedsignednessaccelerated':
-        case 'idp64bitunsignedaccelerated':
-        case 'idp64bitsignedaccelerated':
-        case 'idp64bitmixedsignednessaccelerated':
-        case 'idpaccumulatingsaturating8bitunsignedaccelerated':
-        case 'idpaccumulatingsaturating8bitsignedaccelerated':
-        case 'idpaccumulatingsaturating8bitmixedsignednessaccelerated':
-        case 'idpaccumulatingsaturating4x8bitpackedunsignedaccelerated':
-        case 'idpaccumulatingsaturating4x8bitpackedsignedaccelerated':
-        case 'idpaccumulatingsaturating4x8bitpackedmixedsignednessaccelerated':
-        case 'idpaccumulatingsaturating16bitunsignedaccelerated':
-        case 'idpaccumulatingsaturating16bitsignedaccelerated':
-        case 'idpaccumulatingsaturating16bitmixedsignednessaccelerated':
-        case 'idpaccumulatingsaturating32bitunsignedaccelerated':
-        case 'idpaccumulatingsaturating32bitsignedaccelerated':
-        case 'idpaccumulatingsaturating32bitmixedsignednessaccelerated':
-        case 'idpaccumulatingsaturating64bitunsignedaccelerated':
-        case 'idpaccumulatingsaturating64bitsignedaccelerated':
-        case 'idpaccumulatingsaturating64bitmixedsignednessaccelerated':
         case 'storagetexelbufferoffsetsingletexelalignment':
         case 'uniformtexelbufferoffsetsingletexelalignment':            
         case 'timestampcomputeandgraphics':
@@ -485,13 +414,24 @@ class VulkanProfile {
     }
 
     private function readProperties($version) {
-        $table_names = [
-            '1.0' => 'deviceproperties',
-            '1.1' => 'deviceproperties11',
-            '1.2' => 'deviceproperties12',
-            '1.3' => 'deviceproperties13',
-        ];
-        $table = $table_names[$version];
+        switch($version) {
+            case '1.0':
+                $table = 'deviceproperties';
+                $type_mappings = VkTypes::$VkPhysicalDeviceProperties;
+                break;
+            case '1.1':
+                $table = 'deviceproperties11';
+                $type_mappings = VkTypes::$VkPhysicalDeviceVulkan11Properties;
+                break;
+            case '1.2':
+                $table = 'deviceproperties12';
+                $type_mappings = VkTypes::$VkPhysicalDeviceVulkan12Properties;
+                break;
+            case '1.3':
+                $table = 'deviceproperties13';
+                $type_mappings = VkTypes::$VkPhysicalDeviceVulkan13Properties;
+                break;
+        }
         $stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
         $stmnt->execute([":reportid" => $this->reportid]);
         $result = $stmnt->fetch(PDO::FETCH_ASSOC);
@@ -510,20 +450,21 @@ class VulkanProfile {
                     continue;
                 }
                 if ($key == 'apiversionraw') {
-                    $key_name = 'apiversion';
+                    $key_name = 'apiVersion';
+                }
+                // Fix some spelling differences between spec and database
+                if ($key == 'vendorid') {
+                    $key_name = 'vendorID';
                 }
             }
-            // @todo            
-            if ($table == 'deviceproperties11') {
-                $type = Mappings::$VkPhysicalDeviceVulkan11Properties[$key_name];
-                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type, $key_name);
-            } elseif ($table == 'deviceproperties12') {
-                $type = Mappings::$VkPhysicalDeviceVulkan12Properties[$key_name];
-                $properties[capitalizeFieldName($key_name)] = $this->convertValue($value, $type, $key_name);
-            } else {
-                $converted_value = convertFieldValue($key_name, $value);
-                $properties[capitalizeFieldName($key_name)] = $converted_value;
+            if ($version == '1.3') {
+                // Some member names are so long that they had to be truncated in the database, so we need to get the long names
+                if (stripos($key_name, 'idp') == 0) {
+                    $key_name = str_replace('idp', 'integerDotProduct', $key_name);
+                }
             }
+            $type = $type_mappings[$key_name];
+            $properties[$key_name] = $this->convertValue($value, $type, $key_name);
         }
         if ($version == '1.0') {
             // Remap sparse properties into struct
