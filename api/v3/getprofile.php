@@ -362,7 +362,7 @@ class VulkanProfile {
         if ($api_minor >= 3) {
             $api_version_skip_list[] = 'VK_VERSION_1_3';
         }
-        $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid");
+        $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid order by name asc");
         $stmnt->execute([":reportid" => $this->reportid]);
         $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
         foreach ($result as $key => $values) {
@@ -381,14 +381,25 @@ class VulkanProfile {
                     }
                 }
             }
-            // @todo: get types for properties struct from schema
             $property = null;
             foreach ($values as $value) {
                 $type = null;
-                if (array_key_exists($value['name'], $ext['property_types'])) {
-                    $type = $ext['property_types'][$value['name']];
+                $value_name = $value['name'];
+                // Some properties are stored are stored different on the database than the struct layouts and require some transformation
+                if ($ext['struct_type_physical_device_properties'] == 'VkPhysicalDeviceSampleLocationsPropertiesEXT') {
+                    if (in_array($value_name, ['maxSampleLocationGridSize.width', 'maxSampleLocationGridSize.height'])) {
+                        $property['maxSampleLocationGridSize'][str_replace('maxSampleLocationGridSize.', '', $value_name)] = $this->convertValue($value['value'], 'int32_t');
+                        continue;
+                    }
+                    if (in_array($value_name, ['sampleLocationCoordinateRange[0]', 'sampleLocationCoordinateRange[1]'])) {
+                        $property['sampleLocationCoordinateRange'][] = $this->convertValue($value['value'], 'float');
+                        continue;
+                    }                    
                 }
-                $property[$value['name']] = $this->convertValue($value['value'], $type);
+                if (array_key_exists($value_name, $ext['property_types'])) {
+                    $type = $ext['property_types'][$value_name];
+                }
+                $property[$value_name] = $this->convertValue($value['value'], $type);
             }
             $this->extension_properties[$ext['struct_type_physical_device_properties']] = $property;
         }
