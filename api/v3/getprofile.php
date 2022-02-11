@@ -44,289 +44,6 @@ if ($stmnt->rowCount() == 0) {
 }
 $row = $stmnt->fetch(PDO::FETCH_ASSOC);
 
-function skipField($name, $version) {
-    $skip_fields = [
-        'reportid',
-        'headerversion',
-        'productModel',
-        'productManufacturer',
-        'deviceid',
-        'devicename',
-        'devicetype',
-        'driverversion',
-        'driverversionraw',
-    ];
-    if ($version == '1.0') {
-        $skip_fields = array_merge($skip_fields, [
-            'residencyAlignedMipSize',
-            'residencyNonResidentStrict',
-            'residencyStandard2DBlockShape',
-            'residencyStandard2DMultisampleBlockShape',
-            'residencyStandard3DBlockShape',
-            'subgroupProperties.subgroupSize',
-            'subgroupProperties.supportedStages',
-            'subgroupProperties.supportedOperations',
-            'subgroupProperties.quadOperationsInAllStages',
-            'maxComputeWorkGroupCount[0]',
-            'maxComputeWorkGroupCount[1]',
-            'maxComputeWorkGroupCount[2]',
-            'maxComputeWorkGroupSize[0]',
-            'maxComputeWorkGroupSize[1]',
-            'maxComputeWorkGroupSize[2]',
-            'maxViewportDimensions[0]',
-            'maxViewportDimensions[1]',
-            'pointSizeRange[0]',
-            'pointSizeRange[1]',
-            'viewportBoundsRange[0]',
-            'viewportBoundsRange[1]',
-            'lineWidthRange[0]',
-            'lineWidthRange[1]',
-        ]);
-    }
-    return in_array($name, $skip_fields);
-}
-
-// @todo: move to utils folder outside of api
-
-function getVkFlags($flags, $flag) {
-	$flag_values = array_values($flags);
-    $supported_flags = [];
-	$index = 0;
-	foreach ($flags as $i => $value) {
-		if ($flag & $i) {
-			$supported_flags[] = $flag_values[$index];
-		}
-		$index++;
-	}
-	return $supported_flags;
-}
-
-function getVkValue($lookup, $value) {
-    return (in_array($value, $lookup) ? array_search($value, $lookup) : null);    
-}
-
-function convertFieldValue($name, $value) {
-    switch (strtolower($name)) {
-        case 'vendorid':
-        case 'apiversion':
-        case 'maxmultiviewviewcount':
-        case 'maxmultiviewinstanceindex':
-        case 'devicenodemask':
-        case 'subgroupsize':
-        case 'maxpersetdescriptors':
-        case 'maxperstagedescriptorupdateafterbindsamplers':
-        case 'maxperstagedescriptorupdateafterbinduniformbuffers':
-        case 'maxperstagedescriptorupdateafterbindstoragebuffers':
-        case 'maxperstagedescriptorupdateafterbindsampledimages':
-        case 'maxperstagedescriptorupdateafterbindstorageimages':
-        case 'maxperstagedescriptorupdateafterbindinputattachments':
-        case 'maxperstageupdateafterbindresources':
-        case 'maxdescriptorsetupdateafterbindsamplers':
-        case 'maxdescriptorsetupdateafterbinduniformbuffers':
-        case 'maxdescriptorsetupdateafterbinduniformbuffersdynamic':
-        case 'maxdescriptorsetupdateafterbindstoragebuffers':
-        case 'maxdescriptorsetupdateafterbindstoragebuffersdynamic':
-        case 'maxdescriptorsetupdateafterbindsampledimages':
-        case 'maxdescriptorsetupdateafterbindstorageimages':
-        case 'maxdescriptorsetupdateafterbindinputattachments':
-        case 'maxupdateafterbinddescriptorsinallpools':
-        case 'minsubgroupsize':
-        case 'maxsubgroupsize':
-        case 'maxcomputeworkgroupsubgroups':
-        case 'maxinlineuniformblocksize':
-        case 'maxperstagedescriptorinlineuniformblocks':
-        case 'maxperstagedescriptorupdateafterbindinlineuniformblocks':
-        case 'maxdescriptorsetinlineuniformblocks':
-        case 'maxdescriptorsetupdateafterbindinlineuniformblocks':
-        case 'maxinlineuniformtotalsize':
-        case 'mintexelgatheroffset':
-        case 'mintexeloffset':
-        case 'minmemorymapalignment':
-        case 'discretequeuepriorities':
-        case 'maxbounddescriptorsets':
-        case 'maxclipdistances':
-        case 'maxcolorattachments':
-        case 'maxcombinedclipandculldistances':
-        case 'maxcomputesharedmemorysize':
-        case 'maxcomputeworkgroupcount[3]':
-        case 'maxcomputeworkgroupinvocations':
-        case 'maxcomputeworkgroupsize[3]':
-        case 'maxculldistances':
-        case 'maxdescriptorsetinputattachments':
-        case 'maxdescriptorsetsampledimages':
-        case 'maxdescriptorsetsamplers':
-        case 'maxdescriptorsetstoragebuffers':
-        case 'maxdescriptorsetstoragebuffersdynamic':
-        case 'maxdescriptorsetstorageimages':
-        case 'maxdescriptorsetuniformbuffers':
-        case 'maxdescriptorsetuniformbuffersdynamic':
-        case 'maxdrawindexedindexvalue':
-        case 'maxdrawindirectcount':
-        case 'maxfragmentcombinedoutputresources':
-        case 'maxfragmentdualsrcattachments':
-        case 'maxfragmentinputcomponents':
-        case 'maxfragmentoutputattachments':
-        case 'maxframebufferheight':
-        case 'maxframebufferlayers':
-        case 'maxframebufferwidth':
-        case 'maxgeometryinputcomponents':
-        case 'maxgeometryoutputcomponents':
-        case 'maxgeometryoutputvertices':
-        case 'maxgeometryshaderinvocations':
-        case 'maxgeometrytotaloutputcomponents':
-        case 'maximagearraylayers':
-        case 'maximagedimension1d':
-        case 'maximagedimension2d':
-        case 'maximagedimension3d':
-        case 'maximagedimensioncube':
-        case 'maxmemoryallocationcount':
-        case 'maxperstagedescriptorinputattachments':
-        case 'maxperstagedescriptorsampledimages':
-        case 'maxperstagedescriptorsamplers':
-        case 'maxperstagedescriptorstoragebuffers':
-        case 'maxperstagedescriptorstorageimages':
-        case 'maxperstagedescriptoruniformbuffers':
-        case 'maxperstageresources':
-        case 'maxpushconstantssize':
-        case 'maxsamplemaskwords':
-        case 'maxsamplerallocationcount':
-        case 'maxstoragebufferrange':
-        case 'maxtessellationcontrolperpatchoutputcomponents':
-        case 'maxtessellationcontrolpervertexinputcomponents':
-        case 'maxtessellationcontrolpervertexoutputcomponents':
-        case 'maxtessellationcontroltotaloutputcomponents':
-        case 'maxtessellationevaluationinputcomponents':
-        case 'maxtessellationevaluationoutputcomponents':
-        case 'maxtessellationgenerationlevel':
-        case 'maxtessellationpatchsize':
-        case 'maxtexelbufferelements':
-        case 'maxtexelgatheroffset':
-        case 'maxtexeloffset':
-        case 'maxuniformbufferrange':
-        case 'maxvertexinputattributeoffset':
-        case 'maxvertexinputattributes':
-        case 'maxvertexinputbindings':
-        case 'maxvertexinputbindingstride':
-        case 'maxvertexoutputcomponents':
-        case 'maxviewportdimensions[2]':
-        case 'maxviewports':
-        case 'mipmapprecisionbits':
-        case 'subpixelinterpolationoffsetbits':
-        case 'subpixelprecisionbits':
-        case 'subtexelprecisionbits':
-        case 'viewportsubpixelbits':
-            return intval($value);
-        // Float
-        case 'maxsamplerlodbias':
-        case 'maxsampleranisotropy':
-        case 'mininterpolationoffset':
-        case 'maxinterpolationoffset':
-        case 'timestampperiod':
-        case 'pointsizegranularity':
-        case 'linewidthgranularity':
-            return floatval($value);
-        case 'pipelinecacheuuid':
-        case 'deviceuuid':
-        case 'driveruuid':
-            return unserialize($value);
-        case 'deviceluid':
-            return array_slice(unserialize($value), 0, 8);
-        // Boolean
-        case 'deviceluidvalid':
-        case 'protectednofault':
-        case 'subgroupquadoperationsinallstages':
-        case 'shadersignedzeroinfnanpreservefloat16':
-        case 'shadersignedzeroinfnanpreservefloat32':
-        case 'shadersignedzeroinfnanpreservefloat64':
-        case 'shaderdenormpreservefloat16':
-        case 'shaderdenormpreservefloat32':
-        case 'shaderdenormpreservefloat64':
-        case 'shaderdenormflushtozerofloat16':
-        case 'shaderdenormflushtozerofloat32':
-        case 'shaderdenormflushtozerofloat64':
-        case 'shaderroundingmodertefloat16':
-        case 'shaderroundingmodertefloat32':
-        case 'shaderroundingmodertefloat64':
-        case 'shaderroundingmodertzfloat16':
-        case 'shaderroundingmodertzfloat32':
-        case 'shaderroundingmodertzfloat64':
-        case 'shaderuniformbufferarraynonuniformindexingnative':
-        case 'shadersampledimagearraynonuniformindexingnative':
-        case 'shaderstoragebufferarraynonuniformindexingnative':
-        case 'shaderstorageimagearraynonuniformindexingnative':
-        case 'shaderinputattachmentarraynonuniformindexingnative':
-        case 'robustbufferaccessupdateafterbind':
-        case 'quaddivergentimplicitlod':
-        case 'independentresolvenone':
-        case 'independentresolve':
-        case 'filterminmaxsinglecomponentformats':
-        case 'filterminmaximagecomponentmapping':
-        case 'storagetexelbufferoffsetsingletexelalignment':
-        case 'uniformtexelbufferoffsetsingletexelalignment':            
-        case 'timestampcomputeandgraphics':
-        case 'strictlines':
-        case 'standardsamplelocations':
-            return boolval($value);
-        case 'requiredsubgroupsizestages':
-        case 'subgroupsupportedstages':
-            $flags = [
-                0x00000001 => 'VK_SHADER_STAGE_VERTEX_BIT',
-                0x00000002 => 'VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT',
-                0x00000004 => 'VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT',
-                0x00000008 => 'VK_SHADER_STAGE_GEOMETRY_BIT',
-                0x00000010 => 'VK_SHADER_STAGE_FRAGMENT_BIT',
-                0x00000020 => 'VK_SHADER_STAGE_COMPUTE_BIT',
-                0x0000001F => 'VK_SHADER_STAGE_ALL_GRAPHICS',
-                0x7FFFFFFF => 'VK_SHADER_STAGE_ALL',
-                0x00000100 => 'VK_SHADER_STAGE_RAYGEN_BIT_KHR',
-                0x00000200 => 'VK_SHADER_STAGE_ANY_HIT_BIT_KHR',
-                0x00000400 => 'VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR',
-                0x00000800 => 'VK_SHADER_STAGE_MISS_BIT_KHR',
-                0x00001000 => 'VK_SHADER_STAGE_INTERSECTION_BIT_KHR',
-                0x00002000 => 'VK_SHADER_STAGE_CALLABLE_BIT_KHR',
-                0x00000040 => 'VK_SHADER_STAGE_TASK_BIT_NV',
-                0x00000080 => 'VK_SHADER_STAGE_MESH_BIT_NV',
-                0x00004000 => 'VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI'
-            ];
-            $ret_val = getVkFlags($flags, $value);
-            return $ret_val;
-        case 'framebufferintegercolorsamplecounts':
-        case 'framebuffercolorsamplecounts':
-        case 'framebufferdepthsamplecounts':
-        case 'framebufferstencilsamplecounts':
-        case 'framebuffernoattachmentssamplecounts':
-        case 'sampledimagecolorsamplecounts':
-        case 'sampledimageintegersamplecounts':
-        case 'sampledimagedepthsamplecounts':
-        case 'sampledimagestencilsamplecounts':
-        case 'storageimagesamplecounts':
-            $flags = [
-                0x00000001 => 'VK_SAMPLE_COUNT_1_BIT',
-                0x00000002 => 'VK_SAMPLE_COUNT_2_BIT',
-                0x00000004 => 'VK_SAMPLE_COUNT_4_BIT',
-                0x00000008 => 'VK_SAMPLE_COUNT_8_BIT',
-                0x00000010 => 'VK_SAMPLE_COUNT_16_BIT',
-                0x00000020 => 'VK_SAMPLE_COUNT_32_BIT',
-                0x00000040 => 'VK_SAMPLE_COUNT_64_BIT',
-            ];
-            $ret_val = getVkFlags($flags, $value);
-            return $ret_val;            
-        case 'queueflags':
-            $flags = [
-                0x00000001 => 'VK_QUEUE_GRAPHICS_BIT',
-                0x00000002 => 'VK_QUEUE_COMPUTE_BIT',
-                0x00000004 => 'VK_QUEUE_TRANSFER_BIT',
-                0x00000008 => 'VK_QUEUE_SPARSE_BINDING_BIT',
-                0x00000010 => 'VK_QUEUE_PROTECTED_BIT',
-                0x00000020 => 'VK_QUEUE_VIDEO_DECODE_BIT_KHR',
-                0x00000040 => 'VK_QUEUE_VIDEO_ENCODE_BIT_KHR',
-            ];
-            $ret_val = getVkFlags($flags, $value);
-            return $ret_val;            
-    }
-    return $value;
-}
-
 class VulkanProfile {
     private $reportid = null;
     private $queue_families = [];
@@ -354,6 +71,49 @@ class VulkanProfile {
         $this->json_schema = json_decode($file, true);
     }
 
+    /** Some fields in the database tables are not part of the spec and need to be skipped at completly or skipped to be remapped later*/
+    private function skipField($name, $version) {
+        $skip_fields = [
+            'reportid',
+            'headerversion',
+            'productModel',
+            'productManufacturer',
+            'deviceid',
+            'devicename',
+            'devicetype',
+            'driverversion',
+            'driverversionraw',
+        ];
+        if ($version == '1.0') {
+            $skip_fields = array_merge($skip_fields, [
+                'residencyAlignedMipSize',
+                'residencyNonResidentStrict',
+                'residencyStandard2DBlockShape',
+                'residencyStandard2DMultisampleBlockShape',
+                'residencyStandard3DBlockShape',
+                'subgroupProperties.subgroupSize',
+                'subgroupProperties.supportedStages',
+                'subgroupProperties.supportedOperations',
+                'subgroupProperties.quadOperationsInAllStages',
+                'maxComputeWorkGroupCount[0]',
+                'maxComputeWorkGroupCount[1]',
+                'maxComputeWorkGroupCount[2]',
+                'maxComputeWorkGroupSize[0]',
+                'maxComputeWorkGroupSize[1]',
+                'maxComputeWorkGroupSize[2]',
+                'maxViewportDimensions[0]',
+                'maxViewportDimensions[1]',
+                'pointSizeRange[0]',
+                'pointSizeRange[1]',
+                'viewportBoundsRange[0]',
+                'viewportBoundsRange[1]',
+                'lineWidthRange[0]',
+                'lineWidthRange[1]',
+            ]);
+        }
+        return in_array($name, $skip_fields);
+    }    
+
     private function readFeatures($version) {
         $table_names = [
             '1.0' => 'devicefeatures',
@@ -370,7 +130,7 @@ class VulkanProfile {
         }
         $features = [];
         foreach ($result as $key => $value) {
-            if (skipField($key, $version)) {
+            if ($this->skipField($key, $version)) {
                 continue;
             }
             $features[$key] = boolval($value);
@@ -384,10 +144,11 @@ class VulkanProfile {
         $limit_stmnt->execute([":reportid" => $this->reportid]);
         $limit_result = $limit_stmnt->fetch(PDO::FETCH_ASSOC);
         foreach ($limit_result as $limit_key => $limit_value) {
-            if (skipField($limit_key, '1.0')) {
+            if ($this->skipField($limit_key, '1.0')) {
                 continue;
             }
-            $limits[$limit_key] = convertFieldValue($limit_key, $limit_value);
+            $type = VkTypes::$VkPhysicalDeviceLimits[$limit_key];
+            $limits[$limit_key] = $this->convertValue($limit_value, $type, $limit_key);
         }    
         
         $limitToArray = function($name, $dim, $type) use ($limit_result) {
@@ -404,11 +165,11 @@ class VulkanProfile {
         };
     
         // Multi-dimensional arrays are stored as single columns in the database and need to be remapped        
-        $limit_properties['maxComputeWorkGroupCount'] = $limitToArray('maxComputeWorkGroupCount', 3, 'int');
-        $limit_properties['maxViewportDimensions'] = $limitToArray('maxViewportDimensions', 2, 'int');
-        $limit_properties['pointSizeRange'] = $limitToArray('pointSizeRange', 2, 'float');
-        $limit_properties['viewportBoundsRange'] = $limitToArray('viewportBoundsRange', 2, 'float');
-        $limit_properties['lineWidthRange'] = $limitToArray('lineWidthRange', 2, 'float');
+        $limits['maxComputeWorkGroupCount'] = $limitToArray('maxComputeWorkGroupCount', 3, 'int');
+        $limits['maxViewportDimensions'] = $limitToArray('maxViewportDimensions', 2, 'int');
+        $limits['pointSizeRange'] = $limitToArray('pointSizeRange', 2, 'float');
+        $limits['viewportBoundsRange'] = $limitToArray('viewportBoundsRange', 2, 'float');
+        $limits['lineWidthRange'] = $limitToArray('lineWidthRange', 2, 'float');
     
         return $limits;
     }
@@ -440,7 +201,7 @@ class VulkanProfile {
         }
         $properties = [];
         foreach ($result as $key => $value) {
-            if (skipField($key, $version)) {
+            if ($this->skipField($key, $version)) {
                 continue;
             }
             $key_name = $key;
@@ -535,6 +296,10 @@ class VulkanProfile {
                 case 'uint8_t':
                 case 'uint16_t':
                 case 'uint32_t':
+                case 'int8_t':
+                case 'int16_t':
+                case 'int32_t':
+                case 'size_t':
                     return intval($value);
                 case 'float':
                     return floatval($value);
@@ -662,7 +427,7 @@ class VulkanProfile {
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
             $profile_queue_family = [
                 'VkQueueFamilyProperties' => [
-                    'queueFlags' => convertFieldValue('queueFlags', $row['flags']),
+                    'queueFlags' => Vktypes::VkQueueFlags($row['flags']),
                     'queueCount' => intval($row['count']),
                     'timestampValidBits' => intval($row['timestampValidBits']),
                     'minImageTransferGranularity' => [
@@ -786,8 +551,5 @@ $filename .= ".json";
 header("Content-type: application/json");
 // header("Content-Disposition: attachment; filename=".strtolower($filename));
 echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-// @todo
-//  insertDeviceExtensionFeatures($reportid, $profile_caps);
 
 DB::disconnect();
