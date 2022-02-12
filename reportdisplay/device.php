@@ -89,8 +89,8 @@
 						$key = 'Last update at';
 						$value = '<a href=# data-toggle="modal" data-target="#modal_report_history">' . $value . '</a>';
 						break;
-					case 'devsim':
-						include 'devsim_downloads.php';
+					case 'profile':
+						include 'profile_download.php';
 						continue 2;
 						break;
 				}

@@ -152,7 +152,7 @@ class Report
                 (SELECT max(date) from reportupdatehistory where reportid = :reportid) as lastupdate,
                 r.version as reportversion,
                 r.description,
-                'devsim' as `devsim`
+                'profile' as `profile`
                 from reports r
                 left join
                 deviceproperties p on (p.reportid = r.id)
