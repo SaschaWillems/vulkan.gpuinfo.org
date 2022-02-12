@@ -32,6 +32,12 @@ if (!isset($_GET['id'])) {
     die();
 }
 
+// If set to true, only the portability subset related structures are exported
+$portability_subset = false;
+if (isset($_GET['portabilitysubset'])) {
+    $portability_subset = $_GET['portabilitysubset'] == 'true';
+}
+
 DB::connect();
 $reportid = $_GET['id'];	
 $stmnt = DB::$connection->prepare("SELECT * from reports where id = :reportid");
@@ -59,12 +65,14 @@ class VulkanProfile {
     private $device_name = null;
     private $report_label = null;
     private $api_version = null;
+    private $portability_subset = false;
     
     public $json = null;
     private $json_schema = null;
 
-    function __construct($reportid) {
+    function __construct($reportid, $portability_subset) {
         $this->reportid = $reportid;
+        $this->portability_subset = $portability_subset;
     }
 
     private function loadSchema() {
@@ -291,6 +299,41 @@ class VulkanProfile {
         }
     }
 
+    function readPortabilityFeaturesAndProperties() {
+        // Features
+        $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid and extension = :extension order by name asc");
+        $stmnt->execute([":reportid" => $this->reportid, ":extension" => 'VK_KHR_portability_subset']);
+        $schema_features_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["features"]["properties"];
+        $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
+        foreach ($result as $key => $values) {
+            $ext = Mappings::$extensions[$key];
+            if ($ext['struct_type_physical_device_features'] == '') {
+                continue;
+            }
+            $feature = null;
+            foreach ($values as $value) {
+                $feature[$value['name']] = boolval($value['supported']);
+            }
+            $this->extension_features[$ext['struct_type_physical_device_features']] = $feature;
+        }
+        // Properties
+        $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid and extension = :extension order by name asc");
+        $stmnt->execute([":reportid" => $this->reportid, ":extension" => 'VK_KHR_portability_subset']);
+        $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
+        foreach ($result as $key => $values) {
+            $ext = Mappings::$extensions[$key];
+            if ($ext['struct_type_physical_device_properties'] == '') {
+                continue;
+            }
+            $property = null;
+            foreach ($values as $value) {
+                $type = $ext['property_types'][$value['name']];
+                $property[$value['name']] = $this->convertValue($value['value'], $type);
+            }
+            $this->extension_properties[$ext['struct_type_physical_device_properties']] = $property;
+        }
+    }
+
     function convertValue($value, $type, $name = null) {
         $convert = function($value, $type) {
             switch($type) {
@@ -373,7 +416,7 @@ class VulkanProfile {
             $ext = Mappings::$extensions[$key];
             if ($ext['struct_type_physical_device_properties'] == '') {
                 continue;
-            }            
+            }
             // Skip property structs that have been promoted to a core version supported by the device
             if ($ext['promoted_to'] !== '') {
                 if (stripos($ext['promoted_to'], 'VK_VERSION') !== false) {
@@ -476,15 +519,21 @@ class VulkanProfile {
         DB::connect();
         $this->loadSchema();
         $this->readDeviceInfo();
-        $this->readExtensions();
-        foreach ($api_versions as $version) {
-            $this->features[$version] = $this->readFeatures($version);
-            $this->properties[$version] = $this->readProperties($version);
+        if (!$this->portability_subset) {
+            // Create a complete device report
+            $this->readExtensions();
+            foreach ($api_versions as $version) {
+                $this->features[$version] = $this->readFeatures($version);
+                $this->properties[$version] = $this->readProperties($version);
+            }
+            $this->readExtensionFeatures();
+            $this->readExtensionProperties();
+            $this->readFormats();
+            $this->readQueueFamilies();
+        } else {
+            // Create a device report only containing portability subset features and properties
+            $this->readPortabilityFeaturesAndProperties();
         }
-        $this->readExtensionFeatures();
-        $this->readExtensionProperties();
-        $this->readFormats();
-        $this->readQueueFamilies();
         DB::disconnect();
 
         $this->json['$schema'] = 'https://schema.khronos.org/vulkan/profiles-1.3.204.json#';        
@@ -551,13 +600,14 @@ class VulkanProfile {
         if ($this->queue_families && (count($this->queue_families) > 0)) {
             $this->json['capabilities'][$this->profile_name]['queueFamiliesProperties'] = $this->queue_families;
         } else {
-            $this->json['capabilities'][$this->profile_name]['queueFamiliesProperties'] = (object)null;
+            $this->json['capabilities'][$this->profile_name]['queueFamiliesProperties'] = [];
         }
     }
 }
+
 // Profile generation
 
-$profile = new VulkanProfile($reportid);
+$profile = new VulkanProfile($reportid, $portability_subset);
 $profile->generateJSON();
 
 $filename = $device_name;
