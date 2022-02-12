@@ -35,6 +35,9 @@ PageGenerator::header("Profiles");
 <div class='header'>
 	<?php echo "<h4>Profile coverage for ".PageGenerator::platformInfo($platform) ?>
 </div>
+<div class="alert alert-info" role="alert" style="text-align: center">
+	<b>Note:</b> Data is based on reports submitted or updated with version 3.2 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
+</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listprofiles.php', $platform, true); ?>
@@ -69,9 +72,9 @@ PageGenerator::header("Profiles");
 					$viewDeviceCount->execute($params);
 					$deviceCount = $viewDeviceCount->fetch(PDO::FETCH_COLUMN);
 
-					$sql ="SELECT name, count(distinct displayname) as coverage from deviceprofiles dp join reports r on r.id = dp.reportid";
+					$sql ="SELECT name, count(distinct displayname) as coverage from deviceprofiles dp join reports r on r.id = dp.reportid where dp.supported = 1";
 					if ($platform !== 'all') {
-						$sql .= " where ostype = :ostype";
+						$sql .= " and ostype = :ostype";
 					}
 					$sql .= " group by name";
 

@@ -35,6 +35,7 @@ class ReportFlags
     public $has_vulkan_1_3_properties = false;
     public $has_portability_extension = false;
     public $has_update_history = false;
+    public $has_profiles = false;
 }
 
 class ReportApiVersion
@@ -127,6 +128,7 @@ class Report
         $this->flags->has_vulkan_1_3_properties = DB::getCount("SELECT count(*) from deviceproperties13 where reportid = :reportid", [':reportid' => $this->id]) > 0;
         $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
         $this->flags->has_update_history = DB::getCount("SELECT count(*) from reportupdatehistory where reportid = :reportid", [':reportid' => $this->id]) > 0;
+        $this->flags->has_profiles =  DB::getCount("SELECT count(*) from deviceprofiles where reportid = :reportid", [':reportid' => $this->id]) > 0;
         DB::disconnect();
     }
 
@@ -457,6 +459,19 @@ class Report
         } catch (Throwable $e) {
             return null;
         }
+    }
+
+    public function fetchProfiles()
+    {
+        try {
+            $sql = "SELECT name, supported from deviceprofiles where reportid = :reportid order by name asc";
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute([":reportid" => $this->id]);
+            $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (Throwable $e) {
+            return null;
+        }     
     }
 
     /**
