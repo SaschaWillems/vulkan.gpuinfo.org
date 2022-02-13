@@ -464,7 +464,7 @@ class Report
     public function fetchProfiles()
     {
         try {
-            $sql = "SELECT name, supported from deviceprofiles where reportid = :reportid order by name asc";
+            $sql = "SELECT name, supported from deviceprofiles dp join profiles p on dp.profileid = p.id where reportid = :reportid order by name asc";
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute([":reportid" => $this->id]);
             $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
