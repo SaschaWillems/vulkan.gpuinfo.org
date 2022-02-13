@@ -314,13 +314,14 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
 			VALUES
-				(:submitter, :devicename, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
 
 		$values = array(
 			":submitter" => $json['environment']['submitter'],
 			":devicename" => $json['properties']['deviceName'],
+			":displayname" => $json['properties']['displayName'],
 			":driverversion" => $json['properties']['driverVersionText'],
 			":apiversion" => $json['properties']['apiVersionText'],
 			":osname" => $json['environment']['name'],
