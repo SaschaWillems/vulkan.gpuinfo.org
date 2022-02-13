@@ -201,16 +201,28 @@
             return;
         }        
         $profiles_report = $json['profiles'];
-        $stmnt = DB::$connection->prepare("SELECT name from deviceprofiles where reportid = :reportid");
+        $stmnt = DB::$connection->prepare("SELECT name from deviceprofiles dp join profiles p on dp.profileid = p.id where reportid = :reportid");
         $stmnt->execute(['reportid' => $reportid]);
         $profiles_db = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
         foreach ($profiles_report as $profile_report) {
             if (!in_array($profile_report['profileName'], $profiles_db)) {
+                // Add to global mapping table (if not already present)
+                $sql = "INSERT IGNORE INTO profiles (name) VALUES (:name)";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute(array(":name" => $profile_report['profileName']));	
+			    // Get profile mapping id
+                $sql = "SELECT id FROM profiles WHERE name = :name";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute(array(":name" => $profile_report['profileName']));
+                $profileid = $stmnt->fetchColumn();
+                if ($profileid == null) {
+                    throw new Exception("Could not get lookup entry for profile ".$profile_report['profileName']);
+                }          
                 // Profile is missing, insert
-                $sql = "INSERT INTO deviceprofiles (reportid, name, specversion, supported) VALUES (:reportid, :name, :specversion, :supported)";
+                $sql = "INSERT INTO deviceprofiles (reportid, profileid, specversion, supported) VALUES (:reportid, :profileid, :specversion, :supported)";
                 try {
                     $stmnt = DB::$connection->prepare($sql);
-                    $stmnt->execute([":reportid" => $reportid, ":name" => $profile_report['profileName'], ":specversion" => $profile_report['specVersion'], ":supported" => $profile_report['supported']]);
+                    $stmnt->execute([":reportid" => $reportid, ":profileid" => $profileid, ":specversion" => $profile_report['specVersion'], ":supported" => $profile_report['supported']]);
                 } catch (Exception $e) {
                     die('Error while trying to upload report (error at device profiles)');
                 }

@@ -172,7 +172,7 @@
 
 	function check_profiles_updatable($report, $compare_id, &$updatable) {
 		if (array_key_exists('profiles', $report)) {
-			$stmnt = DB::$connection->prepare("SELECT name from deviceprofiles where reportid = :reportid");
+			$stmnt = DB::$connection->prepare("SELECT name from deviceprofiles dp join profiles p on p.id = dp.profileid where reportid = :reportid");
 			$stmnt->execute(['reportid' => $compare_id]);
 			$profiles_database = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
 			// Check if at least one profile is missing

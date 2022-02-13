@@ -223,8 +223,7 @@
 			$sql = "INSERT IGNORE INTO profiles (name) VALUES (:name)";
 			$stmnt = DB::$connection->prepare($sql);
 			$stmnt->execute(array(":name" => $profile['profileName']));	
-			// Device
-			// Get extension id
+			// Get profile mapping id
 			$sql = "SELECT id FROM profiles WHERE name = :name";
 			$stmnt = DB::$connection->prepare($sql);
 			$stmnt->execute(array(":name" => $profile['profileName']));
