@@ -217,20 +217,30 @@
 		if (!array_key_exists('profiles', $json)) {
 			return;
 		}
-		// Features
 		$jsonnode = $json['profiles'];
 		foreach ($jsonnode as $profile) {
-
+			// Add to global mapping table (if not already present)
+			$sql = "INSERT IGNORE INTO profiles (name) VALUES (:name)";
+			$stmnt = DB::$connection->prepare($sql);
+			$stmnt->execute(array(":name" => $profile['profileName']));	
+			// Device
+			// Get extension id
+			$sql = "SELECT id FROM profiles WHERE name = :name";
+			$stmnt = DB::$connection->prepare($sql);
+			$stmnt->execute(array(":name" => $profile['profileName']));
+			$profileid = $stmnt->fetchColumn();
+			if ($profileid == null) {
+				throw new Exception("Could not get lookup entry for profile ".$profile['profileName']);
+			}
 			// Insert
-			$sql = "INSERT INTO deviceprofiles (reportid, name, specversion, supported) VALUES (:reportid, :name, :specversion, :supported)";
+			$sql = "INSERT INTO deviceprofiles (reportid, profileid, specversion, supported) VALUES (:reportid, :profileid, :specversion, :supported)";
 			try {
 				$stmnt = DB::$connection->prepare($sql);
-				$stmnt->execute([":reportid" => $reportid, ":name" => $profile['profileName'], ":specversion" => $profile['specVersion'], ":supported" => $profile['supported']]);
+				$stmnt->execute(array(":reportid" => $reportid, ":profileid" => $profileid, ":specversion" => $profile['specVersion'], ":supported" => $profile['supported']));
 			} catch (Exception $e) {
-				mailError("Error at device profiles: ".$e->getMessage(), $json);
-				die('Error while trying to upload report (error at devie profiles)');
+				die('Error while trying to upload report (error at device extensions)');
 			}															
-		}	
+		}
 	}
 
 	DB::connect();

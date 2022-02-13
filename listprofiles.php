@@ -64,15 +64,21 @@ PageGenerator::header("Profiles");
 						$params['ostype'] = ostype($platform);
 					}
 					
-					$sql = "SELECT count(DISTINCT displayname) from reports";
+					$sql = "SELECT count(DISTINCT displayname) from reports where id in (select reportid from deviceprofiles)";
 					if ($platform !== 'all') {
-						$sql .= " where ostype = :ostype";
+						$sql .= " and ostype = :ostype";
 					}
 					$viewDeviceCount = DB::$connection->prepare($sql);
 					$viewDeviceCount->execute($params);
 					$deviceCount = $viewDeviceCount->fetch(PDO::FETCH_COLUMN);
 
-					$sql ="SELECT name, count(distinct displayname) as coverage from deviceprofiles dp join reports r on r.id = dp.reportid where dp.supported = 1";
+					$sql ="SELECT
+							name,
+							count(distinct (case when supported = 1 then displayname end)) as supported
+						from
+							deviceprofiles dp
+							join profiles p on p.id = dp.profileid
+							join reports r on r.id = dp.reportid";
 					if ($platform !== 'all') {
 						$sql .= " and ostype = :ostype";
 					}
@@ -83,8 +89,8 @@ PageGenerator::header("Profiles");
 					$profiles = $stmnt->fetchAll(PDO::FETCH_ASSOC);
 
 					foreach ($profiles as $profile) {
-						$coverageLink = "listdevicescoverage.php?profile=" . $profile['name'] . "&platform=$platform";
-						$coverage = round($profile['coverage'] / $deviceCount * 100, 1);
+						$coverageLink = "listdevicescoverage.php?profile=".$profile['name']."&platform=$platform";
+						$coverage = round($profile['supported'] / $deviceCount * 100, 1);
 						echo "<tr>";
 						echo "<td>".$profile['name']."</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
