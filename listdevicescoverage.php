@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -53,7 +53,8 @@ $filters = [
 	'optimaltilingformat',
 	'bufferformat',
 	'featureflagbit',
-	'surfaceusageflag'
+	'surfaceusageflag',
+	'profile'
 ];
 $filter_list = new FilterList($filters);
 
@@ -185,6 +186,12 @@ if ($filter_list->hasFilter('surfaceusageflag')) {
 		"Listing first known driver version support for surface usage flag <code>$surface_usage_flag</code>";
 	$pageTitle = "Surface present mode $surface_usage_flag";
 }
+// Profile 
+if ($filter_list->hasFilter('profile')) {
+	$profile_name = $filter_list->getFilter('profile');
+	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting profile $profile_name" : "Listing first known driver version support for profile $profile_name";
+	$pageTitle = $profile_name;
+}
 // Submitter
 if ($filter_list->hasFilter('submitter')) {
 	$submitter = $filter_list->getFilter('submitter');
@@ -297,6 +304,7 @@ PageGenerator::header($pageTitle);
 						'bufferformat':					'<?= $filter_list->getFilter('bufferformat') ?>',
 						'featureflagbit':				'<?= $filter_list->getFilter('featureflagbit') ?>',
 						'surfaceusageflag':				'<?= $filter_list->getFilter('surfaceusageflag') ?>',
+						'profile':						'<?= $filter_list->getFilter('profile') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {
