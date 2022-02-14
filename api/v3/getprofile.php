@@ -511,7 +511,7 @@ class VulkanProfile {
         $this->device_name = $row['devicename'];
         $this->api_version = $row['apiversion'];
         $this->report_label = $row['devicename']." driver ".$row['driverversion']." on ".ucfirst($row['osname']). " ".$row['osversion'];
-        $this->profile_name = "VP_GPUINFO_".$row['device']."_".$row['apiversion']."_".$row['driverversion']."_".$row['osname']."_".$row['osversion'];
+        $this->profile_name = "VP_GPUINFO_".$row['device']."_".$row['driverversion']."_".$row['osname']."_".$row['osversion'];
         $this->profile_name = preg_replace("/[^A-Za-z0-9]/", '_', $this->profile_name);
     }
 
