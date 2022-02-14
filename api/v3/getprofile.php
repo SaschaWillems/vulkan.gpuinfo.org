@@ -60,7 +60,7 @@ class VulkanProfile {
     private $properties = [];
     private $extension_properties = [];
 
-    private $profile_name = 'device';
+    private $profile_name;
     private $profile_version = 1;
     private $device_name = null;
     private $report_label = null;
@@ -501,7 +501,7 @@ class VulkanProfile {
     }
 
     private function readDeviceInfo() {
-        $stmnt = DB::$connection->prepare("SELECT * from reports where id = :reportid");
+        $stmnt = DB::$connection->prepare("SELECT ifnull(displayname, devicename) as device, reports.* from reports where id = :reportid");
         $stmnt->execute([":reportid" => $this->reportid]);
         if ($stmnt->rowCount() == 0) {
             header('HTTP/ 400 missing_or');
@@ -511,6 +511,8 @@ class VulkanProfile {
         $this->device_name = $row['devicename'];
         $this->api_version = $row['apiversion'];
         $this->report_label = $row['devicename']." driver ".$row['driverversion']." on ".ucfirst($row['osname']). " ".$row['osversion'];
+        $this->profile_name = "VP_GPUINFO_".$row['device']."_".$row['apiversion']."_".$row['driverversion']."_".$row['osname']."_".$row['osversion'];
+        $this->profile_name = preg_replace("/[^A-Za-z0-9]/", '_', $this->profile_name);
     }
 
     function generateJSON() {
@@ -538,15 +540,27 @@ class VulkanProfile {
 
         $this->json['$schema'] = 'https://schema.khronos.org/vulkan/profiles-1.3.204.json#';        
         $this->json['profiles'] = [
-            'GPUINFO_Exported_Profile' => [
+            $this->profile_name => [
                 "version" => $this->profile_version,
                 "api-version" => $this->api_version,
                 "label" => "$this->report_label",
                 "description" => "Exported from https://vulkan.gpuinfo.org",
                 "contributors" => [],
                 "history" => [],
-                "capabilities" => [$this->profile_name]
+                "capabilities" => ["device"]
             ]
+        ];
+
+        // Required fixed profile details
+        $this->json['profiles'][$this->profile_name]['history'][] = [
+            "revision" => 1,
+            "date" => date('Y-m-d'),
+            "author" => "Automated export from https://vulkan.gpuinfo.org",
+            "comment" => ""
+        ];
+        $this->json['profiles'][$this->profile_name]['contributors']['Sascha Willems'] = [
+            "company" => "Independent",
+            "contact" => true
         ];
 
         // Features
@@ -558,7 +572,7 @@ class VulkanProfile {
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Features'],
             ];
             if (array_key_exists($version, $this->features) && ($this->features[$version] !== null) && count($this->features[$version]) > 0) {
-                $this->json['capabilities'][$this->profile_name]['features'][$node_names[$version]['struct']] = $this->features[$version];
+                $this->json['capabilities']['device']['features'][$node_names[$version]['struct']] = $this->features[$version];
             }
         }
         if (count($this->extension_features) > 0) {
