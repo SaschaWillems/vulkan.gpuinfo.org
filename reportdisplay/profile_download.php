@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,11 +22,11 @@
 
 if ($report->info->version >= '1.4') {
 	echo "<tr><td class='subkey'>";
-	echo "Device simulation layer JSON <span title=\"JSON files that can be used with LunarG's Vulkan device simulation layer\" class=\"hint\">[?]</span>";
+	echo "Profile JSON <span title=\"JSON files that can be used with LunarG's Vulkan profile layer\" class=\"hint\">[?]</span>";
 	echo "</td><td>";
-	echo "<a href=\"api/v2/devsim/getreport.php?id=" . $report->id . "\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Full JSON file</a>";
+	echo "<a href=\"api/v3/getprofile.php?id=".$report->id."\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Full JSON profile</a>";
 	if ($report->flags->has_portability_extension) {
-		echo "<br/><a href=\"api/v2/devsim/extension_json.php?id=" . $report->id . "&extension=VK_KHR_portability_subset\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Portability extension JSON file (VK_KHR_portability_subset)</a>";
+		echo "<br/><a href=\"api/v3/getprofile.php?id=".$report->id."&portabilitysubset=true\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Portability extension JSON profile (VK_KHR_portability_subset)</a>";
 	}
 	echo "</td><td>" . $group . "</td></tr>\n";
 }
