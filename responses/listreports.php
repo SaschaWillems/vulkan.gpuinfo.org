@@ -282,7 +282,7 @@ if ($devices->rowCount() > 0) {
             'osversion' => $device["osversion"],
             'osarchitecture' => $device["osarchitecture"],
             'compare' => '<center><input type="checkbox" name="id[' . $device["id"] . ']"></center>',
-            'devsim' => ($portabilitysubset ? "<center><a href=\"api/v2/devsim/extension_json.php?id=".$device["id"]."&extension=VK_KHR_portability_subset\"><span class=\"glyphicon glyphicon-floppy-save\"></span> Download</a></center>" : null)
+            'profile' => ($portabilitysubset ? "<center><a href=\"api/v3/getprofile.php?id=".$device["id"]."\">Download</a></center>" : null)
         );
     }
 }
