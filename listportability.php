@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -28,7 +28,7 @@ $pageTitle = null;
 if (isset($_GET['platform'])) {
 	$platform = $_GET['platform'];
 }
-PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");
+PageGenerator::header($pageTitle == null ? "Portability" : "Reports for $pageTitle");
 ?>
 
 <center>
@@ -55,7 +55,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						<th>Version</th>
 						<th>Driver</th>
 						<th>Api</th>
-						<th>DevSim JSON</th>
+						<th>Profile</th>
 					</tr>
 				</thead>
 			</table>
@@ -117,7 +117,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 					data: 'api'
 				},
 				{
-					data: 'devsim'
+					data: 'profile'
 				},
 			],
 			// Pass order by column information to server side script
