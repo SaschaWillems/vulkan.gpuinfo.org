@@ -60,13 +60,13 @@ class VulkanProfile {
     private $properties = [];
     private $extension_properties = [];
 
-    private $profile_name;
     private $profile_version = 1;
     private $device_name = null;
     private $report_label = null;
     private $api_version = null;
     private $portability_subset = false;
     
+    public $profile_name;
     public $json = null;
     private $json_schema = null;
 
@@ -624,13 +624,13 @@ class VulkanProfile {
 $profile = new VulkanProfile($reportid, $portability_subset);
 $profile->generateJSON();
 
-$filename = $device_name;
+$filename = $profile->profile_name;
 $filename = preg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
 $filename = preg_replace("([\.]{2,})", '', $filename);	
 $filename .= ".json";
 
 header("Content-type: application/json");
-// header("Content-Disposition: attachment; filename=".strtolower($filename));
+header("Content-Disposition: attachment; filename=".strtolower($filename));
 echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 DB::disconnect();
