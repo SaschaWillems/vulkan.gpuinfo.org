@@ -27,7 +27,3 @@ All linear and optimal tiling formats as well as buffer formats with their respe
 ### Available queue families
 
 All queue families available for the selected device.
-
-## Portability subset
-
-For devices supporting the `VK_KHR_portability_subset` extension, profiles that only contain portability related features and properties can be created.
