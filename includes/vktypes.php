@@ -37,6 +37,17 @@ class VkTypes {
         return $lookup[$value];
     }
 
+    private static function addExtensionSuffix(&$value, $extension) {
+        if (strpos($extension, '_KHR_') !== false) {
+            $value .= '_KHR';
+            return;
+        };        
+        if (strpos($extension, '_EXT_') !== false) {
+            $value .= '_EXT';
+            return;
+        };
+    }
+
     public static function VkFormatFeatureFlags($flag) {
         $flag_values = [
             0x0001 => "VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT",
@@ -152,7 +163,7 @@ class VkTypes {
         return self::getFlags($flags, $value);
     }
 
-    public static function VkDriverId($value) {
+    public static function VkDriverId($value, $extension = false) {
         $flags = [
             1 => 'VK_DRIVER_ID_AMD_PROPRIETARY',
             2 => 'VK_DRIVER_ID_AMD_OPEN_SOURCE',
@@ -175,7 +186,9 @@ class VkTypes {
             19 => 'VK_DRIVER_ID_MESA_V3DV',
             20 => 'VK_DRIVER_ID_MESA_PANVK',
         ];
-        return self::getValue($flags, $value);   
+        $value = self::getValue($flags, $value);   
+        self::addExtensionSuffix($value, $extension);
+        return $value;
     }
 
     public static function VkConformanceVersion($value) {
@@ -199,14 +212,16 @@ class VkTypes {
         return self::getFlags($flags, $value);     
     }
 
-    public static function VkShaderFloatControlsIndependence($value) {
+    public static function VkShaderFloatControlsIndependence($value, $extension) {
         $flags = [
             0 => 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY',
             1 => 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL',
             2 => 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE',
-        ];          
-        return self::getValue($flags, $value);      
-    }
+        ];        
+        $value = self::getValue($flags, $value);
+        self::addExtensionSuffix($value, $extension);
+        return $value;     
+    }    
 
     /** Type mappings for Vulkan structures */
     public static $VkPhysicalDeviceProperties = [
