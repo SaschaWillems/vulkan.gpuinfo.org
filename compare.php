@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -139,6 +139,7 @@ $repids = implode(",", $reportids);
 		<li><a data-toggle='tab' href='#queuefamilies'>Queue families</a></li>
 		<li><a data-toggle='tab' href='#memory'>Memory</a></li>
 		<li><a data-toggle='tab' href='#surface'>Surface</a></li>
+		<li><a data-toggle='tab' href='#profiles'>Profiles</a></li>
 	</ul>
 </div>
 
@@ -159,7 +160,8 @@ $repids = implode(",", $reportids);
 		'formats',
 		'queuefamilies',
 		'memory',
-		'surface'
+		'surface',
+		'profiles'
 	];
 	foreach ($views as $index => $view) {
 		echo "<div id='$view' class='tab-pane fade ".($index == 0 ? "in active" : null)." reportdiv'>";
@@ -186,6 +188,7 @@ $repids = implode(",", $reportids);
 				'table_features_core_12',
 				'table_properties_core_11',
 				'table_properties_core_12',
+				'compareprofiles',
 			];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
 				if (typeof $('#'+tableNames[i]) != undefined) {
