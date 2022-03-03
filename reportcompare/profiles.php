@@ -23,34 +23,25 @@
 $report_compare->beginTable("compareprofiles");
 $report_compare->insertTableHeader("Profiles");
 
-$compare_extensions = $report_compare->fetchProfiles();
+$compare_profiles = $report_compare->fetchProfiles();
 
-$colspan = count($reportids) + 1;
-
-foreach ($compare_extensions->captions as $extension) {
-	// Check if missing in at least one report
-	$missing = false;
-	$index = 0;
-	foreach ($reportids as $repid) {
-		if (!in_array($extension, $compare_extensions->data[$index])) {
-			$missing = true;
+foreach ($compare_profiles->captions as $profile) {
+	// Check for the diff toggle: If the profile is supported by at least one reportt and less than the total count
+	$supported_count = 0;
+	$supported = false;
+	foreach ($reportids as $index => $repid) {
+	 	if (in_array($profile, $compare_profiles->data[$index])) {
+	 		$supported_count++;
+			$supported = true;
 		}
-		$index++;
 	}
-	$className = "same";
-	$index = 0;
-	$diff = false;
-	foreach ($reportids as $repid) {
-		if (!in_array($extension, $compare_extensions->data[$index])) {
-			$className = "diff";
-		}
-		$index++;
-	}
-	echo "<tr class='$className'><td class='subkey'>".($missing ? $report_compare->getDiffIcon() : "")."$extension</td>";
+	$diff = $supported && ($supported_count < sizeof(($reportids)));
+	$className = $diff ? 'diff' : 'same';
+	echo "<tr class='$className'><td class='subkey'>".($diff ? $report_compare->getDiffIcon() : "")."$profile</td>";
 	$index = 0;
 	foreach ($reportids as $repid) {
 		$icon = 'missing';
-		if (in_array($extension, $compare_extensions->data[$index])) {
+		if (in_array($profile, $compare_profiles->data[$index])) {
 			$icon = 'check';
 		}
 		echo "<td><img src='images/icons/$icon.png' width=16px></td>";

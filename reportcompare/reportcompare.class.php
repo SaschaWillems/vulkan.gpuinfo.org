@@ -507,10 +507,11 @@ class ReportCompare
     }
 
     public function fetchProfiles()
-    {
+    {       
         try {
             $result = new ReportCompareData;
-            // Gather all extensions supported by at least one of the reports
+            $result->captions = [];
+            // Gather profiles extensions supported by at least one of the reports
             $stmnt = DB::$connection->prepare("SELECT distinct Name from deviceprofiles 
                     left join profiles on profiles.id = deviceprofiles.profileid 
                     where deviceprofiles.ReportID in (" . $this->reportIdsParam() . ")");
@@ -520,10 +521,10 @@ class ReportCompare
                 $result->captions[] = $row[0];
             }
 
-            // Get extensions for each selected report              
+            // Get profiles for each selected report              
             foreach ($this->report_ids as $report_id) {
                 try {
-                    $stmnt = DB::$connection->prepare("SELECT name from profiles left join deviceprofiles on profiles.id = deviceprofiles.profileid where deviceprofiles.reportId = :reportid");
+                    $stmnt = DB::$connection->prepare("SELECT name from profiles left join deviceprofiles on profiles.id = deviceprofiles.profileid where deviceprofiles.reportId = :reportid and supported = 1");
                     $stmnt->execute(["reportid" => $report_id]);
                 } catch (PDOException $e) {
                     die("Could not fetch device profiles for single report!");
