@@ -25,7 +25,9 @@ require './../../database/database.class.php';
 require './../../includes/functions.php';
 require './../../includes/mappings.php';
 require './../../includes/vktypes.php';
-	
+
+header("Content-type: application/json");
+
 if (!isset($_GET['id'])) {
     header('HTTP/ 400 missing_or');
     echo "No report id specified!";
@@ -44,9 +46,8 @@ $stmnt = DB::$connection->prepare("SELECT * from reports where id = :reportid");
 $stmnt->execute([":reportid" => $reportid]);
 if ($stmnt->rowCount() == 0) {
     DB::disconnect();
-    header('HTTP/ 400 missing_or');
-    echo "No report id specified!";
-    die();
+    echo json_encode(['error' => "Could not find report with id $reportid"]);
+    exit();
 }
 $row = $stmnt->fetch(PDO::FETCH_ASSOC);
 
