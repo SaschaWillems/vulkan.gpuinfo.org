@@ -138,7 +138,16 @@ class VulkanProfile {
             ]);
         }
         return in_array($name, $skip_fields);
-    }    
+    }
+
+    /** Checks if a (type) definition is available in the currently loaded schema and returns it (or null if not) */
+    private function getSchemaDefintion($name) {
+        if (array_key_exists($name, $this->json_schema['definitions'])) {
+            return $this->json_schema['definitions'][$name];
+        }
+        return null;
+    }
+
 /** Checks if the extension has been promoted to the core version of the report */
 private function getExtensionPromoted($extension) {
     // Build list of core api versions to skip based on device's api level
@@ -376,8 +385,18 @@ private function getExtensionPromoted($extension) {
             if ($this->getExtensionPromoted($ext)) {
                 continue;
             }
-            // @todo: only include those not part of the reports api version (promotedto)
+
             $struct_name = $ext['struct_type_physical_device_features'];
+            
+            // @todo: rework
+            $ext = $this->mapping_info[$key];
+            $struct_name = $ext['structs']['ext']['physicalDeviceFeatures'];
+
+            if ($this->getSchemaDefintion($struct_name) == null) {
+                $this->warnings[] = $struct_name." not supported for api version ".$this->api_version;
+                continue;
+            }
+
             $feature = null;
             foreach ($values as $value) {
                 $feature[$value['name']] = boolval($value['supported']);
@@ -460,6 +479,24 @@ private function getExtensionPromoted($extension) {
             }
 
             $struct_name = $ext['struct_type_physical_device_properties'];
+            
+            // @todo: rework
+            $ext = $this->mapping_info[$key];
+            if ($ext && $ext['structs']['ext']['physicalDeviceProperties']) {
+                $struct_name = $ext['structs']['ext']['physicalDeviceProperties'];
+            }
+
+            if ($this->getSchemaDefintion($struct_name) == null) {
+                $this->warnings[] = $struct_name." not supported for api version ".$this->api_version;
+                continue;
+            }
+
+            // @todo: only include those not part of the reports api version (promotedto)
+            $feature = null;
+            foreach ($values as $value) {
+                $feature[$value['name']] = boolval($value['supported']);
+            }
+
             $this->extension_properties[$struct_name] = $property;
         }
     }        
