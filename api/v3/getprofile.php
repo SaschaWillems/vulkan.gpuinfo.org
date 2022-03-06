@@ -69,6 +69,7 @@ class VulkanProfile {
     
     public $profile_name;
     public $json = null;
+    private $json_schema_name = null;
     private $json_schema = null;
 
     function __construct($reportid, $portability_subset) {
@@ -76,8 +77,23 @@ class VulkanProfile {
         $this->portability_subset = $portability_subset;
     }
 
-    private function loadSchema() {
-        $file = file_get_contents('profile_schema.json');
+    /** Loads the JSON schema matching the report's api version. If no matching schema exists, a fallback to the closest or latest schame is used */
+    private function loadSchema($apiversion) {
+        $report_profile_name = "../../profiles/schema/profiles-$apiversion.json";
+        if (!file_exists($report_profile_name)) {
+            // Some devices report non-existing versions, so we try to find the next matching schema
+            $profiles = scandir("../../profiles/schema");
+            $profiles[] = "profiles-$apiversion.json";
+            sort($profiles);
+            $idx = array_search("profiles-$apiversion.json", $profiles);
+            $report_profile_name = "../../profiles/schema/".$profiles[$idx+1];
+        }
+        // Use the latest profile if no matching file could be found
+        if (!file_exists($report_profile_name)) {
+            $report_profile_name = "../../profiles/schema/profiles-latest.json";
+        }
+        $file = file_get_contents($report_profile_name);
+        $this->json_schema_name = 'https://schema.khronos.org/vulkan/'.str_replace("../../profiles/schema/", "", $report_profile_name).'#';
         $this->json_schema = json_decode($file, true);
     }
 
@@ -520,8 +536,8 @@ class VulkanProfile {
         $api_versions =  ['1.0', '1.1', '1.2', '1.3'];
 
         DB::connect();
-        $this->loadSchema();
         $this->readDeviceInfo();
+        $this->loadSchema($this->api_version);
         if (!$this->portability_subset) {
             // Create a complete device report
             $this->readExtensions();
@@ -539,7 +555,7 @@ class VulkanProfile {
         }
         DB::disconnect();
 
-        $this->json['$schema'] = 'https://schema.khronos.org/vulkan/profiles-1.3.204.json#';        
+        $this->json['$schema'] = $this->json_schema_name;
         $this->json['profiles'] = [
             $this->profile_name => [
                 "version" => $this->profile_version,
