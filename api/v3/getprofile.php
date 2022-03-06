@@ -577,7 +577,7 @@ class VulkanProfile {
         }
         if (count($this->extension_features) > 0) {
             foreach ($this->extension_features as $ext => $features) {
-                $this->json['capabilities'][$this->profile_name]['features'][$ext] = $features;
+                $this->json['capabilities']['device']['features'][$ext] = $features;
             }
         }
 
@@ -590,31 +590,31 @@ class VulkanProfile {
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Properties'],
             ];
             if (array_key_exists($version, $this->properties) && ($this->properties[$version] !== null) && count($this->properties[$version]) > 0) {
-                $this->json['capabilities'][$this->profile_name]['properties'][$node_names[$version]['struct']] = $this->properties[$version];
+                $this->json['capabilities']['device']['properties'][$node_names[$version]['struct']] = $this->properties[$version];
             }
         }
         if (count($this->extension_properties) > 0) {
             foreach ($this->extension_properties as $ext => $features) {
-                $this->json['capabilities'][$this->profile_name]['properties'][$ext] = $features;
+                $this->json['capabilities']['device']['properties'][$ext] = $features;
             }
         }
 
         if ($this->extensions && (count($this->extensions) > 0)) {
-            $this->json['capabilities'][$this->profile_name]['extensions'] = $this->extensions;
+            $this->json['capabilities']['device']['extensions'] = $this->extensions;
         } else {
-            $this->json['capabilities'][$this->profile_name]['extensions'] = (object)null;
+            $this->json['capabilities']['device']['extensions'] = (object)null;
         }
 
         if ($this->formats && (count($this->formats) > 0)) {
-            $this->json['capabilities'][$this->profile_name]['formats'] = $this->formats;
+            $this->json['capabilities']['device']['formats'] = $this->formats;
         } else {
-            $this->json['capabilities'][$this->profile_name]['formats'] = (object)null;
+            $this->json['capabilities']['device']['formats'] = (object)null;
         }
 
         if ($this->queue_families && (count($this->queue_families) > 0)) {
-            $this->json['capabilities'][$this->profile_name]['queueFamiliesProperties'] = $this->queue_families;
+            $this->json['capabilities']['device']['queueFamiliesProperties'] = $this->queue_families;
         } else {
-            $this->json['capabilities'][$this->profile_name]['queueFamiliesProperties'] = [];
+            $this->json['capabilities']['device']['queueFamiliesProperties'] = [];
         }
     }
 }
