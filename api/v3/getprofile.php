@@ -377,11 +377,12 @@ private function getExtensionPromoted($extension) {
                 continue;
             }
             // @todo: only include those not part of the reports api version (promotedto)
+            $struct_name = $ext['struct_type_physical_device_features'];
             $feature = null;
             foreach ($values as $value) {
                 $feature[$value['name']] = boolval($value['supported']);
             }
-            $this->extension_features[$ext['struct_type_physical_device_features']] = $feature;
+            $this->extension_features[$struct_name] = $feature;
         }
     }
 
@@ -457,7 +458,9 @@ private function getExtensionPromoted($extension) {
                 }
                 $property[$value_name] = $this->convertValue($value['value'], $type, null, $key);
             }
-            $this->extension_properties[$ext['struct_type_physical_device_properties']] = $property;
+
+            $struct_name = $ext['struct_type_physical_device_properties'];
+            $this->extension_properties[$struct_name] = $property;
         }
     }        
 
