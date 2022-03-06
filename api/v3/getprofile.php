@@ -355,19 +355,6 @@ private function getExtensionPromoted($extension) {
     }
 
     function readExtensionFeatures() {
-        // Build list of core api versions to skip based on device's api level
-        $api_version_skip_list = [];
-        $api_major = explode('.', $this->api_version)[0];
-        $api_minor = explode('.', $this->api_version)[1];
-        if ($api_minor >= 1) {
-            $api_version_skip_list[] = 'VK_VERSION_1_1';
-        }
-        if ($api_minor >= 2) {
-            $api_version_skip_list[] = 'VK_VERSION_1_2';
-        }
-        if ($api_minor >= 3) {
-            $api_version_skip_list[] = 'VK_VERSION_1_3';
-        }
         $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
         $stmnt->execute([":reportid" => $this->reportid]);
         $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
@@ -434,19 +421,6 @@ private function getExtensionPromoted($extension) {
     }
 
     function readExtensionProperties() {
-        // Build list of core api versions to skip based on device's api level
-        $api_version_skip_list = [];
-        $api_major = explode('.', $this->api_version)[0];
-        $api_minor = explode('.', $this->api_version)[1];
-        if ($api_minor >= 1) {
-            $api_version_skip_list[] = 'VK_VERSION_1_1';
-        }
-        if ($api_minor >= 2) {
-            $api_version_skip_list[] = 'VK_VERSION_1_2';
-        }
-        if ($api_minor >= 3) {
-            $api_version_skip_list[] = 'VK_VERSION_1_3';
-        }
         $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid order by name asc");
         $stmnt->execute([":reportid" => $this->reportid]);
         $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
