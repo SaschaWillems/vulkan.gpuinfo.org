@@ -139,6 +139,31 @@ class VulkanProfile {
         }
         return in_array($name, $skip_fields);
     }    
+/** Checks if the extension has been promoted to the core version of the report */
+private function getExtensionPromoted($extension) {
+    // Build list of core api versions to skip based on device's api level
+    $api_version_skip_list = [];
+    $api_major = explode('.', $this->api_version)[0];
+    $api_minor = explode('.', $this->api_version)[1];
+    if ($api_minor >= 1) {
+        $api_version_skip_list[] = 'VK_VERSION_1_1';
+    }
+    if ($api_minor >= 2) {
+        $api_version_skip_list[] = 'VK_VERSION_1_2';
+    }
+    if ($api_minor >= 3) {
+        $api_version_skip_list[] = 'VK_VERSION_1_3';
+    }        
+    if ($extension['promoted_to'] !== '') {
+        if (stripos($extension['promoted_to'], 'VK_VERSION') !== false) {
+            if (in_array($extension['promoted_to'], $api_version_skip_list)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}    
+
     /** Applies conversion rules based on value types */
     private function convertValue($value, $type, $name = null, $extension = null) {
         $convert = function($value, $type, $extension) {
@@ -361,12 +386,8 @@ class VulkanProfile {
                 continue;
             }
             // Skip feature structs that have been promoted to a core version supported by the device
-            if ($ext['promoted_to'] !== '') {
-                if (stripos($ext['promoted_to'], 'VK_VERSION') !== false) {
-                    if (in_array($ext['promoted_to'], $api_version_skip_list)) {
-                        continue;
-                    }
-                }
+            if ($this->getExtensionPromoted($ext)) {
+                continue;
             }
             // @todo: only include those not part of the reports api version (promotedto)
             $feature = null;
@@ -438,13 +459,10 @@ class VulkanProfile {
                 continue;
             }
             // Skip property structs that have been promoted to a core version supported by the device
-            if ($ext['promoted_to'] !== '') {
-                if (stripos($ext['promoted_to'], 'VK_VERSION') !== false) {
-                    if (in_array($ext['promoted_to'], $api_version_skip_list)) {
-                        continue;
-                    }
-                }
+            if ($this->getExtensionPromoted($ext)) {
+                continue;
             }
+
             $property = null;
             foreach ($values as $value) {
                 $type = null;
