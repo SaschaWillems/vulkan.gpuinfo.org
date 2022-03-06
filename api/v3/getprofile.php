@@ -139,6 +139,67 @@ class VulkanProfile {
         }
         return in_array($name, $skip_fields);
     }    
+    /** Applies conversion rules based on value types */
+    private function convertValue($value, $type, $name = null, $extension = null) {
+        $convert = function($value, $type, $extension) {
+            switch($type) {
+                case 'uint8_t':
+                case 'uint16_t':
+                case 'uint32_t':
+                case 'int8_t':
+                case 'int16_t':
+                case 'int32_t':
+                case 'size_t':
+                    return intval($value);
+                case 'float':
+                    return floatval($value);
+                case 'VkBool32':
+                    return boolval($value);
+                case 'VkSampleCountFlags':
+                    return VkTypes::VkSampleCountFlags($value);
+                case 'VkShaderStageFlags':
+                    return VkTypes::VkShaderStageFlags($value);
+                case 'VkSampleCountFlagBits':
+                    return VkTypes::VkSampleCountFlagBits($value);
+                case 'VkPointClippingBehavior':
+                    return VkTypes::VkPointClippingBehavior($value);
+                case 'VkSubgroupFeatureFlags':
+                    return VkTypes::VkSubgroupFeatureFlags($value);
+                case 'VkDriverId':
+                    return VkTypes::VkDriverId($value, $extension);
+                case 'VkConformanceVersion':
+                    return VkTypes::VkConformanceVersion($value);
+                case 'VkResolveModeFlags':
+                    return VkTypes::VkResolveModeFlags($value);
+                case 'VkShaderFloatControlsIndependence':
+                    return VkTypes::VkShaderFloatControlsIndependence($value, $extension);
+                case 'VkShaderCorePropertiesFlagsAMD':
+                    // No flags defined in spec
+                    return [];
+                case 'VkExtent2D':
+                    $arr = unserialize($value);                
+                    return ['width' => $arr[0], 'height' => $arr[1]];
+            }
+            return $value;
+        };
+        if (!in_array($type, ['VkExtent2D', 'VkExtent3D']) && substr($value, 0, 2) == 'a:') {
+            $arr = unserialize($value);
+            $values = [];
+            foreach($arr as $value) {
+                $values[] = $convert($value, $type, $extension);
+            }
+            if ($name == "deviceLUID") {
+                $values = array_slice($values, 0, 8);
+            }
+            return $values;
+        } else {
+            $val = $convert($value, $type, $extension);
+            if (($val == null) && (in_array($name, ['sparseAddressSpaceSize']))) {
+                return 0;
+            }
+            return $val;
+        }
+    }  
 
     private function readFeatures($version) {
         $table_names = [
@@ -351,64 +412,6 @@ class VulkanProfile {
         }
     }
 
-    function convertValue($value, $type, $name = null) {
-        $convert = function($value, $type) {
-            switch($type) {
-                case 'uint8_t':
-                case 'uint16_t':
-                case 'uint32_t':
-                case 'int8_t':
-                case 'int16_t':
-                case 'int32_t':
-                case 'size_t':
-                    return intval($value);
-                case 'float':
-                    return floatval($value);
-                case 'VkBool32':
-                    return boolval($value);
-                case 'VkSampleCountFlags':
-                    return VkTypes::VkSampleCountFlags($value);
-                case 'VkShaderStageFlags':
-                    return VkTypes::VkShaderStageFlags($value);
-                case 'VkSampleCountFlagBits':
-                    return VkTypes::VkSampleCountFlagBits($value);
-                case 'VkPointClippingBehavior':
-                    return VkTypes::VkPointClippingBehavior($value);
-                case 'VkSubgroupFeatureFlags':
-                    return VkTypes::VkSubgroupFeatureFlags($value);
-                case 'VkDriverId':
-                    return VkTypes::VkDriverId($value);
-                case 'VkConformanceVersion':
-                    return VkTypes::VkConformanceVersion($value);
-                case 'VkResolveModeFlags':
-                    return VkTypes::VkResolveModeFlags($value);
-                case 'VkShaderFloatControlsIndependence':
-                    return VkTypes::VkShaderFloatControlsIndependence($value);
-                case 'VkExtent2D':
-                    $arr = unserialize($value);                
-                    return ['width' => $arr[0], 'height' => $arr[1]];
-            }
-            return $value;
-        };
-        if (!in_array($type, ['VkExtent2D', 'VkExtent3D']) && substr($value, 0, 2) == 'a:') {
-            $arr = unserialize($value);
-            $values = [];
-            foreach($arr as $value) {
-                $values[] = $convert($value, $type);
-            }
-            if ($name == "deviceLUID") {
-                $values = array_slice($values, 0, 8);
-            }
-            return $values;
-        } else {
-            $val = $convert($value, $type);
-            if (($val == null) && (in_array($name, ['sparseAddressSpaceSize']))) {
-                return 0;
-            }
-            return $val;
-        }
-    }
-
     function readExtensionProperties() {
         // Build list of core api versions to skip based on device's api level
         $api_version_skip_list = [];
@@ -449,18 +452,18 @@ class VulkanProfile {
                 // Some properties are stored are stored different on the database than the struct layouts and require some transformation
                 if ($ext['struct_type_physical_device_properties'] == 'VkPhysicalDeviceSampleLocationsPropertiesEXT') {
                     if (in_array($value_name, ['maxSampleLocationGridSize.width', 'maxSampleLocationGridSize.height'])) {
-                        $property['maxSampleLocationGridSize'][str_replace('maxSampleLocationGridSize.', '', $value_name)] = $this->convertValue($value['value'], 'int32_t');
+                        $property['maxSampleLocationGridSize'][str_replace('maxSampleLocationGridSize.', '', $value_name)] = $this->convertValue($value['value'], 'int32_t', null, $key);
                         continue;
                     }
                     if (in_array($value_name, ['sampleLocationCoordinateRange[0]', 'sampleLocationCoordinateRange[1]'])) {
-                        $property['sampleLocationCoordinateRange'][] = $this->convertValue($value['value'], 'float');
+                        $property['sampleLocationCoordinateRange'][] = $this->convertValue($value['value'], 'float', null, $key);
                         continue;
                     }                    
                 }
                 if (array_key_exists($value_name, $ext['property_types'])) {
                     $type = $ext['property_types'][$value_name];
                 }
-                $property[$value_name] = $this->convertValue($value['value'], $type);
+                $property[$value_name] = $this->convertValue($value['value'], $type, null, $key);
             }
             $this->extension_properties[$ext['struct_type_physical_device_properties']] = $property;
         }
