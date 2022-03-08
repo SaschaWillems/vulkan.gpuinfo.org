@@ -77,20 +77,14 @@ class VulkanProfile {
         $this->portability_subset = $portability_subset;
     }
 
-    /** Loads the JSON schema matching the report's api version. If no matching schema exists, a fallback to the closest or latest schame is used */
+    /** Loads the JSON schema matching the report's api header version */
     private function loadSchema($apiversion) {
-        $report_profile_name = "../../profiles/schema/profiles-$apiversion.json";
-        if (!file_exists($report_profile_name)) {
-            // Some devices report non-existing versions, so we try to find the next matching schema
-            $profiles = scandir("../../profiles/schema");
-            $profiles[] = "profiles-$apiversion.json";
-            sort($profiles);
-            $idx = array_search("profiles-$apiversion.json", $profiles);
-            $report_profile_name = "../../profiles/schema/".$profiles[$idx+1];
-        }
+        // Get profiles schema based on patch level (=header revision)
+        $header_version = explode('.', $apiversion)[2];
+        $report_profile_name = "../../profiles/schema/profiles-0.8.0-$header_version.json";
         // Use the latest profile if no matching file could be found
         if (!file_exists($report_profile_name)) {
-            $report_profile_name = "../../profiles/schema/profiles-latest.json";
+            $report_profile_name = "../../profiles/schema/profiles-0.8-latest.json";
         }
         $file = file_get_contents($report_profile_name);
         $this->json_schema_name = 'https://schema.khronos.org/vulkan/'.str_replace("../../profiles/schema/", "", $report_profile_name).'#';
