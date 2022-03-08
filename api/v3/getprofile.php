@@ -618,7 +618,13 @@ private function getExtensionPromoted($extension) {
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Features'],
             ];
             if (array_key_exists($version, $this->features) && ($this->features[$version] !== null) && count($this->features[$version]) > 0) {
-                $this->json['capabilities']['device']['features'][$node_names[$version]['struct']] = $this->features[$version];
+                // Skip if not part of the schema (for reports with invalid api versions)
+                $struct_name = $node_names[$version]['struct'];
+                if ($this->getSchemaDefintion($struct_name) == null) {
+                    $this->warnings[] = $struct_name." not supported by this schema version";
+                    continue;
+                }   
+                $this->json['capabilities']['device']['features'][$struct_name] = $this->features[$version];
             }
         }
         if (count($this->extension_features) > 0) {
@@ -636,7 +642,13 @@ private function getExtensionPromoted($extension) {
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Properties'],
             ];
             if (array_key_exists($version, $this->properties) && ($this->properties[$version] !== null) && count($this->properties[$version]) > 0) {
-                $this->json['capabilities']['device']['properties'][$node_names[$version]['struct']] = $this->properties[$version];
+                // Skip if not part of the schema (for reports with invalid api versions)
+                $struct_name = $node_names[$version]['struct'];
+                if ($this->getSchemaDefintion($struct_name) == null) {
+                    $this->warnings[] = $struct_name." not supported by this schema version";
+                    continue;
+                }   
+                $this->json['capabilities']['device']['properties'][$struct_name] = $this->properties[$version];
             }
         }
         if (count($this->extension_properties) > 0) {
