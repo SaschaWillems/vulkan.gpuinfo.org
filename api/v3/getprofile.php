@@ -607,8 +607,8 @@ private function getExtensionPromoted($extension) {
         $this->json['profiles'][$this->profile_name]['history'][] = [
             "revision" => 1,
             "date" => date('Y-m-d'),
-            "author" => "Automated export from https://vulkan.gpuinfo.org",
-            "comment" => ""
+            "author" => "Sascha Willems",
+            "comment" => "Automated export from https://vulkan.gpuinfo.org"
         ];
         $this->json['profiles'][$this->profile_name]['contributors']['Sascha Willems'] = [
             "company" => "Independent",
