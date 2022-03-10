@@ -23,7 +23,6 @@
 
 require './../../database/database.class.php';
 require './../../includes/functions.php';
-require './../../includes/mappings.php';
 require './../../includes/vktypes.php';
 
 header("Content-type: application/json");
@@ -32,12 +31,6 @@ if (!isset($_GET['id'])) {
     header('HTTP/ 400 missing_or');
     echo "No report id specified!";
     die();
-}
-
-// If set to true, only the portability subset related structures are exported
-$portability_subset = false;
-if (isset($_GET['portabilitysubset'])) {
-    $portability_subset = $_GET['portabilitysubset'] == 'true';
 }
 
 DB::connect();
@@ -60,21 +53,24 @@ class VulkanProfile {
     private $extension_features = [];
     private $properties = [];
     private $extension_properties = [];
+    public $warnings = [];
 
     private $profile_version = 1;
     private $device_name = null;
     private $report_label = null;
     private $api_version = null;
-    private $portability_subset = false;
     
     public $profile_name;
     public $json = null;
     private $json_schema_name = null;
     private $json_schema = null;
+    // @todo: rename, maybe extension_mappings
+    private $mapping_info = null;
 
-    function __construct($reportid, $portability_subset) {
+    function __construct($reportid) {
         $this->reportid = $reportid;
-        $this->portability_subset = $portability_subset;
+        $src = file_get_contents('./../../includes/mappings.json');
+        $this->mapping_info = json_decode($src, true);
     }
 
     /** Loads the JSON schema matching the report's api header version */
@@ -142,30 +138,38 @@ class VulkanProfile {
         return null;
     }
 
-/** Checks if the extension has been promoted to the core version of the report */
-private function getExtensionPromoted($extension) {
-    // Build list of core api versions to skip based on device's api level
-    $api_version_skip_list = [];
-    $api_major = explode('.', $this->api_version)[0];
-    $api_minor = explode('.', $this->api_version)[1];
-    if ($api_minor >= 1) {
-        $api_version_skip_list[] = 'VK_VERSION_1_1';
+    /** Checks if an extension definition is available in the mapping and returns it (or null if not) */
+    private function getExtensionMapping($name) {
+        if (array_key_exists($name, $this->mapping_info)) {
+            return $this->mapping_info[$name];
+        }
+        return null;
     }
-    if ($api_minor >= 2) {
-        $api_version_skip_list[] = 'VK_VERSION_1_2';
-    }
-    if ($api_minor >= 3) {
-        $api_version_skip_list[] = 'VK_VERSION_1_3';
-    }        
-    if ($extension['promoted_to'] !== '') {
-        if (stripos($extension['promoted_to'], 'VK_VERSION') !== false) {
-            if (in_array($extension['promoted_to'], $api_version_skip_list)) {
-                return true;
+
+    /** Checks if the extension has been promoted to the core version of the report */
+    private function getExtensionPromoted($extension) {
+        // Build list of core api versions to skip based on device's api level
+        $api_version_skip_list = [];
+        $api_major = explode('.', $this->api_version)[0];
+        $api_minor = explode('.', $this->api_version)[1];
+        if ($api_minor >= 1) {
+            $api_version_skip_list[] = 'VK_VERSION_1_1';
+        }
+        if ($api_minor >= 2) {
+            $api_version_skip_list[] = 'VK_VERSION_1_2';
+        }
+        if ($api_minor >= 3) {
+            $api_version_skip_list[] = 'VK_VERSION_1_3';
+        }        
+        if ($extension['promoted_to'] !== '') {
+            if (stripos($extension['promoted_to'], 'VK_VERSION') !== false) {
+                if (in_array($extension['promoted_to'], $api_version_skip_list)) {
+                    return true;
+                }
             }
         }
-    }
-    return false;
-}    
+        return false;
+    }    
 
     /** Applies conversion rules based on value types */
     private function convertValue($value, $type, $name = null, $extension = null) {
@@ -364,28 +368,25 @@ private function getExtensionPromoted($extension) {
         $schema_features_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["features"]["properties"];
         foreach ($result as $key => $values) {
             // @todo: comment
-            if (!array_key_exists($key, Mappings::$extensions)) {
+            // @todo: rework
+            $ext = $this->getExtensionMapping($key);
+            if (!$ext) {
+                $this->warnings[] = "Could not find a mapping for extension $ext";
                 continue;
             }
-            $ext = Mappings::$extensions[$key];
-            if ($ext['struct_type_physical_device_features'] == '') {
+            $struct_name = $ext['structs']['ext']['physicalDeviceFeatures'];
+            if (((!$struct_name) || ($struct_name == ''))) {
                 continue;
             }            
             // Skip extensions that are not defined in the current schema
-            if (!key_exists($ext['struct_type_physical_device_features'], $schema_features_list)) {
+            if (!key_exists($struct_name, $schema_features_list)) {
                 continue;
             }
             // Skip feature structs that have been promoted to a core version supported by the device
             if ($this->getExtensionPromoted($ext)) {
                 continue;
             }
-
-            $struct_name = $ext['struct_type_physical_device_features'];
-            
-            // @todo: rework
-            $ext = $this->mapping_info[$key];
-            $struct_name = $ext['structs']['ext']['physicalDeviceFeatures'];
-
+           
             if ($this->getSchemaDefintion($struct_name) == null) {
                 $this->warnings[] = $struct_name." not supported for api version ".$this->api_version;
                 continue;
@@ -399,53 +400,20 @@ private function getExtensionPromoted($extension) {
         }
     }
 
-    function readPortabilityFeaturesAndProperties() {
-        // Features
-        $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid and extension = :extension order by name asc");
-        $stmnt->execute([":reportid" => $this->reportid, ":extension" => 'VK_KHR_portability_subset']);
-        $schema_features_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["features"]["properties"];
-        $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
-        foreach ($result as $key => $values) {
-            $ext = Mappings::$extensions[$key];
-            if ($ext['struct_type_physical_device_features'] == '') {
-                continue;
-            }
-            $feature = null;
-            foreach ($values as $value) {
-                $feature[$value['name']] = boolval($value['supported']);
-            }
-            $this->extension_features[$ext['struct_type_physical_device_features']] = $feature;
-        }
-        // Properties
-        $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid and extension = :extension order by name asc");
-        $stmnt->execute([":reportid" => $this->reportid, ":extension" => 'VK_KHR_portability_subset']);
-        $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
-        foreach ($result as $key => $values) {
-            $ext = Mappings::$extensions[$key];
-            if ($ext['struct_type_physical_device_properties'] == '') {
-                continue;
-            }
-            $property = null;
-            foreach ($values as $value) {
-                $type = $ext['property_types'][$value['name']];
-                $property[$value['name']] = $this->convertValue($value['value'], $type);
-            }
-            $this->extension_properties[$ext['struct_type_physical_device_properties']] = $property;
-        }
-    }
-
     function readExtensionProperties() {
         $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid order by name asc");
         $stmnt->execute([":reportid" => $this->reportid]);
         $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
         foreach ($result as $key => $values) {
-            if (!array_key_exists($key, Mappings::$extensions)) {
+            $ext = $this->getExtensionMapping($key);
+            if (!$ext) {
+                $this->warnings[] = "Could not find a mapping for extension $ext";
                 continue;
             }
-            $ext = Mappings::$extensions[$key];
-            if ($ext['struct_type_physical_device_properties'] == '') {
+            $struct_name = $ext['structs']['ext']['physicalDeviceProperties'];
+            if (((!$struct_name) || ($struct_name == ''))) {
                 continue;
-            }
+            }          
             // Skip property structs that have been promoted to a core version supported by the device
             if ($this->getExtensionPromoted($ext)) {
                 continue;
@@ -466,8 +434,8 @@ private function getExtensionPromoted($extension) {
                         continue;
                     }                    
                 }
-                if (array_key_exists($value_name, $ext['property_types'])) {
-                    $type = $ext['property_types'][$value_name];
+                if (array_key_exists($value_name, $ext['types'])) {
+                    $type = $ext['types'][$value_name];
                 }
                 $property[$value_name] = $this->convertValue($value['value'], $type, null, $key);
             }
@@ -567,21 +535,15 @@ private function getExtensionPromoted($extension) {
         DB::connect();
         $this->readDeviceInfo();
         $this->loadSchema($this->api_version);
-        if (!$this->portability_subset) {
-            // Create a complete device report
-            $this->readExtensions();
-            foreach ($api_versions as $version) {
-                $this->features[$version] = $this->readFeatures($version);
-                $this->properties[$version] = $this->readProperties($version);
-            }
-            $this->readExtensionFeatures();
-            $this->readExtensionProperties();
-            $this->readFormats();
-            $this->readQueueFamilies();
-        } else {
-            // Create a device report only containing portability subset features and properties
-            $this->readPortabilityFeaturesAndProperties();
+        $this->readExtensions();
+        foreach ($api_versions as $version) {
+            $this->features[$version] = $this->readFeatures($version);
+            $this->properties[$version] = $this->readProperties($version);
         }
+        $this->readExtensionFeatures();
+        $this->readExtensionProperties();
+        $this->readFormats();
+        $this->readQueueFamilies();
         DB::disconnect();
 
         $this->json['$schema'] = $this->json_schema_name;
@@ -687,8 +649,8 @@ $filename = preg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
 $filename = preg_replace("([\.]{2,})", '', $filename);	
 $filename .= ".json";
 
-header("Content-type: application/json");
-header("Content-Disposition: attachment; filename=".strtolower($filename));
+// header("Content-Disposition: attachment; filename=".strtolower($filename));
+// echo implode(PHP_EOL, $profile->warnings);
 echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 DB::disconnect();
