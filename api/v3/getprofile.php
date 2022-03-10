@@ -138,6 +138,22 @@ class VulkanProfile {
         return null;
     }
 
+    /** Checks if a feature type is defined in the currently loaded schema */
+    private function getSchemaFeatureTypeDefinition($name) {
+        if (array_key_exists($name, $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['features']['properties'])) {
+            return $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['features']['properties'];
+        }
+        return null;
+    }
+
+    /** Checks if a property type is defined in the currently loaded schema */
+    private function getSchemaPropertyTypeDefinition($name) {
+        if (array_key_exists($name, $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['properties']['properties'])) {
+            return $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['properties']['properties'];
+        }
+        return null;
+    }
+
     /** Checks if an extension definition is available in the mapping and returns it (or null if not) */
     private function getExtensionMapping($name) {
         if (array_key_exists($name, $this->mapping_info)) {
@@ -387,8 +403,8 @@ class VulkanProfile {
                 continue;
             }
            
-            if ($this->getSchemaDefintion($struct_name) == null) {
-                $this->warnings[] = $struct_name." not supported for api version ".$this->api_version;
+            if ($this->getSchemaFeatureTypeDefinition($struct_name) == null) {
+                $this->warnings[] = "$struct_name not found in selected schema";
                 continue;
             }
 
@@ -442,14 +458,13 @@ class VulkanProfile {
 
             $struct_name = $ext['struct_type_physical_device_properties'];
             
-            // @todo: rework
             $ext = $this->mapping_info[$key];
             if ($ext && $ext['structs']['ext']['physicalDeviceProperties']) {
                 $struct_name = $ext['structs']['ext']['physicalDeviceProperties'];
             }
 
-            if ($this->getSchemaDefintion($struct_name) == null) {
-                $this->warnings[] = $struct_name." not supported for api version ".$this->api_version;
+            if ($this->getSchemaPropertyTypeDefinition($struct_name) == null) {
+                $this->warnings[] = "$struct_name not found in selected schema";
                 continue;
             }
 
@@ -582,8 +597,8 @@ class VulkanProfile {
             if (array_key_exists($version, $this->features) && ($this->features[$version] !== null) && count($this->features[$version]) > 0) {
                 // Skip if not part of the schema (for reports with invalid api versions)
                 $struct_name = $node_names[$version]['struct'];
-                if ($this->getSchemaDefintion($struct_name) == null) {
-                    $this->warnings[] = $struct_name." not supported by this schema version";
+                if ($this->getSchemaFeatureTypeDefinition($struct_name) == null) {
+                    $this->warnings[] = "$struct_name not found in selected schema";
                     continue;
                 }   
                 $this->json['capabilities']['device']['features'][$struct_name] = $this->features[$version];
@@ -606,8 +621,8 @@ class VulkanProfile {
             if (array_key_exists($version, $this->properties) && ($this->properties[$version] !== null) && count($this->properties[$version]) > 0) {
                 // Skip if not part of the schema (for reports with invalid api versions)
                 $struct_name = $node_names[$version]['struct'];
-                if ($this->getSchemaDefintion($struct_name) == null) {
-                    $this->warnings[] = $struct_name." not supported by this schema version";
+                if ($this->getSchemaPropertyTypeDefinition($struct_name) == null) {
+                    $this->warnings[] = "$struct_name not found in selected schema";
                     continue;
                 }   
                 $this->json['capabilities']['device']['properties'][$struct_name] = $this->properties[$version];
