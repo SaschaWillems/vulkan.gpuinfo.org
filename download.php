@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.11';
+$release = '3.2';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -62,6 +62,10 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.2 - 2022-02-19</h4>
+			<ul>
+				<li>Added support for Vulkan profiles</li>
+			</ul>				
 			<h4>3.11 - 2022-01-28</h4>
 			<ul>
 				<li>Bugfix for large maxBufferSize values in Vulkan 1.3 core properties</li>
