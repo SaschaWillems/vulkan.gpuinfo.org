@@ -30,4 +30,4 @@ All queue families available for the selected device.
 
 ## Schema selection
 
-The exported JSON will try to use the schema matching the header version that matches the api version of the selected reports. If not matching schema can be found, the latest schema will be used. The schemas used by the database can be found in this [Khronos repository](https://schema.khronos.org/vulkan/).
+The exported JSON will try to use the schema matching the header version that matches the api version of the selected reports. If no matching schema can be found, the latest schema will be used. The schemas used by the database can be found in this [Khronos repository](https://schema.khronos.org/vulkan/).
