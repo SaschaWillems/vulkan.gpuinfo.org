@@ -110,7 +110,7 @@ class TypeContainer
     }
 }
 
-$xml = simplexml_load_file("V:\\github\\Vulkan-Headers\\registry\\vk.xml") or exit("Could not read vk.xml");
+$xml = simplexml_load_file('https://raw.githubusercontent.com/KhronosGroup/Vulkan-Docs/main/xml/vk.xml') or exit("Could not load vk.xml from the Khronos repository");
 
 $mappings = [];
 
