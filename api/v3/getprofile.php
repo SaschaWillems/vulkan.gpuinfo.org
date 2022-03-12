@@ -64,13 +64,12 @@ class VulkanProfile {
     public $json = null;
     private $json_schema_name = null;
     private $json_schema = null;
-    // @todo: rename, maybe extension_mappings
-    private $mapping_info = null;
+    private $extension_mapping = null;
 
     function __construct($reportid) {
         $this->reportid = $reportid;
         $src = file_get_contents('./../../includes/mappings.json');
-        $this->mapping_info = json_decode($src, true);
+        $this->extension_mapping = json_decode($src, true);
     }
 
     /** Loads the JSON schema matching the report's api header version */
@@ -156,8 +155,8 @@ class VulkanProfile {
 
     /** Checks if an extension definition is available in the mapping and returns it (or null if not) */
     private function getExtensionMapping($name) {
-        if (array_key_exists($name, $this->mapping_info)) {
-            return $this->mapping_info[$name];
+        if (array_key_exists($name, $this->extension_mapping)) {
+            return $this->extension_mapping[$name];
         }
         return null;
     }
@@ -249,6 +248,7 @@ class VulkanProfile {
         }
     }  
 
+    /** Core features */
     private function readFeatures($version) {
         $table_names = [
             '1.0' => 'devicefeatures',
@@ -309,6 +309,7 @@ class VulkanProfile {
         return $limits;
     }
 
+    /** Core properties */
     private function readProperties($version) {
         switch($version) {
             case '1.0':
@@ -377,32 +378,27 @@ class VulkanProfile {
         return $properties;        
     }
 
+    /** Extension features */
     function readExtensionFeatures() {
         $stmnt = DB::$connection->prepare("SELECT extension, name, supported from devicefeatures2 where reportid = :reportid");
         $stmnt->execute([":reportid" => $this->reportid]);
         $result = $stmnt->fetchAll(PDO::FETCH_GROUP  | PDO::FETCH_ASSOC);
-        $schema_features_list = $this->json_schema["properties"]["capabilities"]["additionalProperties"]["properties"]["features"]["properties"];
         foreach ($result as $key => $values) {
-            // @todo: comment
-            // @todo: rework
             $ext = $this->getExtensionMapping($key);
             if (!$ext) {
                 $this->warnings[] = "Could not find a mapping for extension $ext";
                 continue;
             }
+            // Skip if there is no feature struct defined for this extension
             $struct_name = $ext['structs']['ext']['physicalDeviceFeatures'];
             if (((!$struct_name) || ($struct_name == ''))) {
                 continue;
             }            
-            // Skip extensions that are not defined in the current schema
-            if (!key_exists($struct_name, $schema_features_list)) {
-                continue;
-            }
             // Skip feature structs that have been promoted to a core version supported by the device
             if ($this->getExtensionPromoted($ext)) {
                 continue;
             }
-           
+            // Skip feature structs not defined in the selected schema
             if ($this->getSchemaFeatureTypeDefinition($struct_name) == null) {
                 $this->warnings[] = "$struct_name not found in selected schema";
                 continue;
@@ -416,6 +412,7 @@ class VulkanProfile {
         }
     }
 
+    /** Extension properties */
     function readExtensionProperties() {
         $stmnt = DB::$connection->prepare("SELECT extension, name, value from deviceproperties2 where reportid = :reportid order by name asc");
         $stmnt->execute([":reportid" => $this->reportid]);
@@ -427,20 +424,27 @@ class VulkanProfile {
                 continue;
             }
             $struct_name = $ext['structs']['ext']['physicalDeviceProperties'];
+            // Skip if there is no property struct defined for this extension
             if (((!$struct_name) || ($struct_name == ''))) {
                 continue;
-            }          
+            }
             // Skip property structs that have been promoted to a core version supported by the device
             if ($this->getExtensionPromoted($ext)) {
                 continue;
             }
+            // Skip property structs not defined in the selected schema
+            if ($this->getSchemaPropertyTypeDefinition($struct_name) == null) {
+                $this->warnings[] = "$struct_name not found in selected schema";
+                continue;
+            }
 
+            // Convert property values based on their types
             $property = null;
             foreach ($values as $value) {
                 $type = null;
                 $value_name = $value['name'];
-                // Some properties are stored are stored different on the database than the struct layouts and require some transformation
-                if ($ext['struct_type_physical_device_properties'] == 'VkPhysicalDeviceSampleLocationsPropertiesEXT') {
+                // Some properties are stored in a different format in the database (compared to the struct layouts) and require some transformation
+                if (stripos($struct_name, 'VkPhysicalDeviceSampleLocationsPropertiesEXT') === 0) {
                     if (in_array($value_name, ['maxSampleLocationGridSize.width', 'maxSampleLocationGridSize.height'])) {
                         $property['maxSampleLocationGridSize'][str_replace('maxSampleLocationGridSize.', '', $value_name)] = $this->convertValue($value['value'], 'int32_t', null, $key);
                         continue;
@@ -455,29 +459,11 @@ class VulkanProfile {
                 }
                 $property[$value_name] = $this->convertValue($value['value'], $type, null, $key);
             }
-
-            $struct_name = $ext['struct_type_physical_device_properties'];
-            
-            $ext = $this->mapping_info[$key];
-            if ($ext && $ext['structs']['ext']['physicalDeviceProperties']) {
-                $struct_name = $ext['structs']['ext']['physicalDeviceProperties'];
-            }
-
-            if ($this->getSchemaPropertyTypeDefinition($struct_name) == null) {
-                $this->warnings[] = "$struct_name not found in selected schema";
-                continue;
-            }
-
-            // @todo: only include those not part of the reports api version (promotedto)
-            $feature = null;
-            foreach ($values as $value) {
-                $feature[$value['name']] = boolval($value['supported']);
-            }
-
             $this->extension_properties[$struct_name] = $property;
         }
     }        
 
+    /** Extension list */
     private function readExtensions() {
         $this->extensions = [];
         $stmnt = DB::$connection->prepare("SELECT name, specversion from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid");
@@ -492,6 +478,7 @@ class VulkanProfile {
         }
     }
 
+    /** Image and buffer formats */
     private function readFormats() {
         $this->formats = [];
         $stmnt = DB::$connection->prepare("SELECT name, lineartilingfeatures, optimaltilingfeatures, bufferfeatures from deviceformats df join VkFormat vf on df.formatid = vf.value where reportid = :reportid and supported = 1 order by name asc");    
@@ -508,6 +495,7 @@ class VulkanProfile {
         }    
     }
 
+    /** Queue family types */
     private function readQueueFamilies() {
         $this->queue_families = [];
         $stmnt = DB::$connection->prepare("SELECT * from devicequeues where reportid = :reportid");
@@ -529,6 +517,7 @@ class VulkanProfile {
         }   
     }
 
+    /** Device info (including identifiers) */
     private function readDeviceInfo() {
         $stmnt = DB::$connection->prepare("SELECT ifnull(displayname, devicename) as device, reports.* from reports where id = :reportid");
         $stmnt->execute([":reportid" => $this->reportid]);
@@ -544,6 +533,7 @@ class VulkanProfile {
         $this->profile_name = preg_replace("/[^A-Za-z0-9]/", '_', $this->profile_name);
     }
 
+    /** Generate the profile JSON file */
     function generateJSON() {
         $api_versions =  ['1.0', '1.1', '1.2', '1.3'];
 
@@ -655,17 +645,20 @@ class VulkanProfile {
 }
 
 // Profile generation
+try {
+    $profile = new VulkanProfile($reportid, $portability_subset);
+    $profile->generateJSON();
 
-$profile = new VulkanProfile($reportid, $portability_subset);
-$profile->generateJSON();
+    $filename = $profile->profile_name;
+    $filename = preg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
+    $filename = preg_replace("([\.]{2,})", '', $filename);	
+    $filename .= ".json";
 
-$filename = $profile->profile_name;
-$filename = preg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename);
-$filename = preg_replace("([\.]{2,})", '', $filename);	
-$filename .= ".json";
-
-// header("Content-Disposition: attachment; filename=".strtolower($filename));
-// echo implode(PHP_EOL, $profile->warnings);
-echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-DB::disconnect();
+    // header("Content-Disposition: attachment; filename=".strtolower($filename));
+    // echo implode(PHP_EOL, $profile->warnings);
+    echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+} catch (Exception $e) {
+    echo json_encode(['error' => "Could not generate profile"]);
+} finally {
+    DB::disconnect();
+}
