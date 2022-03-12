@@ -654,8 +654,8 @@ try {
     $filename = preg_replace("([\.]{2,})", '', $filename);	
     $filename .= ".json";
 
-    // header("Content-Disposition: attachment; filename=".strtolower($filename));
-    // echo implode(PHP_EOL, $profile->warnings);
+    header("Content-Disposition: attachment; filename=".strtolower($filename));
+    echo implode(PHP_EOL, $profile->warnings);
     echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 } catch (Exception $e) {
     echo json_encode(['error' => "Could not generate profile"]);
