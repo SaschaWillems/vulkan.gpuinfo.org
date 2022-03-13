@@ -275,7 +275,7 @@ PageGenerator::header($pageTitle);
 				"targets": [4]
 			}],
 			"ajax": {
-				url: "responses/devices.php?platform=<?php echo $platform ?>&minversion=true",
+				url: "api/internal/devices.php?platform=<?php echo $platform ?>&minversion=true",
 				data: {
 					"filter": {
 						'extension': 					'<?= $filter_list->getFilter('extension') ?>',

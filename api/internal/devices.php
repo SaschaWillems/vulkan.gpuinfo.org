@@ -20,9 +20,9 @@
  *
  */
 
-include '../database/database.class.php';
-include '../includes/functions.php';
-include '../includes/constants.php';
+include '../../database/database.class.php';
+include '../../includes/functions.php';
+include '../../includes/constants.php';
 
 DB::connect();
 

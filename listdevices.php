@@ -119,7 +119,7 @@ if ($filter_list->hasFilter('submitter')) {
 				"targets": [5]
 			}],
 			"ajax": {
-				url: "responses/devices.php?platform=<?php echo $platform ?>",
+				url: "api/internal/devices.php?platform=<?php echo $platform ?>",
 				data: {
 					"filter": {
 						'extension': 	'<?= $filter_list->getFilter('extension') ?>',
