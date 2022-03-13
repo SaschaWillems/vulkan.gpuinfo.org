@@ -87,7 +87,7 @@ PageGenerator::header($pageTitle == null ? "Portability" : "Reports for $pageTit
 				"targets": [0],
 			}],
 			"ajax": {
-				url: "responses/listreports.php",
+				url: "api/internal/reports.php",
 				data: {
 					"filter": {
 						'portability': 1,

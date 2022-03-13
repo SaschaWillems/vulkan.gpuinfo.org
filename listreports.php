@@ -198,7 +198,7 @@ if ($defaultHeader) {
 				"targets": <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>,
 			}],
 			"ajax": {
-				url: "responses/listreports.php",
+				url: "api/internal/reports.php",
 				data: {
 					"filter": {
 						'submitter': 			'<?= $filter_list->getFilter("submitter") ?>',
