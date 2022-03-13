@@ -23,7 +23,7 @@
 /** Builder class for the SQL statements used on different pages */
 class SqlRepository {
 
-    private static function getMinApiVersion() {
+    public static function getMinApiVersion() {
         if (isset($_SESSION['minversion'])) {
             return $_SESSION['minversion'];
         }
@@ -37,7 +37,7 @@ class SqlRepository {
         return null;
     }
 
-    private static function appendCondition(&$sql, $condition) {
+    public static function appendCondition(&$sql, $condition) {
         if (strpos($sql, 'where') !== false) {
             $sql .= " and $condition";
         } else {

@@ -20,7 +20,10 @@
  *
  */
 
+session_start();
+
 include '../../database/database.class.php';
+include '../../database/sqlrepository.php';
 include '../../includes/functions.php';
 include '../../includes/constants.php';
 
@@ -348,6 +351,14 @@ if (isset($_REQUEST["platform"])) {
         $ostype = ostype($platform);
         $whereClause .= "r.ostype = '" . $ostype . "'";
     }
+}
+
+// Min. api version
+// @todo: move to SQL repository?
+$minApiVersion = SqlRepository::getMinApiVersion();
+if ($minApiVersion) {
+    SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
+    $params['apiversion'] = $minApiVersion;
 }
 
 if ($minversion) {
