@@ -21,7 +21,7 @@
 
 	// Return list of all available reports as json
 	
-	include './../../../database/database.class.php';
+	include './../../database/database.class.php';
 	
 	/**
 	 * Formats a JSON string for pretty printing
@@ -94,7 +94,7 @@
 			r.osarchitecture,
 			r.headerversion,
 			r.version as reportversion,
-			concat('https://vulkan.gpuinfo.org/api/v2/devsim/getreport.php?id=', dp.reportid) as url
+			concat('https://vulkan.gpuinfo.org/api/v2/getreport.php?id=', dp.reportid) as url
 			from deviceproperties dp
 			join reports r on r.id = dp.reportid
 			where r.version >= '1.4'

@@ -213,6 +213,35 @@
 		}
 	}
 
+	function importProfiles($json, $reportid) {
+		if (!array_key_exists('profiles', $json)) {
+			return;
+		}
+		$jsonnode = $json['profiles'];
+		foreach ($jsonnode as $profile) {
+			// Add to global mapping table (if not already present)
+			$sql = "INSERT IGNORE INTO profiles (name) VALUES (:name)";
+			$stmnt = DB::$connection->prepare($sql);
+			$stmnt->execute(array(":name" => $profile['profileName']));	
+			// Get profile mapping id
+			$sql = "SELECT id FROM profiles WHERE name = :name";
+			$stmnt = DB::$connection->prepare($sql);
+			$stmnt->execute(array(":name" => $profile['profileName']));
+			$profileid = $stmnt->fetchColumn();
+			if ($profileid == null) {
+				throw new Exception("Could not get lookup entry for profile ".$profile['profileName']);
+			}
+			// Insert
+			$sql = "INSERT INTO deviceprofiles (reportid, profileid, specversion, supported) VALUES (:reportid, :profileid, :specversion, :supported)";
+			try {
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute(array(":reportid" => $reportid, ":profileid" => $profileid, ":specversion" => $profile['specVersion'], ":supported" => $profile['supported']));
+			} catch (Exception $e) {
+				die('Error while trying to upload report (error at device extensions)');
+			}															
+		}
+	}
+
 	DB::connect();
 	
 	$jsonFile = file_get_contents($file);
@@ -284,13 +313,14 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
 			VALUES
-				(:submitter, :devicename, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
 
 		$values = array(
 			":submitter" => $json['environment']['submitter'],
 			":devicename" => $json['properties']['deviceName'],
+			":displayname" => $json['properties']['displayName'],
 			":driverversion" => $json['properties']['driverVersionText'],
 			":apiversion" => $json['properties']['apiVersionText'],
 			":osname" => $json['environment']['name'],
@@ -868,6 +898,8 @@
 	importCore11Data($json, $reportid);
 	importCore12Data($json, $reportid);
 	importCore13Data($json, $reportid);
+
+	importProfiles($json, $reportid);
 
 	/*
 		Instance

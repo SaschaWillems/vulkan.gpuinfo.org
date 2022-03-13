@@ -32,6 +32,7 @@ class ReportCompareFlags
     public $has_vulkan_1_2_properties = false;
     public $has_vulkan_1_3_features = false;
     public $has_vulkan_1_3_properties = false;
+    public $has_profiles = false;
 }
 
 class ReportCompareDeviceInfo
@@ -504,6 +505,57 @@ class ReportCompare
             return [];
         }        
     }
+
+    public function fetchProfiles()
+    {       
+        try {
+            $result = new ReportCompareData;
+            $result->captions = [];
+            // Gather profiles extensions supported by at least one of the reports
+            $stmnt = DB::$connection->prepare("SELECT distinct Name from deviceprofiles 
+                    left join profiles on profiles.id = deviceprofiles.profileid 
+                    where deviceprofiles.ReportID in (" . $this->reportIdsParam() . ")");
+            $stmnt->execute();
+            $rows = $stmnt->fetchAll(PDO::FETCH_NUM);
+            foreach ($rows as $row) {
+                $result->captions[] = $row[0];
+            }
+
+            // Get profiles for each selected report              
+            foreach ($this->report_ids as $report_id) {
+                try {
+                    $stmnt = DB::$connection->prepare("SELECT name from profiles left join deviceprofiles on profiles.id = deviceprofiles.profileid where deviceprofiles.reportId = :reportid and supported = 1");
+                    $stmnt->execute(["reportid" => $report_id]);
+                } catch (PDOException $e) {
+                    die("Could not fetch device profiles for single report!");
+                }
+                $report_profiles = [];
+                while ($row = $stmnt->fetch(PDO::FETCH_NUM)) {
+                    foreach ($row as $profile) {
+                        $report_profiles[] = $profile;
+                    }
+                }
+                $result->data[] = $report_profiles;
+            }
+            foreach ($rows as $index => $row) {
+                $reportdata = [];
+                foreach ($row as $key => $values) {
+                    if ($key == "reportid") {
+                        continue;
+                    }
+                    $reportdata[] = $values;
+                    if ($index == 0) {
+                        $result->captions[] = $key;
+                    }
+                }
+                $result->data[] = $reportdata;
+            }
+            $result->count = count($result->captions);
+            return $result;
+        } catch (Throwable $e) {
+            return [];
+        }
+    }    
 
     public function beginTable($id)
     {

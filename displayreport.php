@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -54,9 +54,10 @@ try {
 	$memheapcount = DB::getCount("SELECT count(*) from devicememoryheaps where reportid = :reportid", ["reportid" => $reportID]);
 	$surfaceformatscount =  DB::getCount("SELECT count(*) from devicesurfaceformats where reportid = :reportid", [':reportid' => $reportID]);
 	$surfacepresentmodescount =  DB::getCount("SELECT count(*) from devicesurfacemodes where reportid = :reportid", [':reportid' => $reportID]);
+	$profilecount =  DB::getCount("SELECT count(*) from deviceprofiles where reportid = :reportid", [':reportid' => $reportID]);
 } catch (PDOException $e) {
 	DB::disconnect();
-	die("<b>Error while fetcthing report data!</b><br>");
+	die("<b>Error while fetching report data!</b><br>");
 }
 echo "<center>";
 
@@ -85,6 +86,9 @@ echo "</div>";
 		<?php if ($report->flags->has_instance_data) {
 			echo "<li><a data-toggle='tab' href='#instance'>Instance</a></li>";
 		} ?>
+		<?php if ($report->flags->has_profiles) {
+			echo "<li><a data-toggle='tab' href='#profiles'>Profiles</a></li>";
+		} ?>
 	</ul>
 </div>
 
@@ -98,13 +102,16 @@ echo "</div>";
 		'extensions',
 		'formats',
 		'queuefamilies',
-		'memory'
+		'memory',
 	];
 	if ($report->flags->has_surface_caps) {
 		$views[] = 'surface';
 	}
 	if ($report->flags->has_instance_data) {
 		$views[] = 'instance';
+	}
+	if ($report->flags->has_profiles) {
+		$views[] = 'profiles';
 	}
 	foreach ($views as $index => $view) {
 		echo "<div id='$view' class='tab-pane fade ".($index == 0 ? "in active" : null)." reportdiv'>";
@@ -134,7 +141,8 @@ echo "</div>";
 					'table_features_core_13',
 					'table_properties_core_11',
 					'table_properties_core_12',
-					'table_properties_core_13'
+					'table_properties_core_13',
+					'table_deviceprofiles'
 				];
 				for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
 					if (typeof $('#' + tableNames[i]) != undefined) {

@@ -25,6 +25,7 @@
      *  - Core 1.2 features and properties
      *  - Core 1.3 features and properties
      *  - Extension features and properties
+     *  - Profiles
      */
 
     // @todo: log last update info in report
@@ -195,6 +196,41 @@
         }
     }
 
+    function update_profiles($json, $reportid, &$update_log) {
+        if (!array_key_exists('profiles', $json)) {
+            return;
+        }        
+        $profiles_report = $json['profiles'];
+        $stmnt = DB::$connection->prepare("SELECT name from deviceprofiles dp join profiles p on dp.profileid = p.id where reportid = :reportid");
+        $stmnt->execute(['reportid' => $reportid]);
+        $profiles_db = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
+        foreach ($profiles_report as $profile_report) {
+            if (!in_array($profile_report['profileName'], $profiles_db)) {
+                // Add to global mapping table (if not already present)
+                $sql = "INSERT IGNORE INTO profiles (name) VALUES (:name)";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute(array(":name" => $profile_report['profileName']));	
+			    // Get profile mapping id
+                $sql = "SELECT id FROM profiles WHERE name = :name";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute(array(":name" => $profile_report['profileName']));
+                $profileid = $stmnt->fetchColumn();
+                if ($profileid == null) {
+                    throw new Exception("Could not get lookup entry for profile ".$profile_report['profileName']);
+                }          
+                // Profile is missing, insert
+                $sql = "INSERT INTO deviceprofiles (reportid, profileid, specversion, supported) VALUES (:reportid, :profileid, :specversion, :supported)";
+                try {
+                    $stmnt = DB::$connection->prepare($sql);
+                    $stmnt->execute([":reportid" => $reportid, ":profileid" => $profileid, ":specversion" => $profile_report['specVersion'], ":supported" => $profile_report['supported']]);
+                } catch (Exception $e) {
+                    die('Error while trying to upload report (error at device profiles)');
+                }
+                $update_log[] = sprintf('Profile %s added', $profile_report['profileName']);
+            }
+        }
+    }
+
     if (!isset($_GET['reportid'])) {
 		header('HTTP/1.1 400 No report id set');
 		exit();
@@ -270,6 +306,7 @@
         update_core_properties("1.3", $report, $reportid, $update_log);
         update_extended_data($report, $reportid, $update_log);
         update_extensions($report, $reportid, $update_log);
+        update_profiles($report, $reportid, $update_log);
     } finally {
         DB::disconnect();
     }

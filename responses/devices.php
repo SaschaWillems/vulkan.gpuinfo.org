@@ -321,6 +321,18 @@ if (isset($_REQUEST['filter']['displayname'])) {
         $params['filter_displayname'] = $displayname;
     }
 }
+// Profile
+if (isset($_REQUEST['filter']['profile'])) {
+    $profile = $_REQUEST['filter']['profile'];
+    if ($profile != '') {
+        if ($negate) {
+            $whereClause = "where r.version >= '3.2' and r.devicename not in (select r.devicename from deviceprofiles dp join profiles p on dp.profileid = p.id join reports r on r.id = dp.reportid where p.name = :filter_profile and dp.supported = 1)";
+        } else {
+            $whereClause = "where r.id in (select distinct(reportid) from deviceprofiles dp join profiles p on dp.profileid = p.id where p.name = :filter_profile and dp.supported = 1)";
+        }
+        $params['filter_profile'] = $profile;
+    }
+}
 
 $orderBy = "order by " . $orderByColumn . " " . $orderByDir;
 
