@@ -20,10 +20,13 @@
  *
  */
 
+session_start();
+
 include 'pagegenerator.php';
 include './includes/functions.php';
 include './includes/filterlist.class.php';
-include 'database/database.class.php';
+include './database/database.class.php';
+include './database/sqlrepository.php';
 
 $filters = [
 	'platform',
@@ -49,6 +52,10 @@ if ($filter_list->hasFilter('extension')) {
 if ($filter_list->hasFilter('submitter')) {
 	$caption .= "Devices submitted by ".$filter_list->getFilter('submitter');
 	$showTabs = false;
+}
+$minApiVersion = SqlRepository::getMinApiVersion();
+if ($minApiVersion) {
+	$caption .= " supporting Vulkan $minApiVersion (and up)";
 }
 ?>
 

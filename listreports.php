@@ -20,10 +20,13 @@
  *
  */
 
+session_start();
+
 include 'pagegenerator.php';
 include './includes/functions.php';
 include './includes/filterlist.class.php';
 include './database/database.class.php';
+include './database/sqlrepository.php';
 
 $filters = [
 	'platform',
@@ -40,7 +43,7 @@ $filters = [
 ];
 $filter_list = new FilterList($filters);
 
-$defaultHeader = true;
+$caption = "Listing all reports";
 $pageTitle = null;
 $inverted = false;
 $platform = "all";
@@ -49,14 +52,12 @@ $platform = "all";
 $inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
 // Submitter
 if ($filter_list->hasFilter('submitter')) {
-	$defaultHeader = false;
 	$caption = "Reports submitted by <code>".$filter_list->getFilter('submitter')."</code>";
 }
 // List (and order) by limit
 $limit = $filter_list->getFilter('limit');
 $limitvalue = null;
 if ($limit != '') {
-	$defaultHeader = false;
 	$caption = "Listing limits for <code>$limit</code>";
 	// Check if a limit requirement rule has to be applied (see Table 36. of the specs)
 	DB::connect();
@@ -77,18 +78,15 @@ if ($limit != '') {
 }
 // Device name
 if ($filter_list->hasFilter('devicename')) {
-	$defaultHeader = false;
 	$caption = "Reports for <code>".$filter_list->getFilter('devicename')."</code>";
 }
 // Display name (Android devices)
 if ($filter_list->hasFilter('displayname')) {
-	$defaultHeader = false;
 	$caption = "Reports for <code>".$filter_list->getFilter('displayname')."</code>";
 }
 // Instance extension
 if ($filter_list->hasFilter('instanceextension')) {
 	$instanceextension = $filter_list->getFilter('instanceextension');
-	$defaultHeader = false;
 	$caption = "Reports " . ($inverted ? "<b>not</b>" : "") . " supporting instance extension <code>$instanceextension</code>";
 	$caption .= " (<a href='listreports.php?instanceextension=" . $instanceextension . ($inverted ? "" : "&option=not") . "'>toggle</a>)";
 	$pageTitle = $instanceextension;
@@ -96,7 +94,6 @@ if ($filter_list->hasFilter('instanceextension')) {
 // Instance layer
 if ($filter_list->hasFilter('instancelayer')) {
 	$instancelayer = $filter_list->getFilter('instancelayer');
-	$defaultHeader = false;
 	$caption = "Reports " . ($inverted ? "<b>not</b>" : "") . " supporting instance layer <code>$instancelayer</code>";
 	$caption .= " (<a href='listreports.php?instancelayer=" . $instancelayer . ($inverted ? "" : "&option=not") . "'>toggle</a>)";
 	$pageTitle = $instancelayer;
@@ -106,7 +103,6 @@ $coreproperty = $filter_list->getFilter('property');
 $corepropertyvalue = null;
 $coreversion = $filter_list->getFilter('core');
 if (isset($coreproperty) && ($coreproperty != '')) {
-	$defaultHeader = false;
 	$corepropertyvalue = $filter_list->getFilter('value');
 	$displayvalue = getPropertyDisplayValue($coreproperty, $corepropertyvalue);
 	$caption = "Reports with <code>$coreproperty</code> = $displayvalue";
@@ -115,25 +111,23 @@ if (isset($coreproperty) && ($coreproperty != '')) {
 if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !== 'all') {
 	$platform = $filter_list->getFilter('platform');
 	$caption = "Listing " . ($caption ? lcfirst($caption) : "reports") . " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
-	$defaultHeader = false;
+}
+$minApiVersion = SqlRepository::getMinApiVersion();
+if ($minApiVersion) {
+	$caption .= " supporting Vulkan $minApiVersion (and up)";
 }
 
 PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");
 
-if ($defaultHeader) {
-	echo "<div class='header'>";
-	echo "	<h4>Listing reports</h4>";
-	echo "</div>";
-}
 ?>
 <center>
-	<?php
-	if (!$defaultHeader) {
-		echo "<div class='header'><h4>";
-		echo $caption ? $caption : "Listing available devices";
-		echo "</h4></div>";
-	}
+	<div class='header'>
+		<h4>
+			<?= $caption; ?>
+		</h4>
+	</div>
 
+	<?php
 	PageGenerator::platformNavigation('listreports.php', $platform, true, $filter_list->filters);
 	?>
 	<div class='tablediv tab-content' style='display: inline-flex;'>
