@@ -43,15 +43,28 @@ class SqlRepository {
     }
 
     public static function appendCondition(&$sql, $condition) {
-        if (strpos($sql, 'where') !== false) {
+        if (strpos(strtolower($sql), 'where') !== false) {
             $sql .= " and $condition";
         } else {
             $sql .= " where $condition";
         }
     }
 
-    public static function deviceCount($join = null) {
-        $sql = "SELECT count(DISTINCT displayname) from reports r $join";
+    public static function appendFilters(&$sql, &$params) {
+        $ostype = self::getOSType();
+        if ($ostype !== null) {            
+            self::appendCondition($sql, "ostype = :ostype");
+            $params['ostype'] = $ostype;
+        }
+        $apiversion = self::getMinApiVersion();
+        if ($apiversion) {
+            self::appendCondition($sql, "r.apiversion >= :apiversion");
+            $params['apiversion'] = $apiversion;
+        }      
+    }
+
+    public static function deviceCount($sqlAppend = null) {
+        $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $sqlAppend";
         $ostype = self::getOSType();
         if ($ostype !== null) {
             self::appendCondition($sql, "r.ostype = :ostype");
@@ -155,6 +168,45 @@ class SqlRepository {
             } else {
                 $coverage = 0;
             }
+        }
+        return $features;
+    }
+
+    /** Global extension feature listing */
+    public static function listExtensionFeatures($extension) {
+        // Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
+        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.4'");      
+        // Limit to features for a given extension
+        $ext_filter = null;
+        if ($extension) {
+            $params['extension'] = $extension;
+            $ext_filter = 'AND df2.extension = :extension';
+        }
+        $sql = 
+            "SELECT 
+                extension,
+                name,
+                COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
+            FROM
+                devicefeatures2 df2
+                    JOIN
+                reports r ON df2.reportid = r.id
+                    JOIN
+                deviceproperties dp ON dp.reportid = r.id
+            WHERE
+                supported = 1
+                $ext_filter";
+        self::appendFilters($sql, $params);
+        $sql .= " GROUP BY extension , name ORDER BY extension ASC , name ASC";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $features = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $features[] = [
+                'extension' => $row['extension'],
+                'name' => $row['name'], 
+                'coverage' => round($row['supporteddevices'] / $deviceCount * 100, 1),
+            ];
         }
         return $features;
     }

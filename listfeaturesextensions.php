@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,7 @@
 
 include 'pagegenerator.php';
 include './database/database.class.php';
+require './database/sqlrepository.php';
 require './includes/constants.php';
 include './includes/functions.php';
 include './includes/filterlist.class.php';
@@ -65,53 +66,16 @@ PageGenerator::header("Extension features listing");
 				<?php
 				DB::connect();
 				try {
-					$ext_filter = null;
-					$os_filter = null;
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-						$os_filter = 'AND r.ostype = :ostype';
-					}
-					// Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
-					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.version >= '1.4' $os_filter");
-					$stmnt->execute($params);
-					$device_count = $stmnt->fetchColumn();
-					// Get feature coverage
-					if ($extension) {
-						$params['extension'] = $extension;
-						$ext_filter = 'AND df2.extension = :extension';
-					}
-					$sql = 
-						"SELECT 
-							extension,
-							name,
-							COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
-						FROM
-							devicefeatures2 df2
-								JOIN
-							reports r ON df2.reportid = r.id
-								JOIN
-							deviceproperties dp ON dp.reportid = r.id
-						WHERE
-							supported = 1
-							$ext_filter
-							$os_filter
-						GROUP BY extension , name 
-						ORDER BY extension ASC , name ASC";
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute($params);
-
-					if ($stmnt->rowCount() > 0) {
-						while ($feature = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-							$coverageLink = "listdevicescoverage.php?extensionname=" . $feature['extension'] . "&extensionfeature=" . $feature['name'] . "&platform=$platform";
-							$coverage = round($feature['supporteddevices'] / $device_count * 100, 1);
-							echo "<tr>";
-							echo "<td>" . $feature['extension'] . "</td>";
-							echo "<td class='subkey'>" . $feature['name'] . "</td>";
-							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "</tr>";
-						}
+					$features = SqlRepository::listExtensionFeatures($extension);
+					foreach($features as $feature) {
+						$coverageLink = "listdevicescoverage.php?extensionname=" . $feature['extension'] . "&extensionfeature=" . $feature['name'] . "&platform=$platform";
+						$coverage = $feature['coverage'];
+						echo "<tr>";
+						echo "<td>" . $feature['extension'] . "</td>";
+						echo "<td class='subkey'>" . $feature['name'] . "</td>";
+						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "</tr>";
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";
