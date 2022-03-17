@@ -211,4 +211,26 @@ class SqlRepository {
         return $features;
     }
 
+    /** Global memory type listings */
+    public static function listMemoryTypes() {
+        $deviceCount = SqlRepository::deviceCount();
+        $sql = "SELECT
+            propertyflags as memtype, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
+            from devicememorytypes dmt
+            join reports r on r.id = dmt.reportid
+            join deviceproperties dp on dp.reportid = r.id";
+        self::appendFilters($sql, $params);
+        $sql .= " group by memtype desc";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);        
+        $memorytypes = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $memorytypes[] = [
+                'memtype' => $row['memtype'],
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+            ];
+        }
+        return $memorytypes;
+    }
+
 }

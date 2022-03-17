@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -19,9 +19,10 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.php';
+require './includes/functions.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
@@ -32,7 +33,7 @@ PageGenerator::header("Memory");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Memory types for " . PageGenerator::platformInfo($platform)?>
+	<?php echo "<h4>Memory types for " . PageGenerator::filterInfo($platform)?>
 </div>
 
 <center>
@@ -50,33 +51,16 @@ PageGenerator::header("Memory");
 			<tbody>
 				<?php
 				try {
-					$os_filter = null;
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-						$os_filter = 'WHERE r.ostype = :ostype';
-					}					
 					DB::connect();
-					$deviceCount = getDeviceCount($platform);
-					$sql = "SELECT
-						propertyflags as memtype, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
-						from devicememorytypes dmt
-						join reports r on r.id = dmt.reportid
-						join deviceproperties dp on dp.reportid = r.id
-						$os_filter
-						group by memtype desc";
-					$result = DB::$connection->prepare($sql);
-					$result->execute($params);
-
-					foreach ($result as $row) {
-						$coverageLink = "listdevicescoverage.php?" . "memorytype=" . $row['memtype'] . "&platform=$platform";
-						$coverage = $row['coverage'] / $deviceCount * 100.0;
-						$memoryFlags = join("<br>", getMemoryTypeFlags($row['memtype']));
+					$memoryTypes = SqlRepository::listMemoryTypes();
+					foreach ($memoryTypes as $memoryType) {
+						$coverageLink = "listdevicescoverage.php?" . "memorytype=" . $memoryType['memtype'] . "&platform=$platform";
+						$memoryFlags = join("<br>", getMemoryTypeFlags($memoryType['memtype']));
 						if ($memoryFlags == "") $memoryFlags = "0";
 						echo "<tr>";
 						echo "<td class='value'>$memoryFlags</td>";
-						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value'><a class='supported' href='$coverageLink'>" . $memoryType['coverage'] . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . (100.0 - $memoryType['coverage']) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
