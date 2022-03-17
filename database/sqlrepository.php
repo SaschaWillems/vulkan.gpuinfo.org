@@ -348,14 +348,14 @@ class SqlRepository {
                     if ($value !== null) {
                         $properties[$key] += $value;
                     } else {
-                        $properties[$key] = null;
+                        $properties[$key] = 'valuelisting';
                     }
                 }
             }
         }
 
         foreach ($properties as $property => &$coverage) {
-            if ($coverage !== null) {
+            if (is_numeric($coverage)) {
                 $coverage = round($coverage / $deviceCount * 100, 1);
             }
         }

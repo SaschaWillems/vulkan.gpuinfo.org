@@ -59,15 +59,16 @@ PageGenerator::header("Core 1.3 properties");
 				try {
 					$properties = SqlRepository::listCoreProperties(SqlRepository::VK_API_VERSION_1_3);
 					foreach ($properties as $property => $coverage) {
-						$has_coverage = $coverage !== null;
+						$has_coverage = is_numeric($coverage);
+						$field_name = getFullFieldName($property);
 						echo "<tr>";
-						echo "<td>$property</a></td>";
+						echo "<td>$field_name</a></td>";
 						echo "<td class='text-center'>".($has_coverage ? 'Coverage' : 'Values')."</td>";
 						if ($has_coverage) {
-							$link = "listdevicescoverage.php?core=1.3&name=$property&platform=$platform";
+							$link = "listdevicescoverage.php?core=1.3&coreproperty=$field_name&platform=$platform";
 							echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {
-							$link = "<a href='displaycoreproperty.php?core=1.3&name=$property&platform=$platform'>";
+							$link = "<a href='displaycoreproperty.php?core=1.3&coreproperty=$field_name&platform=$platform'>";
 							echo "<td class='text-center'>".$link."Listing</a></td>";
 						}
 						echo "</tr>";
