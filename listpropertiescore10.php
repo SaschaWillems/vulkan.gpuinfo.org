@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,7 @@
 
 require 'pagegenerator.php';
 require './database/database.class.php';
+require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
@@ -34,7 +35,7 @@ PageGenerator::header("Core 1.0 properties");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.0 properties for ".PageGenerator::platformInfo($platform) ?>
+	<?php echo "<h4>Core 1.0 properties for ".PageGenerator::filterInfo($platform) ?>
 </div>
 
 <center>
@@ -50,90 +51,28 @@ PageGenerator::header("Core 1.0 properties");
 				</tr>
 			</thead>
 			<tbody>
-				<?php
-				$coverage_columns = [
-					'residencyAlignedMipSize',
-					'residencyNonResidentStrict',
-					'residencyStandard2DBlockShape',
-					'residencyStandard2DMultisampleBlockShape',
-					'residencyStandard3DBlockShape',
-					'subgroupProperties.quadOperationsInAllStages',
-				];
-				$ignore_columns = [
-					'headerversion',
-					'driverversionraw',
-					'pipelineCacheUUID',
-					'apiversionraw',
-					'productManufacturer',
-					'productModel'
-				];
+			<?php
 				DB::connect();
 				try {
-					$deviceCount = getDeviceCount($platform);
-					
-					$os_filter = null;
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-						$os_filter = 'WHERE r.ostype = :ostype';
-					}
-			
-
-					// Collect coverage numbers
-					$sqlColumns = '';
-					foreach ($coverage_columns as $column) {
-						$sqlColumns .= "max(dp.`$column`) as `$column`,";
-					}
-
-					$supportedCounts = [];
-					$stmnt = DB::$connection->prepare(
-						"SELECT ifnull(r.displayname, dp.devicename) as device, "
-							. substr($sqlColumns, 0, -1) .
-							" FROM deviceproperties dp join reports r on r.id = dp.reportid $os_filter group by device"
-					);
-					$stmnt->execute($params);
-					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-						foreach ($row as $key => $value) {
-							if (strcasecmp($key, 'device') != 0) {
-								$supportedCounts[$key] += $value;
+					$properties = SqlRepository::listCoreProperties(SqlRepository::VK_API_VERSION_1_0);
+					foreach ($properties as $property => $coverage) {
+						$has_coverage = is_numeric($coverage);
+						echo "<tr>";
+						echo "<td>$property</a></td>";
+						if ($coverage == 'limit') {
+							echo "<td class='text-center'>Limit</td>";
+							echo "<td><a href='displaydevicelimit.php?name=$property&platform=$platform'>Listing</a></td>";
+						} else {
+							if ($has_coverage) {
+								$link = "listdevicescoverage.php?coreproperty=$property&platform=$platform";
+								echo "<td class='text-center'>Coverage</td>";
+								echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+							} else {
+								$link = "<a href='displaycoreproperty.php?coreproperty=$property&platform=$platform'>";
+								echo "<td class='text-center'>Values</td>";
+								echo "<td class='text-center'>".$link."Listing</a></td>";
 							}
 						}
-					}
-
-					// Collect properties from column names
-					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'deviceproperties' and COLUMN_NAME not in ('reportid')";
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute();
-
-					while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-						if (in_array($row[0], $ignore_columns)) {
-							continue;
-						}
-						$has_coverage = in_array($row[0], $coverage_columns);
-						$sqlColumns .= "max(" . $row[0] . ") as `$row[0]`," . PHP_EOL;
-						$link = "<a href='displaycoreproperty.php?name=" . $row[0] . "&platform=$platform'>";
-						echo "<tr>";
-						echo "<td>" . $row[0] . "</a></td>";
-						echo "<td class='text-center'>" . ($has_coverage ? 'Coverage' : 'Values') . "</td>";
-						if ($has_coverage) {
-							$coverageLink = "listdevicescoverage.php?coreproperty=" . $row[0] . "&platform=$platform";
-							$coverage = ($deviceCount > 0) ? round($supportedCounts[$row[0]] / $deviceCount * 100, 1) : 0;
-							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						} else {
-							echo "<td class='text-center'>" . $link . "Listing</a></td>";
-						}
-						echo "</tr>";
-					}
-
-					// Collect limits
-					$sql = "SELECT COLUMN_NAME as name, (SELECT feature from limitrequirements where limitname = name) as requirement from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid')";
-					$limits = DB::$connection->prepare($sql);
-					$limits->execute();
-					while ($limit = $limits->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-						echo "<tr>";
-						echo "<td>$limit[0]</td>";
-						echo "<td class='text-center'>Limit</td>";
-						echo "<td><a href='displaydevicelimit.php?name=" . $limit[0] . "&platform=$platform'>Listing</a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {

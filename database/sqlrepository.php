@@ -328,10 +328,10 @@ class SqlRepository {
         while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
             if (in_array($row[0], $coverage_columns)) {
                 // Device coverage with numbers
-                $sqlColumns .= "max(" . $row[0] . ") as $row[0],";
+                $sqlColumns .= "max(`$row[0]`) as `$row[0]`,";
             } else {
-                // Value listing/limit (no numbers)
-                $sqlColumns .= "null as $row[0],";
+                // Value listing (no numbers)
+                $sqlColumns .= "'novalue' as `$row[0]`,";
             }
         }
         $sqlColumnList = rtrim($sqlColumns, ',');
@@ -344,14 +344,25 @@ class SqlRepository {
         $properties = [];
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
             foreach ($row as $key => $value) {
-                if (strcasecmp($key, 'device') != 0) {
-                    if ($value !== null) {
-                        $properties[$key] += $value;
-                    } else {
-                        $properties[$key] = 'valuelisting';
-                    }
+                if (strcasecmp($key, 'device') == 0) {
+                    continue;
+                }
+                if ($value == 'novalue') {
+                    $properties[$key] = 'valuelisting';
+                } else {
+                    $properties[$key] += $value;
                 }
             }
+        }
+
+        // For Vulkan 1.0 we also report limits as properties
+        if ($version == self::VK_API_VERSION_1_0) {
+            $sql = "SELECT COLUMN_NAME as name from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicelimits' and COLUMN_NAME not in ('reportid') order by COLUMN_NAME";
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute();
+            while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+                $properties[$row['name']] = 'limit';
+            }            
         }
 
         foreach ($properties as $property => &$coverage) {
