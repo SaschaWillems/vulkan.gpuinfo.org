@@ -42,9 +42,9 @@ PageGenerator::header("Extension features listing");
 <div class='header'>
 	<?php
 	if ($extension) {
-		echo "<h4>Available extension features for <code>$extension</code> on " . PageGenerator::platformInfo($platform);
+		echo "<h4>Available extension features for <code>$extension</code> on " . PageGenerator::filterInfo($platform);
 	} else {
-		echo "<h4>Extension device feature coverage for " . PageGenerator::platformInfo($platform);
+		echo "<h4>Extension device feature coverage for " . PageGenerator::filterInfo($platform);
 	}
 	?>
 </div>
