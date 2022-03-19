@@ -486,4 +486,29 @@ class SqlRepository {
         return $memorytypes;
     }
 
+    /** Global surface format listing */
+    public static function listSurfaceFormats() {
+        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.2'");
+        $sql = "SELECT
+            VkFormat(dsf.format) as format,
+            dsf.colorspace,
+            count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
+            from reports r
+            join devicesurfaceformats dsf on dsf.reportid = r.id
+            join deviceproperties dp on dp.reportid = r.id";
+        self::appendFilters($sql, $params);
+        $sql .= " group by format, colorspace";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);        
+        $surfaceformats = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $surfaceformats[] = [
+                'format' => $row['format'],
+                'colorspace' => $row['colorspace'],
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+            ];
+        }
+        return $surfaceformats;
+    }
+
 }

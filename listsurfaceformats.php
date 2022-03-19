@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,9 +20,10 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.php';
+require './includes/functions.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
@@ -33,7 +34,7 @@ PageGenerator::header("Surface formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Surface format support on ".PageGenerator::platformInfo($platform); ?>
+	<?php echo "<h4>Surface format support on ".PageGenerator::filterInfo($platform); ?>
 </div>
 
 <center>
@@ -63,24 +64,13 @@ PageGenerator::header("Surface formats");
 						$os_filter = 'WHERE r.ostype = :ostype';
 					}				
 					DB::connect();
-					$deviceCount = getDeviceCount($platform, 'and r.version >= \'1.2\'');
-					$sql = "SELECT
-						VkFormat(dsf.format) as format,
-						dsf.colorSpace,
-						count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
-						from reports r
-						join devicesurfaceformats dsf on dsf.reportid = r.id
-						join deviceproperties dp on dp.reportid = r.id
-						$os_filter
-						group by format, colorSpace";
-					$result = DB::$connection->prepare($sql);
-					$result->execute($params);
-					foreach ($result as $row) {
-						$coverageLink = "listdevicescoverage.php?surfaceformat=".$row['format']."&surfaceformatcolorspace=".$row['colorSpace']."&platform=$platform";
-						$coverage = $row['coverage'] / $deviceCount * 100.0;
+					$surfaceformats = SqlRepository::listSurfaceFormats();
+					foreach ($surfaceformats as $surfaceforamt) {
+						$coverageLink = "listdevicescoverage.php?surfaceformat=".$surfaceforamt['format']."&surfaceformatcolorspace=".$surfaceforamt['colorspace']."&platform=$platform";
+						$coverage = $surfaceforamt['coverage'];
 						echo "<tr>";
-						echo "<td class='value'>".$row['format']."</td>";
-						echo "<td class='value'>".getColorSpace($row['colorSpace'])."</td>";
+						echo "<td class='value'>".$surfaceforamt['format']."</td>";
+						echo "<td class='value'>".getColorSpace($surfaceforamt['colorspace'])."</td>";
 						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
