@@ -511,4 +511,29 @@ class SqlRepository {
         return $surfaceformats;
     }
 
+    /** Global surface present mode listing */
+    public static function listSurfacePresentModes() {
+        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.2'");
+        $sql = "SELECT
+            vkpm.name as mode,
+            count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
+            from devicesurfacemodes dsm
+            join reports r on r.id = dsm.reportid
+            join VkPresentMode vkpm on vkpm.value = dsm.presentmode
+            join deviceproperties dp on dp.reportid = r.id";
+        self::appendFilters($sql, $params);
+        $sql .= " group by mode";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);        
+        $surfaceformats = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $surfaceformats[] = [
+                'mode' => $row['mode'],
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+            ];
+        }
+        return $surfaceformats;
+    }
+
+
 }
