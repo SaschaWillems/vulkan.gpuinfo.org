@@ -374,6 +374,96 @@ class SqlRepository {
         return $properties;
     }
 
+    /** Global extension properties listing */
+    public static function listExtensionProperties($extension) {
+        // Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
+        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.4'");      
+        // Limit to features for a given extension
+        $ext_filter = null;
+        if ($extension) {
+            $params['extension'] = $extension;
+            $ext_filter = 'AND df2.extension = :extension';
+        }
+        // We use three unions to get the whole picture (coverage numbers, value listings)
+        $sql_union_a = "SELECT 
+                    extension,
+                    name,
+                    'coverage' as type,
+                    COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
+                FROM
+                    deviceproperties2 d2
+                        JOIN
+                    reports r ON d2.reportid = r.id
+                        JOIN
+                    deviceproperties dp ON dp.reportid = r.id
+                WHERE
+                    value = 'true'";
+                                    
+        $sql_union_b = "SELECT 
+                    extension,
+                    name,
+                    'coverage' as type,
+                    0 as supporteddevices
+                FROM
+                    deviceproperties2 d2
+                        JOIN
+                    reports r ON d2.reportid = r.id
+                        JOIN
+                    deviceproperties dp ON dp.reportid = r.id
+                WHERE
+                    value ='false'";
+                                            
+        $sql_union_c = "SELECT 
+                    extension,
+                    name,
+                    'values' as type,
+                    0 as supporteddevices
+                FROM
+                    deviceproperties2 d2
+                        JOIN
+                    reports r ON d2.reportid = r.id
+                        JOIN
+                    deviceproperties dp ON dp.reportid = r.id
+                WHERE
+                    value not in ('true', 'false')";
+
+        if ($ext_filter) {
+            $sql_union_a .= " AND $ext_filter";
+            $sql_union_b .= " AND $ext_filter";
+            $sql_union_c .= " AND $ext_filter";
+        }
+                
+        self::appendFilters($sql_union_a, $params);
+        self::appendFilters($sql_union_b, $params);
+        self::appendFilters($sql_union_c, $params);
+
+        $sql = "SELECT extension, name, type, sum(supporteddevices) as supporteddevices FROM
+            (
+                $sql_union_a
+                GROUP BY extension, name
+            UNION
+                $sql_union_b
+                GROUP BY extension, name
+            UNION
+                $sql_union_c
+                GROUP BY extension, name
+            ) tbl
+            GROUP BY extension, name, type
+            ORDER BY extension ASC , name ASC";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);        
+        $properties = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $properties[] = [
+                'extension' => $row['extension'],
+                'name' => $row['name'], 
+                'type' => $row['type'],
+                'coverage' => round($row['supporteddevices'] / $deviceCount * 100, 1),
+            ];
+        }
+        return $properties;        
+    }
+
     /** Global memory type listings */
     public static function listMemoryTypes() {
         $deviceCount = SqlRepository::deviceCount();

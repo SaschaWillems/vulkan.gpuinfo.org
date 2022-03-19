@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,9 +22,10 @@
 
 require 'pagegenerator.php';
 require './database/database.class.php';
+require './database/sqlrepository.php';
 require './includes/constants.php';
 require './includes/functions.php';
-include './includes/filterlist.class.php';
+require './includes/filterlist.class.php';
 
 $filters = ['platform', 'extension'];
 $filter_list = new FilterList($filters);
@@ -41,9 +42,9 @@ PageGenerator::header("Extension properties listing");
 <div class='header'>
 	<?php
 	if ($extension) {
-		echo "<h4>Available extension properties for <code>$extension</code> on " . PageGenerator::platformInfo($platform);
+		echo "<h4>Available extension properties for <code>$extension</code> on " . PageGenerator::filterInfo($platform);
 	} else {
-		echo "<h4>Extension device properties for " . PageGenerator::platformInfo($platform);
+		echo "<h4>Extension device properties for " . PageGenerator::filterInfo($platform);
 	}
 	?>
 </div>
@@ -65,102 +66,20 @@ PageGenerator::header("Extension properties listing");
 				<?php
 				DB::connect();
 				try {
-					$ext_filter = null;
-					$os_filter = null;
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-						$os_filter = 'AND r.ostype = :ostype';
-					}
-					// Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
-					$stmnt = DB::$connection->prepare("SELECT COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) FROM reports r JOIN deviceproperties dp ON r.id = dp.reportid WHERE r.version >= '1.4' $os_filter");
-					$stmnt->execute($params);
-					$device_count = $stmnt->fetchColumn();
-					// Get property coverage
-					if ($extension) {
-						$params['extension'] = $extension;
-						$ext_filter = 'AND d2.extension = :extension';
-					}
-					$stmnt = DB::$connection->prepare(
-						"SELECT extension, name, type, sum(supporteddevices) as supporteddevices FROM
-							(
-							SELECT 
-								extension,
-								name,
-								'coverage' as type,
-								COUNT(DISTINCT IFNULL(r.displayname, dp.devicename)) AS supporteddevices
-							FROM
-								deviceproperties2 d2
-									JOIN
-								reports r ON d2.reportid = r.id
-									JOIN
-								deviceproperties dp ON dp.reportid = r.id
-							WHERE
-								value = 'true' 
-								$ext_filter
-								$os_filter
-							GROUP BY extension , name
-							
-							UNION
-							
-							SELECT 
-								extension,
-								name,
-								'coverage' as type,
-								0 as supporteddevices
-							FROM
-								deviceproperties2 d2
-									JOIN
-								reports r ON d2.reportid = r.id
-									JOIN
-								deviceproperties dp ON dp.reportid = r.id
-							WHERE
-								value = 'false' 
-								$ext_filter
-								$os_filter
-							GROUP BY extension , name
-							
-							
-							UNION
-							
-							SELECT 
-								extension,
-								name,
-								'values' as type,
-								0 as supporteddevices
-							FROM
-								deviceproperties2 d2
-									JOIN
-								reports r ON d2.reportid = r.id
-									JOIN
-								deviceproperties dp ON dp.reportid = r.id
-							WHERE
-								value not in ('true', 'false') 
-								$ext_filter
-								$os_filter
-							GROUP BY extension , name
-							) tbl
-							GROUP BY extension, name, type
-							ORDER BY extension ASC , name ASC"
-					);
-					$stmnt->execute($params);
-
-					if ($stmnt->rowCount() > 0) {
-						while ($property = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-							echo "<tr>";
-							echo "<td>" . $property['extension'] . "</td>";
-							echo "<td class='subkey'>" . $property['name'] . "</td>";
-							echo "<td class='text-center'>" . ucfirst($property['type']) . "</td>";
-							if ($property['type'] == 'coverage') {
-								$coverageLink = "listdevicescoverage.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform";
-								$coverage = round($property['supporteddevices'] / $device_count * 100, 1);
-								echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-							} else {
-								$link = "<a href='displayextensionproperty.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform'>";
-								echo "<td class='text-center'>" . $link . "Listing</a></td>";
-							}
-							echo "</tr>";
+					$properties = SqlRepository::listExtensionProperties($extension);
+					foreach($properties as $property) {
+						echo "<tr>";
+						echo "<td>".$property['extension']."</td>";
+						echo "<td class='subkey'>".$property['name']."</td>";
+						echo "<td class='text-center'>".ucfirst($property['type'])."</td>";
+						if ($property['type'] == 'coverage') {
+							$coverageLink = "listdevicescoverage.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform";
+							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">".$property['coverage']."<span style='font-size:10px;'>%</span></a></td>";
+						} else {
+							$link = "<a href='displayextensionproperty.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform'>";
+							echo "<td class='text-center'>".$link."Listing</a></td>";
 						}
+						echo "</tr>";
 					}
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";
