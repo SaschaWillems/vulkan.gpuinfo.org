@@ -56,14 +56,8 @@ PageGenerator::header("Surface formats");
 			</thead>
 			<tbody>
 				<?php
+				DB::connect();
 				try {
-					$os_filter = null;
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-						$os_filter = 'WHERE r.ostype = :ostype';
-					}				
-					DB::connect();
 					$surfaceformats = SqlRepository::listSurfaceFormats();
 					foreach ($surfaceformats as $surfaceforamt) {
 						$coverageLink = "listdevicescoverage.php?surfaceformat=".$surfaceforamt['format']."&surfaceformatcolorspace=".$surfaceforamt['colorspace']."&platform=$platform";
