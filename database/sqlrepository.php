@@ -535,5 +535,30 @@ class SqlRepository {
         return $surfaceformats;
     }
 
+    /** Global surface usage flags listing */
+    public static function listSurfaceUsageFlags($surface_usage_flags ) {
+
+        // Can't use getDeviceCount here, as some devices that should have no rows in devicesurfacecapabilities (probably custom builds)
+        // $deviceCount = DB::getCount("SELECT count(distinct(r.displayname)) from reports r join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2' $os_filter", $params);
+
+        $deviceCount = SqlRepository::deviceCount("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
+        $surfaceusageflags = [];
+        foreach ($surface_usage_flags as $enum => $flag_name) {
+            $sql = "SELECT
+                count(distinct(r.displayname)) as coverage
+                from devicesurfacecapabilities dsf
+                join reports r on r.id = dsf.reportid
+                where supportedUsageFlags & $enum = $enum";
+            self::appendFilters($sql, $params);
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute($params);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+            $surfaceusageflags[] = [
+                'name' => $flag_name,
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+            ];
+        };
+        return $surfaceusageflags;
+    }
 
 }
