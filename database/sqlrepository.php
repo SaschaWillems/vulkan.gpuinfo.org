@@ -20,6 +20,7 @@
  *
  */
 
+
 /** Builder class for the SQL statements used on different pages */
 class SqlRepository {
 
@@ -64,6 +65,7 @@ class SqlRepository {
     }
 
     public static function deviceCount($sqlAppend = null) {
+        // @todo: count(distinct displayname) ? (slightly different numbers)
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $sqlAppend";
         $ostype = self::getOSType();
         if ($ostype !== null) {
@@ -580,7 +582,33 @@ class SqlRepository {
                 'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
             ];
         }
-        return $instanceextensions;                
+        return $instanceextensions;
+    }
+
+    /** Global instance layer listing */
+    public static function listInstanceLayers() {
+        $deviceCount = SqlRepository::deviceCount();
+        $sql = "SELECT 
+            distinct(name),
+            count(distinct(r.displayname)) as coverage
+            from deviceinstancelayers dl
+            join instancelayers il on dl.layerid = il.id
+            right join reports r on r.id = dl.reportid";
+        self::appendFilters($sql, $params);
+        $sql .= " GROUP by name";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);        
+        $instancelayers = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            if (trim($row['name']) == '') {
+                continue;
+            }
+            $instancelayers[] = [
+                'name' => $row['name'],
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+            ];
+        }
+        return $instancelayers;
     }
 
 }
