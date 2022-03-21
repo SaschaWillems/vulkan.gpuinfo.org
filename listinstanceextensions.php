@@ -1,32 +1,35 @@
-<?php 
-	/* 		
-		*
-		* Vulkan hardware capability database server implementation
-		*	
-		* Copyright (C) 2016-2018 by Sascha Willems (www.saschawillems.de)
-		*	
-		* This code is free software, you can redistribute it and/or
-		* modify it under the terms of the GNU Affero General Public
-		* License version 3 as published by the Free Software Foundation.
-		*	
-		* Please review the following information to ensure the GNU Lesser
-		* General Public License version 3 requirements will be met:
-		* http://www.gnu.org/licenses/agpl-3.0.de.html
-		*	
-		* The code is distributed WITHOUT ANY WARRANTY; without even the
-		* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-		* PURPOSE.  See the GNU AGPL 3.0 for more details.		
-		*
-	*/
-	
-	include 'pagegenerator.php';
-	include './database/database.class.php';
-	
-	PageGenerator::header("Instance extensions");
+<?php
+
+/**	
+ *
+ * Vulkan hardware capability database server implementation
+ *	
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ *	
+ * This code is free software, you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public
+ * License version 3 as published by the Free Software Foundation.
+ *	
+ * Please review the following information to ensure the GNU Lesser
+ * General Public License version 3 requirements will be met:
+ * http://www.gnu.org/licenses/agpl-3.0.de.html
+ *	
+ * The code is distributed WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.		
+ *
+ */
+
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.php';
+require './includes/functions.php';
+
+PageGenerator::header("Instance extensions");
 ?>
 
 <div class='header'>
-	<h4>Listing all available instance extensions</h4>
+	<?php echo "<h4>Listing available instance extensions ".PageGenerator::filterInfo() ?>
 </div>			
 
 <center>	
@@ -43,23 +46,16 @@
 			<?php
 				DB::connect();
 				try {
-					$res =DB::$connection->prepare("select count(*) from reports"); 
-					$res->execute(); 
-					$reportCount = $res->fetchColumn(); 
-
-					$extensions = DB::$connection->prepare("SELECT name from instanceextensions");
-					$extensions->execute($params);
-
-					if ($extensions->rowCount() > 0) { 
-						while ($extension = $extensions->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {								
-							echo "<tr>";
-							echo "<td class='value'><a href='listreports.php?instanceextension=".$extension[0]."'>".$extension[0]."</a> (<a href='listreports.php?instanceextension=".$extension[0]."&option=not'>not</a>)</td>";
-							echo "</tr>";
-						}
+					$instanceextensions = SqlRepository::listInstanceExtensions();
+					foreach($instanceextensions as $instanceextension) {
+						$name = $instanceextension['name'];
+						echo "<tr>";						
+						echo "<td class='value'><a href='listreports.php?instanceextension=".$name."'>".$name."</a> (<a href='listreports.php?instanceextension=".$name."&option=not'>not</a>)</td>";
+						echo "</tr>";
 					}
 
 				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data!</b><br>";
+					echo "<b>Error while fetching data!</b><br>";
 				}
 				DB::disconnect();
 			?>   

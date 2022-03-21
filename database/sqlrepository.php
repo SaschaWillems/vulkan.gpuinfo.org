@@ -557,4 +557,22 @@ class SqlRepository {
         return $surfaceusageflags;
     }
 
+    /** Global instance extension listing */
+    public static function listInstanceExtensions() {
+        $sql = "SELECT distinct(name) from deviceinstanceextensions di join instanceextensions ie on di.extensionid = ie.id right join reports r on r.id = di.reportid";
+        self::appendFilters($sql, $params);
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);        
+        $instanceextensions = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            if (trim($row['name']) == '') {
+                continue;
+            }
+            $instanceextensions[] = [
+                'name' => $row['name']
+            ];
+        }
+        return $instanceextensions;                
+    }
+
 }
