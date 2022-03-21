@@ -25,6 +25,11 @@ require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
 
+$platform = 'all';
+if (isset($_GET['platform'])) {
+	$platform = GET_sanitized('platform');
+}
+
 PageGenerator::header("Instance extensions");
 ?>
 
@@ -32,7 +37,9 @@ PageGenerator::header("Instance extensions");
 	<?php echo "<h4>Listing available instance extensions ".PageGenerator::filterInfo() ?>
 </div>			
 
-<center>	
+<center>
+	<?php PageGenerator::platformNavigation('listinstanceextensions.php', $platform, true); ?>
+
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
