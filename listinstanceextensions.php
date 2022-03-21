@@ -33,36 +33,42 @@ PageGenerator::header("Instance extensions");
 </div>			
 
 <center>	
-	<div class='parentdiv'>
 	<div class='tablediv' style='width:auto; display: inline-block;'>
+		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+			<thead>
+				<tr>
+					<th></th>
+					<th colspan=2 style="text-align: center;">Device coverage</th>
+				</tr>			
+				<tr>			
+					<th>Extensions</th>
+					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>				
+				</tr>
+			</thead>
+			<tbody>		
+				<?php
+					DB::connect();
+					try {
+						$instanceextensions = SqlRepository::listInstanceExtensions();
+						foreach($instanceextensions as $instanceextension) {
+							$name = $instanceextension['name'];
+							$coverageLink = null;
+							$coverage = $instanceextension['coverage'];
+							echo "<tr>";						
+							echo "<td class='value'><a href='listreports.php?instanceextension=".$name."'>".$name."</a> (<a href='listreports.php?instanceextension=".$name."&option=not'>not</a>)</td>";
+							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "</tr>";
+						}
 
-	<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
-		<thead>
-			<tr>			
-				<th>Extensions</th>
-			</tr>
-		</thead>
-		<tbody>		
-			<?php
-				DB::connect();
-				try {
-					$instanceextensions = SqlRepository::listInstanceExtensions();
-					foreach($instanceextensions as $instanceextension) {
-						$name = $instanceextension['name'];
-						echo "<tr>";						
-						echo "<td class='value'><a href='listreports.php?instanceextension=".$name."'>".$name."</a> (<a href='listreports.php?instanceextension=".$name."&option=not'>not</a>)</td>";
-						echo "</tr>";
+					} catch (PDOException $e) {
+						echo "<b>Error while fetching data!</b><br>";
 					}
-
-				} catch (PDOException $e) {
-					echo "<b>Error while fetching data!</b><br>";
-				}
-				DB::disconnect();
-			?>   
-		</tbody>
-	</table>  
-
-</div>
+					DB::disconnect();
+				?>   
+			</tbody>
+		</table>  
 </div>
 
 <script>

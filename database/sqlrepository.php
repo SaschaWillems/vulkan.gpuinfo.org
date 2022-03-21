@@ -559,8 +559,15 @@ class SqlRepository {
 
     /** Global instance extension listing */
     public static function listInstanceExtensions() {
-        $sql = "SELECT distinct(name) from deviceinstanceextensions di join instanceextensions ie on di.extensionid = ie.id right join reports r on r.id = di.reportid";
+        $deviceCount = SqlRepository::deviceCount();
+        $sql = "SELECT 
+            distinct(name),
+            count(distinct(r.displayname)) as coverage
+            from deviceinstanceextensions di            
+            join instanceextensions ie on di.extensionid = ie.id
+            right join reports r on r.id = di.reportid";
         self::appendFilters($sql, $params);
+        $sql .= " GROUP by name";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
         $instanceextensions = [];
@@ -569,7 +576,8 @@ class SqlRepository {
                 continue;
             }
             $instanceextensions[] = [
-                'name' => $row['name']
+                'name' => $row['name'],
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
             ];
         }
         return $instanceextensions;                
