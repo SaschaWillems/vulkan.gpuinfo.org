@@ -25,6 +25,11 @@ require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
 
+$platform = 'all';
+if (isset($_GET['platform'])) {
+	$platform = GET_sanitized('platform');
+}
+
 PageGenerator::header("Instance layers");
 ?>
 
@@ -33,6 +38,8 @@ PageGenerator::header("Instance layers");
 </div>	
 
 <center>	
+	<?php PageGenerator::platformNavigation('listinstancelayers.php', $platform, true); ?>
+
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="instancelayers" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
@@ -53,11 +60,10 @@ PageGenerator::header("Instance layers");
 						$instancelayers = SqlRepository::listInstanceLayers();
 						foreach($instancelayers as $instancelayer) {
 							$layername = $instancelayer['name'];
-							// @todo
-							$coverageLink = null;
+							$coverageLink = "listreports.php?instancelayer=$layername";
 							$coverage = $instancelayer['coverage'];							
 							echo "<tr>";
-							echo "<td class='value'><a href='listreports.php?instancelayer=$layername'>$layername</a> (<a href='listreports.php?instancelayer=$layername&option=not'>not</a>)</td>";
+							echo "<td class='value'>$layername</td>";
 							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 							echo "</tr>";
