@@ -48,6 +48,9 @@ try {
     if (isset($_GET['apiversion'])) {
         $apiversion = $_GET['apiversion'];
     }
+    if ((isset($argc)) && ($argc > 1)) {
+        $apiversion = $argv[1];
+    }    
     foreach (['lineartiling', 'optimaltiling', 'buffer'] as $format_listing_type) {
 
         switch ($format_listing_type) {
@@ -98,7 +101,7 @@ try {
             }
             $statement_count++;
         }
-        // Combined
+        // Combined listing (all operating systems)
         $sql = "SELECT formatid as name, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
                 where df.$column > 0 and df.$column & :value > 0 and r.ostype > -1
                 $api_version_filter                    
@@ -114,12 +117,12 @@ try {
             }
             $statement_count++;
         }
-
         $os_types[] = 'all';
 
-        // Generate html pages for each operating system
+        // Per-OS listing (single operating system)
         foreach ($os_types as $ostype) {
             $sql_count = "SELECT count(distinct(r.displayname)) from reports r join deviceproperties dp on dp.reportid = r.id";
+            $sql_count_params = [];
             if ($ostype !== 'all') {
                 $platform = platformname($ostype);
                 $sql_count .= ' where r.ostype = :ostype';
