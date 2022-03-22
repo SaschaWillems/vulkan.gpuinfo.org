@@ -59,11 +59,11 @@ PageGenerator::header("Instance extensions");
 					try {
 						$instanceextensions = SqlRepository::listInstanceExtensions();
 						foreach($instanceextensions as $instanceextension) {
-							$name = $instanceextension['name'];
-							$coverageLink = null;
+							$extensionname = $instanceextension['name'];
+							$coverageLink = "listreports.php?instanceextension=$extensionname";
 							$coverage = $instanceextension['coverage'];
 							echo "<tr>";						
-							echo "<td class='value'><a href='listreports.php?instanceextension=".$name."'>".$name."</a> (<a href='listreports.php?instanceextension=".$name."&option=not'>not</a>)</td>";
+							echo "<td class='value'>$extensionname</td>";
 							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 							echo "</tr>";
