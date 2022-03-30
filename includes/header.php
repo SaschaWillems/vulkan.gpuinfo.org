@@ -3,20 +3,20 @@
 /**
  *
  * Vulkan hardware capability database server implementation
- *	
+ *
  * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
- *	
+ *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
  * License version 3 as published by the Free Software Foundation.
- *	
+ *
  * Please review the following information to ensure the GNU Lesser
  * General Public License version 3 requirements will be met:
  * http://www.gnu.org/licenses/agpl-3.0.de.html
- *	
+ *
  * The code is distributed WITHOUT ANY WARRANTY; without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE.  See the GNU AGPL 3.0 for more details.		
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.
  *
  */
 
@@ -148,6 +148,7 @@ session_start();
 							<li><a href="listinstancelayers.php">Layers</a></li>
 						</ul>
 					</li>
+					<li><a href="listprofiles.php">Profiles</a></li>
 					<!-- Global version selection -->
 					<li class="dropdown">
 						<?php
@@ -164,7 +165,7 @@ session_start();
 							<li><a href="database/setapiversion.php?version=1.2">Core 1.2 (and up)</a></li>
 							<li><a href="database/setapiversion.php?version=1.3">Core 1.3 (and up)</a></li>
 						</ul>
-					</li>					
+					</li>
 					<li><a href="download.php">Download</a></li>
 					<li><a href="about.php">About</a></li>
 				</ul>
