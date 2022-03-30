@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2021 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2022 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,27 +20,34 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
-include './includes/constants.php';
+session_start();
+
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.php';
+require './includes/functions.php';
+require './includes/constants.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
 
+$minapiversion = null;
+if (SqlRepository::getMinApiVersion() !== null) {
+    $minapiversion = "_".str_replace(".", "_", SqlRepository::getMinApiVersion());
+}
 PageGenerator::header("Formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Optimal image tiling format support on ".PageGenerator::platformInfo($platform); ?>
+	<?php echo "<h4>Optimal image tiling format support on ".PageGenerator::filterInfo($platform); ?>
 </div>
 
 <center>
 	<?php 
 		PageGenerator::platformNavigation('listoptimaltilingformats.php', $platform, true);
-		include "./static/optimaltilingformat_$platform.html";
+		include "./static/optimaltilingformat_".$platform.$minapiversion.".html";
 		PageGenerator::footer();
 	?>
 </center>

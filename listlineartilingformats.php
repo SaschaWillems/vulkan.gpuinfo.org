@@ -20,14 +20,22 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './includes/functions.php';
-include './includes/constants.php';
+session_start();
+
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.php';
+require './includes/functions.php';
+require './includes/constants.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
+}
+
+$minapiversion = null;
+if (SqlRepository::getMinApiVersion() !== null) {
+    $minapiversion = "_".str_replace(".", "_", SqlRepository::getMinApiVersion());
 }
 
 PageGenerator::header("Formats");
@@ -39,12 +47,8 @@ PageGenerator::header("Formats");
 
 <center>
 	<?php 
-		PageGenerator::platformNavigation('listlineartilingformats.php', $platform, true);
-        $includefile = "lineartilingformat_$platform";
-        if (isset($_SESSION['minversion'])) {
-            $includefile .= "_".str_replace('.', '_', $_SESSION['minversion']);
-        }
-		include "./static/$includefile.html";
+        PageGenerator::platformNavigation('listlineartilingformats.php', $platform, true);
+        include "./static/lineartilingformat_".$platform.$minapiversion.".html";
 		PageGenerator::footer();
 	?>
 </center>

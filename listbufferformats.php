@@ -22,11 +22,10 @@
 
 session_start();
 
-include 'pagegenerator.php';
-include './database/database.class.php';
-include './database/sqlrepository.php';
-include './includes/functions.php';
-include './includes/constants.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
+require './database/sqlrepository.php';
+require './includes/functions.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
