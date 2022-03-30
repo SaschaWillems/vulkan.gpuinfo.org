@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2021 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2022 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,8 +20,11 @@
  *
  */
 
+session_start();
+
 include 'pagegenerator.php';
 include './database/database.class.php';
+include './database/sqlrepository.php';
 include './includes/functions.php';
 include './includes/constants.php';
 
@@ -30,17 +33,22 @@ if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
 
+$minapiversion = null;
+if (SqlRepository::getMinApiVersion() !== null) {
+    $minapiversion = "_".str_replace(".", "_", SqlRepository::getMinApiVersion());
+}
+
 PageGenerator::header("Formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Buffer format support on ".PageGenerator::platformInfo($platform); ?>
+	<?php echo "<h4>Buffer format support on ".PageGenerator::filterInfo($platform); ?>
 </div>
 
 <center>
 	<?php 
 		PageGenerator::platformNavigation('listbufferformats.php', $platform, true);
-		include "./static/bufferformat_$platform.html";
+		include "./static/bufferformat_".$platform.$minapiversion.".html";
 		PageGenerator::footer();
 	?>
 </center>
