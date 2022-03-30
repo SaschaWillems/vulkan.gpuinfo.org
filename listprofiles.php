@@ -22,6 +22,7 @@
 
 require 'pagegenerator.php';
 require './database/database.class.php';
+require './database/sqlrepository.php';
 require './includes/functions.php';
 
 $platform = 'all';
@@ -33,7 +34,7 @@ PageGenerator::header("Profiles");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Profile coverage for ".PageGenerator::platformInfo($platform) ?>
+	<?php echo "<h4>Profile coverage for ".PageGenerator::filterInfo($platform) ?>
 </div>
 <div class="alert alert-info" role="alert" style="text-align: center">
 	<b>Note:</b> Data is based on reports submitted or updated with version 3.2 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
@@ -57,50 +58,22 @@ PageGenerator::header("Profiles");
 			</thead>
 			<tbody>
 				<?php
-				DB::connect();
-				try {
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
+					DB::connect();
+					try {
+						$profiles = SqlRepository::listProfiles();
+						foreach ($profiles as $profile) {
+							$coverageLink = "listdevicescoverage.php?profile=".$profile['name']."&platform=$platform";
+							$coverage = $profile['coverage'];
+							echo "<tr>";
+							echo "<td>".$profile['name']."</td>";
+							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "</tr>";
+						}
+					} catch (PDOException $e) {
+						echo "<b>Error while fetching data!</b><br>";
 					}
-					
-					$sql = "SELECT count(DISTINCT displayname) from reports where id in (select reportid from deviceprofiles)";
-					if ($platform !== 'all') {
-						$sql .= " and ostype = :ostype";
-					}
-					$viewDeviceCount = DB::$connection->prepare($sql);
-					$viewDeviceCount->execute($params);
-					$deviceCount = $viewDeviceCount->fetch(PDO::FETCH_COLUMN);
-
-					$sql ="SELECT
-							name,
-							count(distinct (case when supported = 1 then displayname end)) as supported
-						from
-							deviceprofiles dp
-							join profiles p on p.id = dp.profileid
-							join reports r on r.id = dp.reportid";
-					if ($platform !== 'all') {
-						$sql .= " and ostype = :ostype";
-					}
-					$sql .= " group by name";
-
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute($params);
-					$profiles = $stmnt->fetchAll(PDO::FETCH_ASSOC);
-
-					foreach ($profiles as $profile) {
-						$coverageLink = "listdevicescoverage.php?profile=".$profile['name']."&platform=$platform";
-						$coverage = round($profile['supported'] / $deviceCount * 100, 1);
-						echo "<tr>";
-						echo "<td>".$profile['name']."</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "</tr>";
-					}
-				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data!</b><br>";
-				}
-				DB::disconnect();
+					DB::disconnect();
 				?>
 			</tbody>
 		</table>
