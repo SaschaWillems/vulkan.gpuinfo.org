@@ -22,34 +22,31 @@
 
 require 'pagegenerator.php';
 require 'database/database.class.php';
+require 'database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/chart.php';
 
-$name = null;
-if (isset($_GET['name'])) {
-	$name = $_GET['name'];
-}
 $filter = null;
-$tablename = 'deviceproperties';
-$core = null;
-if (isset($_GET['core'])) {
-	$core = $_GET['core'];
-	switch ($_GET['core']) {
-		case '1.1':
-			$tablename = 'deviceproperties11';
-			break;
-		case '1.2':
-			$tablename = 'deviceproperties12';
-			break;
-		case '1.3':
-			$tablename = 'deviceproperties13';
-			break;
-	}
+
+$name = SqlRepository::getGetValue('name');
+
+$table = 'deviceproperties';
+$core = SqlRepository::getGetValue('core');
+switch ($core) {
+	case '1.1':
+		$table = 'deviceproperties11';
+		break;
+	case '1.2':
+		$table = 'deviceproperties12';
+		break;
+	case '1.3':
+		$table = 'deviceproperties13';
+		break;
 }
 // Check if property is valid and part of the selected table
 DB::connect();
-$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :tablename and column_name = :columnname");
-$result->execute(["tablename" => $tablename, "columnname" => $name]);
+$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :table and column_name = :columnname");
+$result->execute(["table" => $table, "columnname" => $name]);
 DB::disconnect();
 if ($result->rowCount() == 0) {
 	PageGenerator::errorMessage("<strong>This is not the <strike>droid</strike> device property you are looking for!</strong><br><br>You may have passed a wrong device property name.");
@@ -57,7 +54,7 @@ if ($result->rowCount() == 0) {
 
 PageGenerator::header($name);
 
-$caption = "Value distribution for <code>$name</code>";
+$caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInfo();;
 
 $platform = null;
 if (isset($_GET['platform'])) {
@@ -69,31 +66,10 @@ if (isset($_GET['platform'])) {
 	}
 }
 
-// Gather data
-$values = [];
-$displayvalues = [];
-$counts = [];
-DB::connect();
-switch ($name) {
-	case 'vendorid':
-		$sql = "SELECT `$name`as value, VendorId(vendorid) as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 3 desc";
-		break;
-	default:
-		$sql = "SELECT `$name` as value, null as displayvalue, count(0) as reports from $tablename $filter group by 1 order by 3 desc";
-}
-$result = DB::$connection->prepare($sql);
-$result->execute();
-$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-foreach ($rows as $row) {
-	$values[] = $row['value'];
-	$displayvalues[] = ($row['displayvalue'] !== null) ? $row['displayvalue'] : getPropertyDisplayValue($name, $row['value']);
-	$counts[] = $row['reports'];
-}
-DB::disconnect();
 ?>
 
 <div class='header'>
-	<h4 class='headercaption'><?php echo $caption; ?></h4>
+	<h4 class='headercaption'><?= $caption; ?></h4>
 </div>
 
 <center>
@@ -109,21 +85,28 @@ DB::disconnect();
 				</thead>
 				<tbody>
 					<?php
-					for ($i = 0; $i < count($values); $i++) {
-						$color_style = "style='border-left: ".Chart::getColor($i)." 3px solid'";
-						$link = "listreports.php?property=$name&value=".$values[$i].($platform ? "&platform=$platform" : "");
-						if ($core) {
-							$link .= "&core=$core";
+					DB::connect();
+					try {
+						$values = SqlRepository::listCorePropertyValues($name, $table);
+						foreach ($values as $index => $value) {
+							$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
+							$link = "listreports.php?property=$name&value=".$value['value'].($platform ? "&platform=$platform" : "");
+							if ($core) {
+								$link .= "&core=$core";
+							}
+							echo "<tr>";
+							echo "<td $color_style>".$value['value']."</td>";
+							if ($value['count'] != null) {
+								echo "<td><a href='$link'>".$value['count']."</a></td>";
+							} else {
+								echo "<td class='na'>".$value['count']."</td>";
+							}
+							echo "</tr>";
 						}
-						echo "<tr>";
-						echo "<td $color_style>".$displayvalues[$i]."</td>";
-						if ($values[$i] != null) {
-							echo "<td><a href='$link'>".$counts[$i]."</a></td>";
-						} else {
-							echo "<td class='na'>".$counts[$i]."</td>";
-						}
-						echo "</tr>";
+					} catch (PDOException $e) {
+						echo "<b>Error while fetching data!</b><br>";
 					}
+					DB::disconnect();
 					?>
 				</tbody>
 			</table>
@@ -147,7 +130,7 @@ DB::disconnect();
 		});
 	});
 	<?php
-		Chart::draw($values, $counts);
+		Chart::draw($values, 'value', 'count');
 	?>
 </script>
 

@@ -75,7 +75,7 @@ class PageGenerator
 			$apiversion = sanitize($_SESSION['minversion']);
 		}
 		$info = '';
-		if ($platform) {
+		if ($platform && ($platform !== 'all')) {
 			$info = "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
 		} else {
 			$info = " all platforms";

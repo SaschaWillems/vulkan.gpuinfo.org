@@ -43,6 +43,14 @@ class SqlRepository {
         return null;
     }
 
+    public static function getGetValue($name) {
+        // @todo: sanitize
+        if (isset($_GET[$name])) {
+            return $_GET[$name];
+        }
+        return null;
+    }
+
     public static function appendCondition(&$sql, $condition) {
         if (strpos(strtolower($sql), 'where') !== false) {
             $sql .= " and $condition";
@@ -374,6 +382,31 @@ class SqlRepository {
         }
 
         return $properties;
+    }
+
+    /** Value listing for given core property */
+    public static function listCorePropertyValues($name, $table) {
+        $params = [];
+        switch ($name) {
+            case 'vendorid':
+                $sql = "SELECT dp.`$name`as value, VendorId(vendorid) as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
+                break;
+            default:
+                $sql = "SELECT dp.`$name` as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
+        }                
+        self::appendFilters($sql, $params);
+        $sql .= " group by 1 order by 3 desc";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $values = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $values[] = [
+                'value' => $row['value'],
+                'displayvalue' => ($row['displayvalue'] !== null) ? $row['displayvalue'] : getPropertyDisplayValue($name, $row['value']),
+                'count' => $row['count']
+            ];
+        }
+        return $values;
     }
 
     /** Global extension properties listing */

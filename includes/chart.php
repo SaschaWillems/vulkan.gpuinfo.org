@@ -28,21 +28,24 @@ class Chart {
         return self::colors[$index % count(self::colors)];
     }
 
-    public static function draw($labels, $series) {
+    public static function draw($values, $label_key, $count_key) {
+        $total_count = 0;
+        foreach ($values as $value) {
+            $total_count += $value[$count_key];
+        }
         // Counts below a certain threshold will be grouped into a single "others" slice
-        $total_count = array_sum($series);
         $lower_limit = $total_count * 0.0015;
         $others_count = 0;
         $chart_labels = [];
         $chart_series = [];
         $chart_colors = [];
-        for ($i = 0; $i < count($labels); $i++) {        
-            if ($series[$i] <= $lower_limit) {
-                $others_count += $series[$i];
+        for ($i = 0; $i < count($values); $i++) {        
+            if ($values[$i][$count_key] <= $lower_limit) {
+                $others_count += $values[$i][$count_key];
                 continue;
             }
-            $chart_labels[] = $labels[$i];
-            $chart_series[] = $series[$i];
+            $chart_labels[] = $values[$i][$label_key];
+            $chart_series[] = $values[$i][$count_key];
             $chart_colors[] = self::colors[$i % count(self::colors)];
         }
         if ($others_count > 0)  {
@@ -74,5 +77,5 @@ class Chart {
             var chart = new ApexCharts(document.getElementById('chart'), options)
             chart.render()
         ";
-    }    
+    }
 }
