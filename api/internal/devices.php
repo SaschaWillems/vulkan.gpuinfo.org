@@ -354,7 +354,6 @@ if (isset($_REQUEST["platform"])) {
 }
 
 // Min. api version
-// @todo: move to SQL repository?
 $minApiVersion = SqlRepository::getMinApiVersion();
 if ($minApiVersion) {
     SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
