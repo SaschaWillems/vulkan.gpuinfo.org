@@ -68,7 +68,7 @@ PageGenerator::header("Core 1.0 properties");
 								echo "<td class='text-center'>Coverage</td>";
 								echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 							} else {
-								$link = "<a href='displaycoreproperty.php?coreproperty=$property&platform=$platform'>";
+								$link = "<a href='displaycoreproperty.php?name=$property&platform=$platform'>";
 								echo "<td class='text-center'>Values</td>";
 								echo "<td class='text-center'>".$link."Listing</a></td>";
 							}
