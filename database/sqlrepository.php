@@ -44,9 +44,8 @@ class SqlRepository {
     }
 
     public static function getGetValue($name) {
-        // @todo: sanitize
         if (isset($_GET[$name])) {
-            return $_GET[$name];
+            return GET_sanitized($_GET[$name]);
         }
         return null;
     }
@@ -408,6 +407,24 @@ class SqlRepository {
         }
         return $values;
     }
+
+    /** Value listing for given extension property */
+    public static function listExtensionPropertyValues($name, $extension) {
+        $params = [":name" => $name, ":extension" => $extension];
+        $sql = 'SELECT value, count(distinct(r.displayname)) as `count` from deviceproperties2 dp2 join reports r on dp2.reportid = r.id where name = :name and extension = :extension';
+        self::appendFilters($sql, $params);
+        $sql .= " group by value";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $values = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $values[] = [
+                'value' => $row['value'],
+                'count' => $row['count']
+            ];
+        }
+        return $values;
+    }    
 
     /** Global extension properties listing */
     public static function listExtensionProperties($extension) {
