@@ -33,26 +33,26 @@ require './includes/chart.php';
 
 $filters = ['platform', 'extensionname', 'extensionproperty'];
 $filter_list = new FilterList($filters);
-if ((!$filter_list->hasFilter('extensionname')) || (!$filter_list->hasFilter('extensionproperty'))) {
-	PageGenerator::errorMessage("This is not the <strike>droid</strike> extension property you are looking for!</strong><br><br>You did not specify all required parameters.");
-}
-
 $ext_name = $filter_list->getFilter('extensionname');
 $property_name = $filter_list->getFilter('extensionproperty');
 
-DB::connect();
-$result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name and extension = :extension");
-$result->execute([":name" => $property_name, ":extension" => $ext_name]);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-if ($result->rowCount() == 0) {
-	PageGenerator::errorMessage("This is not the <strike>droid</strike> extension property you are looking for!</strong><br><br>You may have passed a wrong extension property name.");
+PageGenerator::header($property_name);
+
+try {
+	DB::connect();
+	if (!SqlRepository::extensionPropertyExists($property_name, $ext_name)) {
+		PageGenerator::errorMessage("This is not the <strike>droid</strike> extension property you are looking for!</strong><br><br>You may have passed a wrong extension property name.");
+	}
+	$values = SqlRepository::listExtensionPropertyValues($property_name, $ext_name);
+} catch (PDOException $e) {
+	echo "<b>Error while fetching data!</b><br>";
+} finally {
+	DB::disconnect();
 }
-DB::disconnect();
 
 $caption = "Value distribution for <code>$property_name</code> property of <code>$ext_name</code>";
-
-PageGenerator::header($property_name);
 ?>
+
 <div class='header'>
 	<h4 class='headercaption'><?=$caption?></h4>
 </div>
@@ -70,30 +70,22 @@ PageGenerator::header($property_name);
 				</thead>
 				<tbody>
 				<?php
-					DB::connect();
-					try {
-						$values = SqlRepository::listExtensionPropertyValues($property_name, $ext_name);
-						foreach ($values as $index => $value) {
-							$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
-							$link = "listdevicescoverage.php?extensionname=$ext_name&extensionproperty=$property_name&extensionpropertyvalue=".$value['value'].($platform ? "&platform=$platform" : "");
-							if ($core) {
-								$link .= "&core=$core";
-							}
-							echo "<tr>";
-							echo "<td $color_style>".$value['value']."</td>";
-							if ($value['count'] != null) {
-								echo "<td><a href='$link'>".$value['count']."</a></td>";
-							} else {
-								echo "<td class='na'>".$value['count']."</td>";
-							}
-							echo "</tr>";
+					foreach ($values as $index => $value) {
+						$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
+						$link = "listdevicescoverage.php?extensionname=$ext_name&extensionproperty=$property_name&extensionpropertyvalue=".$value['value'].($platform ? "&platform=$platform" : "");
+						if ($core) {
+							$link .= "&core=$core";
 						}
-					} catch (PDOException $e) {
-						echo "<b>Error while fetching data!</b><br>";
-						echo $e->getMessage();
+						echo "<tr>";
+						echo "<td $color_style>".$value['value']."</td>";
+						if ($value['count'] != null) {
+							echo "<td><a href='$link'>".$value['count']."</a></td>";
+						} else {
+							echo "<td class='na'>".$value['count']."</td>";
+						}
+						echo "</tr>";
 					}
-					DB::disconnect();
-					?>
+				?>
 				</tbody>
 			</table>
 
