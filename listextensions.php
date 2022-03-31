@@ -59,36 +59,22 @@ PageGenerator::header("Extensions");
 			<tbody>
 				<?php
 				DB::connect();
-				try {
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-					}			
-
-					// Fetch extension features and properties to highlight extensions with a detail page
-					$stmnt = DB::$connection->prepare("SELECT distinct(extension) FROM devicefeatures2");
-					$stmnt->execute(['ostype' => ostype($platform)]);
-					$extensionFeatures = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
-					$stmnt = DB::$connection->prepare("SELECT distinct(extension) FROM deviceproperties2");
-					$stmnt->execute(['ostype' => ostype($platform)]);
-					$extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
-
+				try {	
 					$deviceCount = SqlRepository::deviceCount();
 					$extensions = SqlRepository::listExtensions();
-
 					foreach ($extensions as $extension) {
 						if (trim($extension['name']) == '') {
 							continue;
 						}
 						$coverageLink = "listdevicescoverage.php?extension=" . $extension['name'] . "&platform=$platform";
-						$coverage = round($extension['coverage'] / $deviceCount * 100, 1);
+						$coverage = $extension['coverage'];
 						$ext = $extension['name'];
 						$feature_link = null;
-						if (in_array($extension['name'], $extensionFeatures) != false) {
+						if ($extension['hasfeatures']) {
 							$feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
 						}
 						$property_link = null;
-						if (in_array($extension['name'], $extensionProperties) != false) {
+						if ($extension['hasproperties']) {
 							$property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
 						}
 						echo "<tr>";

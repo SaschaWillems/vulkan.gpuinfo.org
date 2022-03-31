@@ -91,25 +91,41 @@ class SqlRepository {
     }
 
     /** Global extension listing */
-    public static function listExtensions() {
+    public static function listExtensions() {        
+        $deviceCount = self::deviceCount();
+        // Fetch extension features and properties to highlight extensions with a detail page
+        $params = [];
+        $sql = "SELECT distinct(extension) FROM devicefeatures2 d join reports r on r.id = d.reportid";
+        self::appendFilters($sql, $params);
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $extensionFeatures = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
+        //
+        $params = [];
+        $sql = "SELECT distinct(extension) FROM deviceproperties2 d join reports r on r.id = d.reportid";
+        self::appendFilters($sql, $params);
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);        
+        //
         $params = [];
         $sql ="SELECT e.name, count(distinct displayname) as coverage from extensions e 
             join deviceextensions de on de.extensionid = e.id 
             join reports r on r.id = de.reportid";
-        $ostype = self::getOSType();
-        if ($ostype !== null) {            
-            self::appendCondition($sql, "ostype = :ostype");
-            $params['ostype'] = $ostype;
-        }
-        $apiversion = self::getMinApiVersion();
-        if ($apiversion) {
-            self::appendCondition($sql, "r.apiversion >= :apiversion");
-            $params['apiversion'] = $apiversion;
-        }
+        self::appendFilters($sql, $params);
         $sql .= " group by name";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);
-        return $stmnt->fetchAll(PDO::FETCH_ASSOC);
+        $extensions = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $extensions[] = [
+                'name' => $row['name'],
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 1),
+                'hasfeatures' => in_array($row['name'], $extensionFeatures) != false, 
+                'hasproperties' => in_array($row['name'], $extensionProperties) != false
+            ];
+        }        
+        return $extensions;
     }
 
     /** Global core feature listings */
@@ -424,7 +440,15 @@ class SqlRepository {
             ];
         }
         return $values;
-    }    
+    }
+
+    /** Check if extension property exists */
+    public static function extensionPropertyExists($name, $extension) {
+        $result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name and extension = :extension");
+        $result->execute([":name" => $name, ":extension" => $extension]);
+        $result->fetch(PDO::FETCH_ASSOC);
+        return ($result->rowCount() > 0);
+    }
 
     /** Global extension properties listing */
     public static function listExtensionProperties($extension) {
