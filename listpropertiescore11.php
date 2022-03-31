@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -67,7 +67,7 @@ PageGenerator::header("Core 1.1 properties");
 							$link = "listdevicescoverage.php?core=1.1&coreproperty=$property&platform=$platform";
 							echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {
-							$link = "<a href='displaycoreproperty.php?core=1.1&coreproperty=$property&platform=$platform'>";
+							$link = "<a href='displaycoreproperty.php?core=1.1&name=$property&platform=$platform'>";
 							echo "<td class='text-center'>".$link."Listing</a></td>";
 						}
 						echo "</tr>";

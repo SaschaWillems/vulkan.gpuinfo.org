@@ -67,7 +67,7 @@ PageGenerator::header("Core 1.2 properties");
 							$link = "listdevicescoverage.php?core=1.2&coreproperty=$property&platform=$platform";
 							echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {
-							$link = "<a href='displaycoreproperty.php?core=1.2&coreproperty=$property&platform=$platform'>";
+							$link = "<a href='displaycoreproperty.php?core=1.2&name=$property&platform=$platform'>";
 							echo "<td class='text-center'>".$link."Listing</a></td>";
 						}
 						echo "</tr>";
