@@ -45,7 +45,7 @@ class SqlRepository {
 
     public static function getGetValue($name) {
         if (isset($_GET[$name])) {
-            return GET_sanitized($_GET[$name]);
+            return GET_sanitized($name);
         }
         return null;
     }
