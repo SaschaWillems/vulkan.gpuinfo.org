@@ -116,6 +116,7 @@ function getMemoryTypeFlags($flag)
 		0x0020 => "PROTECTED_BIT",
 		0x0040 => "DEVICE_COHERENT_BIT_AMD",
 		0x0080 => "DEVICE_UNCACHED_BIT_AMD",
+		0x0100 => "RDMA_CAPABLE_BIT_NV"
 	);
 	return getFlags($flags, $flag);
 }
