@@ -178,7 +178,6 @@ if (isset($_REQUEST['filter']['coreproperty'])) {
                 $tablename = 'deviceproperties';
         }
         $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename dp on dp.reportid = r.id where dp.$property = 1)";
-        $params['filter_core_property'] = $property;
     }
 }
 // Submitter
