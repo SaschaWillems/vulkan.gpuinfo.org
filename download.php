@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.2';
+$release = '3.21';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -62,6 +62,14 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.21 - 2022-04-03</h4>			
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_graphics_pipeline_library</li>
+						<li>VK_EXT_primitives_generated_query</li>
+						<li>VK_VALVE_descriptor_set_host_mapping</li>
+					</ul>
+				</li>
 			<h4>3.2 - 2022-02-19</h4>
 			<ul>
 				<li>Added support for Vulkan profiles</li>
