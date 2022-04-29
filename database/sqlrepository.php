@@ -378,7 +378,7 @@ class SqlRepository {
                     $properties[$key] += $value;
                 }
             }
-        }
+        }       
 
         // For Vulkan 1.0 we also report limits as properties
         if ($version == self::VK_API_VERSION_1_0) {
@@ -397,6 +397,24 @@ class SqlRepository {
         }
 
         return $properties;
+    }
+
+    /** Value listing for Vulkan 1.0 core limit */
+    public static function listCoreLimitValues($name) {
+        $params = [];
+        $sql = "SELECT `$name` as value, count(0) as count from devicelimits dl join reports r on r.id = dl.reportid";
+        self::appendFilters($sql, $params);
+        $sql .= " group by 1 order by 2 desc";        
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $values = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $values[] = [
+                'value' => $row['value'],
+                'count' => $row['count']
+            ];
+        }
+        return $values;        
     }
 
     /** Value listing for given core property */

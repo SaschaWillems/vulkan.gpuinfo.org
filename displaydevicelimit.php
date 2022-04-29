@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,30 +22,16 @@
 
 require 'pagegenerator.php';
 require 'database/database.class.php';
+require 'database/sqlrepository.php';
+require './includes/functions.php';
 require './includes/chart.php';
 
 $name = null;
 if (isset($_GET['name'])) {
 	$name = $_GET['name'];
 }
-$os = null;
-$filter = null;
-if (isset($_GET['os'])) {
-	$os = $_GET['os'];
-	if (!in_array($os, ['windows', 'android', 'linux', 'ios', 'osx'])) {
-		$os = null;
-	}
-	if ($os) {
-		if (in_array($os, ['windows', 'android', 'ios', 'osx'])) {
-			$filter = "where reportid in (select id from reports where osname = '$os')";
-		}
-		if (in_array($os, ['linux'])) {
-			$filter = "where reportid in (select id from reports where osname not in ('windows', 'android', 'ios', 'osx'))";
-		}
-	}
-}
 
-// Check if capability as valid and part of the selected table
+// Check if capability is valid and part of the selected table
 DB::connect();
 $result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = 'devicelimits' and column_name = :columnname");
 $result->execute([":columnname" => $name]);
@@ -56,44 +42,11 @@ if ($result->rowCount() == 0) {
 
 PageGenerator::header($name);
 
-$caption = "Value distribution for <code>$name</code>";
-
-$platform = null;
-if (isset($_GET['platform'])) {
-	$platform = $_GET["platform"];
-	if ($platform !== "all") {
-		switch ($platform) {
-			case 'windows':
-				$ostype = 0;
-				break;
-			case 'linux':
-				$ostype = 1;
-				break;
-			case 'android':
-				$ostype = 2;
-				break;
-		}
-		$filter .= "where reportid in (select id from reports where ostype = '" . $ostype . "')";
-		$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
-	}
-}
-
-// Gather data
-$values = [];
-$counts = [];
-DB::connect();
-$result = DB::$connection->prepare("SELECT `$name` as value, count(0) as reports from devicelimits $filter group by 1 order by 2 desc");
-$result->execute();
-$rows = $result->fetchAll(PDO::FETCH_ASSOC);
-foreach ($rows as $row) {
-	$values[] = $row['value'];
-	$counts[] = $row['reports'];
-}
-DB::disconnect();
+$caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInfo();
 ?>
 
 <div class='header'>
-	<h4 class='headercaption'><?php echo $caption; ?></h4>
+	<h4 class='headercaption'><?= $caption; ?></h4>
 </div>
 
 <center>
@@ -109,13 +62,21 @@ DB::disconnect();
 				</thead>
 				<tbody>
 					<?php
-					for ($i = 0; $i < count($values); $i++) {
-						$color_style = "style='border-left: ".Chart::getColor($i)." 3px solid'";
-						$link = "listreports.php?limit=$name&value=".$values[$i].($platform ? "&platform=$platform" : "");
-						echo "<tr>";
-						echo "<td $color_style>".$values[$i]."</td>";
-						echo "<td><a href='$link'>".$counts[$i]."</a></td>";
-						echo "</tr>";
+					DB::connect();
+					try {
+						$values = SqlRepository::listCoreLimitValues($name);
+						foreach ($values as $index => $value) {
+							$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
+							$link = "listreports.php?limit=$name&value=".$value['value'].($platform ? "&platform=$platform" : "");
+							echo "<tr>";
+							echo "<td $color_style>".$value['value']."</td>";
+							echo "<td><a href='$link'>".$value['count']."</a></td>";
+							echo "</tr>";
+						}
+					} catch (PDOException $e) {
+						echo "<b>Error while fetching data!</b><br>";
+					} finally {				
+						DB::disconnect();						
 					}
 					?>
 				</tbody>
@@ -140,7 +101,7 @@ DB::disconnect();
 		});
 	});
 	<?php
-		Chart::draw($values, $counts);
+		Chart::draw($values, 'value', 'count');
 	?>	
 </script>
 
