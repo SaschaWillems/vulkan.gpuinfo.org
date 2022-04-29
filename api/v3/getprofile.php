@@ -503,7 +503,7 @@ class VulkanProfile {
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
             $profile_queue_family = [
                 'VkQueueFamilyProperties' => [
-                    'queueFlags' => Vktypes::VkQueueFlags($row['flags']),
+                    'queueFlags' => VkTypes::VkQueueFlags($row['flags']),
                     'queueCount' => intval($row['count']),
                     'timestampValidBits' => intval($row['timestampValidBits']),
                     'minImageTransferGranularity' => [
