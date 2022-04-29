@@ -54,18 +54,7 @@ if ($result->rowCount() == 0) {
 
 PageGenerator::header($name);
 
-$caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInfo();;
-
-$platform = null;
-if (isset($_GET['platform'])) {
-	$platform = $_GET["platform"];
-	$ostype = ostype($platform);
-	if ($ostype !== null) {
-		$filter .= "where reportid in (select id from reports where ostype = $ostype)";
-		$caption .= " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
-	}
-}
-
+$caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInfo();
 ?>
 
 <div class='header'>
@@ -95,7 +84,7 @@ if (isset($_GET['platform'])) {
 								$link .= "&core=$core";
 							}
 							echo "<tr>";
-							echo "<td $color_style>".$value['value']."</td>";
+							echo "<td $color_style>".$value['displayvalue']."</td>";
 							if ($value['count'] != null) {
 								echo "<td><a href='$link'>".$value['count']."</a></td>";
 							} else {
@@ -105,8 +94,9 @@ if (isset($_GET['platform'])) {
 						}
 					} catch (PDOException $e) {
 						echo "<b>Error while fetching data!</b><br>";
+					} finally {				
+						DB::disconnect();						
 					}
-					DB::disconnect();
 					?>
 				</tbody>
 			</table>
