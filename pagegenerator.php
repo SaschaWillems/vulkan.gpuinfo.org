@@ -23,6 +23,15 @@
 class PageGenerator
 {
 	private static $platform_list = ['windows', 'linux', 'android', 'macos', 'ios'];
+	private static $platform_display_name = ['windows' => 'Windows', 'linux' => 'Linux', 'android' => 'Android', 'macos' => 'macOS', 'ios' => 'iOS'];
+
+	public static function platformDisplayName($platform)
+	{
+		if (isset(self::$platform_display_name[$platform])) {
+			return self::$platform_display_name[$platform];
+		}
+		return ucfirst($platform);
+	}
 
 	public static function header($title = null)
 	{
@@ -75,7 +84,7 @@ class PageGenerator
 		if ($platform == 'all') {
 			return " all platforms";
 		}
-		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . self::platformDisplayName($platform);
 	}
 
 	public static function filterInfo()
@@ -91,7 +100,7 @@ class PageGenerator
 		}
 		$info = '';
 		if ($platform && ($platform !== 'all')) {
-			$info = "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+			$info = "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . self::platformDisplayName($platform);
 		} else {
 			$info = " all platforms";
 		}
@@ -148,7 +157,7 @@ class PageGenerator
 			if ($url_parameter_string) {
 				$target_url .= '&'.$url_parameter_string;
 			}			
-			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$target_url'><img src='images/" . $navplatform . "logo.png' height='".$icon_size."px' style='padding-right:5px'/>" . ucfirst($navplatform) . "</a> </li>";
+			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$target_url'><img src='images/" . $navplatform . "logo.png' height='".$icon_size."px' style='padding-right:5px'/>" . self::platformDisplayName($navplatform) . "</a> </li>";
 		};
 		echo "	</ul>";
 		echo "</div>";

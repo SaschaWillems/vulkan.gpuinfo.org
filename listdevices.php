@@ -43,7 +43,7 @@ $showTabs = true;
 
 if ($filter_list->hasFilter('platform')) {
 	$platform = $filter_list->getFilter('platform');
-	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform)." devices";
+	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>".PageGenerator::platformDisplayName($platform)." devices";
 }
 if ($filter_list->hasFilter('extension')) {
 	$caption .= " supporting ".$filter_list->getFilter('extension');

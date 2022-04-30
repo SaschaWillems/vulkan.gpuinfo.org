@@ -110,7 +110,7 @@ if (isset($coreproperty) && ($coreproperty != '')) {
 // Platform (os)
 if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !== 'all') {
 	$platform = $filter_list->getFilter('platform');
-	$caption = "Listing " . ($caption ? lcfirst($caption) : "reports") . " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+	$caption = "Listing " . ($caption ? lcfirst($caption) : "reports") . " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . PageGenerator::platformDisplayName($platform);
 }
 $minApiVersion = SqlRepository::getMinApiVersion();
 if ($minApiVersion) {
