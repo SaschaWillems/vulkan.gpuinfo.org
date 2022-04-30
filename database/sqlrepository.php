@@ -29,6 +29,18 @@ class SqlRepository {
     const VK_API_VERSION_1_2 = '1.2';
     const VK_API_VERSION_1_3 = '1.3';
 
+    private static function getDevicePropertiesTable($version) {
+        switch ($version) {
+            case self::VK_API_VERSION_1_1:
+                return('deviceproperties11');
+            case self::VK_API_VERSION_1_2:
+                return('deviceproperties12');
+            case self::VK_API_VERSION_1_3:
+                return('deviceproperties13');
+        }
+        return 'deviceproperties';
+    }
+
     public static function getMinApiVersion() {
         if (isset($_SESSION['minversion'])) {
             return $_SESSION['minversion'];
@@ -418,7 +430,8 @@ class SqlRepository {
     }
 
     /** Value listing for given core property */
-    public static function listCorePropertyValues($name, $table) {
+    public static function listCorePropertyValues($version, $name) {
+        $table = self::getDevicePropertiesTable($version);
         $params = [];
         switch ($name) {
             case 'vendorid':
@@ -458,14 +471,6 @@ class SqlRepository {
             ];
         }
         return $values;
-    }
-
-    /** Check if extension property exists */
-    public static function extensionPropertyExists($name, $extension) {
-        $result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name and extension = :extension");
-        $result->execute([":name" => $name, ":extension" => $extension]);
-        $result->fetch(PDO::FETCH_ASSOC);
-        return ($result->rowCount() > 0);
     }
 
     /** Global extension properties listing */
@@ -729,5 +734,30 @@ class SqlRepository {
         }
         return $instancelayers;        
     }
+
+    /** Check if core limit exists */
+    public static function coreLimitExists($name) {
+        $result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :table and column_name = :columnname");
+        $result->execute(["table" => 'devicelimits', "columnname" => $name]);
+        $result->fetch(PDO::FETCH_ASSOC);
+        return ($result->rowCount() > 0);
+    }
+
+    /** Check if core property exists */
+    public static function corePropertyExists($version, $name) {
+        $table = self::getDevicePropertiesTable($version);
+        $result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :table and column_name = :columnname");
+        $result->execute(["table" => $table, "columnname" => $name]);
+        $result->fetch(PDO::FETCH_ASSOC);
+        return ($result->rowCount() > 0);
+    }
+
+    /** Check if extension property exists */
+    public static function extensionPropertyExists($name, $extension) {
+        $result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name and extension = :extension");
+        $result->execute([":name" => $name, ":extension" => $extension]);
+        $result->fetch(PDO::FETCH_ASSOC);
+        return ($result->rowCount() > 0);
+    }    
 
 }
