@@ -55,6 +55,21 @@ class PageGenerator
 		}
 	}
 
+	public static function databaseErrorMessage()
+	{
+		self::header();
+?>
+		<div class="div-h-center">
+			<div class="div-alert alert alert-danger error">
+				<strong>Error while fetching data</strong><br/>
+				A database error occured. Please try again, and if the error persists please submit the issue <a href="https://github.com/SaschaWillems/vulkan.gpuinfo.org">here</a>.
+			</div>
+		</div>
+<?php
+		self::footer();
+		die();
+	}	
+
 	public static function platformInfo($platform)
 	{
 		if ($platform == 'all') {
