@@ -465,8 +465,14 @@ class SqlRepository {
         $stmnt->execute($params);
         $values = [];
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $val = $row['value'];
+            // Some values are stored as serialized arrays and need to be unserialized
+            if (substr($val, 0, 2) == 'a:') {
+                $val = unserialize($val);
+                $val = '['.implode(',', $val).']';
+            }
             $values[] = [
-                'value' => $row['value'],
+                'value' => $val,
                 'count' => $row['count']
             ];
         }
