@@ -26,33 +26,22 @@ require 'database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/chart.php';
 
-$filter = null;
-
 $name = SqlRepository::getGetValue('name');
-
-$table = 'deviceproperties';
 $core = SqlRepository::getGetValue('core');
-switch ($core) {
-	case '1.1':
-		$table = 'deviceproperties11';
-		break;
-	case '1.2':
-		$table = 'deviceproperties12';
-		break;
-	case '1.3':
-		$table = 'deviceproperties13';
-		break;
-}
-// Check if property is valid and part of the selected table
-DB::connect();
-$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :table and column_name = :columnname");
-$result->execute(["table" => $table, "columnname" => $name]);
-DB::disconnect();
-if ($result->rowCount() == 0) {
-	PageGenerator::errorMessage("<strong>This is not the <strike>droid</strike> device property you are looking for!</strong><br><br>You may have passed a wrong device property name.");
-}
 
 PageGenerator::header($name);
+
+try {
+	DB::connect();
+	if (!SqlRepository::corePropertyExists($core, $name)) {
+		PageGenerator::errorMessage("<strong>This is not the <strike>droid</strike> device property you are looking for!</strong><br><br>You may have passed a wrong device property name.");
+	}
+	$values = SqlRepository::listCorePropertyValues($core, $name);
+} catch (PDOException $e) {
+	PageGenerator::databaseErrorMessage();
+} finally {
+	DB::disconnect();
+}
 
 $caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInfo();
 ?>
@@ -74,28 +63,20 @@ $caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInf
 				</thead>
 				<tbody>
 					<?php
-					DB::connect();
-					try {
-						$values = SqlRepository::listCorePropertyValues($name, $table);
-						foreach ($values as $index => $value) {
-							$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
-							$link = "listreports.php?property=$name&value=".$value['value'].($platform ? "&platform=$platform" : "");
-							if ($core) {
-								$link .= "&core=$core";
-							}
-							echo "<tr>";
-							echo "<td $color_style>".$value['displayvalue']."</td>";
-							if ($value['count'] != null) {
-								echo "<td><a href='$link'>".$value['count']."</a></td>";
-							} else {
-								echo "<td class='na'>".$value['count']."</td>";
-							}
-							echo "</tr>";
+					foreach ($values as $index => $value) {
+						$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
+						$link = "listreports.php?property=$name&value=".$value['value'].($platform ? "&platform=$platform" : "");
+						if ($core) {
+							$link .= "&core=$core";
 						}
-					} catch (PDOException $e) {
-						echo "<b>Error while fetching data!</b><br>";
-					} finally {				
-						DB::disconnect();						
+						echo "<tr>";
+						echo "<td $color_style>".$value['displayvalue']."</td>";
+						if ($value['count'] != null) {
+							echo "<td><a href='$link'>".$value['count']."</a></td>";
+						} else {
+							echo "<td class='na'>".$value['count']."</td>";
+						}
+						echo "</tr>";
 					}
 					?>
 				</tbody>
