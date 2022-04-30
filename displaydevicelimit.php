@@ -26,21 +26,21 @@ require 'database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/chart.php';
 
-$name = null;
-if (isset($_GET['name'])) {
-	$name = $_GET['name'];
-}
-
-// Check if capability is valid and part of the selected table
-DB::connect();
-$result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = 'devicelimits' and column_name = :columnname");
-$result->execute([":columnname" => $name]);
-DB::disconnect();
-if ($result->rowCount() == 0) {
-	PageGenerator::errorMessage("<strong>This is not the <strike>droid</strike> device limit you are looking for!</strong><br><br>You may have passed a wrong device limit name.");
-}
+$name = SqlRepository::getGetValue('name');
 
 PageGenerator::header($name);
+
+try {
+	DB::connect();
+	if (!SqlRepository::coreLimitExists($name)) {
+		PageGenerator::errorMessage("<strong>This is not the <strike>droid</strike> device limit you are looking for!</strong><br><br>You may have passed a wrong device limit name.");
+	}
+	$values = SqlRepository::listCoreLimitValues($name);
+} catch (PDOException $e) {
+	PageGenerator::databaseErrorMessage();
+} finally {
+	DB::disconnect();
+}
 
 $caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInfo();
 ?>
@@ -62,21 +62,13 @@ $caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInf
 				</thead>
 				<tbody>
 					<?php
-					DB::connect();
-					try {
-						$values = SqlRepository::listCoreLimitValues($name);
-						foreach ($values as $index => $value) {
-							$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
-							$link = "listreports.php?limit=$name&value=".$value['value'].($platform ? "&platform=$platform" : "");
-							echo "<tr>";
-							echo "<td $color_style>".$value['value']."</td>";
-							echo "<td><a href='$link'>".$value['count']."</a></td>";
-							echo "</tr>";
-						}
-					} catch (PDOException $e) {
-						echo "<b>Error while fetching data!</b><br>";
-					} finally {				
-						DB::disconnect();						
+					foreach ($values as $index => $value) {
+						$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
+						$link = "listreports.php?limit=$name&value=".$value['value'].($platform ? "&platform=$platform" : "");
+						echo "<tr>";
+						echo "<td $color_style>".$value['value']."</td>";
+						echo "<td><a href='$link'>".$value['count']."</a></td>";
+						echo "</tr>";
 					}
 					?>
 				</tbody>
