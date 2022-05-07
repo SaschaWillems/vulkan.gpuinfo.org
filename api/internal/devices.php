@@ -20,9 +20,12 @@
  *
  */
 
-include '../database/database.class.php';
-include '../includes/functions.php';
-include '../includes/constants.php';
+session_start();
+
+include '../../database/database.class.php';
+include '../../database/sqlrepository.php';
+include '../../includes/functions.php';
+include '../../includes/constants.php';
 
 DB::connect();
 
@@ -175,7 +178,6 @@ if (isset($_REQUEST['filter']['coreproperty'])) {
                 $tablename = 'deviceproperties';
         }
         $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename dp on dp.reportid = r.id where dp.$property = 1)";
-        $params['filter_core_property'] = $property;
     }
 }
 // Submitter
@@ -348,6 +350,13 @@ if (isset($_REQUEST["platform"])) {
         $ostype = ostype($platform);
         $whereClause .= "r.ostype = '" . $ostype . "'";
     }
+}
+
+// Min. api version
+$minApiVersion = SqlRepository::getMinApiVersion();
+if ($minApiVersion) {
+    SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
+    $params['apiversion'] = $minApiVersion;
 }
 
 if ($minversion) {

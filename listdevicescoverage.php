@@ -25,6 +25,7 @@ include './includes/functions.php';
 include './includes/constants.php';
 include './includes/filterlist.class.php';
 include './database/database.class.php';
+include './database/sqlrepository.php';
 
 // Supported filter values for this listing
 $filters = [
@@ -206,8 +207,12 @@ if ($filter_list->hasFilter('platform')) {
 		$pageTitle .= " on " . PageGenerator::platformInfo($platform);
 	}
 }
-
 PageGenerator::header($pageTitle);
+
+$minApiVersion = SqlRepository::getMinApiVersion();
+if ($minApiVersion) {
+	$caption .= " Vulkan $minApiVersion (and up)";
+}
 ?>
 
 <center>
@@ -275,7 +280,7 @@ PageGenerator::header($pageTitle);
 				"targets": [4]
 			}],
 			"ajax": {
-				url: "responses/devices.php?platform=<?php echo $platform ?>&minversion=true",
+				url: "api/internal/devices.php?platform=<?php echo $platform ?>&minversion=true",
 				data: {
 					"filter": {
 						'extension': 					'<?= $filter_list->getFilter('extension') ?>',

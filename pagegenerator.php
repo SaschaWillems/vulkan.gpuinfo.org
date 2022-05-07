@@ -23,6 +23,15 @@
 class PageGenerator
 {
 	private static $platform_list = ['windows', 'linux', 'android', 'macos', 'ios'];
+	private static $platform_display_name = ['windows' => 'Windows', 'linux' => 'Linux', 'android' => 'Android', 'macos' => 'macOS', 'ios' => 'iOS'];
+
+	public static function platformDisplayName($platform)
+	{
+		if (isset(self::$platform_display_name[$platform])) {
+			return self::$platform_display_name[$platform];
+		}
+		return ucfirst($platform);
+	}
 
 	public static function header($title = null)
 	{
@@ -55,12 +64,50 @@ class PageGenerator
 		}
 	}
 
+	public static function databaseErrorMessage()
+	{
+		self::header();
+?>
+		<div class="div-h-center">
+			<div class="div-alert alert alert-danger error">
+				<strong>Error while fetching data</strong><br/>
+				A database error occured. Please try again, and if the error persists please submit the issue <a href="https://github.com/SaschaWillems/vulkan.gpuinfo.org">here</a>.
+			</div>
+		</div>
+<?php
+		self::footer();
+		die();
+	}	
+
 	public static function platformInfo($platform)
 	{
 		if ($platform == 'all') {
 			return " all platforms";
 		}
-		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($platform);
+		return "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . self::platformDisplayName($platform);
+	}
+
+	public static function filterInfo()
+	{
+		$platform = null;
+		if (isset($_GET['platform'])) {
+			$platform = GET_sanitized('platform');
+		}
+		// @todo: also take from $_GET
+		$apiversion = null;
+		if (isset($_SESSION['minversion'])) {
+			$apiversion = sanitize($_SESSION['minversion']);
+		}
+		$info = '';
+		if ($platform && ($platform !== 'all')) {
+			$info = "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . self::platformDisplayName($platform);
+		} else {
+			$info = " all platforms";
+		}
+		if ($apiversion) {
+			$info .= " Vulkan $apiversion (and up)";
+		}
+		return $info;
 	}
 
 	/**
@@ -110,7 +157,7 @@ class PageGenerator
 			if ($url_parameter_string) {
 				$target_url .= '&'.$url_parameter_string;
 			}			
-			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$target_url'><img src='images/" . $navplatform . "logo.png' height='".$icon_size."px' style='padding-right:5px'/>" . ucfirst($navplatform) . "</a> </li>";
+			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$target_url'><img src='images/" . $navplatform . "logo.png' height='".$icon_size."px' style='padding-right:5px'/>" . self::platformDisplayName($navplatform) . "</a> </li>";
 		};
 		echo "	</ul>";
 		echo "</div>";

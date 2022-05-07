@@ -64,7 +64,7 @@ echo "<center>";
 // Header
 $header = "Device report for " . $report->info->device_description;
 if ($report->info->platform !== null) {
-	$header .= " on <img src='images/" . strtolower($report->info->platform) . "logo.png' height='14px' style='padding-right:5px'/>" . ucfirst($report->info->platform);
+	$header .= " on <img src='images/" . strtolower($report->info->platform) . "logo.png' height='14px' style='padding-right:5px'/>" . PageGenerator::platformDisplayName($report->info->platform);
 }
 echo "<div class='header'>";
 echo "<h4>$header</h4>";

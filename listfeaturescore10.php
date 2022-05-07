@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,7 @@
 
 include 'pagegenerator.php';
 include './database/database.class.php';
+require './database/sqlrepository.php';
 include './includes/constants.php';
 include './includes/functions.php';
 
@@ -34,7 +35,7 @@ PageGenerator::header("Features");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.0 device feature coverage for ".PageGenerator::platformInfo($platform) ?>
+	<?php echo "<h4>Core 1.0 device feature coverage for ".PageGenerator::filterInfo($platform) ?>
 </div>
 
 <center>
@@ -56,45 +57,9 @@ PageGenerator::header("Features");
 				<?php
 				DB::connect();
 				try {
-					$deviceCount = getDeviceCount($platform);
-
-					$os_filter = null;
-					$params = [];
-					if ($platform !== 'all') {
-						$params['ostype'] = ostype($platform);
-						$os_filter = 'WHERE r.ostype = :ostype';
-					}
-
-					// Collect feature column names
-					$sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'devicefeatures' and COLUMN_NAME not in ('reportid')";
-					$stmnt = DB::$connection->prepare($sql);
-					$stmnt->execute();
-
-					$features = array();
-					$sqlColumns = "";
-					while ($row = $stmnt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
-						$features[] = $row[0];
-						$sqlColumns .= "max(" . $row[0] . ") as $row[0],";
-					}
-
-					$supportedCounts = [];
-					$stmnt = DB::$connection->prepare(
-						"SELECT ifnull(r.displayname, dp.devicename) as device, "
-							. substr($sqlColumns, 0, -1) .
-							" FROM devicefeatures df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid $os_filter group by device"
-					);
-					$stmnt->execute($params);
-					while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-						foreach ($row as $key => $value) {
-							if (strcasecmp($key, 'device') != 0) {
-								$supportedCounts[$key] += $value;
-							}
-						}
-					}
-
-					foreach ($features as $feature) {
-						$coverageLink = "listdevicescoverage.php?feature=" . $feature . "&platform=$platform";
-						$coverage = ($deviceCount> 0) ? round($supportedCounts[$feature] / $deviceCount * 100, 1) : 0;
+					$features = SqlRepository::listCoreFeatures(SqlRepository::VK_API_VERSION_1_0);
+					foreach ($features as $feature => $coverage) {
+						$coverageLink = "listdevicescoverage.php?feature=$feature&platform=$platform";
 						echo "<tr>";
 						echo "<td>" . $feature . "</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";

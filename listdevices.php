@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,10 +20,13 @@
  *
  */
 
+session_start();
+
 include 'pagegenerator.php';
 include './includes/functions.php';
 include './includes/filterlist.class.php';
-include 'database/database.class.php';
+include './database/database.class.php';
+include './database/sqlrepository.php';
 
 $filters = [
 	'platform',
@@ -40,7 +43,7 @@ $showTabs = true;
 
 if ($filter_list->hasFilter('platform')) {
 	$platform = $filter_list->getFilter('platform');
-	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>".ucfirst($platform)." devices";
+	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>".PageGenerator::platformDisplayName($platform)." devices";
 }
 if ($filter_list->hasFilter('extension')) {
 	$caption .= " supporting ".$filter_list->getFilter('extension');
@@ -49,6 +52,10 @@ if ($filter_list->hasFilter('extension')) {
 if ($filter_list->hasFilter('submitter')) {
 	$caption .= "Devices submitted by ".$filter_list->getFilter('submitter');
 	$showTabs = false;
+}
+$minApiVersion = SqlRepository::getMinApiVersion();
+if ($minApiVersion) {
+	$caption .= " Vulkan $minApiVersion (and up)";
 }
 ?>
 
@@ -119,7 +126,7 @@ if ($filter_list->hasFilter('submitter')) {
 				"targets": [5]
 			}],
 			"ajax": {
-				url: "responses/devices.php?platform=<?php echo $platform ?>",
+				url: "api/internal/devices.php?platform=<?php echo $platform ?>",
 				data: {
 					"filter": {
 						'extension': 	'<?= $filter_list->getFilter('extension') ?>',

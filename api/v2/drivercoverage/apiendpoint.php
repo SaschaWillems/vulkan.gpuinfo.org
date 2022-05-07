@@ -28,7 +28,7 @@
         private $platform;
        
         private function getOSType() {
-            $this->ostype = null;
+            $this->osType = null;
             $this->platform = null;
             if (isset($_GET["platform"])) {
                 $this->platform = $_GET["platform"];

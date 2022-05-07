@@ -35,7 +35,7 @@ PageGenerator::header("Formats");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Image and buffer format support on ".PageGenerator::platformInfo($platform); ?>
+	<?php echo "<h4>Image and buffer format support on ".PageGenerator::filterInfo($platform); ?>
 </div>
 
 <center>
