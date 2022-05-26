@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.21';
+$release = '3.22';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -62,7 +62,24 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.22 - 2022-05-26</h4>			
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_image_2d_view_of_3d</li>
+						<li>VK_EXT_image_compression_control</li>
+						<li>VK_EXT_image_compression_control_swapchain</li>
+						<li>VK_EXT_pipeline_properties</li>
+						<li>VK_EXT_subpass_merge_feedback</li>
+						<li>VK_KHR_ray_tracing_maintenance1</li>
+						<li>VK_KHR_fragment_shader_barycentric</li>
+						<li>VK_AMD_shader_early_and_late_fragment_tests</li>
+					</ul>
+				</li>
+				<li>Disabled uploads when feature modifying tools are detected (e.g. an active profiles layer)</li>
+			</ul>
 			<h4>3.21 - 2022-04-03</h4>			
+			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
 					<ul>
 						<li>VK_EXT_graphics_pipeline_library</li>
@@ -70,6 +87,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_VALVE_descriptor_set_host_mapping</li>
 					</ul>
 				</li>
+			</ul>
 			<h4>3.2 - 2022-02-19</h4>
 			<ul>
 				<li>Added support for Vulkan profiles</li>
