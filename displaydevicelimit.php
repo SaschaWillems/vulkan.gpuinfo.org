@@ -25,8 +25,15 @@ require 'database/database.class.php';
 require 'database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/chart.php';
+include './includes/filterlist.class.php';
 
-$name = SqlRepository::getGetValue('name');
+$filters = ['platform', 'name'];
+$filter_list = new FilterList($filters);
+$name = $filter_list->getFilter('name');
+$platform = 'all';
+if ($filter_list->hasFilter('platform')) {
+	$platform = $filter_list->getFilter('platform');
+}
 
 PageGenerator::header($name);
 
@@ -50,6 +57,7 @@ $caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInf
 </div>
 
 <center>
+	<?php PageGenerator::platformNavigation('displaydevicelimit.php', $platform, true, $filter_list->filters); ?>
 	<div class='chart-div'>
 		<div id="chart"></div>
 		<div class='chart-table-div'>
