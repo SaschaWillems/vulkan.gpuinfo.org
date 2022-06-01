@@ -111,7 +111,7 @@ $caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInf
 		});
 	});
 	<?php
-		Chart::draw($values, 'value', 'count');
+		Chart::draw($values, 'displayvalue', 'count');
 	?>
 </script>
 
