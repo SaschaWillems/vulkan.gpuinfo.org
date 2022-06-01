@@ -176,8 +176,8 @@ function listSubgroupFeatureFlags($flag)
 		0x0010 => "SHUFFLE",
 		0x0020 => "SHUFFLE (RELATIVE)",
 		0x0040 => "CLUSTERED",
-		0x0080 => "QUAD"
-		//0x0100 => "PARTITIONED_BIT_NV"
+		0x0080 => "QUAD",
+		0x0100 => "PARTITIONED_BIT_NV"
 	);
 
 	if ($flag === null) {
