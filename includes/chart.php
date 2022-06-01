@@ -44,7 +44,7 @@ class Chart {
                 $others_count += $values[$i][$count_key];
                 continue;
             }
-            $chart_labels[] = $values[$i][$label_key];
+            $chart_labels[] = str_replace('\'', '"', $values[$i][$label_key]);
             $chart_series[] = $values[$i][$count_key];
             $chart_colors[] = self::colors[$i % count(self::colors)];
         }
