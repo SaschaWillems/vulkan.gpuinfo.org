@@ -60,7 +60,7 @@ PageGenerator::header("Instance layers");
 						$instancelayers = SqlRepository::listInstanceLayers();
 						foreach($instancelayers as $instancelayer) {
 							$layername = $instancelayer['name'];
-							$coverageLink = "listreports.php?instancelayer=$layername";
+							$coverageLink = "listreports.php?instancelayer=$layername&platform=$platform";
 							$coverage = $instancelayer['coverage'];							
 							echo "<tr>";
 							echo "<td class='value'>$layername</td>";

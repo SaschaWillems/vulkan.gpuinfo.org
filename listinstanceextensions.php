@@ -60,7 +60,7 @@ PageGenerator::header("Instance extensions");
 						$instanceextensions = SqlRepository::listInstanceExtensions();
 						foreach($instanceextensions as $instanceextension) {
 							$extensionname = $instanceextension['name'];
-							$coverageLink = "listreports.php?instanceextension=$extensionname";
+							$coverageLink = "listreports.php?instanceextension=$extensionname&platform=$platform";
 							$coverage = $instanceextension['coverage'];
 							echo "<tr>";						
 							echo "<td class='value'>$extensionname</td>";
