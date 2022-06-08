@@ -35,6 +35,9 @@ $filters = ['platform', 'extensionname', 'extensionproperty'];
 $filter_list = new FilterList($filters);
 $ext_name = $filter_list->getFilter('extensionname');
 $property_name = $filter_list->getFilter('extensionproperty');
+if ($filter_list->hasFilter('platform')) {
+	$platform = $filter_list->getFilter('platform');
+}
 
 PageGenerator::header($property_name);
 
@@ -58,6 +61,7 @@ $caption = "Value distribution for <code>$property_name</code> property of <code
 </div>
 
 <center>
+	<?php PageGenerator::platformNavigation('displayextensionproperty.php', $platform, true, $filter_list->filters); ?>
 	<div class='parentdiv'>
 		<div id="chart"></div>
 		<div class='property-table'>
