@@ -1,5 +1,5 @@
 {
-    "headerversion": "210",
+    "headerversion": "218",
     "VK_KHR_surface": {
         "name": "VK_KHR_surface",
         "promotedTo": null,
@@ -3335,7 +3335,7 @@
     },
     "VK_NV_fragment_shader_barycentric": {
         "name": "VK_NV_fragment_shader_barycentric",
-        "promotedTo": null,
+        "promotedTo": "VK_KHR_fragment_shader_barycentric",
         "structs": {
             "ext": {
                 "physicalDeviceFeatures": "VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV",
@@ -5076,8 +5076,8 @@
         },
         "types": []
     },
-    "VK_EXT_extension_312": {
-        "name": "VK_EXT_extension_312",
+    "VK_EXT_metal_objects": {
+        "name": "VK_EXT_metal_objects",
         "promotedTo": null,
         "structs": {
             "ext": {
@@ -5231,12 +5231,12 @@
             "graphicsPipelineLibraryIndependentInterpolationDecoration": "VkBool32"
         }
     },
-    "VK_AMD_extension_322": {
-        "name": "VK_AMD_extension_322",
+    "VK_AMD_shader_early_and_late_fragment_tests": {
+        "name": "VK_AMD_shader_early_and_late_fragment_tests",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -5246,20 +5246,24 @@
         },
         "types": []
     },
-    "VK_AMD_extension_323": {
-        "name": "VK_AMD_extension_323",
+    "VK_KHR_fragment_shader_barycentric": {
+        "name": "VK_KHR_fragment_shader_barycentric",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceFragmentShaderBarycentricFeaturesKHR",
+                "physicalDeviceProperties": "VkPhysicalDeviceFragmentShaderBarycentricPropertiesKHR"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "triStripVertexOrderIndependentOfProvokingVertex": "VkBool32"
+        }
     },
     "VK_KHR_shader_subgroup_uniform_control_flow": {
         "name": "VK_KHR_shader_subgroup_uniform_control_flow",
@@ -5497,12 +5501,12 @@
         },
         "types": []
     },
-    "VK_ARM_extension_339": {
-        "name": "VK_ARM_extension_339",
+    "VK_EXT_image_compression_control": {
+        "name": "VK_EXT_image_compression_control",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceImageCompressionControlFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -5990,13 +5994,13 @@
         },
         "types": []
     },
-    "VK_NV_extension_373": {
-        "name": "VK_NV_extension_373",
+    "VK_EXT_pipeline_properties": {
+        "name": "VK_EXT_pipeline_properties",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDevicePipelinePropertiesFeaturesEXT",
+                "physicalDeviceProperties": "VkPhysicalDevicePipelinePropertiesFeaturesEXT"
             },
             "core": {
                 "physicalDeviceFeatures": null,
@@ -6200,12 +6204,12 @@
         },
         "types": []
     },
-    "VK_KHR_extension_387": {
-        "name": "VK_KHR_extension_387",
+    "VK_KHR_ray_tracing_maintenance1": {
+        "name": "VK_KHR_ray_tracing_maintenance1",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceRayTracingMaintenance1FeaturesKHR",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -6309,12 +6313,12 @@
             "maxMultiDrawCount": "uint32_t"
         }
     },
-    "VK_EXT_extension_394": {
-        "name": "VK_EXT_extension_394",
+    "VK_EXT_image_2d_view_of_3d": {
+        "name": "VK_EXT_image_2d_view_of_3d",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceImage2DViewOf3DFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -6748,12 +6752,12 @@
         },
         "types": []
     },
-    "VK_EXT_disable_cube_map_wrap": {
-        "name": "VK_EXT_disable_cube_map_wrap",
+    "VK_EXT_non_seamless_cube_map": {
+        "name": "VK_EXT_non_seamless_cube_map",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -6977,12 +6981,12 @@
         },
         "types": []
     },
-    "VK_EXT_extension_438": {
-        "name": "VK_EXT_extension_438",
+    "VK_EXT_image_compression_control_swapchain": {
+        "name": "VK_EXT_image_compression_control_swapchain",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceImageCompressionControlSwapchainFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -7292,12 +7296,12 @@
         },
         "types": []
     },
-    "VK_ARM_extension_459": {
-        "name": "VK_ARM_extension_459",
+    "VK_EXT_subpass_merge_feedback": {
+        "name": "VK_EXT_subpass_merge_feedback",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceSubpassMergeFeedbackFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -7367,6 +7371,21 @@
         },
         "types": []
     },
+    "VK_EXT_extension_464": {
+        "name": "VK_EXT_extension_464",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
     "VK_NV_extension_465": {
         "name": "VK_NV_extension_465",
         "promotedTo": null,
@@ -7382,8 +7401,263 @@
         },
         "types": []
     },
-    "VK_EXT_extension_464": {
-        "name": "VK_EXT_extension_464",
+    "VK_EXT_extension_466": {
+        "name": "VK_EXT_extension_466",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_467": {
+        "name": "VK_EXT_extension_467",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_468": {
+        "name": "VK_EXT_extension_468",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_ANDROID_extension_469": {
+        "name": "VK_ANDROID_extension_469",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_470": {
+        "name": "VK_AMD_extension_470",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_471": {
+        "name": "VK_AMD_extension_471",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_472": {
+        "name": "VK_AMD_extension_472",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_473": {
+        "name": "VK_AMD_extension_473",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_474": {
+        "name": "VK_AMD_extension_474",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_475": {
+        "name": "VK_AMD_extension_475",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_476": {
+        "name": "VK_AMD_extension_476",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_477": {
+        "name": "VK_AMD_extension_477",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_478": {
+        "name": "VK_AMD_extension_478",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_AMD_extension_479": {
+        "name": "VK_AMD_extension_479",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_480": {
+        "name": "VK_EXT_extension_480",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_481": {
+        "name": "VK_EXT_extension_481",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_482": {
+        "name": "VK_EXT_extension_482",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_483": {
+        "name": "VK_EXT_extension_483",
         "promotedTo": null,
         "structs": {
             "ext": {
