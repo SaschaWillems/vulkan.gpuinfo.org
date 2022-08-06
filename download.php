@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.22';
+$release = '3.24';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -61,7 +61,31 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 			</ul>
 		</div>
 		<div class="page-header">
-			<h3>Release notes</h3>
+			<h3>Release notes</h3>	
+			<h4>3.24 - 2022-08-06</h4>			
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_pipeline_robustness</li>
+						<li>VK_EXT_shader_module_identifier</li>
+						<li>VK_EXT_attachment_feedback_loop_layout</li>
+						<li>VK_EXT_multisampled_render_to_single_sampled</li>
+						<li>VK_QCOM_image_processing</li>
+						<li>VK_QCOM_tile_properties</li>
+						<li>VK_SEC_amigo_profiling</li>
+					</ul>
+				</li>
+				<li>Updated Vulkan profiles library to latest version	)</li>
+			</ul>			
+			<h4>3.23 - 2022-06-27</h4>
+			<ul>
+				<li>Added support for the VK_KHR_portability_enumeration extension on MacOS</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_non_seamless_cube_map</li>
+					</ul>
+				</li>
+			</ul>
 			<h4>3.22 - 2022-05-26</h4>			
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
