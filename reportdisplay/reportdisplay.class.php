@@ -359,7 +359,7 @@ class Report
     public function fetchExtensionFeatures()
     {
         try {
-            $sql = "SELECT name, supported, extension from devicefeatures2 where reportid = :reportid order by extension asc";
+            $sql = "SELECT name, supported, extension from devicefeatures2 where reportid = :reportid order by extension, name asc";
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute([":reportid" => $this->id]);
             $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
@@ -438,7 +438,7 @@ class Report
     public function fetchExtensionProperties()
     {
         try {
-            $sql = "SELECT name, value, extension from deviceproperties2 where reportid = :reportid order by name asc";
+            $sql = "SELECT name, value, extension from deviceproperties2 where reportid = :reportid order by extension, name asc";
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute([":reportid" => $this->id]);
             $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
