@@ -555,7 +555,6 @@ class SqlRepository {
             ) tbl
             GROUP BY extension, name, type
             ORDER BY extension ASC , name ASC";
-        file_put_contents('statement.sql', $sql);
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
         $properties = [];
