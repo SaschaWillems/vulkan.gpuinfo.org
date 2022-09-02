@@ -487,7 +487,7 @@ class SqlRepository {
         $ext_filter = null;
         if ($extension) {
             $params['extension'] = $extension;
-            $ext_filter = 'AND df2.extension = :extension';
+            $ext_filter = 'AND d2.extension = :extension';
         }
         // We use three unions to get the whole picture (coverage numbers, value listings)
         $sql_union_a = "SELECT 
@@ -533,9 +533,9 @@ class SqlRepository {
                     value not in ('true', 'false')";
 
         if ($ext_filter) {
-            $sql_union_a .= " AND $ext_filter";
-            $sql_union_b .= " AND $ext_filter";
-            $sql_union_c .= " AND $ext_filter";
+            $sql_union_a .= " $ext_filter";
+            $sql_union_b .= " $ext_filter";
+            $sql_union_c .= " $ext_filter";
         }
                 
         self::appendFilters($sql_union_a, $params);
@@ -555,6 +555,7 @@ class SqlRepository {
             ) tbl
             GROUP BY extension, name, type
             ORDER BY extension ASC , name ASC";
+        file_put_contents('statement.sql', $sql);
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
         $properties = [];
