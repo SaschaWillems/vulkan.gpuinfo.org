@@ -73,7 +73,7 @@ PageGenerator::header("Extension properties listing");
 						echo "<td class='subkey'>".$property['name']."</td>";
 						echo "<td class='text-center'>".ucfirst($property['type'])."</td>";
 						if ($property['type'] == 'coverage') {
-							$coverageLink = "listdevicescoverage.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform";
+							$coverageLink = "listdevicescoverage.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&extensionpropertyvalue=true"."&platform=$platform";
 							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">".$property['coverage']."<span style='font-size:10px;'>%</span></a></td>";
 						} else {
 							$link = "<a href='displayextensionproperty.php?extensionname=".$property['extension']."&extensionproperty=".$property['name']."&platform=$platform'>";
