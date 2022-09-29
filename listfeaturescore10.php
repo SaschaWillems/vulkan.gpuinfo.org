@@ -63,7 +63,7 @@ PageGenerator::header("Features");
 						echo "<tr>";
 						echo "<td>" . $feature . "</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {

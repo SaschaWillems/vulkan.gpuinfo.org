@@ -64,8 +64,8 @@ PageGenerator::header("Instance layers");
 							$coverage = $instancelayer['coverage'];							
 							echo "<tr>";
 							echo "<td class='value'>$layername</td>";
-							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
 							echo "</tr>";
 						}
 					} catch (PDOException $e) {

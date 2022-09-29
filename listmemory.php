@@ -60,7 +60,7 @@ PageGenerator::header("Memory");
 						echo "<tr>";
 						echo "<td class='value'>$memoryFlags</td>";
 						echo "<td class='value'><a class='supported' href='$coverageLink'>" . $memoryType['coverage'] . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . (100.0 - $memoryType['coverage']) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>".round(100.0 - $memoryType['coverage'], 2)."<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {

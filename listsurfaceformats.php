@@ -65,8 +65,8 @@ PageGenerator::header("Surface formats");
 						echo "<tr>";
 						echo "<td class='value'>".$surfaceforamt['format']."</td>";
 						echo "<td class='value'>".getColorSpace($surfaceforamt['colorspace'])."</td>";
-						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {

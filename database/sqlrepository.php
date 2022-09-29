@@ -132,7 +132,7 @@ class SqlRepository {
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
             $extensions[] = [
                 'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1),
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2),
                 'hasfeatures' => in_array($row['name'], $extensionFeatures) != false, 
                 'hasproperties' => in_array($row['name'], $extensionProperties) != false
             ];
@@ -201,7 +201,7 @@ class SqlRepository {
 
         foreach($features as $feature => &$coverage) {
             if ($deviceCount > 0) {
-                $coverage = round($coverage / $deviceCount * 100, 1);
+                $coverage = round($coverage / $deviceCount * 100, 2);
             } else {
                 $coverage = 0;
             }
@@ -242,7 +242,7 @@ class SqlRepository {
             $features[] = [
                 'extension' => $row['extension'],
                 'name' => $row['name'], 
-                'coverage' => round($row['supporteddevices'] / $deviceCount * 100, 1),
+                'coverage' => round($row['supporteddevices'] / $deviceCount * 100, 2),
             ];
         }
         return $features;
@@ -404,7 +404,7 @@ class SqlRepository {
 
         foreach ($properties as $property => &$coverage) {
             if (is_numeric($coverage)) {
-                $coverage = round($coverage / $deviceCount * 100, 1);
+                $coverage = round($coverage / $deviceCount * 100, 2);
             }
         }
 
@@ -563,7 +563,7 @@ class SqlRepository {
                 'extension' => $row['extension'],
                 'name' => $row['name'], 
                 'type' => $row['type'],
-                'coverage' => round($row['supporteddevices'] / $deviceCount * 100, 1),
+                'coverage' => round($row['supporteddevices'] / $deviceCount * 100, 2, PHP_ROUND_HALF_UP),
             ];
         }
         return $properties;        
@@ -585,7 +585,7 @@ class SqlRepository {
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
             $memorytypes[] = [
                 'memtype' => $row['memtype'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
         return $memorytypes;
@@ -610,7 +610,7 @@ class SqlRepository {
             $surfaceformats[] = [
                 'format' => $row['format'],
                 'colorspace' => $row['colorspace'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
         return $surfaceformats;
@@ -634,7 +634,7 @@ class SqlRepository {
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
             $surfaceformats[] = [
                 'mode' => $row['mode'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
         return $surfaceformats;
@@ -656,7 +656,7 @@ class SqlRepository {
             $row = $stmnt->fetch(PDO::FETCH_ASSOC);
             $surfaceusageflags[] = [
                 'name' => $flag_name,
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         };
         return $surfaceusageflags;
@@ -682,7 +682,7 @@ class SqlRepository {
             }
             $instanceextensions[] = [
                 'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
         return $instanceextensions;
@@ -708,7 +708,7 @@ class SqlRepository {
             }
             $instancelayers[] = [
                 'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
         return $instancelayers;
@@ -735,7 +735,7 @@ class SqlRepository {
             }
             $instancelayers[] = [
                 'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 1)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
         return $instancelayers;        
