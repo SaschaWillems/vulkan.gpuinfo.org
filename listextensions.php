@@ -24,11 +24,14 @@ require 'pagegenerator.php';
 require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
+require './includes/constants.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
+
+$vulkan_html_registry = "https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/";
 
 PageGenerator::header("Extensions");
 ?>
@@ -67,6 +70,7 @@ PageGenerator::header("Extensions");
 							continue;
 						}
 						$coverageLink = "listdevicescoverage.php?extension=" . $extension['name'] . "&platform=$platform";
+						$manPageLink = "[<a href='".$vulkan_html_registry.$extension['name'].".html' target='_blank' title='Show manpage for this extension'>?</a>]";
 						$coverage = $extension['coverage'];
 						$ext = $extension['name'];
 						$feature_link = null;
@@ -78,7 +82,7 @@ PageGenerator::header("Extensions");
 							$property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
 						}
 						echo "<tr>";
-						echo "<td>$ext</td>";
+						echo "<td>$ext $manPageLink</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='text-center' style='vertical-align: middle'>$feature_link</td>";
