@@ -177,6 +177,9 @@ if (isset($_REQUEST['filter']['coreproperty'])) {
             default:
                 $tablename = 'deviceproperties';
         }
+        if (stripos($property, 'subgroupProperties.') !== false) {
+            $property = "`$property`";
+        }
         $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename dp on dp.reportid = r.id where dp.$property = 1)";
     }
 }
