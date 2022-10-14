@@ -198,6 +198,10 @@ class VulkanProfile {
                 case 'int32_t':
                 case 'size_t':
                     return intval($value);
+                case 'VkDeviceSize':
+                case 'uint64_t':
+                    // @todo: JS/JSON has limited support for 64 bit values, but probably okay to export them as int here
+                    return intval($value);
                 case 'float':
                     return floatval($value);
                 case 'VkBool32':
