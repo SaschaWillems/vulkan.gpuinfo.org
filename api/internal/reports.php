@@ -275,10 +275,20 @@ $sql = "SELECT
         " . $searchClause . "
         " . $orderBy;
 
+$compareBntFnTemplate = "function compareClick() {
+    var ajaxurl = 'api/internal/comparer.php',
+    data =  {'action': 'add', 'reportid': __reportid__, 'reportname': '__reportname__'};
+    $.post(ajaxurl, data, function (response) {
+        displayCompare(response);
+    });
+    }; compareClick();";
+
 $devices = DB::$connection->prepare($sql . " " . $paging);
 $devices->execute($params);
 if ($devices->rowCount() > 0) {
     foreach ($devices as $device) {
+        $compareBtnJsFn = str_replace('__reportid__', $device['id'], $compareBntFnTemplate);
+        $compareBtnJsFn = str_replace('__reportname__', $device['devicename'], $compareBtnJsFn);
         $driver = getDriverVerson($device["driver"], "", $device["vendorid"], $device["osname"]);
         $data[] = array(
             'id' => $device["id"],
@@ -291,7 +301,8 @@ if ($devices->rowCount() > 0) {
             'osname' => $device["osname"],
             'osversion' => $device["osversion"],
             'osarchitecture' => $device["osarchitecture"],
-            'compare' => '<center><input type="checkbox" name="id[' . $device["id"] . ']"></center>',
+            // @todo
+            'compare' => '<center><Button onClick="'.$compareBtnJsFn.'">Add</Button>',
             'profile' => ($portabilitysubset ? "<center><a href=\"api/v3/getprofile.php?id=".$device["id"]."\">Download</a></center>" : null)
         );
     }
