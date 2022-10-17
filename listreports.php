@@ -127,6 +127,11 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 		</h4>
 	</div>
 
+	<div id="compare-div" class="alert alert-info" role="alert" style="text-align: center; display: none;">
+		<span id="compare-info">No reports selected for compare</span>
+		<Button onClick="clearCompare()">Clear</Button>
+		<Button onClick="compare()">Compare</Button>
+	</div>
 	<?php
 	PageGenerator::platformNavigation('listreports.php', $platform, true, $filter_list->filters);
 	?>
@@ -168,11 +173,53 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 </center>
 
 <script>
+	var ajaxurl = 'api/internal/comparer.php',
+	compareIds = [];
+
+	function clearCompare() {
+		data =  {'action': 'clear' };
+		$.post(ajaxurl, data, function (response) {
+			displayCompare(null);
+		});
+    };
+
+	function removeFromCompare(id) {
+    	data =  {'action': 'remove', 'reportid': id };
+    	$.post(ajaxurl, data, function (response) {
+        	displayCompare(response);
+    	});		
+	}
+
+	function displayCompare(data) {
+		elem = $('#compare-info');
+		div = $('#compare-div'); 
+		html = 'No reports selected for compare';
+		arr = JSON.parse(data);
+		compareIds = [];
+		if (Array.isArray(arr)) {
+			html = 'Selected for compare: ';			
+			arr.map((element) => {
+				html += '<span class="compare-device">' + element.name + ' <Button onClick="removeFromCompare(' + element.id + ');">X</Button></span>'
+				compareIds.push(element.id);
+			});
+		}
+		elem.html(html);
+		compareIds.length > 0 ? div.show() : div.hide();			
+	}
+
+	function compare() {
+		location.href = 'compare.php?reports=' + compareIds.join();
+	}
+
 	$(document).on("keypress", "form", function(event) {
 		return event.keyCode != 13;
 	});
 
 	$(document).ready(function() {
+
+		$.get(ajaxurl, null, function (response) {
+			displayCompare(response);
+		});
 
 		var table = $('#reports').DataTable({
 			"processing": true,
