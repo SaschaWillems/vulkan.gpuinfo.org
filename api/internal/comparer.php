@@ -20,43 +20,37 @@
  *
  */
 
- // Writes and reads reports to compare to the server session
+// Writes and reads reports to compare to the server session
 
 session_start();
 header("HTTP/1.1 200 OK");
+
 $action = $_POST['action'];
+$reportid = intval($_POST['reportid']);
+$reportname = $_POST['reportname'];
+
 switch($action) {
     case 'add':
-        if (in_array(intval($_POST['reportid']), $_SESSION['compare_ids']) === false) {
-            $_SESSION['compare_ids'][] = intval($_POST['reportid']);
-            $_SESSION['compare_names'][] = $_POST['reportname'];
+        if ((!is_array($_SESSION['compare_reports'])) || (!array_key_exists($reportid, $_SESSION['compare_reports']))) {
+            $_SESSION['compare_reports'][$reportid] = $reportname;
         }
         break;
     case 'remove':
-        $deleteIdx = null;
-        for ($i = 0; $i < count($_SESSION['compare_ids']); $i++) {
-            if ($_SESSION['compare_ids'][$i] == intval($_POST['reportid'])) {
-                $deleteIdx = $i;
-                break;
-            }
-        }
-        if ($deleteIdx !== null) {
-            array_splice($_SESSION['compare_ids'], $deleteIdx, 1);
-            array_splice($_SESSION['compare_names'], $deleteIdx, 1);
+        if ((!is_array($_SESSION['compare_reports'])) || (array_key_exists($reportid, $_SESSION['compare_reports']))) {
+            unset($_SESSION['compare_reports'][$reportid]);
         }
         break;
-    case 'clear':
-        $_SESSION['compare_ids'] = [];
-        $_SESSION['compare_names'] = [];
+    case 'clear':      
+        $_SESSION['compare_reports'] = [];
         break;
 }
 
 $response = [];
-if (is_array($_SESSION['compare_ids'])) {
-    for ($i = 0; $i < count($_SESSION['compare_ids']); $i++) {
+if (is_array($_SESSION['compare_reports'])) {
+    foreach ($_SESSION['compare_reports'] as $key => $value) {
         $response[] = [
-            "id" => $_SESSION['compare_ids'][$i],
-            "name" => $_SESSION['compare_names'][$i]
+            "id" => $key,
+            "name" => $value
         ];
     }
 }
