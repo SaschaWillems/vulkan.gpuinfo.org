@@ -127,48 +127,52 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 		</h4>
 	</div>
 
+	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="alert alert-info" role="alert" style="text-align: center; display: none;">
-		<span id="compare-info">No reports selected for compare</span>
-		<Button onClick="clearCompare()">Clear</Button>
-		<Button onClick="compare()">Compare</Button>
+		<div class="compare-header">Selected reports for compare:</div>
+		<span id="compare-info"></span>
+		<div class="compare-footer">
+			<Button onClick="clearCompare()"><span class='glyphicon glyphicon-button glyphicon-erase'></span> Clear</Button>
+			<Button onClick="compare()"><span class='glyphicon glyphicon-button glyphicon-ok'></span>Compare</Button>
+		</div>
 	</div>
+
 	<?php
 	PageGenerator::platformNavigation('listreports.php', $platform, true, $filter_list->filters);
 	?>
 	<div class='tablediv tab-content' style='display: inline-flex;'>
-		<form method="get" action="compare.php?compare">
-			<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
-				<thead>
-					<tr>
-						<th></th>
-						<?php if (isset($_GET["limit"])) echo "<th></th>" ?>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-					</tr>
-					<tr>
-						<th>id</th>
-						<?php if (isset($_GET["limit"])) echo "<th>Limit</th>" ?>
-						<th>Device</th>
-						<th>Driver</th>
-						<th>Api</th>
-						<th>Vendor</th>
-						<th>Type</th>
-						<th>OS</th>
-						<th>Version</th>
-						<th>Platform</th>
-						<th><input type='submit' name='compare' value='compare' class='button'></th>
-					</tr>
-				</thead>
-			</table>
-			<div id="errordiv" style="color:#D8000C;"></div>
-		</form>
+		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
+			<thead>
+				<tr>
+					<th></th>
+					<?php if (isset($_GET["limit"])) echo "<th></th>" ?>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+				<tr>
+					<th>id</th>
+					<?php if (isset($_GET["limit"])) echo "<th>Limit</th>" ?>
+					<th>Device</th>
+					<th>Driver</th>
+					<th>Api</th>
+					<th>Vendor</th>
+					<th>Type</th>
+					<th>OS</th>
+					<th>Version</th>
+					<th>Platform</th>
+					<th>Compare</th>
+					<!-- <th><input type='submit' name='compare' value='compare' class='button'></th> -->
+				</tr>
+			</thead>
+		</table>
+		<div id="errordiv" style="color:#D8000C;"></div>
 	</div>
 </center>
 
@@ -197,11 +201,13 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 		arr = JSON.parse(data);
 		compareIds = [];
 		if (Array.isArray(arr)) {
-			html = 'Selected for compare: ';			
-			arr.map((element) => {
-				html += '<span class="compare-device">' + element.name + ' <Button onClick="removeFromCompare(' + element.id + ');">X</Button></span>'
+			html = '';
+			for (var i = 0; i < arr.length; i++) {
+				var element = arr[i];
+				var last = (i == arr.length - 1);
+				html += element.name + ' <span onClick="removeFromCompare(' + element.id + ');" class="glyphicon glyphicon-button glyphicon-trash report-remove-icon"></span> ' + (last ? '' : '- ');
 				compareIds.push(element.id);
-			});
+			}
 		}
 		elem.html(html);
 		compareIds.length > 0 ? div.show() : div.hide();			
