@@ -133,7 +133,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 		<span id="compare-info"></span>
 		<div class="compare-footer">
 			<Button onClick="clearCompare()"><span class='glyphicon glyphicon-button glyphicon-erase'></span> Clear</Button>
-			<Button onClick="compare()"><span class='glyphicon glyphicon-button glyphicon-ok'></span>Compare</Button>
+			<Button onClick="compare()"><span class='glyphicon glyphicon-button glyphicon-duplicate'></span> Compare</Button>
 		</div>
 	</div>
 

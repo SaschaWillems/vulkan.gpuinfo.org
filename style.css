@@ -689,3 +689,25 @@ h1 {
 code {
 	background-color: inherit;
 }
+
+.button-glyphicon {
+	height: 20px;
+}
+
+.report-remove-icon {
+	cursor: hand;
+	color: black;
+	/* padding-right: 10px; */
+}
+
+.report-remove-icon:hover {
+	color: #6e0000;
+}
+
+.compare-header {
+	margin-bottom: 10px;
+}
+
+.compare-footer {
+	margin-top: 10px;
+}
