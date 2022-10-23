@@ -20,37 +20,37 @@
  *
  */
 
-// Writes and reads reports to compare to the server session
+// Writes and reads devices to compare to the server session
 
 session_start();
 header("HTTP/1.1 200 OK");
 
 $action = $_POST['action'];
-$reportid = intval($_POST['reportid']);
-$reportname = $_POST['reportname'];
+$devicename = $_POST['devicename'];
+$ostype = $_POST['ostype'];
 
 switch($action) {
     case 'add':
-        if ((!is_array($_SESSION['compare_reports'])) || (!array_key_exists($reportid, $_SESSION['compare_reports']))) {
-            $_SESSION['compare_reports'][$reportid] = $reportname;
+        if ((!is_array($_SESSION['compare_devices'])) || (!array_key_exists($devicename, $_SESSION['compare_devices']))) {
+            $_SESSION['compare_devices'][$devicename] = $ostype !== '' ? $ostype : null;
         }
         break;
     case 'remove':
-        if ((!is_array($_SESSION['compare_reports'])) || (array_key_exists($reportid, $_SESSION['compare_reports']))) {
-            unset($_SESSION['compare_reports'][$reportid]);
+        if ((!is_array($_SESSION['compare_devices'])) || (array_key_exists($devicename, $_SESSION['compare_devices']))) {
+            unset($_SESSION['compare_devices'][$devicename]);
         }
         break;
     case 'clear':      
-        $_SESSION['compare_reports'] = [];
+        $_SESSION['compare_devices'] = [];
         break;
 }
 
 $response = [];
-if (is_array($_SESSION['compare_reports'])) {
-    foreach ($_SESSION['compare_reports'] as $key => $value) {
+if (is_array($_SESSION['compare_devices'])) {
+    foreach ($_SESSION['compare_devices'] as $key => $value) {
         $response[] = [
-            "id" => $key,
-            "name" => $value
+            "name" => $key,
+            "ostype" => $value,
         ];
     }
 }
