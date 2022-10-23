@@ -30,7 +30,7 @@ PageGenerator::header('Compare reports');
 
 DB::connect();
 
-// Use url parameter to enable diff only display
+// If the "diff" url parameter is set, the "show differences" toggle is set by default
 $diff = false;
 if (isset($_GET['diff'])) {
 	$diff = (int)($_GET['diff']) == 1;
@@ -38,10 +38,7 @@ if (isset($_GET['diff'])) {
 
 $headerFields = array("device", "driverversion", "apiversion", "os");
 
-$reportids = array();
-$reportlimit = false;
-
-if ((!isset($_REQUEST['id'])) && (!isset($_REQUEST['devices']))) {
+if ((!isset($_REQUEST['id'])) && (!isset($_REQUEST['devices'])) && (!isset($_REQUEST['reports']))) {
 	echo "<center>";
 ?>
 	<div class="alert alert-warning">
@@ -53,54 +50,59 @@ if ((!isset($_REQUEST['id'])) && (!isset($_REQUEST['devices']))) {
 	die();
 }
 
-// Compare from report list
-if (isset($_REQUEST['id'])) {
-	foreach ($_REQUEST['id'] as $k => $v) {
-		$reportids[] = $k;
-		// Limit to 8 reports
-		if (count($reportids) > 7) {
-			$reportlimit = true;
-			break;
+// The number of reports that can be compared is limited due to performance and layout
+$maxReportCount = 8;
+
+$reportids = [];
+
+// Compare from report list (new format)
+// The URL contains a comma separated list of report ids dot compare
+// e.g. compare.php/reports=100,200,900
+if (isset($_REQUEST['reports'])) {
+	$params = explode(',', $_REQUEST['reports']);
+	foreach($params as $param) {
+		if (is_numeric($param)) {
+			$reportids[] = intval($param);
 		}
 	}
+	// @todo: clear session data for this compare?
 }
 
 // Compare from device list
+// This is a bit more complicated, as we need to find the most recent report id for the compare
+// The URL contains a comma-separated list of device names, with the selected os appended using a double point
+// e.g. compare.php/devices=DeviceA:os=-1,DeviceB:os=2
+// os = -1 means "across all operating" systems
+// This list ist is separated into device name / os pairs used to fetch the most recent report for that device 
+// and (optional OS) based on (in this order) the highest api version, the highest driver version
 if (isset($_REQUEST['devices'])) {
-	$devices = $_REQUEST["devices"];
+	$devices = explode(',', $_REQUEST["devices"]);
 	if (empty($devices)) {
-		die();
+		exit("No devices to compare");
 	}
 	for ($i = 0; $i < count($devices); $i++) {
-		$device = explode('&os=', $devices[$i]);
+		$selector = explode(':os=', $devices[$i]);
 
-		$oswhere = '';
-		switch ($device[1]) {
-			case 'windows':
-				$oswhere = ' and ostype = 0';
-				break;
-			case 'linux':
-				$oswhere = ' and ostype = 1';
-				break;
-			case 'android':
-				$oswhere = ' and ostype = 2';
-				break;
+		$whereStatement = '';
+		if ($selector[1] > -1) {
+			$whereStatement = ' and ostype = '.$selector[1];
 		}
 
-		$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $oswhere order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
-		$result->execute([":device" => $device[0]]);
+		$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $whereStatement order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
+		$result->execute([":device" => $selector[0]]);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 
 		if ($row) {
 			$reportids[] = $row['id'];
 		}
-
-		// Limit to 8 reports
-		if (count($reportids) > 7) {
-			$reportlimit = true;
-			break;
-		}
 	}
+}
+
+// Limit max. number of reports to compare
+$reportlimit = false;
+if (count($reportids) > $maxReportCount) {
+	$reportlimit = true;
+	$reportids = array_slice($reportids, 0, $maxReportCount);
 }
 
 $report_compare = new ReportCompare($reportids);

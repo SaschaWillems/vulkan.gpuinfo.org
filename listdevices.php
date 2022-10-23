@@ -67,6 +67,16 @@ if ($minApiVersion) {
 		</h4>
 	</div>
 
+	<!-- Compare block (only visible when at least one report is selected) -->
+	<div id="compare-div" class="alert alert-info" role="alert" style="text-align: center; display: none;">
+		<div class="compare-header">Selected devices for compare:</div>
+		<span id="compare-info"></span>
+		<div class="compare-footer">
+			<Button onClick="clearCompare()"><span class='glyphicon glyphicon-button glyphicon-erase'></span> Clear</Button>
+			<Button onClick="compare()"><span class='glyphicon glyphicon-button glyphicon-duplicate'></span> Compare</Button>
+		</div>
+	</div>	
+
 	<?php
 	if ($showTabs) {
 		PageGenerator::platformNavigation('listdevices.php', $platform, true);
@@ -75,39 +85,85 @@ if ($minApiVersion) {
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 		<div id='devices_div' class='tab-pane fade in active'>
-			<form method="get" action="compare.php">
-				<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
-					<thead>
-						<tr>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-						</tr>
-						<tr>
-							<th>Device</th>
-							<th>Max. API version</th>
-							<th>Latest Driver version</th>
-							<th>Last submission</th>
-							<th>Count</th>
-							<th><input type='submit' class='button' value='compare'></th>
-						</tr>
-					</thead>
-				</table>
-				<div id="errordiv" style="color:#D8000C;"></div>
-			</form>
+			<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th></th>
+					</tr>
+					<tr>
+						<th>Device</th>
+						<th>Max. API version</th>
+						<th>Latest Driver version</th>
+						<th>Last submission</th>
+						<th>Count</th>
+						<th>Compare</th>
+					</tr>
+				</thead>
+			</table>
+			<div id="errordiv" style="color:#D8000C;"></div>
 		</div>
 	</div>
 </center>
 
 <script>
+	var comparerUrl = 'api/internal/devicecomparer.php',
+	compareDevices = [];
+
+	function clearCompare() {
+		data =  {'action': 'clear' };
+		$.post(comparerUrl, data, function (response) {
+			displayCompare(null);
+		});
+    };
+
+	function removeFromCompare(name) {
+    	data =  {'action': 'remove', 'devicename': name };
+    	$.post(comparerUrl, data, function (response) {
+        	displayCompare(response);
+    	});		
+	}
+
+	function displayCompare(data) {
+		elem = $('#compare-info');
+		div = $('#compare-div'); 
+		html = '';
+		arr = JSON.parse(data);
+		compareDevices = [];
+		if (Array.isArray(arr)) {
+			html = '';
+			for (var i = 0; i < arr.length; i++) {
+				var element = arr[i];
+				var last = (i == arr.length - 1);
+				var ostypes = ['Windows', 'Linux', 'Android', 'macOS', 'iOS'];
+				var osname = (element.ostype !== null) ? ostypes[element.ostype] : 'All';
+				html += element.name + ' (' + osname + ') <span onClick="removeFromCompare(' + element.name + ');" class="glyphicon glyphicon-button glyphicon-trash report-remove-icon"></span> ' + (last ? '' : '- ');
+				compareDevices.push(element);
+			}
+		}
+		elem.html(html);
+		compareDevices.length > 0 ? div.show() : div.hide();			
+	}
+
+	function compare() {
+		var params = compareDevices.map((element) => (element.name + ':os=' + (element.ostype !== null ? element.ostype : '-1')) ).join();
+		location.href = 'compare.php?devices=' + params;
+	}
+
 	$(document).on("keypress", "form", function(event) {
 		return event.keyCode != 13;
 	});
 
 	$(document).ready(function() {
+		
+		$.get(comparerUrl, null, function (response) {
+			displayCompare(response);
+		});
+
 		var table = $('#devices').DataTable({
 			"processing": true,
 			"serverSide": true,

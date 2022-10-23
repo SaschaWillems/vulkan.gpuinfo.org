@@ -168,7 +168,6 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 					<th>Version</th>
 					<th>Platform</th>
 					<th>Compare</th>
-					<!-- <th><input type='submit' name='compare' value='compare' class='button'></th> -->
 				</tr>
 			</thead>
 		</table>
@@ -177,19 +176,19 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 </center>
 
 <script>
-	var ajaxurl = 'api/internal/comparer.php',
+	var comparerUrl = 'api/internal/reportcomparer.php',
 	compareIds = [];
 
 	function clearCompare() {
 		data =  {'action': 'clear' };
-		$.post(ajaxurl, data, function (response) {
+		$.post(comparerUrl, data, function (response) {
 			displayCompare(null);
 		});
     };
 
 	function removeFromCompare(id) {
     	data =  {'action': 'remove', 'reportid': id };
-    	$.post(ajaxurl, data, function (response) {
+    	$.post(comparerUrl, data, function (response) {
         	displayCompare(response);
     	});		
 	}
@@ -197,7 +196,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 	function displayCompare(data) {
 		elem = $('#compare-info');
 		div = $('#compare-div'); 
-		html = 'No reports selected for compare';
+		html = '';
 		arr = JSON.parse(data);
 		compareIds = [];
 		if (Array.isArray(arr)) {
@@ -223,7 +222,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 
 	$(document).ready(function() {
 
-		$.get(ajaxurl, null, function (response) {
+		$.get(comparerUrl, null, function (response) {
 			displayCompare(response);
 		});
 
