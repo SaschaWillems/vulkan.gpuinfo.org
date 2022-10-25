@@ -141,7 +141,7 @@ if ($minApiVersion) {
 				var last = (i == arr.length - 1);
 				var ostypes = ['Windows', 'Linux', 'Android', 'macOS', 'iOS'];
 				var osname = (element.ostype !== null) ? ostypes[element.ostype] : 'All';
-				html += element.name + ' (' + osname + ') <span onClick="removeFromCompare(' + element.name + ');" class="glyphicon glyphicon-button glyphicon-trash report-remove-icon"></span> ' + (last ? '' : '- ');
+				html += element.name + ' (' + osname + ') <span onClick="removeFromCompare(\'' + element.name + '\');" class="glyphicon glyphicon-button glyphicon-trash report-remove-icon"></span> ' + (last ? '' : '- ');
 				compareDevices.push(element);
 			}
 		}
