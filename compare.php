@@ -76,24 +76,45 @@ if (isset($_REQUEST['reports'])) {
 // This list ist is separated into device name / os pairs used to fetch the most recent report for that device 
 // and (optional OS) based on (in this order) the highest api version, the highest driver version
 if (isset($_REQUEST['devices'])) {
-	$devices = explode(',', $_REQUEST["devices"]);
-	if (empty($devices)) {
-		exit("No devices to compare");
-	}
-	for ($i = 0; $i < count($devices); $i++) {
-		$selector = explode(':os=', $devices[$i]);
+	// Backwards compatibility for old link style
+	$old_compare_link = is_array($_REQUEST['devices']);
+	if ($old_compare_link) {
+		$devices = $_REQUEST['devices'];
+		for ($i = 0; $i < count($devices); $i++) {
+			$device = explode('&os=', $devices[$i]);
+	
+			$ostype = ostype($device[1]);			
+			$oswhere = ($ostype !== null) ? " and ostype = $ostype" : '';
 
-		$whereStatement = '';
-		if ($selector[1] > -1) {
-			$whereStatement = ' and ostype = '.$selector[1];
+			$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $oswhere order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
+			$result->execute([":device" => $device[0]]);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+	
+			if ($row) {
+				$reportids[] = $row['id'];
+			}
+		}		
+	} else {
+		// New compare link style (shorter)
+		$devices = explode(',', $_REQUEST["devices"]);
+		if (empty($devices)) {
+			exit("No devices to compare");
 		}
+		for ($i = 0; $i < count($devices); $i++) {
+			$selector = explode(':os=', $devices[$i]);
 
-		$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $whereStatement order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
-		$result->execute([":device" => $selector[0]]);
-		$row = $result->fetch(PDO::FETCH_ASSOC);
+			$whereStatement = '';
+			if ($selector[1] > -1) {
+				$whereStatement = ' and ostype = '.$selector[1];
+			}
 
-		if ($row) {
-			$reportids[] = $row['id'];
+			$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $whereStatement order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
+			$result->execute([":device" => $selector[0]]);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+
+			if ($row) {
+				$reportids[] = $row['id'];
+			}
 		}
 	}
 }
