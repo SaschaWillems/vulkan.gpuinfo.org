@@ -125,8 +125,15 @@ if ($minApiVersion) {
     	data =  {'action': 'remove', 'devicename': name };
     	$.post(comparerUrl, data, function (response) {
         	displayCompare(response);
-    	});		
+    	});	
 	}
+
+	function addToCompare(devicename, ostype) {
+		data = {'action': 'add', 'devicename': devicename, 'ostype': ostype};
+		$.post(comparerUrl, data, function (response) {
+			displayCompare(response);
+		});
+    }	
 
 	function displayCompare(data) {
 		elem = $('#compare-info');

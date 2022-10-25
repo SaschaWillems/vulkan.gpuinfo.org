@@ -186,12 +186,19 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 		});
     };
 
-	function removeFromCompare(id) {
-    	data =  {'action': 'remove', 'reportid': id };
+	function removeFromCompare(reportid) {
+    	data =  {'action': 'remove', 'reportid': reportid };
     	$.post(comparerUrl, data, function (response) {
         	displayCompare(response);
     	});		
 	}
+
+	function addToCompare(reportid, reportname) {
+		data = {'action': 'add', 'reportid': reportid, 'reportname': reportname};
+		$.post(comparerUrl, data, function (response) {
+			displayCompare(response);
+		});
+    }
 
 	function displayCompare(data) {
 		elem = $('#compare-info');
