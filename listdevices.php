@@ -157,8 +157,17 @@ if ($minApiVersion) {
 	}
 
 	function compare() {
-		var params = compareDevices.map((element) => (element.name + ':os=' + (element.ostype !== null ? element.ostype : '-1')) ).join();
-		location.href = 'compare.php?devices=' + params;
+		var url = 'compare.php?devices[]=';
+		for (var i = 0; i < compareDevices.length; i++) {
+			if (i > 0) {
+				url += '&devices[]=';
+			}
+			var ostypes = ['windows', 'linux', 'android', 'macos', 'ios'];
+			let ostype = compareDevices[i].ostype !== null ? ostypes[compareDevices[i].ostype] : 'all';
+			url += compareDevices[i].name;
+			url += '&os=' + ostype;
+		}
+		location.href = url;
 	}
 
 	$(document).on("keypress", "form", function(event) {

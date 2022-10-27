@@ -70,53 +70,26 @@ if (isset($_REQUEST['reports'])) {
 
 // Compare from device list
 // This is a bit more complicated, as we need to find the most recent report id for the compare
-// The URL contains a comma-separated list of device names, with the selected os appended using a double point
-// e.g. compare.php/devices=DeviceA:os=-1,DeviceB:os=2
-// os = -1 means "across all operating" systems
-// This list ist is separated into device name / os pairs used to fetch the most recent report for that device 
+// The URL contains a comma-separated list of device names, with the selected os appended
+// e.g. compare.php?devices[]=NVIDIA GeForce RTX 3090&os=all&devices[]=Apple M1&os=macos
+// This list is separated into device name / os pairs used to fetch the most recent report for that device 
 // and (optional OS) based on (in this order) the highest api version, the highest driver version
 if (isset($_REQUEST['devices'])) {
-	// Backwards compatibility for old link style
-	$old_compare_link = is_array($_REQUEST['devices']);
-	if ($old_compare_link) {
-		$devices = $_REQUEST['devices'];
-		for ($i = 0; $i < count($devices); $i++) {
-			$device = explode('&os=', $devices[$i]);
-	
-			$ostype = ostype($device[1]);			
-			$oswhere = ($ostype !== null) ? " and ostype = $ostype" : '';
+	$devices = $_REQUEST['devices'];
+	for ($i = 0; $i < count($devices); $i++) {
+		$device = explode('&os=', $devices[$i]);
 
-			$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $oswhere order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
-			$result->execute([":device" => $device[0]]);
-			$row = $result->fetch(PDO::FETCH_ASSOC);
-	
-			if ($row) {
-				$reportids[] = $row['id'];
-			}
-		}		
-	} else {
-		// New compare link style (shorter)
-		$devices = explode(',', $_REQUEST["devices"]);
-		if (empty($devices)) {
-			exit("No devices to compare");
+		$ostype = ostype($device[1]);			
+		$oswhere = ($ostype !== null) ? " and ostype = $ostype" : '';
+
+		$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $oswhere order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
+		$result->execute([":device" => $device[0]]);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		if ($row) {
+			$reportids[] = $row['id'];
 		}
-		for ($i = 0; $i < count($devices); $i++) {
-			$selector = explode(':os=', $devices[$i]);
-
-			$whereStatement = '';
-			if ($selector[1] > -1) {
-				$whereStatement = ' and ostype = '.$selector[1];
-			}
-
-			$result = DB::$connection->prepare("SELECT * from reports r join deviceproperties dp on r.id = dp.reportid where ifnull(r.displayname, dp.devicename) = :device $whereStatement order by dp.apiversionraw desc, dp.driverversionraw desc, r.version desc, r.submissiondate desc");
-			$result->execute([":device" => $selector[0]]);
-			$row = $result->fetch(PDO::FETCH_ASSOC);
-
-			if ($row) {
-				$reportids[] = $row['id'];
-			}
-		}
-	}
+	}		
 }
 
 // Limit max. number of reports to compare
