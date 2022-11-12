@@ -68,7 +68,7 @@ if ($minApiVersion) {
 	</div>
 
 	<!-- Compare block (only visible when at least one report is selected) -->
-	<div id="compare-div" class="alert alert-info" role="alert" style="text-align: center; display: none;">
+	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">
 		<div class="compare-header">Selected devices for compare:</div>
 		<span id="compare-info"></span>
 		<div class="compare-footer">
@@ -110,66 +110,9 @@ if ($minApiVersion) {
 	</div>
 </center>
 
+<script src="js/devicecompare.js"></script>
+
 <script>
-	var comparerUrl = 'api/internal/devicecomparer.php',
-	compareDevices = [];
-
-	function clearCompare() {
-		data =  {'action': 'clear' };
-		$.post(comparerUrl, data, function (response) {
-			displayCompare(null);
-		});
-    };
-
-	function removeFromCompare(name) {
-    	data =  {'action': 'remove', 'devicename': name };
-    	$.post(comparerUrl, data, function (response) {
-        	displayCompare(response);
-    	});	
-	}
-
-	function addToCompare(devicename, ostype) {
-		data = {'action': 'add', 'devicename': devicename, 'ostype': ostype};
-		$.post(comparerUrl, data, function (response) {
-			displayCompare(response);
-		});
-    }	
-
-	function displayCompare(data) {
-		elem = $('#compare-info');
-		div = $('#compare-div'); 
-		html = '';
-		arr = JSON.parse(data);
-		compareDevices = [];
-		if (Array.isArray(arr)) {
-			html = '';
-			for (var i = 0; i < arr.length; i++) {
-				var element = arr[i];
-				var last = (i == arr.length - 1);
-				var ostypes = ['Windows', 'Linux', 'Android', 'macOS', 'iOS'];
-				var osname = (element.ostype !== null) ? ostypes[element.ostype] : 'All';
-				html += element.name + ' (' + osname + ') <span onClick="removeFromCompare(\'' + element.name + '\');" class="glyphicon glyphicon-button glyphicon-trash report-remove-icon"></span> ' + (last ? '' : '- ');
-				compareDevices.push(element);
-			}
-		}
-		elem.html(html);
-		compareDevices.length > 0 ? div.show() : div.hide();			
-	}
-
-	function compare() {
-		var url = 'compare.php?devices[]=';
-		for (var i = 0; i < compareDevices.length; i++) {
-			if (i > 0) {
-				url += '&devices[]=';
-			}
-			var ostypes = ['windows', 'linux', 'android', 'macos', 'ios'];
-			let ostype = compareDevices[i].ostype !== null ? ostypes[compareDevices[i].ostype] : 'all';
-			url += compareDevices[i].name;
-			url += '&os=' + ostype;
-		}
-		location.href = url;
-	}
-
 	$(document).on("keypress", "form", function(event) {
 		return event.keyCode != 13;
 	});
