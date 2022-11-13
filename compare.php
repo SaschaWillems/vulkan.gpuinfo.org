@@ -65,7 +65,7 @@ if (isset($_REQUEST['reports'])) {
 			$reportids[] = intval($param);
 		}
 	}
-	// @todo: clear session data for this compare?
+	$_SESSION['compare_reports'] = [];
 }
 
 // Compare from device list
@@ -89,7 +89,8 @@ if (isset($_REQUEST['devices'])) {
 		if ($row) {
 			$reportids[] = $row['id'];
 		}
-	}		
+	}
+	$_SESSION['compare_devices'] = [];
 }
 
 // Limit max. number of reports to compare
