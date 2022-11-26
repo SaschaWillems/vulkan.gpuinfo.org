@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -127,45 +127,55 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 		</h4>
 	</div>
 
+	<!-- Compare block (only visible when at least one report is selected) -->
+	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">
+		<div class="compare-header">Selected reports for compare:</div>
+		<span id="compare-info"></span>
+		<div class="compare-footer">
+			<Button onClick="clearCompare()"><span class='glyphicon glyphicon-button glyphicon-erase'></span> Clear</Button>
+			<Button onClick="compare()"><span class='glyphicon glyphicon-button glyphicon-duplicate'></span> Compare</Button>
+		</div>
+	</div>
+
 	<?php
 	PageGenerator::platformNavigation('listreports.php', $platform, true, $filter_list->filters);
 	?>
 	<div class='tablediv tab-content' style='display: inline-flex;'>
-		<form method="get" action="compare.php?compare">
-			<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
-				<thead>
-					<tr>
-						<th></th>
-						<?php if (isset($_GET["limit"])) echo "<th></th>" ?>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-					</tr>
-					<tr>
-						<th>id</th>
-						<?php if (isset($_GET["limit"])) echo "<th>Limit</th>" ?>
-						<th>Device</th>
-						<th>Driver</th>
-						<th>Api</th>
-						<th>Vendor</th>
-						<th>Type</th>
-						<th>OS</th>
-						<th>Version</th>
-						<th>Platform</th>
-						<th><input type='submit' name='compare' value='compare' class='button'></th>
-					</tr>
-				</thead>
-			</table>
-			<div id="errordiv" style="color:#D8000C;"></div>
-		</form>
+		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
+			<thead>
+				<tr>
+					<th></th>
+					<?php if (isset($_GET["limit"])) echo "<th></th>" ?>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+				<tr>
+					<th>id</th>
+					<?php if (isset($_GET["limit"])) echo "<th>Limit</th>" ?>
+					<th>Device</th>
+					<th>Driver</th>
+					<th>Api</th>
+					<th>Vendor</th>
+					<th>Type</th>
+					<th>OS</th>
+					<th>Version</th>
+					<th>Platform</th>
+					<th>Compare</th>
+				</tr>
+			</thead>
+		</table>
+		<div id="errordiv" style="color:#D8000C;"></div>
 	</div>
 </center>
+
+<script src="js/reportcompare.js"></script>
 
 <script>
 	$(document).on("keypress", "form", function(event) {
@@ -173,6 +183,10 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 	});
 
 	$(document).ready(function() {
+
+		$.get(comparerUrl, null, function (response) {
+			displayCompare(response);
+		});
 
 		var table = $('#reports').DataTable({
 			"processing": true,

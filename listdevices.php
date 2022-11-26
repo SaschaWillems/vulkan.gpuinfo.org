@@ -67,6 +67,16 @@ if ($minApiVersion) {
 		</h4>
 	</div>
 
+	<!-- Compare block (only visible when at least one report is selected) -->
+	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">
+		<div class="compare-header">Selected devices for compare:</div>
+		<span id="compare-info"></span>
+		<div class="compare-footer">
+			<Button onClick="clearCompare()"><span class='glyphicon glyphicon-button glyphicon-erase'></span> Clear</Button>
+			<Button onClick="compare()"><span class='glyphicon glyphicon-button glyphicon-duplicate'></span> Compare</Button>
+		</div>
+	</div>	
+
 	<?php
 	if ($showTabs) {
 		PageGenerator::platformNavigation('listdevices.php', $platform, true);
@@ -75,32 +85,32 @@ if ($minApiVersion) {
 
 	<div class='tablediv tab-content' style='display: inline-flex;'>
 		<div id='devices_div' class='tab-pane fade in active'>
-			<form method="get" action="compare.php">
-				<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
-					<thead>
-						<tr>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-							<th></th>
-						</tr>
-						<tr>
-							<th>Device</th>
-							<th>Max. API version</th>
-							<th>Latest Driver version</th>
-							<th>Last submission</th>
-							<th>Count</th>
-							<th><input type='submit' class='button' value='compare'></th>
-						</tr>
-					</thead>
-				</table>
-				<div id="errordiv" style="color:#D8000C;"></div>
-			</form>
+			<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th></th>
+					</tr>
+					<tr>
+						<th>Device</th>
+						<th>Max. API version</th>
+						<th>Latest Driver version</th>
+						<th>Last submission</th>
+						<th>Count</th>
+						<th>Compare</th>
+					</tr>
+				</thead>
+			</table>
+			<div id="errordiv" style="color:#D8000C;"></div>
 		</div>
 	</div>
 </center>
+
+<script src="js/devicecompare.js"></script>
 
 <script>
 	$(document).on("keypress", "form", function(event) {
@@ -108,6 +118,11 @@ if ($minApiVersion) {
 	});
 
 	$(document).ready(function() {
+		
+		$.get(comparerUrl, null, function (response) {
+			displayCompare(response);
+		});
+
 		var table = $('#devices').DataTable({
 			"processing": true,
 			"serverSide": true,

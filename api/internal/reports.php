@@ -291,7 +291,7 @@ if ($devices->rowCount() > 0) {
             'osname' => $device["osname"],
             'osversion' => $device["osversion"],
             'osarchitecture' => $device["osarchitecture"],
-            'compare' => '<center><input type="checkbox" name="id[' . $device["id"] . ']"></center>',
+            'compare' => '<center><Button onClick="addToCompare('.$device['id'].',\''.$device['devicename'].'\')">Add</Button>',
             'profile' => ($portabilitysubset ? "<center><a href=\"api/v3/getprofile.php?id=".$device["id"]."\">Download</a></center>" : null)
         );
     }
