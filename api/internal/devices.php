@@ -420,7 +420,7 @@ if ($devices->rowCount() > 0) {
             'reportversion' => $device["reportversion"],
             'submissiondate' => $device["submissiondate"],
             'vendor' => $device["vendor"],
-            'compare' => '<center><Button onClick="addToCompare(\''.$device['device'].'\','.($ostype ? $ostype : '').')">Add</Button>',
+            'compare' => '<center><Button onClick="addToCompare(\''.$device['device'].'\','.($ostype !== null ? $ostype : '').')">Add</Button>',
         );
     }
 }
