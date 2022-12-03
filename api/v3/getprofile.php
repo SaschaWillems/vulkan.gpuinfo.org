@@ -76,7 +76,7 @@ class VulkanProfile {
     private function loadSchema($apiversion) {
         // Get profiles schema based on patch level (=header revision)
         $header_version = explode('.', $apiversion)[2];
-        $report_profile_name = "../../profiles/schema/profiles-0.8.0-$header_version.json";
+        $report_profile_name = "../../profiles/schema/profiles-0.8.1-$header_version.json";
         // Use the latest profile if no matching file could be found
         if (!file_exists($report_profile_name)) {
             $report_profile_name = "../../profiles/schema/profiles-0.8-latest.json";

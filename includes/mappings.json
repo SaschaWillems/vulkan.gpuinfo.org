@@ -1,5 +1,5 @@
 {
-    "headerversion": "218",
+    "headerversion": "236",
     "VK_KHR_surface": {
         "name": "VK_KHR_surface",
         "promotedTo": null,
@@ -1038,20 +1038,27 @@
         },
         "types": []
     },
-    "VK_IMG_extension_69": {
-        "name": "VK_IMG_extension_69",
+    "VK_EXT_pipeline_robustness": {
+        "name": "VK_EXT_pipeline_robustness",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDevicePipelineRobustnessFeaturesEXT",
+                "physicalDeviceProperties": "VkPhysicalDevicePipelineRobustnessPropertiesEXT"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "defaultRobustnessStorageBuffers": "VkPipelineRobustnessBufferBehaviorEXT",
+            "defaultRobustnessUniformBuffers": "VkPipelineRobustnessBufferBehaviorEXT",
+            "defaultRobustnessVertexInputs": "VkPipelineRobustnessBufferBehaviorEXT",
+            "defaultRobustnessImages": "VkPipelineRobustnessImageBehaviorEXT"
+        }
     },
     "VK_KHR_maintenance1": {
         "name": "VK_KHR_maintenance1",
@@ -4791,12 +4798,12 @@
         },
         "types": []
     },
-    "VK_NV_extension_293": {
-        "name": "VK_NV_extension_293",
+    "VK_NV_present_barrier": {
+        "name": "VK_NV_present_barrier",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDevicePresentBarrierFeaturesNV",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -5151,20 +5158,24 @@
         },
         "types": []
     },
-    "VK_AMD_extension_317": {
-        "name": "VK_AMD_extension_317",
+    "VK_EXT_descriptor_buffer": {
+        "name": "VK_EXT_descriptor_buffer",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceDescriptorBufferFeaturesEXT",
+                "physicalDeviceProperties": "VkPhysicalDeviceDescriptorBufferDensityMapPropertiesEXT"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "combinedImageSamplerDensityMapDescriptorSize": "size_t"
+        }
     },
     "VK_AMD_extension_318": {
         "name": "VK_AMD_extension_318",
@@ -5344,20 +5355,51 @@
         },
         "types": []
     },
-    "VK_NV_extension_329": {
-        "name": "VK_NV_extension_329",
+    "VK_EXT_mesh_shader": {
+        "name": "VK_EXT_mesh_shader",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceMeshShaderFeaturesEXT",
+                "physicalDeviceProperties": "VkPhysicalDeviceMeshShaderPropertiesEXT"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "maxTaskWorkGroupTotalCount": "uint32_t",
+            "maxTaskWorkGroupCount": "uint32_t",
+            "maxTaskWorkGroupInvocations": "uint32_t",
+            "maxTaskWorkGroupSize": "uint32_t",
+            "maxTaskPayloadSize": "uint32_t",
+            "maxTaskSharedMemorySize": "uint32_t",
+            "maxTaskPayloadAndSharedMemorySize": "uint32_t",
+            "maxMeshWorkGroupTotalCount": "uint32_t",
+            "maxMeshWorkGroupCount": "uint32_t",
+            "maxMeshWorkGroupInvocations": "uint32_t",
+            "maxMeshWorkGroupSize": "uint32_t",
+            "maxMeshSharedMemorySize": "uint32_t",
+            "maxMeshPayloadAndSharedMemorySize": "uint32_t",
+            "maxMeshOutputMemorySize": "uint32_t",
+            "maxMeshPayloadAndOutputMemorySize": "uint32_t",
+            "maxMeshOutputComponents": "uint32_t",
+            "maxMeshOutputVertices": "uint32_t",
+            "maxMeshOutputPrimitives": "uint32_t",
+            "maxMeshOutputLayers": "uint32_t",
+            "maxMeshMultiviewViewCount": "uint32_t",
+            "meshOutputPerVertexGranularity": "uint32_t",
+            "meshOutputPerPrimitiveGranularity": "uint32_t",
+            "maxPreferredTaskWorkGroupInvocations": "uint32_t",
+            "maxPreferredMeshWorkGroupInvocations": "uint32_t",
+            "prefersLocalInvocationVertexOutput": "VkBool32",
+            "prefersLocalInvocationPrimitiveOutput": "VkBool32",
+            "prefersCompactVertexOutput": "VkBool32",
+            "prefersCompactPrimitiveOutput": "VkBool32"
+        }
     },
     "VK_NV_extension_330": {
         "name": "VK_NV_extension_330",
@@ -5516,12 +5558,12 @@
         },
         "types": []
     },
-    "VK_EXT_extension_340": {
-        "name": "VK_EXT_extension_340",
+    "VK_EXT_attachment_feedback_loop_layout": {
+        "name": "VK_EXT_attachment_feedback_loop_layout",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -5546,12 +5588,12 @@
         },
         "types": []
     },
-    "VK_EXT_extension_342": {
-        "name": "VK_EXT_extension_342",
+    "VK_EXT_device_fault": {
+        "name": "VK_EXT_device_fault",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceFaultFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -5563,7 +5605,7 @@
     },
     "VK_ARM_rasterization_order_attachment_access": {
         "name": "VK_ARM_rasterization_order_attachment_access",
-        "promotedTo": null,
+        "promotedTo": "VK_EXT_rasterization_order_attachment_access",
         "structs": {
             "ext": {
                 "physicalDeviceFeatures": "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM",
@@ -5668,7 +5710,7 @@
     },
     "VK_VALVE_mutable_descriptor_type": {
         "name": "VK_VALVE_mutable_descriptor_type",
-        "promotedTo": null,
+        "promotedTo": "VK_EXT_mutable_descriptor_type",
         "structs": {
             "ext": {
                 "physicalDeviceFeatures": "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE",
@@ -5720,12 +5762,12 @@
             "renderMinor": "int64_t"
         }
     },
-    "VK_EXT_extension_355": {
-        "name": "VK_EXT_extension_355",
+    "VK_EXT_device_address_binding_report": {
+        "name": "VK_EXT_device_address_binding_report",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceAddressBindingReportFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -6054,12 +6096,12 @@
         },
         "types": []
     },
-    "VK_EXT_extension_377": {
-        "name": "VK_EXT_extension_377",
+    "VK_EXT_multisampled_render_to_single_sampled": {
+        "name": "VK_EXT_multisampled_render_to_single_sampled",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -6358,20 +6400,25 @@
         },
         "types": []
     },
-    "VK_NV_extension_397": {
-        "name": "VK_NV_extension_397",
+    "VK_EXT_opacity_micromap": {
+        "name": "VK_EXT_opacity_micromap",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceOpacityMicromapFeaturesEXT",
+                "physicalDeviceProperties": "VkPhysicalDeviceOpacityMicromapPropertiesEXT"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "maxOpacity2StateSubdivisionLevel": "uint32_t",
+            "maxOpacity4StateSubdivisionLevel": "uint32_t"
+        }
     },
     "VK_NV_extension_398": {
         "name": "VK_NV_extension_398",
@@ -6737,12 +6784,12 @@
         },
         "types": []
     },
-    "VK_EXT_extension_422": {
-        "name": "VK_EXT_extension_422",
+    "VK_EXT_depth_clamp_zero_one": {
+        "name": "VK_EXT_depth_clamp_zero_one",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDeviceDepthClampZeroOneFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -6816,35 +6863,44 @@
             "fragmentDensityOffsetGranularity": "VkExtent2D"
         }
     },
-    "VK_NV_extension_427": {
-        "name": "VK_NV_extension_427",
+    "VK_NV_copy_memory_indirect": {
+        "name": "VK_NV_copy_memory_indirect",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceCopyMemoryIndirectFeaturesNV",
+                "physicalDeviceProperties": "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "supportedQueues": "VkQueueFlags"
+        }
     },
-    "VK_NV_extension_428": {
-        "name": "VK_NV_extension_428",
+    "VK_NV_memory_decompression": {
+        "name": "VK_NV_memory_decompression",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceMemoryDecompressionFeaturesNV",
+                "physicalDeviceProperties": "VkPhysicalDeviceMemoryDecompressionPropertiesNV"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "decompressionMethods": "VkMemoryDecompressionMethodFlagsNV",
+            "maxDecompressionIndirectCount": "uint64_t"
+        }
     },
     "VK_NV_extension_429": {
         "name": "VK_NV_extension_429",
@@ -7026,20 +7082,27 @@
         },
         "types": []
     },
-    "VK_QCOM_extension_441": {
-        "name": "VK_QCOM_extension_441",
+    "VK_QCOM_image_processing": {
+        "name": "VK_QCOM_image_processing",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceImageProcessingFeaturesQCOM",
+                "physicalDeviceProperties": "VkPhysicalDeviceImageProcessingPropertiesQCOM"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "maxWeightFilterPhases": "uint32_t",
+            "maxWeightFilterDimension": "VkExtent2D",
+            "maxBlockMatchRegion": "VkExtent2D",
+            "maxBoxFilterBlockSize": "VkExtent2D"
+        }
     },
     "VK_COREAVI_extension_442": {
         "name": "VK_COREAVI_extension_442",
@@ -7251,20 +7314,24 @@
         },
         "types": []
     },
-    "VK_NV_extension_456": {
-        "name": "VK_NV_extension_456",
+    "VK_EXT_extended_dynamic_state3": {
+        "name": "VK_EXT_extended_dynamic_state3",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
+                "physicalDeviceFeatures": "VkPhysicalDeviceExtendedDynamicState3FeaturesEXT",
+                "physicalDeviceProperties": "VkPhysicalDeviceExtendedDynamicState3PropertiesEXT"
             },
             "core": {
                 "physicalDeviceFeatures": null,
                 "physicalDeviceProperties": null
             }
         },
-        "types": []
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "dynamicPrimitiveTopologyUnrestricted": "VkBool32"
+        }
     },
     "VK_EXT_extension_457": {
         "name": "VK_EXT_extension_457",
@@ -7311,8 +7378,8 @@
         },
         "types": []
     },
-    "VK_EXT_extension_460": {
-        "name": "VK_EXT_extension_460",
+    "VK_LUNARG_direct_driver_loading": {
+        "name": "VK_LUNARG_direct_driver_loading",
         "promotedTo": null,
         "structs": {
             "ext": {
@@ -7356,12 +7423,31 @@
         },
         "types": []
     },
-    "VK_EXT_extension_463": {
-        "name": "VK_EXT_extension_463",
+    "VK_EXT_shader_module_identifier": {
+        "name": "VK_EXT_shader_module_identifier",
         "promotedTo": null,
         "structs": {
             "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceShaderModuleIdentifierFeaturesEXT",
+                "physicalDeviceProperties": "VkPhysicalDeviceShaderModuleIdentifierPropertiesEXT"
+            },
+            "core": {
                 "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "shaderModuleIdentifierAlgorithmUUID": "uint8_t"
+        }
+    },
+    "VK_EXT_rasterization_order_attachment_access": {
+        "name": "VK_EXT_rasterization_order_attachment_access",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -7371,12 +7457,41 @@
         },
         "types": []
     },
-    "VK_EXT_extension_464": {
-        "name": "VK_EXT_extension_464",
+    "VK_NV_optical_flow": {
+        "name": "VK_NV_optical_flow",
         "promotedTo": null,
         "structs": {
             "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceOpticalFlowFeaturesNV",
+                "physicalDeviceProperties": "VkPhysicalDeviceOpticalFlowPropertiesNV"
+            },
+            "core": {
                 "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "supportedOutputGridSizes": "VkOpticalFlowGridSizeFlagsNV",
+            "supportedHintGridSizes": "VkOpticalFlowGridSizeFlagsNV",
+            "hintSupported": "VkBool32",
+            "costSupported": "VkBool32",
+            "bidirectionalFlowSupported": "VkBool32",
+            "globalFlowSupported": "VkBool32",
+            "minWidth": "uint32_t",
+            "minHeight": "uint32_t",
+            "maxWidth": "uint32_t",
+            "maxHeight": "uint32_t",
+            "maxNumRegionsOfInterest": "uint32_t"
+        }
+    },
+    "VK_EXT_legacy_dithering": {
+        "name": "VK_EXT_legacy_dithering",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceLegacyDitheringFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -7386,42 +7501,12 @@
         },
         "types": []
     },
-    "VK_NV_extension_465": {
-        "name": "VK_NV_extension_465",
+    "VK_EXT_pipeline_protected_access": {
+        "name": "VK_EXT_pipeline_protected_access",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
-            },
-            "core": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
-            }
-        },
-        "types": []
-    },
-    "VK_EXT_extension_466": {
-        "name": "VK_EXT_extension_466",
-        "promotedTo": null,
-        "structs": {
-            "ext": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
-            },
-            "core": {
-                "physicalDeviceFeatures": null,
-                "physicalDeviceProperties": null
-            }
-        },
-        "types": []
-    },
-    "VK_EXT_extension_467": {
-        "name": "VK_EXT_extension_467",
-        "promotedTo": null,
-        "structs": {
-            "ext": {
-                "physicalDeviceFeatures": null,
+                "physicalDeviceFeatures": "VkPhysicalDevicePipelineProtectedAccessFeaturesEXT",
                 "physicalDeviceProperties": null
             },
             "core": {
@@ -7658,6 +7743,346 @@
     },
     "VK_EXT_extension_483": {
         "name": "VK_EXT_extension_483",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_484": {
+        "name": "VK_EXT_extension_484",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_QCOM_tile_properties": {
+        "name": "VK_QCOM_tile_properties",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceTilePropertiesFeaturesQCOM",
+                "physicalDeviceProperties": "VkPhysicalDeviceTilePropertiesFeaturesQCOM"
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_SEC_amigo_profiling": {
+        "name": "VK_SEC_amigo_profiling",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceAmigoProfilingFeaturesSEC",
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_487": {
+        "name": "VK_EXT_extension_487",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_488": {
+        "name": "VK_EXT_extension_488",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_QCOM_multiview_per_view_viewports": {
+        "name": "VK_QCOM_multiview_per_view_viewports",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceMultiviewPerViewViewportsFeaturesQCOM",
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_NV_extension_490": {
+        "name": "VK_NV_extension_490",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_NV_ray_tracing_invocation_reorder": {
+        "name": "VK_NV_ray_tracing_invocation_reorder",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV",
+                "physicalDeviceProperties": "VkPhysicalDeviceRayTracingInvocationReorderPropertiesNV"
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "rayTracingInvocationReorderReorderingHint": "VkRayTracingInvocationReorderModeNV"
+        }
+    },
+    "VK_NV_extension_492": {
+        "name": "VK_NV_extension_492",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_NV_extension_493": {
+        "name": "VK_NV_extension_493",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_NV_extension_494": {
+        "name": "VK_NV_extension_494",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_mutable_descriptor_type": {
+        "name": "VK_EXT_mutable_descriptor_type",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT",
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_496": {
+        "name": "VK_EXT_extension_496",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_497": {
+        "name": "VK_EXT_extension_497",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_ARM_shader_core_builtins": {
+        "name": "VK_ARM_shader_core_builtins",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": "VkPhysicalDeviceShaderCoreBuiltinsFeaturesARM",
+                "physicalDeviceProperties": "VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM"
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": {
+            "sType": "VkStructureType",
+            "pNext": "void",
+            "shaderCoreMask": "uint64_t",
+            "shaderCoreCount": "uint32_t",
+            "shaderWarpsPerCore": "uint32_t"
+        }
+    },
+    "VK_EXT_extension_499": {
+        "name": "VK_EXT_extension_499",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_500": {
+        "name": "VK_EXT_extension_500",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_501": {
+        "name": "VK_EXT_extension_501",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_502": {
+        "name": "VK_EXT_extension_502",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_503": {
+        "name": "VK_EXT_extension_503",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_NV_extension_504": {
+        "name": "VK_NV_extension_504",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            },
+            "core": {
+                "physicalDeviceFeatures": null,
+                "physicalDeviceProperties": null
+            }
+        },
+        "types": []
+    },
+    "VK_EXT_extension_505": {
+        "name": "VK_EXT_extension_505",
         "promotedTo": null,
         "structs": {
             "ext": {
