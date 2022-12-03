@@ -6,6 +6,6 @@
 
 If new profiles are released at https://github.com/KhronosGroup/Khronos-Schemas:
 - run tools/generate_mappings.php to update the mapping.json file
-- Copy the profiles*.json files from https://github.com/KhronosGroup/Khronos-Schemas/tree/main/vulkan into profiles/schemas
+- run tools/update_profiles.php to fetch latest profile schemas
 - If the profile version has changed:
   - Update profile file names in api/v3/getprofile.php in the `loadSchema` function
