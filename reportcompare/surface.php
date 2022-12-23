@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,16 +27,16 @@ $compare_surface_present_modes = $report_compare->fetchSurfacePresentModes();
 
 <div>
 	<ul class='nav nav-tabs nav-level1'>
-		<li class='active'><a data-toggle='tab' href='#surface-tabs-1'>Properties</a></li>
-		<li><a data-toggle='tab' href='#surface-tabs-2'>Formats</a></li>
-		<li><a data-toggle='tab' href='#surface-tabs-3'>Present modes</a></li>
+		<li class='active'><a data-toggle='tab' href='#surfaceproperties'>Properties</a></li>
+		<li><a data-toggle='tab' href='#surfaceformats'>Formats</a></li>
+		<li><a data-toggle='tab' href='#surfacepresentmodes'>Present modes</a></li>
 	</ul>
 </div>
 
 <div class='tab-content'>
 
 	<!-- Surface properties tab -->
-	<div id='surface-tabs-1' class='tab-pane fade in active reportdiv'>
+	<div id='surfaceproperties' class='tab-pane fade in active reportdiv'>
 		<?php
 		$report_compare->beginTable("surface-caps");
 		$report_compare->insertTableHeader("Surface property");
@@ -84,7 +84,7 @@ $compare_surface_present_modes = $report_compare->fetchSurfacePresentModes();
 	</div>
 
 	<!-- Surface formats tab -->
-	<div id='surface-tabs-2' class='tab-pane fade in reportdiv'>
+	<div id='surfaceformats' class='tab-pane fade in reportdiv'>
 		<?php
 		$report_compare->beginTable("surface-formats");
 		$report_compare->insertTableHeader("Surface formats");
@@ -121,7 +121,7 @@ $compare_surface_present_modes = $report_compare->fetchSurfacePresentModes();
 
 
 	<!-- Surface present modes tab -->
-	<div id='surface-tabs-3' class='tab-pane fade in reportdiv'>
+	<div id='surfacepresentmodes' class='tab-pane fade in reportdiv'>
 		<?php
 		$report_compare->beginTable("surface-present-modes");
 		$report_compare->insertTableHeader("Surface present modes");
