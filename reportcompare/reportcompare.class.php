@@ -156,6 +156,8 @@ class ReportCompare
                 echo "Driver $device_info->driver_version";
                 echo "<br>";
                 echo ucfirst($device_info->platform);
+                echo "<br>";
+                echo $device_info->reportid;
                 echo "</th>";
             }
         } else {
@@ -574,7 +576,7 @@ class ReportCompare
                         continue;
                     }
                     // Captions from column names
-                    if (!array_key_exists($caption, $result->captions)) {
+                    if (!in_array($caption, $result->captions)) {
                         $result->captions[] = $caption;
                     }
                     $result->data[$caption][$row['reportid']] = $value;
@@ -606,7 +608,7 @@ class ReportCompare
             $result->data = [];
             $result->captions = [];           
             foreach ($rows as $row) {
-                if (!array_key_exists($row['format'], $result->captions)) {
+                if (!in_array($row['format'], $result->captions)) {
                     $result->captions[] = $row['format'];
                     $result->data[$row['format']] = [];
                 }
@@ -642,7 +644,7 @@ class ReportCompare
             $result->captions = [];
             foreach ($rows as $row) {
                 $mode = getPresentMode($row['presentmode']);
-                if (!array_key_exists($row['presentmode'], $result->captions)) {
+                if (!in_array($mode, $result->captions)) {
                     $result->captions[] = $mode;
                     $result->data[$mode] = [];
                 }

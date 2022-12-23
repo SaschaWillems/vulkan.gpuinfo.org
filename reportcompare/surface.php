@@ -106,16 +106,12 @@ $compare_surface_present_modes = $report_compare->fetchSurfacePresentModes();
 			for ($i = 0; $i < $report_compare->report_count; $i++) {
 				$rid = $report_compare->report_ids[$i];
 				$value = $compare_surface_formats->data[$caption][$rid];
-				switch($value) {
-					case null:
-						echo "<td class='na'>n/a</td>";
-						break;
-					case true:
-						echo "<td class='supported'>true</td>";
-						break;
-					case false:
-						echo "<td class='unsupported'>false</td>";
-						break;
+				if ($value == false) {
+					echo "<td class='unsupported'>false</td>";
+				} elseif ($value == true) {
+					echo "<td class='supported'>true</td>";
+				} else {
+					echo "<td class='na'>n/a</td>";
 				}
 			}
 		}
@@ -147,16 +143,12 @@ $compare_surface_present_modes = $report_compare->fetchSurfacePresentModes();
 			for ($i = 0; $i < $report_compare->report_count; $i++) {
 				$rid = $report_compare->report_ids[$i];
 				$value = $compare_surface_present_modes->data[$caption][$rid];
-				switch($value) {
-					case null:
-						echo "<td class='na'>n/a</td>";
-						break;
-					case true:
-						echo "<td class='supported'>true</td>";
-						break;
-					case false:
-						echo "<td class='unsupported'>false</td>";
-						break;
+				if ($value == false) {
+					echo "<td class='unsupported'>false</td>";
+				} elseif ($value == true) {
+					echo "<td class='supported'>true</td>";
+				} else {
+					echo "<td class='na'>n/a</td>";
 				}
 			}
 		}
