@@ -19,157 +19,149 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.
  *
  */
+
+$compare_surface_properties = $report_compare->fetchSurfaceProperties();
+$compare_surface_formats = $report_compare->fetchSurfaceFormats();
+$compare_surface_present_modes = $report_compare->fetchSurfacePresentModes();
 ?>
 
 <div>
 	<ul class='nav nav-tabs nav-level1'>
 		<li class='active'><a data-toggle='tab' href='#surface-tabs-1'>Properties</a></li>
 		<li><a data-toggle='tab' href='#surface-tabs-2'>Formats</a></li>
-		<!-- <li><a data-toggle='tab' href='#surface-tabs-3'>Present modes</a></li> -->
+		<li><a data-toggle='tab' href='#surface-tabs-3'>Present modes</a></li>
 	</ul>
 </div>
 
 <div class='tab-content'>
 
-	<?php
-	/* 
-		Surface properties
-	*/
-	$surfaceProperties = array();
-
-	echo "<div id='surface-tabs-1' class='tab-pane fade in active reportdiv'>";
-
-	$rowCount = 0;
-	try {
-		$stmnt = DB::$connection->prepare("SELECT count(*) from devicesurfacecapabilities WHERE reportid in (" . implode(',', $reportids) . ")");
-		$stmnt->execute();
-		$rowCount = $stmnt->rowCount();
-	} catch (PDOException $e) {
-		die("Could not fetch device surface!");
-	}
-
-	if ($rowCount > 0) {
-		$reportIndex = 0;
-
-		echo "<table id='surface-caps' width='100%' class='table table-striped table-bordered'>";
+	<!-- Surface properties tab -->
+	<div id='surface-tabs-1' class='tab-pane fade in active reportdiv'>
+		<?php
+		$report_compare->beginTable("surface-caps");
 		$report_compare->insertTableHeader("Surface property");
-
-		$props = null;
-
-		try {
-			$stmnt = DB::$connection->prepare("SELECT *from devicesurfacecapabilities WHERE reportid in (" . implode(',', $reportids) . ")");
-			$stmnt->execute();
-			$rowCount = $stmnt->rowCount();
-		} catch (PDOException $e) {
-			die("Could not fetch device surface!");
-		}
-
-		$idx = 0;
-		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-			foreach ($row as $key => $value) {
-				if ($key == "reportid") {
-					continue;
+		foreach ($compare_surface_properties->captions as $dataIndex => $caption) {			
+			$diff = false;
+			$last_val = null;
+			$className = 'same';
+			// Check if values differ across reports
+			for ($i = 0; $i < $report_compare->report_count; $i++) {
+				$rid = $report_compare->report_ids[$i];
+				$value = $compare_surface_properties->data[$caption][$rid];
+				if (($i > 0) && ($value != $last_val)) {
+					$diff = true;
+					$className = 'diff';
 				}
-				$surfaceProperties[$row["reportid"]][$key] = $value;
-				if ($idx == 0) {
-					$props[] = $key;
-				}
+				$last_val = $value;
 			}
-			$idx++;
-		}
-
-		foreach ($props as $prop) {
-			echo "<tr><td>" . $prop . "</td>";
-			foreach ($reportids as $repid) {
+			echo "<tr class='$className'><td class='subkey'>".($diff ? $report_compare->getDiffIcon() : "")."$caption</td>";
+			for ($i = 0; $i < $report_compare->report_count; $i++) {				
+				$reportid = $report_compare->report_ids[$i];
 				echo "<td>";
-				if ($surfaceProperties[$repid] == null) {
-					echo "<span class='inactive'>n/a</span>";
+				$value = $compare_surface_properties->data[$caption][$reportid];
+				if ($value) {
+					switch($caption) {
+						case 'supportedUsageFlags':
+							listFlags(getImageUsageFlags($value));
+							break;
+						case 'supportedTransforms':
+							listFlags(getSurfaceTransformFlags($value));
+							break;
+						case 'supportedCompositeAlpha':
+							listFlags(getCompositeAlphaFlags($value));
+							break;
+						default:
+							echo $value;
+					}
 				} else {
-					$value = $surfaceProperties[$repid][$prop];
-					if ($prop == "supportedUsageFlags") {
-						listFlags(getImageUsageFlags($value));
-						continue;
-					}
-					if ($prop == "supportedTransforms") {
-						listFlags(getSurfaceTransformFlags($value));
-						continue;
-					}
-					if ($prop == "supportedCompositeAlpha") {
-						listFlags(getCompositeAlphaFlags($value));
-						continue;
-					}
-					echo $value;
+					echo "<div class='na'>n/a</div>";
 				}
 				echo "</td>";
 			}
-			echo "</tr>";
 		}
+		$report_compare->endTable();
+		?>
+	</div>
 
-		echo "</tbody></table>";
-	} else {
-		echo "<i>No data</i>";
-	}
-
-	echo "</div>";
-
-
-	/* 
-		Surface formats
-	*/
-	$surfaceFormats = array();
-
-	echo "<div id='surface-tabs-2' class='tab-pane fade in reportdiv'>";
-
-	$rowCount = 0;
-	try {
-		$stmnt = DB::$connection->prepare("SELECT *from devicesurfaceformats WHERE reportid in (" . implode(',', $reportids) . ")");
-		$stmnt->execute();
-		$rowCount = $stmnt->rowCount();
-	} catch (PDOException $e) {
-		die("Could not fetch device surface formats!");
-	}
-	if ($rowCount > 0) {
-		$reportIndex = 0;
-
-		echo "<table id='surface-formats' width='100%' class='table table-striped table-bordered'>";
-		$report_compare->insertTableHeader("Surface format");
-
-		try {
-			$stmnt = DB::$connection->prepare("SELECT dsf.reportid AS reportid, vf.name as name FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (" . implode(',', $reportids) . ")");
-			$stmnt->execute();
-			$rowCount = $stmnt->rowCount();
-		} catch (PDOException $e) {
-			die("Could not fetch device surface formats!");
-		}
-		$idx = 0;
-		while ($row = $stmnt->fetch(PDO::FETCH_ASSOC)) {
-			foreach ($row as $key => $value) {
-				if ($key == "reportid") {
-					continue;
-				}
-				$formats[$row["name"]][$row["reportid"]] = true;
+	<!-- Surface formats tab -->
+	<div id='surface-tabs-2' class='tab-pane fade in reportdiv'>
+		<?php
+		$report_compare->beginTable("surface-formats");
+		$report_compare->insertTableHeader("Surface formats");
+		foreach ($compare_surface_formats->captions as $caption) {			
+			$diff = false;
+			$last_val = null;
+			$className = 'same';
+			// Check if values differ across reports
+			for ($i = 0; $i < $report_compare->report_count; $i++) {
+				$rid = $report_compare->report_ids[$i];
+		 		$value = $compare_surface_formats->data[$caption][$rid];
+			 	if (($i > 0) && ($value != $last_val)) {
+			 		$diff = true;
+			 		$className = 'diff';
+			 	}
+			 	$last_val = $value;
 			}
-			$idx++;
-		}
-
-		foreach ($formats as $key => $format) {
-			echo "<tr><td>" . $key . "</td>";
-			foreach ($reportids as $repid) {
-				if (isset($format[$repid])) {
-					echo "<td class='supported'>true</td>";
-				} else {
-					echo "<td class='unsupported'>false</td>";
+			echo "<tr class='$className'><td>".($diff ? $report_compare->getDiffIcon() : "")."$caption</td>";
+			for ($i = 0; $i < $report_compare->report_count; $i++) {
+				$rid = $report_compare->report_ids[$i];
+				$value = $compare_surface_formats->data[$caption][$rid];
+				switch($value) {
+					case null:
+						echo "<td class='na'>n/a</td>";
+						break;
+					case true:
+						echo "<td class='supported'>true</td>";
+						break;
+					case false:
+						echo "<td class='unsupported'>false</td>";
+						break;
 				}
 			}
-			echo "</tr>";
 		}
+		$report_compare->endTable();
+		?>
+	</div>
 
-		echo "</tbody></table>";
-	} else {
-		echo "<i>No data</i>";
-	}
 
-	echo "</div>";
+	<!-- Surface present modes tab -->
+	<div id='surface-tabs-3' class='tab-pane fade in reportdiv'>
+		<?php
+		$report_compare->beginTable("surface-present-modes");
+		$report_compare->insertTableHeader("Surface present modes");
+		foreach ($compare_surface_present_modes->captions as $caption) {			
+			$diff = false;
+			$last_val = null;
+			$className = 'same';
+			// Check if values differ across reports
+			for ($i = 0; $i < $report_compare->report_count; $i++) {
+				$rid = $report_compare->report_ids[$i];
+		 		$value = $compare_surface_present_modes->data[$caption][$rid];
+			 	if (($i > 0) && ($value != $last_val)) {
+			 		$diff = true;
+			 		$className = 'diff';
+			 	}
+			 	$last_val = $value;
+			}
+			echo "<tr class='$className'><td>".($diff ? $report_compare->getDiffIcon() : "")."$caption</td>";
+			for ($i = 0; $i < $report_compare->report_count; $i++) {
+				$rid = $report_compare->report_ids[$i];
+				$value = $compare_surface_present_modes->data[$caption][$rid];
+				switch($value) {
+					case null:
+						echo "<td class='na'>n/a</td>";
+						break;
+					case true:
+						echo "<td class='supported'>true</td>";
+						break;
+					case false:
+						echo "<td class='unsupported'>false</td>";
+						break;
+				}
+			}
+		}
+		$report_compare->endTable();
+		?>
+	</div>
 
-	echo "</div>";
-	?>
+</div>

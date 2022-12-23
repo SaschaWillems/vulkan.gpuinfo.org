@@ -180,6 +180,7 @@ $repids = implode(",", $reportids);
 			var tableNames = [
 				'surface-caps', 
 				'surface-formats', 
+				'surface-present-modes',
 				'table_features_core_10',
 				'table_features_core_11',
 				'table_features_core_12',
@@ -293,7 +294,7 @@ $repids = implode(",", $reportids);
 				if ((a === '#instanceextensions') || (a === '#instancelayers')) {
 					$('.nav a[href=\\#instance]').tab('show');
 				}
-				if ((a === '#surfaceproperties') || (a === '#surfaceformats') || (a === '#presentmodes')) {
+				if ((a === '#surfaceproperties') || (a === '#surfaceformats') || (a === '#surfacepresentmodes')) {
 					$('.nav a[href=\\#surface]').tab('show');
 				}
 				$('.nav a[href=\\'+a+']').tab('show');

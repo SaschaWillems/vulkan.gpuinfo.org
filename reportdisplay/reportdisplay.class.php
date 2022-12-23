@@ -293,6 +293,8 @@ class Report
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute([":reportid" => $this->id]);
             $result = $stmnt->fetch(PDO::FETCH_ASSOC);
+            // Min and max extents depend on surface size and may be misleading, so remove them
+            unset($result['minImageExtent.width'], $result['minImageExtent.height'], $result['maxImageExtent.width'], $result['maxImageExtent.height']);
             return $result;
         } catch (Throwable $e) {
             return null;

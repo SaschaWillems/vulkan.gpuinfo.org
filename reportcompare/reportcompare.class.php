@@ -555,7 +555,120 @@ class ReportCompare
         } catch (Throwable $e) {
             return [];
         }
-    }    
+    }
+
+    public function fetchSurfaceProperties()
+    {
+        try {
+            $sql = "SELECT * from devicesurfacecapabilities where reportid in (" . $this->reportIdsParam() . ") order by reportid asc";
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute();
+            $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+            $result = new ReportCompareData;
+            $result->data = [];
+            $result->captions = [];
+            foreach ($rows as $row) {
+                foreach ($row as $caption => $value) {
+                    // Min and max extents depend on surface size and may be misleading, so remove them
+                    if (in_array($caption, ['reportid', 'minImageExtent.width', 'minImageExtent.height', 'maxImageExtent.width', 'maxImageExtent.height'])) {
+                        continue;
+                    }
+                    // Captions from column names
+                    if (!array_key_exists($caption, $result->captions)) {
+                        $result->captions[] = $caption;
+                    }
+                    $result->data[$caption][$row['reportid']] = $value;
+                }
+            }
+            // Insert empty data for reports with no or partial surface property data
+            foreach ($result->captions as $caption) {
+                foreach ($this->report_ids as $reportid) {
+                    if (!array_key_exists($reportid, $result->data[$caption])) {
+                        $result->data[$caption][$reportid] = null;
+                    }
+                }
+            }
+            return $result;
+        } catch (Throwable $e) {
+            return [];
+        }    
+    }
+
+    public function fetchSurfaceFormats()
+    {
+        try {            
+            $sql = "SELECT dsf.reportid AS reportid, vf.name as format FROM devicesurfaceformats dsf JOIN VkFormat vf ON dsf.format = vf.value WHERE reportid IN (" . $this->reportIdsParam() . ")";          
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute();
+            $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+            $result = new ReportCompareData;
+            // Get format list
+            $result->data = [];
+            $result->captions = [];           
+            foreach ($rows as $row) {
+                if (!array_key_exists($row['format'], $result->captions)) {
+                    $result->captions[] = $row['format'];
+                    $result->data[$row['format']] = [];
+                }
+            }
+            // Get format support per report
+            foreach ($rows as $row) {
+                $result->data[$row['format']][$row['reportid']] = true;
+            }
+            // Insert empty data for reports with no or partial surface property data
+            foreach ($result->captions as $caption) {
+                foreach ($this->report_ids as $reportid) {
+                    if (!array_key_exists($reportid, $result->data[$caption])) {
+                        $result->data[$caption][$reportid] = null;
+                    }
+                }
+            }                        
+            return $result;
+        } catch (Throwable $e) {
+            return [];
+        }    
+    }
+
+    public function fetchSurfacePresentModes()
+    {
+        try {            
+            $sql = "SELECT presentmode, reportid from devicesurfacemodes WHERE reportid IN (" . $this->reportIdsParam() . ")";          
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute();
+            $rows = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+            $result = new ReportCompareData;
+            // Get mode list
+            $result->data = [];
+            $result->captions = [];
+            foreach ($rows as $row) {
+                $mode = getPresentMode($row['presentmode']);
+                if (!array_key_exists($row['presentmode'], $result->captions)) {
+                    $result->captions[] = $mode;
+                    $result->data[$mode] = [];
+                }
+            }
+            // Get format support per report
+            $reports_with_data = [];
+            foreach ($rows as $row) {
+                $mode = getPresentMode($row['presentmode']);
+                $result->data[$mode][$row['reportid']] = true;
+                if (!in_array($row['reportid'], $reports_with_data)) {
+                    $reports_with_data[] = $row['reportid'];
+                }
+            }
+            // Fill data structure with missing information
+            foreach ($result->captions as $caption) {
+                foreach ($this->report_ids as $reportid) {
+                    if (!array_key_exists($reportid, $result->data[$caption])) {
+                        $result->data[$caption][$reportid] = in_array($reportid, $reports_with_data) ? false : null;
+                    }
+                }
+            }                        
+            return $result;
+        } catch (Throwable $e) {
+            return [];
+        }    
+    }       
 
     public function beginTable($id)
     {
