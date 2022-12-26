@@ -156,8 +156,6 @@ class ReportCompare
                 echo "Driver $device_info->driver_version";
                 echo "<br>";
                 echo ucfirst($device_info->platform);
-                echo "<br>";
-                echo $device_info->reportid;
                 echo "</th>";
             }
         } else {

@@ -121,9 +121,10 @@ class SqlRepository {
         $extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);        
         //
         $params = [];
-        $sql ="SELECT e.name, count(distinct displayname) as coverage from extensions e 
-            join deviceextensions de on de.extensionid = e.id 
-            join reports r on r.id = de.reportid";
+        $sql ="SELECT e.name, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
+                join deviceextensions de on de.extensionid = e.id 
+                join reports r on r.id = de.reportid
+                join deviceproperties dp on dp.reportid = de.reportid";
         self::appendFilters($sql, $params);
         $sql .= " group by name";
         $stmnt = DB::$connection->prepare($sql);
