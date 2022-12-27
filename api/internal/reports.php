@@ -279,7 +279,7 @@ $devices = DB::$connection->prepare($sql . " " . $paging);
 $devices->execute($params);
 if ($devices->rowCount() > 0) {
     foreach ($devices as $device) {
-        $driver = getDriverVerson($device["driver"], "", $device["vendorid"], $device["osname"]);
+        $driver = getDriverVersion($device["driver"], "", $device["vendorid"], $device["osname"]);
         $data[] = array(
             'id' => $device["id"],
             'devicelimit' => ($limit != '') ? $device["devicelimit"] : null,

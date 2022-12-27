@@ -361,7 +361,7 @@ function getColorSpace($value)
 }
 
 // Convert vendor specific driver version string
-function getDriverVerson($versionraw, $versiontext, $vendorid, $osname)
+function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 {
 	if ($versionraw != '') {
 		// NVIDIA

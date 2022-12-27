@@ -415,7 +415,7 @@ if ($devices->rowCount() > 0) {
         $data[] = array(
             'device' => '<a href="' . $url . '">' . $device["device"] . '</a>',
             'api' => versionToString($device["api"]),
-            'driver' =>  getDriverVerson($device["driverversionraw"], "", $device["vendorid"], $device["osname"]),
+            'driver' =>  getDriverVersion($device["driverversionraw"], "", $device["vendorid"], $device["osname"]),
             'reportcount' => $device["reportcount"],
             'reportversion' => $device["reportversion"],
             'submissiondate' => $device["submissiondate"],
