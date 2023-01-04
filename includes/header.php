@@ -168,6 +168,8 @@ session_start();
 					</li>
 					<li><a href="download.php">Download</a></li>
 					<li><a href="about.php">About</a></li>
+					<!-- @todo -->
+					<li><button onclick="toggleDarkMode()">Toggle dark mode</button></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class="dropdown">
@@ -188,3 +190,6 @@ session_start();
 			</div>
 		</div>
 	</nav>
+
+	<script type="text/javascript" src="js/darkmode.js"></script>
+	<script>loadDarkMode();</script>
