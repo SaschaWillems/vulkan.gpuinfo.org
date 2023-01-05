@@ -12,6 +12,12 @@
 	--textcolor-na: #BABABA;
 	--bordercolor: #DDD;
 	--table-odd-row-background: #f7f7f7;
+	--icon-invert: 0;
+	--mode-toggle-grayscale: 0.75;
+	--link-color: #337ab7;
+	--backgroundcolor-pager-active: #337ab7;
+	--bordercolor-pager-active: #337ab7;
+	--backgroundcolor-format-table-format: #f4f4f4;
 }
 
 [data-theme='dark'] {
@@ -28,6 +34,12 @@
 	--textcolor-na: #535353;
 	--bordercolor: rgb(34, 34, 34);
 	--table-odd-row-background: rgb(10, 10, 10);
+	--icon-invert: 1;
+	--mode-toggle-grayscale: 0.5;
+	--link-color: #21517a;
+	--backgroundcolor-pager-active: #21517a;
+	--bordercolor-pager-active: #21517a;
+	--backgroundcolor-format-table-format: rgb(10, 10, 10);
 }
 
 body {
@@ -60,6 +72,10 @@ body {
 	color: var(--textcolor);
 }
 
+.nav-tabs>li>a:focus {
+	background-color: var(--backgroundcolor-header);
+}
+
 .nav-tabs>li.active>a:hover {
 	background-color: var(--backgroundcolor-full);
 	border-color: var(--bordercolor);
@@ -88,6 +104,10 @@ tr:hover>td {
 
 .vulkanlogo {
 	padding-right:10px;
+}
+
+.sorting:after, .sorting_desc:after, .sorting_asc:after {
+	filter: invert(var(--icon-invert));
 }
 
 .error {
@@ -480,24 +500,12 @@ a:hover {  text-decoration:none !important; }
 	color: #BABABA;
 }
 
-.divider-vertical {
-	height: 50px;
-	margin: 0 9px;
-	border-left: 1px solid #333333;
-	border-right: 1px solid #333333;
-}
-
-.flagtable td {
-	padding: 2px;
-	padding-right: 4px;
-}
-
 .na {
 	color: var(--textcolor-na);
 }
 
 #overlay_devices {
-    background-color: rgba(255, 255, 255, 1.0);
+    background-color: var(--backgroundcolor-full);
 }
 
 h1 {
@@ -673,7 +681,7 @@ h1 {
 {
 	text-align: left !important;
 	color:#a31d21;
-	background-color: #f4f4f4 !important;	
+	background-color: var(--backgroundcolor-format-table-format);
 }
 
 .property-table
@@ -715,9 +723,15 @@ code {
 	height: 20px;
 }
 
+.mode-toggle {
+	height: 20px;
+    position: relative;
+	filter: grayscale(var(--mode-toggle-grayscale));
+}
+
 .report-remove-icon {
 	cursor: hand;
-	color: black;
+	color: var(--textcolor-button);
 }
 
 .report-remove-icon:hover {
@@ -768,4 +782,27 @@ button:hover {
 	background-color: var(--backgroundcolor-full);
 	border: 0px;
 	border-bottom: 1px solid var(--bordercolor);
+}
+
+a {
+	color: var(--link-color);
+}
+
+.pagination>li>a, .pagination>li>span {
+	background-color: var(--backgroundcolor-full);
+	border: 1px solid var(--bordercolor);
+}
+
+.pagination>.disabled>a, .pagination>.disabled>a:focus, .pagination>.disabled>a:hover, .pagination>.disabled>span, .pagination>.disabled>span:focus, .pagination>.disabled>span:hover {
+	background-color: var(--backgroundcolor-full);
+	border: 1px solid var(--bordercolor);
+}
+
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+	background-color: var(--backgroundcolor-pager-active);
+	border: 1px solid var(--bordercolor-pager-active);
+}
+
+.dataTables_wrapper .dataTables_processing {
+	border: 1px solid var(--bordercolor);
 }

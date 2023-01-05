@@ -18,18 +18,22 @@
  *
  */
 
-function toggleDarkMode() {
+function toggleDarkMode(event) {
   if (localStorage.mode != 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('mode-toggle').src = "./images/sun.svg";
     localStorage.mode = 'dark';    
   } else {
     document.documentElement.removeAttribute('data-theme', 'light')
+    document.getElementById('mode-toggle').src = "./images/moon.svg";
     localStorage.mode = 'light';
   }
 }
 
 function loadDarkMode() {
   const mode = localStorage.getItem('mode') ? localStorage.getItem('mode') : null;
+  const icon = (mode && mode == 'dark') ? 'sun' : 'moon';
+  document.getElementById('mode-toggle').src = "./images/"+icon+".svg";
   if (mode) {
     document.documentElement.setAttribute('data-theme', mode);
   }
