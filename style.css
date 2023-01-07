@@ -25,7 +25,7 @@
 	--backgroundcolor-full: rgb(0, 0, 0);
 	--backgroundcolor-header: rgb(52, 52, 52);
 	--backgroundcolor-textpages: rgb(17, 17, 17);
-	--textcolor: rgb(165, 165, 165);
+	--textcolor: rgb(128, 128, 128);
 	--textcolor-placeholder: rgb(77, 77, 77);
 	--textcolor-button: rgb(92, 92, 92);
 	--textcolor-supported: rgb(5, 86, 25);
@@ -40,6 +40,7 @@
 	--backgroundcolor-pager-active: #21517a;
 	--bordercolor-pager-active: #21517a;
 	--backgroundcolor-format-table-format: rgb(10, 10, 10);
+
 }
 
 body {
@@ -229,16 +230,6 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 	padding-right:5px;
 }
 
-.reportheader {
-    height: 65px;
-	font-size: 1.5em;
-    line-height: 40px;
-	background: #333333;
-	color: #FFFFFF;
-	vertical-align: middle;
-	line-height:65px;
-}
-
 .navbar-default {
     background-color: #222;
     border-color: #121212;
@@ -290,24 +281,28 @@ h4 {
 	color: #4F8A10;
 	background: #DFF2BF;
 	border-left: 4px solid #3c763d;
+	filter: brightness(var(--color-info-box-grayscale));
 }
 
 .header-red {
 	color: #D8000C;
 	background: #FFBABA;
 	border-left: 4px solid #a94442;
+	filter: brightness(var(--color-info-box-grayscale));
 }
 
 .header-blue {
 	color: #00529B;
 	background: #BDE5F8;
 	border-left: 4px solid #31708f;
+	filter: brightness(var(--color-info-box-grayscale));
 }
 
 .header-yellow {
 	color: #9F6000;
 	background-color: #fcf8e3;
 	border-left: 4px solid #8a6d3b;
+	filter: brightness(var(--color-info-box-grayscale));
 }
 
 .tableheader {
@@ -359,23 +354,6 @@ h4 {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;	
-}
-
-.reportrow
-{
-	padding-left: 10px;
-	padding-right : 5px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
-
-.reportrowb
-{
-	background-color: #EFEFEF;
-	padding-left: 10px;
-	padding-right : 5px;
-	padding-top: 2px;
-	padding-bottom: 2px;
 }
 
 .reporttabelheader
@@ -754,10 +732,11 @@ code {
 	background-color: var(--table-odd-row-background) !important;
  }
 
- input[type="text"], input[type="search"] {
+input[type="text"], input[type="search"] {
 	background-color : var(--backgroundcolor-full); 	  
 	border-color: var(--bordercolor);
 }
+
 input::placeholder {
 	color: var(--textcolor-placeholder);
 }
@@ -768,14 +747,11 @@ button {
 	border-radius: 3px;
 	color: var(--textcolor-button);
 }
+
 button:hover {
 	background-color: rgb(34, 34, 34);
 	border: 1px solid rgb(92, 92, 92);		
 	color: rgb(165, 165, 165);
-	/* box-shadow:
-	0 0 60px 10px #fff,
-	0 0 100px 20px #f0f,
-	0 0 140px 30px #0ff; */
 }
 
 #compare-div {
