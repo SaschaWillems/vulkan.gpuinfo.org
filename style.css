@@ -18,29 +18,45 @@
 	--backgroundcolor-pager-active: #337ab7;
 	--bordercolor-pager-active: #337ab7;
 	--backgroundcolor-format-table-format: #f4f4f4;
+	--color-info-box-brightness: 100%;
+	--background-color-input: #fff;
+	--textcolor-code: rgb(199, 44, 59);
+	--backgroundcolor-button: rgb(239, 239, 239);
+	--backgroundcolor-button-hover: rgb(228, 228, 228);
+	--textcolor-button-hover: #000;
+	--backgroundcolor-pagination-hover: #fff;
+	--textcolor-nav: rgb(232, 230, 227);
 }
 
 [data-theme='dark'] {
 	--backgroundcolor: rgb(17, 17, 17);
-	--backgroundcolor-full: rgb(0, 0, 0);
+	--backgroundcolor-full: rgb(24, 26, 27);
 	--backgroundcolor-header: rgb(52, 52, 52);
 	--backgroundcolor-textpages: rgb(17, 17, 17);
-	--textcolor: rgb(128, 128, 128);
-	--textcolor-placeholder: rgb(77, 77, 77);
-	--textcolor-button: rgb(92, 92, 92);
-	--textcolor-supported: rgb(5, 86, 25);
-	--textcolor-unsupported: rgb(135, 0, 0);
+	--textcolor: rgb(175, 168, 158);
+	--textcolor-placeholder: rgb(120, 117, 113);
+	--textcolor-button: rgb(120, 117, 113);
+	--textcolor-supported: rgb(53, 173, 109);
+	--textcolor-unsupported: rgb(200, 30, 32);
 	--textcolor-header: rgb(165, 165, 165);
 	--textcolor-na: #535353;
-	--bordercolor: rgb(34, 34, 34);
-	--table-odd-row-background: rgb(10, 10, 10);
+	--bordercolor: rgb(41, 44, 46);
+	--table-even-row-background: rgb(24, 26, 27);
+	--table-odd-row-background: rgb(29, 31, 32);
 	--icon-invert: 1;
 	--mode-toggle-grayscale: 0.5;
-	--link-color: #21517a;
+	--link-color: rgb(104, 139, 165);
 	--backgroundcolor-pager-active: #21517a;
 	--bordercolor-pager-active: #21517a;
 	--backgroundcolor-format-table-format: rgb(10, 10, 10);
-
+	--color-info-box-brightness: 75%;
+	--background-color-input: rgb(59, 59, 59);
+	--textcolor-code: rgb(170, 128, 69);
+	--backgroundcolor-button: rgb(59, 59, 59);
+	--backgroundcolor-button-hover: rgb(90, 90, 90);
+	--textcolor-button-hover: rgb(165, 165, 165);
+	--backgroundcolor-pagination-hover: rgb(34, 36, 38);
+	--textcolor-nav: rgb(232, 230, 227);
 }
 
 body {
@@ -115,6 +131,7 @@ tr:hover>td {
 	width:50%;
 	margin-top: 50px;
 	padding-bottom : 25px;
+	filter: brightness(var(--color-info-box-brightness));
 }
 
 .datatables_filter { 
@@ -236,16 +253,16 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
 }
 
 .navbar-text {
-	color:#fff;
+	color: var(--textcolor-nav);
 }
 
 .navbar-default .navbar-nav>li>a {
-    color: #fff;
+	color: var(--textcolor-nav);
 }
 
 .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
     background-color: #000;
-    color: #fff;
+	color: var(--textcolor-nav);
 }
 
 h4 {
@@ -275,6 +292,10 @@ h4 {
 	margin-bottom: 10px;
 	padding-left: 10px;
 	text-align: center;
+}
+
+.alert {
+	filter: brightness(var(--color-info-box-brightness));
 }
 
 .header-green {
@@ -730,10 +751,14 @@ code {
 
 .table-striped>tbody>tr:nth-of-type(odd) {
 	background-color: var(--table-odd-row-background) !important;
+}
+
+.table-striped>tbody>tr:nth-of-type(even) {
+	background-color: var(--table-even-row-background) !important;
  }
 
 input[type="text"], input[type="search"] {
-	background-color : var(--backgroundcolor-full); 	  
+	background-color : var(--background-color-input);
 	border-color: var(--bordercolor);
 }
 
@@ -742,16 +767,16 @@ input::placeholder {
 }
 
 button {
-	background-color: var(--backgroundcolor-full);
+	background-color: var(--backgroundcolor-button);
 	border: 1px solid var(--bordercolor);
 	border-radius: 3px;
 	color: var(--textcolor-button);
 }
 
 button:hover {
-	background-color: rgb(34, 34, 34);
+	background-color: var(--backgroundcolor-button-hover);
 	border: 1px solid rgb(92, 92, 92);		
-	color: rgb(165, 165, 165);
+	color: var(--textcolor-button-hover);
 }
 
 #compare-div {
@@ -781,4 +806,13 @@ a {
 
 .dataTables_wrapper .dataTables_processing {
 	border: 1px solid var(--bordercolor);
+}
+
+.pagination>li>a:hover {
+	background-color: var(--backgroundcolor-pagination-hover);
+	border: 1px solid var(--bordercolor);
+}
+
+code {
+	color: var(--textcolor-code);
 }
