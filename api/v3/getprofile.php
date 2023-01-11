@@ -305,6 +305,7 @@ class VulkanProfile {
     
         // Multi-dimensional arrays are stored as single columns in the database and need to be remapped        
         $limits['maxComputeWorkGroupCount'] = $limitToArray('maxComputeWorkGroupCount', 3, 'int');
+        $limits['maxComputeWorkGroupSize'] = $limitToArray('maxComputeWorkGroupSize', 3, 'int');
         $limits['maxViewportDimensions'] = $limitToArray('maxViewportDimensions', 2, 'int');
         $limits['pointSizeRange'] = $limitToArray('pointSizeRange', 2, 'float');
         $limits['viewportBoundsRange'] = $limitToArray('viewportBoundsRange', 2, 'float');
