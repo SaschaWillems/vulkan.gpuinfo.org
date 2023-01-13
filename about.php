@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2020 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -26,11 +26,11 @@
 	<div class="panel panel-default">
 		<div class="panel-body" style="margin-left:50px; width:65%px;">    
 			<div class="page-header">
-				<h2>About this database</h2>
+				<h2>About the Vulkan Hardware Database</h2>
 			</div>
-			<p>
+			<!-- <p>
 				<img src="images/vulkanlogoscene.png" width="320px">
-			</p>
+			</p> -->
 			<div>
 				Welcome to the community-driven Vulkan hardware database, an online tool for developers that want to check out GPU hardware capabilites for the <a href="https://www.khronos.org/vulkan">new explicit graphics and compute
 				API from Khronos</a>.<br><br>
@@ -39,7 +39,7 @@
 				No profit is made from this data, nor is this data used in any commercial way and no personal data is transferred, stored or passed.<br><br>
 				If you want to contribute to the development, you can find the source code at <a href="https://github.com/SaschaWillems" target="_blank">https://github.com/SaschaWillems</a>.				
 			</div>
-			<div class="page-header">
+			<!-- <div class="page-header">
 				<h2>Donating</h2>
 			</div>
 			<div>
@@ -48,7 +48,7 @@
 			<div>
 				<h3>PayPal</h3>
 				<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=BHXPMV6ZKPH9E"><img alt="" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"/></a>
-			</div>				
+			</div>				 -->
 		</div>    
 	</div>
 </div>

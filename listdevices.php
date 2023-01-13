@@ -20,8 +20,6 @@
  *
  */
 
-session_start();
-
 include 'pagegenerator.php';
 include './includes/functions.php';
 include './includes/filterlist.class.php';

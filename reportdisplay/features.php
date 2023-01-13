@@ -47,7 +47,7 @@ function insertExtensionFeatures($report)
 	if ($extension_features) {
 		foreach ($extension_features as $extension_feature) {
 			echo "<tr><td class='subkey'>" . $extension_feature['name'] . "</td><td>";
-			echo ($extension_feature['supported'] == 1) ? "<font color='green'>true</font>" : "<font color='red'>false</font>";
+			echo ($extension_feature['supported'] == 1) ? "<div class='supported'>true</div>" : "<div class='unsupported'>false</di>";
 			echo "<td>" . $extension_feature['extension'] . "</td>";
 			echo "</td></tr>";
 		}

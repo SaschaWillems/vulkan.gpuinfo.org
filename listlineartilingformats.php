@@ -20,8 +20,6 @@
  *
  */
 
-session_start();
-
 require 'pagegenerator.php';
 require './database/database.class.php';
 require './database/sqlrepository.php';

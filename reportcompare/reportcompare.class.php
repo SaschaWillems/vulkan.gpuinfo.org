@@ -156,6 +156,8 @@ class ReportCompare
                 echo "Driver $device_info->driver_version";
                 echo "<br>";
                 echo ucfirst($device_info->platform);
+                echo "<br>";
+                echo "Vulkan $device_info->api_version";
                 echo "</th>";
             }
         } else {
