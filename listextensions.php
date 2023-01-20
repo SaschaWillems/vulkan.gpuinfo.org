@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -25,6 +25,10 @@ require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
+include './includes/filterlist.class.php';
+
+$filters = ['platform'];
+$filter_list = new FilterList($filters);
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
@@ -48,79 +52,79 @@ PageGenerator::header("Extensions");
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan=2 style="text-align: center;">Device coverage</th>
-					<th colspan=2>Additional</th>
+					<th class="centered" colspan=2>Device coverage</th>
+					<th class="centered">First seen</th>
+					<th class="centered" colspan=2>Additional</th>
 				</tr>
 				<tr>
 					<th>Extension</th>
-					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
+					<th class="centered"><img src='images/icons/check.png' width=16px></th>
+					<th class="centered"><img src='images/icons/missing.png' width=16px></th>
+					<th class="centered"><abbr title="Date at when the extension was first submitted to the database for the current platform selection">Date</abbr></th>
 					<th><abbr title="Extension-related features">F.</abbr></th>
 					<th><abbr title="Extension-related properties">P.</abbr></th>
 				</tr>
 			</thead>
-			<tbody>
-				<?php
-				DB::connect();
-				try {	
-					$deviceCount = SqlRepository::deviceCount();
-					$extensions = SqlRepository::listExtensions();
-					foreach ($extensions as $extension) {
-						if (trim($extension['name']) == '') {
-							continue;
-						}
-						$coverageLink = "listdevicescoverage.php?extension=" . $extension['name'] . "&platform=$platform";
-						$manPageLink = "[<a href='".$vulkan_html_registry.$extension['name'].".html' target='_blank' title='Show manpage for this extension'>?</a>]";
-						$coverage = $extension['coverage'];
-						$ext = $extension['name'];
-						$feature_link = null;
-						if ($extension['hasfeatures']) {
-							$feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
-						}
-						$property_link = null;
-						if ($extension['hasproperties']) {
-							$property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
-						}
-						echo "<tr>";
-						echo "<td>$ext $manPageLink</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center' style='vertical-align: middle'>$feature_link</td>";
-						echo "<td class='text-center' style='vertical-align: middle'>$property_link</td>";
-						echo "</tr>";
-					}
-				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data!</b><br>";
-				}
-				DB::disconnect();
-				?>
-			</tbody>
 		</table>
 	</div>
 
 	<script>
 		$(document).ready(function() {
 			var table = $('#extensions').DataTable({
-				"pageLength": -1,
-				"paging": false,
-				"stateSave": false,
-				"searchHighlight": true,
-				"dom": 'f',
-				"bInfo": false,
-				"fixedHeader": {
-					"header": true,
-					"headerOffset": 50
+				pageLength: -1,
+				paging: false,
+				stateSave: false,
+				searchHighlight: true,
+				processing: true,
+				dom: 'f',
+				bInfo: false,
+				fixedHeader: {
+					header: true,
+					headerOffset: 50
 				},
-				"order": [
+				order: [
 					[0, "asc"]
 				],
-				"columnDefs": [{
-					"targets": [1, 2],
-				}]
-			});
-
-			$("#searchbox").on("keyup search input paste cut", function() {
-				table.search(this.value).draw();
+				columnDefs: [{
+					targets: [1, 2],
+				}],
+				ajax: {
+					url: "api/internal/extensions.php",
+					data: {
+						"filter": {
+							'platform': '<?= $filter_list->getFilter('platform') ?>',
+						}
+					},
+					error: function(xhr, error, thrown) {
+						$('#errordiv').html('Could not fetch data (' + error + ')');
+						$('#extensions_processing').hide();
+					}
+				},
+				columns: [
+					{
+						data: 'name'
+					},
+					{
+						data: 'coverage',
+						className: 'centered',
+					},
+					{
+						data: 'coverageunsupported',
+						className: 'centered',
+					},
+					{
+						data: 'date',
+						className: 'centered',
+					},
+					{
+						data: 'features',
+						className: 'centered',
+					},
+					{
+						data: 'properties',
+						className: 'centered',
+					},
+				],				
 			});
 
 		});

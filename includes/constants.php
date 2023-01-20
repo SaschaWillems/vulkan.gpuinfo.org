@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -23,6 +23,10 @@
 define('VULKAN_CORE_1_0_TEXT', 'Vulkan Core 1.0');
 define('VULKAN_CORE_1_1_TEXT', 'Vulkan Core 1.1');
 define('VULKAN_CORE_1_2_TEXT', 'Vulkan Core 1.2');
+
+define('SESSION_NAME', 'gpuinfo');
+
+define('VULKAN_REGISTRY_URL', "https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/");
 
 $queue_flag_bits = [
     0x0001 => "GRAPHICS_BIT",

@@ -219,6 +219,10 @@ th.sorting::after, th.sorting_asc::after, th.sorting_desc::after {
     text-align:center;
 }
 
+.centered {
+    text-align:center;
+}
+
 .tablediv {
 	padding-top: 25px;
 	padding-left: 40px;
