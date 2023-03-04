@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -37,7 +37,7 @@ PageGenerator::header("Surface formats");
 	<?php echo "<h4>Surface format support on ".PageGenerator::filterInfo($platform); ?>
 </div>
 
-<center>
+<div class="centered">
 	<?php PageGenerator::platformNavigation('listsurfaceformats.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
@@ -71,7 +71,7 @@ PageGenerator::header("Surface formats");
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data!</b><br>";
+					echo "<b>Error while fetching data!</b><br>";
 				}
 				DB::disconnect();
 				?>
@@ -79,30 +79,12 @@ PageGenerator::header("Surface formats");
 		</table>
 	</div>
 
-	<script>
-		$(document).ready(function() {
-			var table = $('#surfaceformats').DataTable({
-				"pageLength": -1,
-				"paging": false,
-				"stateSave": false,
-				"searchHighlight": true,
-				"dom": 'f',
-				"bInfo": false,
-				"order": [
-					[0, "asc"]
-				]
-			});
+	<?php 
+		PageGenerator::dataTablesScript('surfaceformats');
+		PageGenerator::footer(); 
+	?>
 
-			$("#searchbox").on("keyup search input paste cut", function() {
-				table.search(this.value).draw();
-			});
-
-		});
-	</script>
-
-	<?php PageGenerator::footer(); ?>
-
-</center>
+</div>
 </body>
 
 </html>

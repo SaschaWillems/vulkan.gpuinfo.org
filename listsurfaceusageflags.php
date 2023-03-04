@@ -38,12 +38,11 @@ PageGenerator::header("Surface usage flags");
 	<?php echo "<h4>Surface usage flag support on ".PageGenerator::filterInfo($platform); ?>
 </div>
 
-<center>
-	<?php 
-		PageGenerator::platformNavigation('listsurfaceusageflags.php', $platform, true); ?>
+<div class="centered">
+	<?php PageGenerator::platformNavigation('listsurfaceusageflags.php', $platform, true); ?>
 
 		<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
+		<table id="usageflags" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
 			<thead>
 				<tr>
 					<th></th>
@@ -80,29 +79,12 @@ PageGenerator::header("Surface usage flags");
 		</table>
 	</div>
 
-	<script>
-		$(document).ready(function() {
-			var table = $('#presentmodes').DataTable({
-				"pageLength": -1,
-				"paging": false,
-				"stateSave": false,
-				"searchHighlight": true,
-				"dom": 'f',
-				"bInfo": false,
-				"order": [
-					[0, "asc"]
-				]
-			});
+	<?php 
+		PageGenerator::dataTablesScript('usageflags');
+		PageGenerator::footer(); 
+	?>
 
-			$("#searchbox").on("keyup search input paste cut", function() {
-				table.search(this.value).draw();
-			});
-
-		});
-	</script>
-
-	<?php PageGenerator::footer(); ?>
-</center>
+</div>
 </body>
 
 </html>
