@@ -642,10 +642,10 @@ class SqlRepository {
     }
 
     /** Global surface usage flags listing */
-    public static function listSurfaceUsageFlags($surface_usage_flags ) {
+    public static function listSurfaceUsageFlags($flags) {
         $deviceCount = SqlRepository::deviceCount("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
         $surfaceusageflags = [];
-        foreach ($surface_usage_flags as $enum => $flag_name) {
+        foreach ($flags as $enum => $flag_name) {
             $sql = "SELECT
                 count(distinct(r.displayname)) as coverage
                 from devicesurfacecapabilities dsf
@@ -662,6 +662,50 @@ class SqlRepository {
         };
         return $surfaceusageflags;
     }
+
+    /** Global surface transform modes listing */
+    public static function listSurfaceTransformModes($flags) {
+        $deviceCount = SqlRepository::deviceCount("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
+        $result = [];
+        foreach ($flags as $enum => $flag_name) {
+            $sql = "SELECT
+                count(distinct(r.displayname)) as coverage
+                from devicesurfacecapabilities dsf
+                join reports r on r.id = dsf.reportid
+                where supportedTransforms & $enum = $enum";
+            self::appendFilters($sql, $params);
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute($params);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+            $result[] = [
+                'name' => $flag_name,
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
+            ];
+        };
+        return $result;
+    }
+
+    /** Global surface composite alpha flags listing */
+    public static function listSurfaceCompositeAlphaModes($flags) {
+        $deviceCount = SqlRepository::deviceCount("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
+        $result = [];
+        foreach ($flags as $enum => $flag_name) {
+            $sql = "SELECT
+                count(distinct(r.displayname)) as coverage
+                from devicesurfacecapabilities dsf
+                join reports r on r.id = dsf.reportid
+                where supportedCompositeAlpha & $enum = $enum";
+            self::appendFilters($sql, $params);
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute($params);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+            $result[] = [
+                'name' => $flag_name,
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
+            ];
+        };
+        return $result;
+    }        
 
     /** Global instance extension listing */
     public static function listInstanceExtensions() {

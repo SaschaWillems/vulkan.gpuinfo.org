@@ -284,7 +284,7 @@ if ($surfacepresentmode != '') {
 // Surface usage flag
 $surface_usage_flag = $_REQUEST['filter']['surfaceusageflag'];
 if ($surface_usage_flag != '') {
-    $surface_usage_flag_value = array_search($surface_usage_flag , $surface_usage_flags);
+    $surface_usage_flag_value = array_search($surface_usage_flag , SurfaceConstants::UsageFlags);
     $whereClause =
         "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
             (

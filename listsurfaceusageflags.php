@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2022 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2023 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -59,7 +59,7 @@ PageGenerator::header("Surface usage flags");
 				<?php
 				DB::connect();
 				try {
-					$surfaceusageflags = SqlRepository::listSurfaceUsageFlags($surface_usage_flags);
+					$surfaceusageflags = SqlRepository::listSurfaceUsageFlags(SurfaceConstants::UsageFlags);
 					foreach ($surfaceusageflags as $surfaceusageflag) {
 						$coverageLink = "listdevicescoverage.php?surfaceusageflag=".$surfaceusageflag['name']."&platform=$platform";
 						$coverage = $surfaceusageflag['coverage'];
@@ -72,7 +72,7 @@ PageGenerator::header("Surface usage flags");
 						}
 					}
 				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data!</b><br>";
+					echo "<b>Error while fetching data!</b><br>";
 				}
 				DB::disconnect();
 				?>
