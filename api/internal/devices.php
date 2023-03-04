@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -297,6 +297,41 @@ if ($surface_usage_flag != '') {
             and r.version >= '1.2'";
     $params['filter_surface_usage_flag'] = $surface_usage_flag_value;
 }
+
+// Surface transform mode
+$surface_transform_mode = $_REQUEST['filter']['surfacetransformmode'];
+if ($surface_transform_mode != '') {
+    $surface_transform_mode_value = array_search($surface_transform_mode , SurfaceConstants::TransformFlags);
+    $whereClause =
+        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
+            (
+                select ifnull(r.displayname, r.devicename)
+                from reports r
+                join devicesurfacecapabilities dsf on dsf.reportid = r.id
+                where dsf.supportedTransforms & :filter_surface_transform_mode = :filter_surface_transform_mode
+                $os_and_clause
+            )
+            and r.version >= '1.2'";
+    $params['filter_surface_transform_mode'] = $surface_transform_mode_value;
+}
+
+// Surface composite alpha mode
+$surface_composite_alpha_mode = $_REQUEST['filter']['surfacecompositealphamode'];
+if ($surface_composite_alpha_mode != '') {
+    $surface_composite_alpha_mode_value = array_search($surface_composite_alpha_mode , SurfaceConstants::CompositeAlphaFlags);
+    $whereClause =
+        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
+            (
+                select ifnull(r.displayname, r.devicename)
+                from reports r
+                join devicesurfacecapabilities dsf on dsf.reportid = r.id
+                where dsf.supportedCompositeAlpha & :filter_surface_composite_alpha_mode = :filter_surface_composite_alpha_mode
+                $os_and_clause
+            )
+            and r.version >= '1.2'";
+    $params['filter_surface_composite_alpha_mode'] = $surface_composite_alpha_mode_value;
+}
+
 // Limit
 $limit = $_REQUEST['filter']['devicelimit'];
 if ($limit != '') {

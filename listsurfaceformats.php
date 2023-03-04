@@ -46,13 +46,14 @@ PageGenerator::header("Surface formats");
 				<tr>
 				<th></th>
 					<th></th>
-					<th colspan=2 style="text-align: center;">Device coverage</th>
+					<th colspan=2 class="centered">Device coverage</th>
 				</tr>
-				<th>Format</th>
-				<th>Colorspace</th>
-				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				</th>
+				<tr>
+					<th>Format</th>
+					<th>Colorspace</th>
+					<th class="centered"><img src='images/icons/check.png' width=16px></th>
+					<th class="centered"><img src='images/icons/missing.png' width=16px></th>
+				</tr>
 			</thead>
 			<tbody>
 				<?php
@@ -65,8 +66,8 @@ PageGenerator::header("Surface formats");
 						echo "<tr>";
 						echo "<td class='value'>".$surfaceforamt['format']."</td>";
 						echo "<td class='value'>".getColorSpace($surfaceforamt['colorspace'])."</td>";
-						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {

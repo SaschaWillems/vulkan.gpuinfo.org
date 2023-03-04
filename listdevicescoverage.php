@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -49,6 +49,8 @@ $filters = [
 	'surfaceformat',
 	'surfaceformatcolorspace',
 	'surfacepresentmode',
+	'surfacetransformmode',
+	'surfacecompositealphamode',
 	'option',
 	'lineartilingformat',
 	'optimaltilingformat',
@@ -187,6 +189,24 @@ if ($filter_list->hasFilter('surfaceusageflag')) {
 		"Listing first known driver version support for surface usage flag <code>$surface_usage_flag</code>";
 	$pageTitle = "Surface present mode $surface_usage_flag";
 }
+// Surface transform mode
+if ($filter_list->hasFilter('surfacetransformmode')) {
+	$surface_transform_mode = $filter_list->getFilter('surfacetransformmode');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting surface transform mode <code>$surface_transform_mode</code>"
+		:
+		"Listing first known driver version support for surface transform mode <code>$surface_transform_mode</code>";
+	$pageTitle = "Surface transform mode $surface_transform_mode";
+}
+// Surface composite alpha mode flag
+if ($filter_list->hasFilter('surfacecompositealphamode')) {
+	$surface_composite_alpha_mode = $filter_list->getFilter('surfacecompositealphamode');
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting surface composite alpha mode <code>$surface_composite_alpha_mode</code>"
+		:
+		"Listing first known driver version support for surface composite alpha mode <code>$surface_composite_alpha_mode</code>";
+	$pageTitle = "Surface composite alpha mode $surface_composite_alpha_mode";
+}
 // Profile 
 if ($filter_list->hasFilter('profile')) {
 	$profile_name = $filter_list->getFilter('profile');
@@ -295,6 +315,8 @@ if ($minApiVersion) {
 						'surfaceformat': 				'<?= $filter_list->getFilter('surfaceformat') ?>',
 						'surfaceformatcolorspace':		'<?= $filter_list->getFilter('surfaceformatcolorspace') ?>',
 						'surfacepresentmode': 			'<?= $filter_list->getFilter('surfacepresentmode') ?>',
+						'surfacetransformmode': 		'<?= $filter_list->getFilter('surfacetransformmode') ?>',
+						'surfacecompositealphamode':    '<?= $filter_list->getFilter('surfacecompositealphamode') ?>',
 						'devicename': 					'<?= $filter_list->getFilter('devicename') ?>',
 						'displayname': 					'<?= $filter_list->getFilter('displayname') ?>',
 						'extensionfeature_name': 		'<?= $filter_list->getFilter('extensionname') ?>',

@@ -148,6 +148,8 @@ if (($_SESSION['theme']) && ($_SESSION['theme'] == 'dark')) {
 							<li><a href="listsurfaceformats.php">Formats</a></li>
 							<li><a href="listsurfacepresentmodes.php">Present modes</a></li>
 							<li><a href="listsurfaceusageflags.php">Usage flags</a></li>
+							<li><a href="listsurfacetransformmodes.php">Transform modes</a></li>
+							<li><a href="listsurfacecompositealphamodes.php">Composite alpha</a></li>
 						</ul>
 					</li>
 					<li class="dropdown">

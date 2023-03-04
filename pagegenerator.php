@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2020-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2020-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -161,5 +161,36 @@ class PageGenerator
 		};
 		echo "	</ul>";
 		echo "</div>";
+	}
+
+	/**
+	 * Inserts the default JavaScript setup script for a datatable that can be filtered
+	 * 
+	 * @param string $table_id ID of the table for which to insert the JavaScript settings block
+	 */		
+	public static function dataTablesScript($table_id)
+	{
+		echo <<<HTML
+		<script>
+			$(document).ready(function() {
+				var table = $('#{$table_id}').DataTable({
+					"pageLength": -1,
+					"paging": false,
+					"stateSave": false,
+					"searchHighlight": true,
+					"dom": 'f',
+					"bInfo": false,
+					"order": [
+						[1, "desc"]
+					]
+				});
+				
+				$("#searchbox").on("keyup search input paste cut", function() {
+					table.search(this.value).draw();
+				});
+
+			});
+		</script>
+HTML;
 	}
 }

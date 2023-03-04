@@ -45,12 +45,13 @@ PageGenerator::header("Surface present modes");
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan=2 style="text-align: center;">Device coverage</th>
+					<th colspan=2 class="centered">Device coverage</th>
 				</tr>
-				<th>Mode</th>
-				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				</th>
+				<tr>
+					<th>Mode</th>
+					<th class="centered"><img src='images/icons/check.png' width=16px></th>
+					<th class="centered"><img src='images/icons/missing.png' width=16px></th>
+				</tr>
 			</thead>
 			<tbody>
 				<?php
@@ -62,12 +63,12 @@ PageGenerator::header("Surface present modes");
 						$coverage = $surfacepresentmode['coverage'] ;
 						echo "<tr>";
 						echo "<td class='value'>" . $surfacepresentmode['mode'] . "</td>";
-						echo "<td class='value'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='value'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data!</b><br>";
+					echo "<b>Error while fetching data!</b><br>";
 				}
 				DB::disconnect();
 				?>

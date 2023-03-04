@@ -49,10 +49,11 @@ PageGenerator::header("Surface usage flags");
 					<th></th>
 					<th colspan=2 style="text-align: center;">Device coverage</th>
 				</tr>
-				<th>Mode</th>
-				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				</th>
+				<tr>
+					<th>Mode</th>
+					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
+				</tr>
 			</thead>
 			<tbody>
 				<?php
