@@ -38,6 +38,7 @@ class ReportCompareFlags
 class ReportCompareDeviceInfo
 {
     public $name;
+    public $displayname;
     public $driver_version;
     public $api_version;
     public $platform;
@@ -106,6 +107,7 @@ class ReportCompare
             $stmnt = DB::$connection->prepare(
                 "SELECT 
                     concat(VendorId(p.vendorid), ' ', p.devicename),
+                    r.displayname,
                     p.driverversion,
                     p.apiversion,
                     concat(r.osname, ' ', r.osversion, ' (',  r.osarchitecture, ')'),
@@ -120,11 +122,12 @@ class ReportCompare
         foreach ($stmnt->fetchAll(PDO::FETCH_NUM) as $device) {
             $device_info = new ReportCompareDeviceInfo;
             $device_info->name = $device[0];
-            $device_info->driver_version = $device[1];
-            $device_info->api_version = $device[2];
-            $device_info->platform = $device[3];
-            $device_info->ostype = $device[4];
-            $device_info->reportid = $device[5];
+            $device_info->displayname = $device[1];
+            $device_info->driver_version = $device[2];
+            $device_info->api_version = $device[3];
+            $device_info->platform = $device[4];
+            $device_info->ostype = $device[5];
+            $device_info->reportid = $device[6];
             $this->device_infos[] = $device_info;
         }
     }
@@ -153,6 +156,10 @@ class ReportCompare
                 echo "<th>";
                 echo $device_info->name;
                 echo "<br>";
+                if (stripos($device_info->platform, 'android') !== false) {
+                    echo $device_info->displayname;
+                    echo "<br>";   
+                }
                 echo "Driver $device_info->driver_version";
                 echo "<br>";
                 echo ucfirst($device_info->platform);
