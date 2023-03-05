@@ -3,7 +3,7 @@
 *
 * Vulkan hardware capability database back-end
 *	
-* Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
 *	
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public
@@ -522,6 +522,30 @@ class VulkanProfile {
         }   
     }
 
+    /** Some mappings require manual conversion */
+    private function addManualMappings() {
+        if ($this->api_version >= '1.0') {
+            // Subgroup operations have no explicit struct, so we need to manually create and append that
+            $stmnt = DB::$connection->prepare('SELECT 
+                `subgroupProperties.subgroupSize` as subgroupSize,
+                `subgroupProperties.supportedStages` as supportedStages,
+                `subgroupProperties.supportedOperations` as supportedOperations,
+                `subgroupProperties.quadOperationsInAllStages` as quadOperationsInAllStages
+                from deviceproperties where reportid = :reportid');
+            $stmnt->execute([':reportid' => $this->reportid]);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                $subgroup_properties = [
+                    'subgroupSize' => intval($row['subgroupSize']),
+                    'supportedStages' => VkTypes::VkShaderStageFlags($row['supportedStages']),
+                    'supportedOperations' => VkTypes::VkSubgroupFeatureFlags($row['supportedOperations']),
+                    'quadOperationsInAllStages' => $row['quadOperationsInAllStages'] ? true : false
+                ];
+                $this->json['capabilities']['device']['properties']['VkPhysicalDeviceSubgroupProperties'] = $subgroup_properties;
+            }
+        }        
+    }
+
     /** Device info (including identifiers) */
     private function readDeviceInfo() {
         $stmnt = DB::$connection->prepare("SELECT ifnull(displayname, devicename) as device, reports.* from reports where id = :reportid");
@@ -554,7 +578,6 @@ class VulkanProfile {
         $this->readExtensionProperties();
         $this->readFormats();
         $this->readQueueFamilies();
-        DB::disconnect();
 
         $this->json['$schema'] = $this->json_schema_name;
         $this->json['profiles'] = [
@@ -646,6 +669,9 @@ class VulkanProfile {
         } else {
             $this->json['capabilities']['device']['queueFamiliesProperties'] = [];
         }
+
+        $this->addManualMappings($this->json);
+        DB::disconnect();
     }
 }
 
