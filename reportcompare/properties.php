@@ -136,6 +136,7 @@ function insertExtensionProperties($report_compare)
 				$html = '';
 				$diff = false;
 				$last_val = null;
+				$curr_val = null;
 				foreach ($reports as $index => $report) {
 					$ext_present = array_key_exists($extension, $report);
 					if ($ext_present) {
