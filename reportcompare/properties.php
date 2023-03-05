@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -111,7 +111,7 @@ function insertCoreProperties($report_compare, $version)
 		echo "<td class='subkey'>" . ($differing_values ? $report_compare->getDiffIcon() : "") . $compare_properties->captions[$i] . "</td>";
 		for ($j = 0; $j < count($compare_properties->data); $j++) {
 			$value = $compare_properties->data[$j][$i];
-			$displayvalue = (($value !== null) ? getPropertyDisplayValue($compare_properties->captions[$i], $value) : "<span class='na'>n/a</span>");
+			$displayvalue = (($value !== null) ? getPropertyDisplayValue($compare_properties->captions[$i], $value, true) : "<span class='na'>n/a</span>");
 			echo "<td>$displayvalue</td>";
 		}
 		echo "</tr>";
@@ -155,7 +155,7 @@ function insertExtensionProperties($report_compare)
 						$last_val = $curr_val;
 					};
 					if ($curr_val !== null) {
-						$displayvalue = getPropertyDisplayValue($feature['name'], $curr_val);
+						$displayvalue = getPropertyDisplayValue($feature['name'], $curr_val, true);
 						$html .= "<td>$displayvalue</td>";
 					} else {
 						$html .= "<td class='na'>n.a.</td>";
