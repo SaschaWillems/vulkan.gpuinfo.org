@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -160,7 +160,7 @@
 	}
 
 	function importCore13Data($json, $reportid) {
-		if (!array_key_exists('core11', $json)) {
+		if (!array_key_exists('core13', $json)) {
 			return;
 		}
 		// Features
@@ -282,8 +282,8 @@
 			osarchitecture = :osarchitecture";
 		$params = array(
 			":devicename" => $json['properties']['deviceName'],
-			":driverversion" => $json['properties']['driverVersion'],
-			":apiversion" => $json['properties']['apiVersion'],
+			":driverversion" => $json['properties']['driverVersionText'],
+			":apiversion" => $json['properties']['apiVersionText'],
 			":osname" => $json['environment']['name'],
 			":osversion" => $json['environment']['version'],
 			":osarchitecture" => $json['environment']['architecture'],
@@ -543,6 +543,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute(array(":reportid" => $reportid, ":extensionid" => $extensionid, ":specversion" => $ext['specVersion']));
 			} catch (Exception $e) {
+				mailError("Error at device extensions: ".$e->getMessage(), $jsonFile);
 				die('Error while trying to upload report (error at device extensions)');
 			}															
 		}	
@@ -985,32 +986,34 @@
 		
 	echo "res_uploaded";	  	
 
-	try {
-		$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
-		if (false) {
-			$msgtitle = "[DEVELOPMENT] ".$msgtitle;
-			$msg = "New Vulkan hardware report uploaded to the development database\n\n";
-			$msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
-		} else {
-			$msg = "New Vulkan hardware report uploaded to the database\n\n";
-			$msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
-		}
-		
-		$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
-		if ($display_name !== null) {
-			$msg .= "Displayname = ".$display_name."\n";
-		}
-		$msg .= "Driver version = ".$json['properties']['driverVersionText']."\n";
-		$msg .= "API version = ".$json['properties']['apiVersionText']."\n";
-		$msg .= "OS = ".$json['environment']['name']."\n";
-		$msg .= "OS version = ".$json['environment']['version']."\n";
-		$msg .= "OS arch = ".$json['environment']['architecture']."\n";
-		$msg .= "Submitter = ".$json['environment']['submitter']."\n";
-		$msg .= "Comment = ".$json['environment']['comment']."\n";
-		$msg .= "Report version = ".$json['environment']['reportversion']."\n";
-		
-		mail($mailto, $msgtitle, $msg);
-	} catch (Exception $e) {
-		// Failure to mail is not critical
-	}	
+	if ($mailto) {
+		try {
+			$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
+			if (false) {
+				$msgtitle = "[DEVELOPMENT] ".$msgtitle;
+				$msg = "New Vulkan hardware report uploaded to the development database\n\n";
+				$msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
+			} else {
+				$msg = "New Vulkan hardware report uploaded to the database\n\n";
+				$msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
+			}
+			
+			$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
+			if ($display_name !== null) {
+				$msg .= "Displayname = ".$display_name."\n";
+			}
+			$msg .= "Driver version = ".$json['properties']['driverVersionText']."\n";
+			$msg .= "API version = ".$json['properties']['apiVersionText']."\n";
+			$msg .= "OS = ".$json['environment']['name']."\n";
+			$msg .= "OS version = ".$json['environment']['version']."\n";
+			$msg .= "OS arch = ".$json['environment']['architecture']."\n";
+			$msg .= "Submitter = ".$json['environment']['submitter']."\n";
+			$msg .= "Comment = ".$json['environment']['comment']."\n";
+			$msg .= "Report version = ".$json['environment']['reportversion']."\n";
+			
+			mail($mailto, $msgtitle, $msg);
+		} catch (Exception $e) {
+			// Failure to mail is not critical
+		}	
+	}
 ?>
