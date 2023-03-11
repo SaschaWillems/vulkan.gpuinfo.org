@@ -820,3 +820,39 @@ a {
 code {
 	color: var(--textcolor-code);
 }
+
+.fileupload {
+	opacity: 0;
+	width: 0.1px;
+	height: 0.1px;
+	position: absolute;
+}
+
+.file-input label, .file-input button {
+	display: block;
+	position: relative;
+	width: 180px;
+	height: 40px;
+	border-radius: 5px;
+	background: #fff;
+	box-shadow: 0 4px 7px rgba(0, 0, 0, 0.4);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	color: #5a5a5a;
+	font-weight: normal;
+}
+
+.file-input label:hover, .file-input button:hover {
+	background: #ececec;
+	border: 0px;
+}
+
+.file-name {
+	position: absolute;
+	bottom: -35px;
+	left: 10px;
+	font-size: 0.85rem;
+	color: #555;
+}
