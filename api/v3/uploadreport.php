@@ -793,7 +793,7 @@
 	}
 
 	// Platform details
-	{		
+	if (array_key_exists('platformdetails', $json)) {
 		$jsonnode = $json['platformdetails']; 
 		$index = 0;
 		$platform_model = null;
