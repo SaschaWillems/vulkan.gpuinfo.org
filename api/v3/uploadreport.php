@@ -46,7 +46,15 @@
 	if ($ext != 'json') {
 		echo "Report '$file' is not of file type json!";
 		exit();  
-	} 
+	}
+
+	// Make sure it's really a text file
+	$finfo = new finfo(FILEINFO_MIME);
+	$mime_type = $finfo->file($_FILES['data']['tmp_name']);
+	if ((!$mime_type) || (stripos($mime_type, 'text') === false)) {
+		echo "Uploaded file looks like a binary file!";
+		exit();
+	}
 	
 	move_uploaded_file($_FILES['data']['tmp_name'], $path.$_FILES['data']['name']) or die(''); 
 
