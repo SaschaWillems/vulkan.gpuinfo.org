@@ -30,12 +30,15 @@ PageGenerator::header("Manual report upload");
 
 <script>
     async function uploadFile() {
+        let progressArea = document.getElementById("progress-area");
+        progressArea.style.display = 'block';
         let formData = new FormData();
         formData.append("data", fileupload.files[0]);
         const response = await fetch('/api/v3/uploadreport.php', {
             method: "POST",
             body: formData
         });
+        progressArea.style.display = 'none';
         let resultArea = document.getElementById("result-area");
         resultArea.style.display = 'block';
         const status = await response.status;
@@ -83,8 +86,8 @@ PageGenerator::header("Manual report upload");
                     <button id="upload-button" class="file-input" onclick="uploadFile()" style="margin-top: 10px; display:none; ">Upload </button>
                 </div>
             </div>
-            <div id="result-area" class="alert alert-info" style="display:none; margin-top: 20px; margin-bottom: 0px">
-            </div>
+            <div id="progress-area" style="display:none; margin-top: 20px; margin-bottom: 0px">Uploading...</div>
+            <div id="result-area" class="alert alert-info" style="display:none; margin-top: 20px; margin-bottom: 0px"></div>
         </div>
     </div>
 </center>
