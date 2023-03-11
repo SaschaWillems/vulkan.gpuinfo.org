@@ -989,15 +989,8 @@
 	if ($mailto) {
 		try {
 			$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
-			if (false) {
-				$msgtitle = "[DEVELOPMENT] ".$msgtitle;
-				$msg = "New Vulkan hardware report uploaded to the development database\n\n";
-				$msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
-			} else {
-				$msg = "New Vulkan hardware report uploaded to the database\n\n";
-				$msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
-			}
-			
+			$msg = "New Vulkan hardware report uploaded to the database\n\n";
+			$msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";	
 			$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
 			if ($display_name !== null) {
 				$msg .= "Displayname = ".$display_name."\n";
@@ -1010,7 +1003,9 @@
 			$msg .= "Submitter = ".$json['environment']['submitter']."\n";
 			$msg .= "Comment = ".$json['environment']['comment']."\n";
 			$msg .= "Report version = ".$json['environment']['reportversion']."\n";
-			
+			if (array_key_exists('appvariant', $json['environment'])) {
+				$msg .= "App variant = ".$json['environment']['appvariant']."\n";
+			}			
 			mail($mailto, $msgtitle, $msg);
 		} catch (Exception $e) {
 			// Failure to mail is not critical
