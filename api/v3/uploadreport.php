@@ -22,16 +22,12 @@
 	include "./../../includes/functions.php";
 	include './../../database/database.class.php';	
 	
-	// Check for valid file
-	$path='./';
-	
-	// Reports are pretty small, so limit file size for upload (512 KByte will be more than enough)
-	$MAX_FILESIZE = 512 * 1024;
-	
+	// File validty check
+
 	$file = $_FILES['data']['name'];
 
-	// Check filesize
-	if ($_FILES['data']['size'] > $MAX_FILESIZE)  {
+	// Reports are pretty small, so limit file size for upload to 512 KByte (should be more than enough)
+	if ($_FILES['data']['size'] > 512 * 1024)  {
 		echo "File exceeds size limitation of 512 KByte!";
 		exit();  
 	}
@@ -42,7 +38,7 @@
 	}	
 	
 	// Check file extension 
-	$ext = pathinfo($_FILES['data']['name'], PATHINFO_EXTENSION); 
+	$ext = pathinfo($file, PATHINFO_EXTENSION); 
 	if ($ext != 'json') {
 		echo "Report '$file' is not of file type json!";
 		exit();  
@@ -56,7 +52,7 @@
 		exit();
 	}
 	
-	move_uploaded_file($_FILES['data']['tmp_name'], $path.$_FILES['data']['name']) or die(''); 
+	move_uploaded_file($_FILES['data']['tmp_name'], './'.$_FILES['data']['name']) or die(''); 
 
 	function convertValue($val) {
 		if (is_string($val)) {
@@ -254,8 +250,10 @@
 	
 	$jsonFile = file_get_contents($file);
 	$json = json_decode($jsonFile, true, 512, JSON_BIGINT_AS_STRING);
-	$display_name = null;
-	
+	if (json_last_error() !== JSON_ERROR_NONE) {
+		exit('Could not decode JSON Input file');
+	}
+
 	// Check report version
 	$reportversion = floatval($json['environment']['reportversion']);
 	if ($reportversion < 3.0)
@@ -267,7 +265,7 @@
 	
 	// Check if device is blacklisted
 	try {
-		$sql = "select * from blacklist where devicename = :devicename";
+		$sql = "SELECT * from blacklist where devicename = :devicename";
 		$stmnt = DB::$connection->prepare($sql);
 		$stmnt->execute(array(":devicename" => $json['properties']['deviceName']));
 		if ($stmnt->rowCount() > 0) { 
@@ -281,7 +279,7 @@
 		
 	// Check if report is already present
 	{
-		$sql = "select id from reports where
+		$sql = "SELECT id from reports where
 			devicename = :devicename and 
 			driverversion = :driverversion and
 			apiversion = :apiversion and
@@ -801,6 +799,7 @@
 	}
 
 	// Platform details
+	$display_name = null;
 	if (array_key_exists('platformdetails', $json)) {
 		$jsonnode = $json['platformdetails']; 
 		$index = 0;
