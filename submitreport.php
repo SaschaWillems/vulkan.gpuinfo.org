@@ -32,10 +32,11 @@ PageGenerator::header("Manual report upload");
     async function uploadFile() {
         let progressArea = document.getElementById("progress-area");
         let resultArea = document.getElementById("result-area");
+        let uploadButton = document.getElementById("upload-button");
         progressArea.style.display = 'block';
         let formData = new FormData();
         formData.append("data", fileupload.files[0]);
-        const response = await fetch('/api/v3/uploadreport.php', {
+        const response = await fetch('/api/v4/uploadreport.php', {
             method: "POST",
             body: formData
         });
@@ -45,20 +46,23 @@ PageGenerator::header("Manual report upload");
         const text = await response.text();
         resultArea.className = 'alert alert-info'
         resultArea.innerText = text;
-        if (text.trim() == 'res_uploaded') {
+        if (text.trim() == 'res_uploaded') {            
             resultArea.innerText = 'Report uploaded successfully';
             resultArea.className = 'alert alert-success'
+            uploadButton.style.display = 'none';
         }
         if (text.indexOf('already present') > 0) {
             resultArea.className = 'alert alert-warning'
+            uploadButton.style.display = 'none';
         }
     }
 
     function checkAccept() {
+        let uploadButton = document.getElementById("upload-button");
         if (document.getElementById('accept').checked) {
-            document.getElementById("upload-button").style.display = 'block';
+            uploadButton.style.display = 'block';
         } else {
-            document.getElementById("upload-button").style.display = 'none';
+            uploadButton.style.display = 'none';
         }
     }
 
@@ -92,7 +96,7 @@ PageGenerator::header("Manual report upload");
                 </div>
                 <div id='accept-area' style="display:none; margin-top: 20px; margin-bottom: 0px">
                     <label for="accept">
-                        <input type="checkbox" id="accept" name="accept" onClick="checkAccept()"> I confirm this is a valid Vulkan report
+                        <input type="checkbox" id="accept" name="accept" onClick="checkAccept()"> I confirm this is a valid device report file exported from the Vulkan Hardware Capability viewer
                     </label>                
                 </div>
                 <div class="file-input">
