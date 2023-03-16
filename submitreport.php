@@ -31,6 +31,7 @@ PageGenerator::header("Manual report upload");
 <script>
     async function uploadFile() {
         let progressArea = document.getElementById("progress-area");
+        let resultArea = document.getElementById("result-area");
         progressArea.style.display = 'block';
         let formData = new FormData();
         formData.append("data", fileupload.files[0]);
@@ -39,7 +40,6 @@ PageGenerator::header("Manual report upload");
             body: formData
         });
         progressArea.style.display = 'none';
-        let resultArea = document.getElementById("result-area");
         resultArea.style.display = 'block';
         const status = await response.status;
         const text = await response.text();
@@ -54,10 +54,18 @@ PageGenerator::header("Manual report upload");
         }
     }
 
+    function checkAccept() {
+        if (document.getElementById('accept').checked) {
+            document.getElementById("upload-button").style.display = 'block';
+        } else {
+            document.getElementById("upload-button").style.display = 'none';
+        }
+    }
+
     $(document).ready(function() {
         document.getElementById("fileupload").onchange = function() {
             document.getElementById("upload-file-info").innerHTML = this.files[0].name;
-            document.getElementById("upload-button").style.display = 'block';
+            document.getElementById("accept-area").style.display = 'block';
         };
     });
 </script>
@@ -82,8 +90,13 @@ PageGenerator::header("Manual report upload");
                     </label>
                     <p id="upload-file-info"></p>
                 </div>
+                <div id='accept-area' style="display:none; margin-top: 20px; margin-bottom: 0px">
+                    <label for="accept">
+                        <input type="checkbox" id="accept" name="accept" onClick="checkAccept()"> I confirm this is a valid Vulkan report
+                    </label>                
+                </div>
                 <div class="file-input">
-                    <button id="upload-button" class="file-input" onclick="uploadFile()" style="margin-top: 10px; display:none; ">Upload </button>
+                    <button id="upload-button" class="file-input" onclick="uploadFile()" style="margin-top: 10px; display:none;">Upload </button>
                 </div>
             </div>
             <div id="progress-area" style="display:none; margin-top: 20px; margin-bottom: 0px">Uploading...</div>
