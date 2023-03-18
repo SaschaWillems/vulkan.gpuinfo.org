@@ -155,10 +155,13 @@
 		if (array_key_exists('extended', $report)) {
 			if (array_key_exists('deviceproperties2', $report['extended'])) {
 				if ((is_array($report['extended']['deviceproperties2'])) && (count($report['extended']['deviceproperties2']) > 0)) {
+					// Some Vulkan 1.1 devices may report the same device extension property twice (usually for VK_KHR_maintenance3)
+					// This would always tell the application that the report can be updated, so we make sure to only compare unique entries to the database
+					$unique_properties_2 = array_values(array_unique($report['extended']['deviceproperties2'], SORT_REGULAR));
 					// Update allowed if number of extended properties in the new report is higher than what's stored on the databae
 					$stmnt = DB::$connection->prepare("SELECT count(*) from deviceproperties2 where reportid = :reportid");
 					$stmnt->execute(['reportid' => $compare_id]);
-					$count_report = count($report['extended']['deviceproperties2']);
+					$count_report = count($unique_properties_2);
 					$count_database = intval($stmnt->fetchColumn());
 					if ($count_report > $count_database) {
 						$updatable[] = 'Vulkan extension properties';
