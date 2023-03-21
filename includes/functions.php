@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -374,6 +374,7 @@ function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 				($versionraw) & 0x003f
 			);
 		}
+		// Intel (Windows)
 		if ($vendorid == 0x8086 && $osname == 'windows') {
 			return sprintf(
 				"%d.%d",
@@ -381,6 +382,13 @@ function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 				($versionraw) & 0x3fff
 			);
 		}
+		// Broadcom
+		if ($vendorid == 5348) {
+			// Version encoded as human-readable (10000 * major + 100 * minor)
+			$major = $versionraw / 10000;
+			$minor = ($versionraw % 10000) / 100;
+			return sprintf('%d.%d', $major, $minor);
+		}		
 		// Use Vulkan version conventions if vendor mapping is not available
 		return sprintf(
 			"%d.%d.%d",
