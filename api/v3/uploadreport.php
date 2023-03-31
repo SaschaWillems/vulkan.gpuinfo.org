@@ -54,6 +54,14 @@
 	
 	move_uploaded_file($_FILES['data']['tmp_name'], './'.$_FILES['data']['name']) or die(''); 
 
+	// Use a closure to exit the script that ensures an uploaded file is always deleted
+	$exitScript = function($message = null) use ($file) {
+		if (file_exists($file)) {
+			unlink($file);
+		}
+		exit($message);
+	};
+
 	function convertValue($val) {
 		if (is_string($val)) {
 			if (strpos($val, '0x') === 0) {
@@ -278,40 +286,38 @@
 	}		
 		
 	// Check if report is already present
-	{
-		$sql = "SELECT id from reports where
-			devicename = :devicename and 
-			driverversion = :driverversion and
-			apiversion = :apiversion and
-			osname = :osname and
-			osversion = :osversion and
-			osarchitecture = :osarchitecture";
-		$params = array(
-			":devicename" => $json['properties']['deviceName'],
-			":driverversion" => $json['properties']['driverVersionText'],
-			":apiversion" => $json['properties']['apiVersionText'],
-			":osname" => $json['environment']['name'],
-			":osversion" => $json['environment']['version'],
-			":osarchitecture" => $json['environment']['architecture'],
-		);
+	$sql = "SELECT id from reports where
+		devicename = :devicename and 
+		driverversion = :driverversion and
+		apiversion = :apiversion and
+		osname = :osname and
+		osversion = :osversion and
+		osarchitecture = :osarchitecture";
+	$params = array(
+		":devicename" => $json['properties']['deviceName'],
+		":driverversion" => $json['properties']['driverVersionText'],
+		":apiversion" => $json['properties']['apiVersionText'],
+		":osname" => $json['environment']['name'],
+		":osversion" => $json['environment']['version'],
+		":osarchitecture" => $json['environment']['architecture'],
+	);
 
-		try {
-			$stmnt = DB::$connection->prepare($sql);		
-			$stmnt->execute($params);	
-		} catch (Exception $e) {
-			die('Error while trying to upload report (error at device present check)');
-		}		
-		
-		if ($stmnt->rowCount() > 0) {
-			$reportid = $stmnt->fetchColumn();
-			$sql = "UPDATE reports SET counter = counter+1 WHERE id = :reportid";
-			$stmnt = DB::$connection->prepare($sql);		
-			$stmnt->execute(array(":reportid" => $reportid));			
-			echo "Report already present!";
-			DB::disconnect();
-			exit();	  
-		}	
-	}
+	try {
+		$stmnt = DB::$connection->prepare($sql);		
+		$stmnt->execute($params);	
+	} catch (Exception $e) {
+		die('Error while trying to upload report (error at device present check)');
+	}		
+	
+	if ($stmnt->rowCount() > 0) {
+		$reportid = $stmnt->fetchColumn();
+		$sql = "UPDATE reports SET counter = counter+1 WHERE id = :reportid";
+		$stmnt = DB::$connection->prepare($sql);		
+		$stmnt->execute(array(":reportid" => $reportid));			
+		echo "Report already present!";
+		DB::disconnect();
+		$exitScript();
+	}	
 
 	DB::$connection->beginTransaction();
 	
@@ -705,8 +711,12 @@
 
 	// Surface properties
 	$hassurfacecaps = false;
-	if (array_key_exists('surfacecapabilites', $json)) {
-		$surfacecaps = $json['surfacecapabilites'];
+	if (array_key_exists('surfacecapabilites', $json) || array_key_exists('surfaceCapabilities', $json)) {
+		if (array_key_exists('surfacecapabilites', $json)) {
+			$surfacecaps = $json['surfacecapabilites'];
+		} else {
+			$surfacecaps = $json['surfaceCapabilities'];
+		}
 		$hassurfacecaps = ($surfacecaps['validSurface'] == 1);
 		if ($hassurfacecaps) {
 			// Caps
@@ -763,7 +773,7 @@
 			}																
 
 			// Present modes
-			$jsonnode = $json['surfacecapabilites']['presentmodes']; 
+			$jsonnode = $surfacecaps['presentmodes']; 
 			if (is_array($jsonnode)) {
 				foreach ($jsonnode as $presentmode) {
 					$sql = "INSERT INTO devicesurfacemodes
@@ -780,7 +790,7 @@
 			}	
 
 			// Surface formats	 		
-			$jsonnode = $json['surfacecapabilites']['surfaceformats']; 
+			$jsonnode = $surfacecaps['surfaceformats']; 
 			if (is_array($jsonnode)) {
 				foreach ($jsonnode as $surfaceformat) {
 					$sql = "INSERT INTO devicesurfaceformats
