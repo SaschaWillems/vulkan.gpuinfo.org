@@ -562,8 +562,9 @@ function displayHex($value)
 
 /**
  * Visualize certain properties (e.g. flags) in a more readable way
+ * If $shorten is set to true, values larger than 20 chars are shortened (use for e.g. report compare to not break the layout)
  */
-function getPropertyDisplayValue($key, $value)
+function getPropertyDisplayValue($key, $value, $shorten = false)
 {
 	$displayvalue = $value;
 	switch ($key) {
@@ -709,6 +710,10 @@ function getPropertyDisplayValue($key, $value)
 				$displayvalue = displayBool($value);
 			};
 	}
+	// Some value may contain very long values that break the layout, so we shorten theme for the compare view
+	if ($shorten && (in_array(strtolower($key), ['driverinfo']))) {
+		$displayvalue = shorten($displayvalue);
+	}
 	return $displayvalue;
 }
 
@@ -808,4 +813,12 @@ function getShortFieldName($full_name)
 		return $aliases[$full_name];
 	}
 	return $full_name;
+}
+
+function shorten($value, $length = 20, $add = '...')
+{
+	if (strlen($value) >= $length) {
+		return substr($value, 0, $length - strlen($add)) . $add;
+	}
+	return $value;
 }
