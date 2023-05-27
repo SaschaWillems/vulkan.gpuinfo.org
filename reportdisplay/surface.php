@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -68,10 +68,9 @@
 
 	<!-- Surface formats	 -->
 	<div id='surfaceformats' class='tab-pane fade reportdiv'>
-		<table id='devicesurfaceformats' class='table table-striped table-bordered table-hover reporttable'>
+		<table id='table_surfaceformats' class='table table-striped table-bordered table-hover reporttable'>
 			<thead>
 				<tr>
-					<td class='caption'>Index</td>
 					<td class='caption'>Format</td>
 					<td class='caption'>Colorspace</td>
 				</tr>
@@ -80,9 +79,8 @@
 				<?php
 				$surface_formats = $report->fetchSurfaceFormats();
 				if ($surface_formats) {
-					foreach ($surface_formats as $index => $surface_format) {
+					foreach ($surface_formats as $surface_format) {
 						echo "<tr>";
-						echo "<td>$index</td>";
 						echo "<td>" . $surface_format['format'] . "</td>";
 						echo "<td>" . getColorSpace($surface_format['colorspace']) . "</td>";
 						echo "</tr>";
@@ -95,7 +93,7 @@
 
 	<!-- Present modes	 -->
 	<div id='presentmodes' class='tab-pane fade reportdiv'>
-		<table id='devicepresentmodes' class='table table-striped table-bordered table-hover reporttable'>
+		<table id='table_presentmodes' class='table table-striped table-bordered table-hover reporttable'>
 			<thead>
 				<tr>
 					<td class='caption'>Present mode</td>

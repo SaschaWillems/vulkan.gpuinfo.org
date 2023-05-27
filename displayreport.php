@@ -142,7 +142,9 @@ echo "</div>";
 					'table_properties_core_11',
 					'table_properties_core_12',
 					'table_properties_core_13',
-					'table_deviceprofiles'
+					'table_deviceprofiles',
+					'table_surfaceformats',
+					'table_presentformats'
 				];
 				for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
 					if (typeof $('#' + tableNames[i]) != undefined) {
