@@ -3,25 +3,25 @@
 /**
  *
  * Vulkan hardware capability database server implementation
- *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
- *	
+ *
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
  * License version 3 as published by the Free Software Foundation.
- *	
+ *
  * Please review the following information to ensure the GNU Lesser
  * General Public License version 3 requirements will be met:
  * http://www.gnu.org/licenses/agpl-3.0.de.html
- *	
+ *
  * The code is distributed WITHOUT ANY WARRANTY; without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE.  See the GNU AGPL 3.0 for more details.		
+ * PURPOSE.  See the GNU AGPL 3.0 for more details.
  *
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.24';
+$release = '3.31';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -38,8 +38,8 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 			The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">the repository</a>.<br>
 		</div>
 		<div class="page-header">
-			<h3>Current stable release <?=$release?></h3>
-			<ul>		
+			<h3>Current release <?=$release?></h3>
+			<ul>
 				<li>Windows
 					<ul>
 						<li><a href="<?=$filename_prefix?>_win64.zip">Windows 64-bit (zip)</a></li>
@@ -54,6 +54,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 				</li>
 				<li>Android
 					<ul>
+						<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer&hl=en_US">Install from GooglePlay</a></li>
 						<li><a href="<?=$filename_prefix?>_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
 				<li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li>
@@ -61,8 +62,98 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 			</ul>
 		</div>
 		<div class="page-header">
-			<h3>Release notes</h3>	
-			<h4>3.24 - 2022-08-06</h4>			
+			<h3>Release notes</h3>
+			<h4>3.31 - 2023-05-27</h4>
+			<ul>
+				<li>Enable VK_EXT_swapchain_colorspace if supported by the implementation
+					<ul>
+						<li>This will report additional surface formats (e.g. for HDR color spaces), esp. on Android</li>
+						<li>Existing reports can be updated if new surface formats are reported with this version</li>
+					</ul>
+				</li>
+				<li>Fixes a bug that stopped the application from working on certain Linux platforms using wayland</li>
+			</ul>			
+			<h4>3.30 - 2023-05-13</h4>
+			<ul>
+				<li><b>Important note for Linux users:</b> Due to changes with automated builds, this version may no longer work on older eol Linux versions (e.g. Ubuntu < 20)</li>
+				<li>Vulkan header 1.3.250</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_KHR_ray_tracing_position_fetch</li>
+						<li>VK_EXT_attachment_feedback_loop_dynamic_state</li>
+						<li>VK_EXT_shader_tile_image</li>
+						<li>VK_EXT_shader_object</li>
+						<li>VK_NV_displacement_micromap</li>						
+					</ul>
+				</li>	
+			</ul>			
+			<h4>3.29 - 2023-03-17</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_ARM_shader_core_properties</li>
+						<li>VK_EXT_image_sliced_view_of_3d</li>
+						<li>VK_EXT_pipeline_library_group_handles</li>
+						<li>VK_QCOM_multiview_per_view_render_areas</li>
+					</ul>
+				</li>
+				<li>Filtering will keep child values displayed</li>
+				<li>Add new queue family flag bits</li>				
+			</ul>
+			<h4>3.28 - 2023-01-25</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_HUAWEI_cluster_culling_shader</li>
+					</ul>
+				</li>
+				<li>Use Vulkan profiles library from LunarG SDK</li>
+			</ul>
+			<h4>3.27 - 2022-11-19</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_descriptor_buffer</li>
+						<li>VK_ARM_shader_core_builtins</li>
+						<li>VK_NV_copy_memory_indirect</li>
+						<li>VK_NV_memory_decompression</li>
+						<li>VK_NV_ray_tracing_invocation_reorder</li>
+					</ul>
+				</li>
+			</ul>
+			<h4>3.26 - 2022-09-30</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_opacity_micromap</li>
+						<li>VK_EXT_extended_dynamic_state3</li>
+						<li>VK_EXT_device_fault</li>
+						<li>VK_EXT_device_address_binding_report</li>
+						<li>VK_EXT_pipeline_protected_access</li>
+						<li>VK_EXT_legacy_dithering</li>
+						<li>VK_EXT_mutable_descriptor_type</li>
+						<li>VK_EXT_rasterization_order_attachment_access</li>
+						<li>VK_NV_present_barrier</li>
+						<li>VK_NV_optical_flow</li>
+					</ul>
+				</li>
+				<li>Updated Vulkan profiles library to the latest version</li>
+				<li>Added detection for Windows 11</li>
+				<li>Fixed a bug with large values for maxTimelineSemaphoreValueDifference</li>
+				</li>
+			</ul>
+			<h4>3.25 - 2022-09-01</h4>
+			<ul>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_mesh_shader</li>
+						<li>VK_EXT_depth_clamp_zero_one</li>
+						<li>VK_EXT_rasterization_order_attachment_access</li>
+					</ul>
+				</li>
+				<li>Updated Vulkan profiles library to the latest version</li>
+			</ul>
+			<h4>3.24 - 2022-08-06</h4>
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
 					<ul>
@@ -75,8 +166,8 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_SEC_amigo_profiling</li>
 					</ul>
 				</li>
-				<li>Updated Vulkan profiles library to latest version	)</li>
-			</ul>			
+				<li>Updated Vulkan profiles library to the latest version</li>
+			</ul>
 			<h4>3.23 - 2022-06-27</h4>
 			<ul>
 				<li>Added support for the VK_KHR_portability_enumeration extension on MacOS</li>
@@ -86,7 +177,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 			</ul>
-			<h4>3.22 - 2022-05-26</h4>			
+			<h4>3.22 - 2022-05-26</h4>
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
 					<ul>
@@ -102,7 +193,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 				</li>
 				<li>Disabled uploads when feature modifying tools are detected (e.g. an active profiles layer)</li>
 			</ul>
-			<h4>3.21 - 2022-04-03</h4>			
+			<h4>3.21 - 2022-04-03</h4>
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
 					<ul>
@@ -115,11 +206,11 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 			<h4>3.2 - 2022-02-19</h4>
 			<ul>
 				<li>Added support for Vulkan profiles</li>
-			</ul>				
+			</ul>
 			<h4>3.11 - 2022-01-28</h4>
 			<ul>
 				<li>Bugfix for large maxBufferSize values in Vulkan 1.3 core properties</li>
-			</ul>				
+			</ul>
 			<h4>3.1 - 2022-01-25</h4>
 			<ul>
 				<li>Added support for Vulkan 1.3 core features and properties</li>
@@ -130,7 +221,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_NV_linear_color_attachment</li>
 					</ul>
 				</li>
-			</ul>			
+			</ul>
 			<h4>3.05 - 2021-11-27</h4>
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
@@ -143,7 +234,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 				<li>Fixed proxy settings not being properly applied and changed proxy type to http.	</li>
-			</ul>			
+			</ul>
 			<h4>3.04 - 2021-10-12</h4>
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
@@ -157,7 +248,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 				<li>Added support for PowerVR image formats</li>
-			</ul>			
+			</ul>
 			<h4>3.03 - 2021-08-22</h4>
 			<ul>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
@@ -166,9 +257,9 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_HUAWEI_invocation_mask</li>
 						<li>VK_KHR_present_wait</li>
 						<li>VK_KHR_present_id</li>
-					</ul>					
+					</ul>
 				</li>
-			</ul>				
+			</ul>
 			<h4>3.02 - 2021-08-07</h4>
 			<ul>
 				<li>Fixed queue family present support info on Linux</li>
@@ -186,9 +277,9 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_NV_external_memory_rdma</li>
 						<li>VK_EXT_provoking_vertex</li>
 						<li>VK_EXT_extended_dynamic_state2</li>
-					</ul>					
+					</ul>
 				</li>
-			</ul>			
+			</ul>
 			<h4>3.01 - 2021-04-24</h4>
 			<ul>
 				<li>Added VK_KHR_video_queue encode and decode flags to queue family display</li>
@@ -202,7 +293,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_KHR_zero_initialize_workgroup_memory</li>
 						<li>VK_KHR_workgroup_memory_explicit_layout</li>
 						<li>VK_NV_inherited_viewport_scissor</li>
-					</ul>					
+					</ul>
 				</li>
 			</ul>
 			<h4>3.0 - 2021-01-10</h4>
