@@ -301,7 +301,6 @@ try {
 	check_extension_properties_updatable($report, $reportid, $updatable);
 	check_profiles_updatable($report, $reportid, $updatable);
 	check_surface_formats_updatable($report, $reportid, $updatable);
-	file_put_contents('update.txt', implode(PHP_EOL, $updatable));
 	DB::disconnect();
 	$can_update = count($updatable) > 0;
 	if ($can_update) {
