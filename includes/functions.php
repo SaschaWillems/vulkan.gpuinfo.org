@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -161,6 +161,8 @@ function getStageFlags($flag)
 		0x0008 => "GEOMETRY",
 		0x0010 => "FRAGMENT",
 		0x0020 => "COMPUTE",
+		0x0040 => "TASK",
+		0x0080 => "MESH",		
 		0x001F => "ALL_GRAPHICS",
 	);
 	return getFlags($flags, $flag);
@@ -204,6 +206,8 @@ function listSubgroupStageFlags($flag)
 		0x0008 => "GEOMETRY",
 		0x0010 => "FRAGMENT",
 		0x0020 => "COMPUTE",
+		0x0040 => "TASK",
+		0x0080 => "MESH",		
 		0x001F => "ALL GRAPHICS",
 	);
 
