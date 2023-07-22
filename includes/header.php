@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,19 +20,13 @@
  *
  */
 
-session_set_cookie_params(0, '/', '.gpuinfo.org');
-session_name('gpuinfo');
+session_set_cookie_params(0, '/', $_SERVER['SERVER_NAME']);
+session_name('vulkan');
 session_start();
 
-$data_theme = null;
-$data_theme_icon = 'moon';
-if (($_SESSION['theme']) && ($_SESSION['theme'] == 'dark')) {
-	$data_theme = 'data-theme="dark"';
-	$data_theme_icon = 'sun';
-}
 
 ?>
-<html <?= $data_theme ?>>
+<html>
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="ISO-8859-1">
@@ -149,7 +143,7 @@ if (($_SESSION['theme']) && ($_SESSION['theme'] == 'dark')) {
 							<li><a href="listsurfacepresentmodes.php">Present modes</a></li>
 							<li><a href="listsurfaceusageflags.php">Usage flags</a></li>
 							<li><a href="listsurfacetransformmodes.php">Transform modes</a></li>
-							<li><a href="listsurfacecompositealphamodes.php">Composite alpha</a></li>
+							<li><a href="listsurfacecompositealphamodes.php">Composite alpha modes</a></li>
 						</ul>
 					</li>
 					<li class="dropdown">
@@ -180,7 +174,6 @@ if (($_SESSION['theme']) && ($_SESSION['theme'] == 'dark')) {
 					</li>
 					<li><a href="download.php">Download</a></li>
 					<li><a href="about.php">About</a></li>
-					<li><a href="toggletheme.php" title="Toggle dark/light themes"><img id="mode-toggle" class="mode-toggle" src="./images/<?= $data_theme_icon ?>.svg"/></a> </li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class="dropdown">

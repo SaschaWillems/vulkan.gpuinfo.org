@@ -28,35 +28,37 @@
 	--textcolor-nav: rgb(232, 230, 227);
 }
 
-[data-theme='dark'] {
-	--backgroundcolor: rgb(17, 17, 17);
-	--backgroundcolor-full: rgb(24, 26, 27);
-	--backgroundcolor-header: rgb(52, 52, 52);
-	--backgroundcolor-textpages: rgb(17, 17, 17);
-	--textcolor: rgb(175, 168, 158);
-	--textcolor-placeholder: rgb(120, 117, 113);
-	--textcolor-button: rgb(120, 117, 113);
-	--textcolor-supported: rgb(53, 173, 109);
-	--textcolor-unsupported: rgb(200, 30, 32);
-	--textcolor-header: rgb(165, 165, 165);
-	--textcolor-na: #535353;
-	--bordercolor: rgb(41, 44, 46);
-	--table-even-row-background: rgb(24, 26, 27);
-	--table-odd-row-background: rgb(29, 31, 32);
-	--icon-invert: 1;
-	--mode-toggle-grayscale: 0.5;
-	--link-color: rgb(104, 139, 165);
-	--backgroundcolor-pager-active: #21517a;
-	--bordercolor-pager-active: #21517a;
-	--backgroundcolor-format-table-format: rgb(10, 10, 10);
-	--color-info-box-brightness: 75%;
-	--background-color-input: rgb(59, 59, 59);
-	--textcolor-code: rgb(170, 128, 69);
-	--backgroundcolor-button: rgb(59, 59, 59);
-	--backgroundcolor-button-hover: rgb(90, 90, 90);
-	--textcolor-button-hover: rgb(165, 165, 165);
-	--backgroundcolor-pagination-hover: rgb(34, 36, 38);
-	--textcolor-nav: rgb(232, 230, 227);
+@media (prefers-color-scheme: dark) {
+	:root {
+		--backgroundcolor: rgb(17, 17, 17);
+		--backgroundcolor-full: rgb(24, 26, 27);
+		--backgroundcolor-header: rgb(52, 52, 52);
+		--backgroundcolor-textpages: rgb(17, 17, 17);
+		--textcolor: rgb(175, 168, 158);
+		--textcolor-placeholder: rgb(120, 117, 113);
+		--textcolor-button: rgb(120, 117, 113);
+		--textcolor-supported: rgb(53, 173, 109);
+		--textcolor-unsupported: rgb(200, 30, 32);
+		--textcolor-header: rgb(165, 165, 165);
+		--textcolor-na: #535353;
+		--bordercolor: rgb(41, 44, 46);
+		--table-even-row-background: rgb(24, 26, 27);
+		--table-odd-row-background: rgb(29, 31, 32);
+		--icon-invert: 1;
+		--mode-toggle-grayscale: 0.5;
+		--link-color: rgb(104, 139, 165);
+		--backgroundcolor-pager-active: #21517a;
+		--bordercolor-pager-active: #21517a;
+		--backgroundcolor-format-table-format: rgb(10, 10, 10);
+		--color-info-box-brightness: 75%;
+		--background-color-input: rgb(59, 59, 59);
+		--textcolor-code: rgb(170, 128, 69);
+		--backgroundcolor-button: rgb(59, 59, 59);
+		--backgroundcolor-button-hover: rgb(90, 90, 90);
+		--textcolor-button-hover: rgb(165, 165, 165);
+		--backgroundcolor-pagination-hover: rgb(34, 36, 38);
+		--textcolor-nav: rgb(232, 230, 227);
+	}
 }
 
 body {
@@ -819,4 +821,12 @@ a {
 
 code {
 	color: var(--textcolor-code);
+}
+
+.subcaption-level-1 {
+	font-size: smaller;
+}
+
+.subcaption-level-2 {
+	font-size: smaller;
 }
