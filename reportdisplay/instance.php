@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -49,7 +49,7 @@ $instance_layers_count = $instance_layers ? count($instance_layers) : 0;
 				if ($instance_extensions) {
 					foreach ($instance_extensions as $ext) {
 						echo "<tr><td><a href='listreports.php?instanceextension=" . $ext["name"] . "'>" . $ext["name"] . "</a></td>";
-						echo "<td>" . versionToString($ext["specversion"]) . "</td>";
+						echo "<td>r.".$ext["specversion"]."</td>";
 						echo "</tr>\n";
 					}
 				}

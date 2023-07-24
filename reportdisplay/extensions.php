@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -34,7 +34,7 @@
 			foreach ($data as $extension) {
 				$link = "listdevicescoverage.php?extension=" . $extension['name'] . $linkplatform;
 				echo "<tr><td><a href='$link'>" . $extension['name'] . "</a></td>";
-				echo "<td>" . versionToString($extension['specversion']) . "</td>";
+				echo "<td>r.".$extension['specversion']."</td>";
 				echo "</tr>";
 			}
 		}
