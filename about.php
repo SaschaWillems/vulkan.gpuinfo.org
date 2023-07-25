@@ -3,7 +3,7 @@
 		*
 		* Vulkan hardware capability database server implementation
 		*	
-		* Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+		* Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
 		*	
 		* This code is free software, you can redistribute it and/or
 		* modify it under the terms of the GNU Affero General Public
@@ -31,9 +31,10 @@
 			<!-- <p>
 				<img src="images/vulkanlogoscene.png" width="320px">
 			</p> -->
-			<div>
+			<div class="page-header">
 				Welcome to the community-driven Vulkan hardware database, an online tool for developers that want to check out GPU hardware capabilites for the <a href="https://www.khronos.org/vulkan">new explicit graphics and compute
 				API from Khronos</a>.<br><br>
+				<b>Please note:</b> This is a tool for developers. The database does <b>in no way represent market shares</b>.<br><br>
 				This database and the client applications to submit reports are developed and maintained by me (<a href="http://www.saschawillems.de/" target="_blank">Sascha Willems</a>) in my spare time.<br><br>		
 				Thanks to the authors of <a href="https://www.datatables.net/" target="_blank">datatables</a> and <a href="https://github.com/vedmack/yadcf" target="_blank">yadcf</a> which are both used by the front-end of the database.<br><br>
 				No profit is made from this data, nor is this data used in any commercial way and no personal data is transferred, stored or passed.<br><br>
