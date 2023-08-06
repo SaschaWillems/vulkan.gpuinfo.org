@@ -276,6 +276,52 @@ function listFlags($flags)
 		echo "none";
 	}
 }
+function listImageLayouts($value) {
+	$formats = [
+		0 => 'UNDEFINED',
+		1 => 'GENERAL',
+		2 => 'COLOR_ATTACHMENT_OPTIMAL',
+		3 => 'DEPTH_STENCIL_ATTACHMENT_OPTIMAL',
+		4 => 'DEPTH_STENCIL_READ_ONLY_OPTIMAL',
+		5 => 'SHADER_READ_ONLY_OPTIMAL',
+		6 => 'TRANSFER_SRC_OPTIMAL',
+		7 => 'TRANSFER_DST_OPTIMAL',
+		8 => 'PREINITIALIZED',
+		1000117000 => 'DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL',
+		1000117001 => 'DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL',
+		1000241000 => 'DEPTH_ATTACHMENT_OPTIMAL',
+		1000241001 => 'DEPTH_READ_ONLY_OPTIMAL',
+		1000241002 => 'STENCIL_ATTACHMENT_OPTIMAL',
+		1000241003 => 'STENCIL_READ_ONLY_OPTIMAL',
+		1000314000 => 'READ_ONLY_OPTIMAL',
+		1000314001 => 'ATTACHMENT_OPTIMAL',
+		1000001002 => 'PRESENT_SRC_KHR',
+		1000024000 => 'VIDEO_DECODE_DST_KHR',
+		1000024001 => 'VIDEO_DECODE_SRC_KHR',
+		1000024002 => 'VIDEO_DECODE_DPB_KHR',
+		1000111000 => 'SHARED_PRESENT_KHR',
+		1000218000 => 'FRAGMENT_DENSITY_MAP_OPTIMAL_EXT',
+		1000164003 => 'FRAGMENT_SHADING_RATE_ATTACHMENT_OPTIMAL_KHR',
+		1000299000 => 'VIDEO_ENCODE_DST_KHR',
+		1000299001 => 'VIDEO_ENCODE_SRC_KHR',
+		1000299002 => 'VIDEO_ENCODE_DPB_KHR',
+		1000339000 => 'ATTACHMENT_FEEDBACK_LOOP_OPTIMAL_EXT',  
+	];     
+
+	try {
+		$arr = unserialize($value);
+		foreach ($arr as &$val) {
+			if (array_key_exists($val, $formats)) {
+				$val = $formats[$val];
+			} else {
+				$val = 'UNKNOWN LAYOUT';
+			}
+		}
+		return implode('<br>', $arr);
+	} catch (Throwable $e) {
+		return null;
+	}
+}
 
 function getShaderFloatControlsIndependence($value)
 {
@@ -699,6 +745,10 @@ function getPropertyDisplayValue($key, $value)
 		case 'shaderBinaryUUID':
 		case 'optimalTilingLayoutUUID':
 			$displayvalue = UUIDtoString($value);			
+			break;
+		case 'pCopyDstLayouts':
+		case 'pCopySrcLayouts':									
+			$displayvalue = listImageLayouts($value);
 			break;
 		default:
 			// Serialized arrays
