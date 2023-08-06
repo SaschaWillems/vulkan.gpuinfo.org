@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -112,12 +112,7 @@ function insertExtensionProperties($report)
 			$key = $extension_property['name'];
 			$value = $extension_property['value'];
 			$displayvalue = $value;
-			if (is_string($value) && substr($value, 0, 2) == "a:") {
-				$arr = unserialize($value);
-				$displayvalue = "[" . implode(',', $arr) . "]";
-			} else {
-				$displayvalue = getPropertyDisplayValue($key, $value);
-			}
+			$displayvalue = getPropertyDisplayValue($key, $value);
 			echo "<tr><td class='subkey'>$key</td><td>";
 			echo $displayvalue;
 			echo "<td>" . $extension_property['extension'] . "</td>";
