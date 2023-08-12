@@ -35,6 +35,8 @@ include '../../includes/functions.php';
 
 DB::connect();
 
+$start = microtime(true);
+
 // Process the ordering, paging, searching, etc. parts of the ajax requests of a datatable
 
 $paging = null;
@@ -90,10 +92,9 @@ if ($platform !== 'all') {
 }
 
 // Fetch extensions with coverage based on unique device names from the database
-$sql ="SELECT e.name as name, date(min(e.$dateColumn)) as date, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
+$sql ="SELECT e.name as name, date(min(e.$dateColumn)) as date, count(distinct(r.displayname)) as coverage from extensions e 
         join deviceextensions de on de.extensionid = e.id 
         join reports r on r.id = de.reportid
-        join deviceproperties dp on dp.reportid = de.reportid
         $whereClause
         group by name";
 $stmnt = DB::$connection->prepare($sql);
@@ -136,5 +137,9 @@ $results = array(
     "data" => $data
 );
 echo json_encode($results);
+
+$elapsed = (microtime(true) - $start) * 1000;
+
+DB::log('api/external/extensions.php', $sql, $elapsed);
 
 DB::disconnect();
