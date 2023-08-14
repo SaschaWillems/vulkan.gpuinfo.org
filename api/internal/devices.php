@@ -20,14 +20,18 @@
  *
  */
 
-session_start();
-
+ 
 include '../../database/database.class.php';
 include '../../database/sqlrepository.php';
 include '../../includes/functions.php';
 include '../../includes/constants.php';
 
+session_name(SESSION_NAME);
+session_start();
+
 DB::connect();
+
+$start = microtime(true);
 
 $data = array();
 $params = array();
@@ -478,6 +482,10 @@ $results = array(
     "recordsFiltered" => intval($filteredCount),
     "data" => $data
 );
+
+$elapsed = (microtime(true) - $start) * 1000;
+
+DB::log('api/internal/devices.php', $sql, $elapsed);
 
 DB::disconnect();
 
