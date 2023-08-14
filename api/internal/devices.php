@@ -405,45 +405,46 @@ if ($minApiVersion) {
 }
 
 if ($minversion) {
-    // @todo: is this required anymore?
+    // This statement is used for coverage based listings, e.g. extension support
     $sql = sprintf(
         "SELECT 
-            ifnull(r.displayname, dp.devicename) as device, 
+            r.displayname as device, 
             r.devicename as gpuname,
             min(dp.apiversionraw) as api,
             min(dp.driverversion) as driverversion,
             min(dp.driverversionraw) as driverversionraw, 
             0 as reportcount,
             min(submissiondate) as submissiondate,
-            VendorId(dp.vendorid) as vendor,
+            v.name as vendor,
             dp.vendorid as vendorid,
             date(min(submissiondate)) as submissiondate,
             r.osname as osname
             from reports r
             join deviceproperties dp on r.id = dp.reportid
-            left join devicealiases da on da.devicename = r.devicename
+            left join vendorids v on v.id = dp.vendorid
             %s
             group by device
             %s
             %s",
         $whereClause, $searchClause, $orderBy);
 } else {
+    // This statement is used for general device listsings
     $sql = sprintf(
         "SELECT 
             r.id,
-            ifnull(r.displayname, dp.devicename) as device, 
+            r.displayname as device, 
             r.devicename as gpuname,
             max(dp.apiversionraw) as api,
             max(dp.driverversion) as driverversion,
             max(dp.driverversionraw) as driverversionraw, 
             count(distinct r.id) as reportcount,
-            VendorId(dp.vendorid) as vendor,
+            v.name as vendor,
             dp.vendorid as vendorid,
             max(r.submissiondate) as submissiondate,
             r.osname as osname
             from deviceproperties dp
             join reports r on r.id = dp.reportid
-            left join devicealiases da on da.devicename = r.devicename
+            left join vendorids v on v.id = dp.vendorid          
             %s
             group by device
             %s

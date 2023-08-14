@@ -258,28 +258,31 @@ if ($orderByColumn == "api") {
     $orderBy = "order by length(" . $orderByColumn . ") " . $orderByDir . ", " . $orderByColumn . " " . $orderByDir;
 }
 
-$sql = "SELECT 
+$sql = sprintf(
+    "SELECT
         r.id,
-        ifnull(r.displayname, r.devicename) as devicename,
+        r.displayname as devicename,
         ifnull(p.driverversionraw, p.driverversion) as driver,
         p.driverversion,
         p.vendorid,
         p.apiversion as api,
-        VendorId(p.vendorid) as vendor,
+        v.name as vendor,
         p.devicetype,
         r.osname,
         r.osversion,
         r.osarchitecture,
         r.version
-        " . $selectAddColumns . "
+        %s
         from reports r
-        left join
-        deviceproperties p on (p.reportid = r.id)
-        " . $whereClause . "        
-        " . $searchClause . "
-        " . $orderBy;
+        left join deviceproperties p on (p.reportid = r.id)
+        left join vendorids v on v.id = p.vendorid     
+        %s
+        %s
+        %s
+        %s",
+    $selectAddColumns, $whereClause, $searchClause, $orderBy, $paging);
 
-$devices = DB::$connection->prepare($sql . " " . $paging);
+$devices = DB::$connection->prepare($sql);
 $devices->execute($params);
 if ($devices->rowCount() > 0) {
     foreach ($devices as $device) {
