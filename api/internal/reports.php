@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,13 +20,17 @@
  *
  */
 
-session_start();
-
 include '../../database/database.class.php';
 include '../../database/sqlrepository.php';
 include '../../includes/functions.php';
+include '../../includes/constants.php';
+
+session_name(SESSION_NAME);
+session_start();
 
 DB::connect();
+
+$start = microtime(true);
 
 $data = array();
 $params = array();
@@ -315,6 +319,10 @@ $results = array(
     "recordsFiltered" => intval($filteredCount),
     "data" => $data
 );
+
+$elapsed = (microtime(true) - $start) * 1000;
+
+DB::log('api/internal/reports.php', $sql, $elapsed);
 
 DB::disconnect();
 
