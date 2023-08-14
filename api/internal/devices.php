@@ -63,7 +63,10 @@ if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
 }
 
 // Filtering
-$searchColumns = ['device', 'api', 'driverversion', 'reportversion', 'reportcount'];
+$searchColumns = ['device', 'api', 'driverversion', 'reportcount'];
+if ($ostype == 2) {
+    array_splice($searchColumns, 1, 0, ['gpuname']);
+}
 
 $minversion = false;
 if (isset($_REQUEST['minversion'])) {
@@ -402,48 +405,53 @@ if ($minApiVersion) {
 }
 
 if ($minversion) {
-    $sql =
+    // @todo: is this required anymore?
+    $sql = sprintf(
         "SELECT 
-                ifnull(r.displayname, dp.devicename) as device, 
-                min(dp.apiversionraw) as api,
-                min(dp.driverversion) as driverversion,
-                min(dp.driverversionraw) as driverversionraw, 
-                0 as reportversion,
-                0 as reportcount,
-                min(submissiondate) as submissiondate,
-                VendorId(dp.vendorid) as vendor,
-                dp.vendorid as vendorid,
-                date(min(submissiondate)) as submissiondate,
-                r.osname as osname
-                from reports r
-                join deviceproperties dp on r.id = dp.reportid
-                $whereClause
-                group by device
-                " . $searchClause . "
-                " . $orderBy;
+            ifnull(r.displayname, dp.devicename) as device, 
+            r.devicename as gpuname,
+            min(dp.apiversionraw) as api,
+            min(dp.driverversion) as driverversion,
+            min(dp.driverversionraw) as driverversionraw, 
+            0 as reportcount,
+            min(submissiondate) as submissiondate,
+            VendorId(dp.vendorid) as vendor,
+            dp.vendorid as vendorid,
+            date(min(submissiondate)) as submissiondate,
+            r.osname as osname
+            from reports r
+            join deviceproperties dp on r.id = dp.reportid
+            left join devicealiases da on da.devicename = r.devicename
+            %s
+            group by device
+            %s
+            %s",
+        $whereClause, $searchClause, $orderBy);
 } else {
-    $sql =
+    $sql = sprintf(
         "SELECT 
-                r.id,
-                ifnull(r.displayname, dp.devicename) as device, 
-                max(dp.apiversionraw) as api,
-                max(dp.driverversion) as driverversion,
-                max(dp.driverversionraw) as driverversionraw, 
-                count(distinct r.id) as reportcount,
-                max(r.version) as reportversion,
-                VendorId(dp.vendorid) as vendor,
-                dp.vendorid as vendorid,
-                max(r.submissiondate) as submissiondate,
-                r.osname as osname
-                from deviceproperties dp
-                join reports r on r.id = dp.reportid
-                $whereClause
-                group by device
-                " . $searchClause . "
-                " . $orderBy;
+            r.id,
+            ifnull(r.displayname, dp.devicename) as device, 
+            r.devicename as gpuname,
+            max(dp.apiversionraw) as api,
+            max(dp.driverversion) as driverversion,
+            max(dp.driverversionraw) as driverversionraw, 
+            count(distinct r.id) as reportcount,
+            VendorId(dp.vendorid) as vendor,
+            dp.vendorid as vendorid,
+            max(r.submissiondate) as submissiondate,
+            r.osname as osname
+            from deviceproperties dp
+            join reports r on r.id = dp.reportid
+            left join devicealiases da on da.devicename = r.devicename
+            %s
+            group by device
+            %s
+            %s",
+        $whereClause, $searchClause, $orderBy);
 }
 
-$devices = DB::$connection->prepare($sql . " " . $paging);
+$devices = DB::$connection->prepare($sql." ".$paging);
 $devices->execute($params);
 if ($devices->rowCount() > 0) {
     foreach ($devices as $device) {
@@ -453,10 +461,10 @@ if ($devices->rowCount() > 0) {
         }
         $data[] = array(
             'device' => '<a href="' . $url . '">' . $device["device"] . '</a>',
+            'gpuname' => $device['gpuname'],
             'api' => versionToString($device["api"]),
             'driver' =>  getDriverVersion($device["driverversionraw"], "", $device["vendorid"], $device["osname"]),
             'reportcount' => $device["reportcount"],
-            'reportversion' => $device["reportversion"],
             'submissiondate' => $device["submissiondate"],
             'vendor' => $device["vendor"],
             'compare' => '<center><Button onClick="addToCompare(\''.$device['device'].'\','.($ostype !== null ? $ostype : '').')">Add</Button>',

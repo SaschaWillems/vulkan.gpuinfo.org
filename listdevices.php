@@ -92,9 +92,19 @@ if ($minApiVersion) {
 						<th></th>
 						<th></th>
 						<th></th>
+						<?php 
+							if ($platform == 'android') {
+								echo "<th></th>";
+							}
+						?>						
 					</tr>
 					<tr>
 						<th>Device</th>
+						<?php 
+							if ($platform == 'android') {
+								echo "<th>GPU</th>";
+							}
+						?>						
 						<th>Max. API version</th>
 						<th>Latest Driver version</th>
 						<th>Last submission</th>
@@ -134,9 +144,21 @@ if ($minApiVersion) {
 			],
 			"columnDefs": [{
 				"searchable": false,
-				"targets": [3, 4, 5],
+				<?php 
+					if ($platform == 'android') { 
+						echo '"targets": [4, 5, 6],'; 
+					} else {
+						echo '"targets": [3, 4, 5],';
+					}
+				?>
 				"orderable": false,
-				"targets": [5]
+				<?php 
+					if ($platform == 'android') { 
+						echo '"targets": [6],'; 
+					} else {
+						echo '"targets": [5],';
+					}
+				?>				
 			}],
 			"ajax": {
 				url: "api/internal/devices.php?platform=<?php echo $platform ?>",
@@ -154,13 +176,17 @@ if ($minApiVersion) {
 			"columns": [{
 					data: 'device'
 				},
+				<?php 
+					if ($platform == 'android') {
+						echo "{ data: 'gpuname' }, ";
+					}
+				?>
 				{
 					data: 'api'
 				},
 				{
 					data: 'driver'
 				},
-				// { data: 'reportversion' },
 				{
 					data: 'submissiondate'
 				},
@@ -195,6 +221,17 @@ if ($minApiVersion) {
 				filter_type: "text",
 				filter_delay: 500
 			},
+			<?php 
+				if ($platform == 'android') { 			
+			?>
+			{
+				column_number: 3,
+				filter_type: "text",
+				filter_delay: 500
+			},			
+			<?php
+				}
+			?>
 		], {
 			filters_tr_index: 0
 		});
