@@ -65,6 +65,7 @@ PageGenerator::header("Extension features listing");
 			<tbody>
 				<?php
 				DB::connect();
+				$start = microtime(true);
 				try {
 					$features = SqlRepository::listExtensionFeatures($extension);
 					foreach($features as $feature) {
@@ -80,6 +81,7 @@ PageGenerator::header("Extension features listing");
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";
 				}
+				DB::log('api/listfeaturesextensions.php', null, (microtime(true) - $start) * 1000);
 				DB::disconnect();
 				?>
 			</tbody>
