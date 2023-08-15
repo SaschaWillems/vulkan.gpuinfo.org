@@ -24,14 +24,13 @@
   * Back-end data source for extension listing
   */ 
 
+include '../../database/database.class.php';
+include '../../database/sqlrepository.php';
+include '../../includes/functions.php';
 include '../../includes/constants.php';
 
 session_name(SESSION_NAME);
 session_start();
-
-include '../../database/database.class.php';
-include '../../database/sqlrepository.php';
-include '../../includes/functions.php';
 
 DB::connect();
 
@@ -140,6 +139,6 @@ echo json_encode($results);
 
 $elapsed = (microtime(true) - $start) * 1000;
 
-DB::log('api/external/extensions.php', $sql, $elapsed);
+DB::log('api/internal/extensions.php', $sql, $elapsed);
 
 DB::disconnect();
