@@ -229,9 +229,9 @@ if ($linear_tiling_format != '' || $optimal_tiling_format != '' || $buffer_forma
     }
 
     $whereClause = "
-        where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
+        where r.displayname " . ($negate ? "not" : "") . " in
         (
-            select ifnull(r.displayname, r.devicename)
+            select r.displayname
             from reports r
             join deviceformats df on df.reportid = r.id
             join VkFormat vf on vf.value = df.formatid where 
