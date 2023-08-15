@@ -75,7 +75,7 @@ body {
 }
 
 .page-header {
-	border-bottom: 1px solid var(--bordercolor);
+	border-bottom: 0px solid var(--bordercolor);
 }
 
 .nav-tabs>li.active>a {
@@ -829,4 +829,16 @@ code {
 
 .subcaption-level-2 {
 	font-size: smaller;
+}
+
+.faq > .entry {
+	padding-bottom: 15px;
+}
+
+.faq > .entry > .question::first-letter {
+	font-weight: bold;
+}
+
+.faq > .entry > .answer::first-letter {
+	font-weight: bold;
 }
