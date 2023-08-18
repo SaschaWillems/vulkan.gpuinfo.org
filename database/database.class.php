@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -47,5 +47,12 @@ class DB
         $stmnt = DB::$connection->prepare($statement);
         $stmnt->execute($params);
         return $stmnt->fetchColumn();
+    }
+
+    public static function log($page, $statement, $executiontime)
+    {
+        $sql ="INSERT INTO log (page, statement, execution_time) VALUES (:page, :statement, :executiontime)";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute(['page' => $page, 'statement' => $statement, 'executiontime' => $executiontime]);
     }
 }
