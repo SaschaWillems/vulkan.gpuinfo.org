@@ -278,11 +278,10 @@ $sql = sprintf(
         left join vendorids v on v.id = p.vendorid     
         %s
         %s
-        %s
         %s",
-    $selectAddColumns, $whereClause, $searchClause, $orderBy, $paging);
+    $selectAddColumns, $whereClause, $searchClause, $orderBy);
 
-$devices = DB::$connection->prepare($sql);
+$devices = DB::$connection->prepare($sql." ".$paging);
 $devices->execute($params);
 if ($devices->rowCount() > 0) {
     foreach ($devices as $device) {
