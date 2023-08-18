@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -52,6 +52,7 @@ PageGenerator::header("Memory");
 				<?php
 				try {
 					DB::connect();
+					$start = microtime(true);
 					$memoryTypes = SqlRepository::listMemoryTypes();
 					foreach ($memoryTypes as $memoryType) {
 						$coverageLink = "listdevicescoverage.php?" . "memorytype=" . $memoryType['memtype'] . "&platform=$platform";
@@ -64,8 +65,9 @@ PageGenerator::header("Memory");
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
-					echo "<b>Error while fetcthing data: " . $e->getMessage() . "</b><br>";
+					echo "<b>Error while fetching data: " . $e->getMessage() . "</b><br>";
 				}
+				DB::log('listmemory.php', null, (microtime(true) - $start) * 1000);
 				DB::disconnect();
 				?>
 			</tbody>

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -56,6 +56,7 @@ PageGenerator::header("Instance layers");
 			<tbody>		
 				<?php
 					DB::connect();
+					$start = microtime(true);
 					try {
 						$instancelayers = SqlRepository::listInstanceLayers();
 						foreach($instancelayers as $instancelayer) {
@@ -69,8 +70,9 @@ PageGenerator::header("Instance layers");
 							echo "</tr>";
 						}
 					} catch (PDOException $e) {
-						echo "<b>Error while fetcthing data!</b><br>";
+						echo "<b>Error while fetching data!</b><br>";
 					}
+					DB::log('listinstancelayers.php', null, (microtime(true) - $start) * 1000);
 					DB::disconnect();
 				?>   
 			</tbody>

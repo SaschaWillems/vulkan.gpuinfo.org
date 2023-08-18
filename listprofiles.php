@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -59,6 +59,7 @@ PageGenerator::header("Profiles");
 			<tbody>
 				<?php
 					DB::connect();
+					$start = microtime(true);
 					try {
 						$profiles = SqlRepository::listProfiles();
 						foreach ($profiles as $profile) {
@@ -73,6 +74,7 @@ PageGenerator::header("Profiles");
 					} catch (PDOException $e) {
 						echo "<b>Error while fetching data!</b><br>";
 					}
+					DB::log('listprofiles.php', null, (microtime(true) - $start) * 1000);
 					DB::disconnect();
 				?>
 			</tbody>
