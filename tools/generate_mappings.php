@@ -118,6 +118,7 @@ $header_version_node = $xml->xpath("./types/type/name[.='VK_HEADER_VERSION']/.."
 $vk_header_version = filter_var($header_version_node[0], FILTER_SANITIZE_NUMBER_INT);
 $mappings['headerversion'] = $vk_header_version;
 
+// Extensions
 $type_container = new TypeContainer($xml);
 foreach ($xml->extensions->extension as $ext_node) {
     $features2_node = null;
@@ -142,7 +143,7 @@ foreach ($xml->extensions->extension as $ext_node) {
         }
     }
     if ($ext_node['promotedto']) {
-        $ext->promotedto = (string)$ext_node['promotedto'];
+        // $ext->promotedto = (string)$ext_node['promotedto'];
         $extension['promotedTo'] = (string)$ext_node['promotedto'];
         // Promoted feature/property names
         if ($extension['structs']['ext']['physicalDeviceFeatures']) {
@@ -175,5 +176,30 @@ foreach ($xml->extensions->extension as $ext_node) {
 
     $mappings[$extension['name']] = $extension;
 }
+
+// Gather enums for translation at runtime
+$enums = [];
+foreach ($xml->enums as $enum_node) {
+    $enum = null;
+    if (strcmp($enum_node['name'], 'API Constants') == 0) {
+        continue;
+    }   
+    echo($enum_node['name']).PHP_EOL;
+    $enum['name'] = (string)$enum_node['name'];
+    $enum['type'] = (string)$enum_node['type'];    
+    foreach ($enum_node->enum as $enum_childnode) {
+        if (isset($enum_childnode['value'])) {
+            $enum['values'][] = (int)$enum_childnode['value'];
+        }
+        if (isset($enum_childnode['bitpos'])) {
+            $enum['bitpos'][] = (int)$enum_childnode['bitpos'];
+        }
+        $enum['names'][] = (string)$enum_childnode['name'];
+    }
+    if ($enum) {
+        $enums[$enum['name']] = $enum;
+    }
+}
+$mappings['enums'] = $enums;
 
 file_put_contents('./../includes/mappings.json', json_encode($mappings, JSON_PRETTY_PRINT));
