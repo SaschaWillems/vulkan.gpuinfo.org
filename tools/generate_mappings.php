@@ -170,8 +170,11 @@ foreach ($xml->extensions->extension as $ext_node) {
         $property_type = $type_container->getProperties2Type($property_struct_name);
         if ($property_type) {
             foreach ($property_type as $member) {
+                if (($member->name == 'sType') || ($member->name == 'pNext')) {
+                    continue;
+                }
                 if ($member->type) {
-                    $property_types[(string)$member->name] = (string)$member->type;
+                    $property_types[$property_struct_name][(string)$member->name] = (string)$member->type;
                 }
             }
         } else {
