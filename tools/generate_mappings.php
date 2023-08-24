@@ -198,12 +198,14 @@ foreach ($xml->enums as $enum_node) {
     $enum['type'] = (string)$enum_node['type'];    
     foreach ($enum_node->enum as $enum_childnode) {
         if (isset($enum_childnode['value'])) {
+            // @todo
             $enum['values'][] = (int)$enum_childnode['value'];
+            $enum['names'][] = (string)$enum_childnode['name'];
         }
         if (isset($enum_childnode['bitpos'])) {
             $enum['bitpos'][] = (int)$enum_childnode['bitpos'];
+            $enum['bitnames'][] = (string)$enum_childnode['name'];
         }
-        $enum['names'][] = (string)$enum_childnode['name'];
     }
     if ($enum) {
         $enums[$enum['name']] = $enum;
