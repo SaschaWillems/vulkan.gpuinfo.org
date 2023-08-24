@@ -126,19 +126,19 @@ foreach ($xml->extensions->extension as $ext_node) {
     $extension = [];
     $extension['name'] = (string)$ext_node['name'];
     $extension['promotedTo'] = null;  
-    $extension['structs']['ext']['physicalDeviceFeatures'] = null;  
-    $extension['structs']['ext']['physicalDeviceProperties'] = null;
-    $extension['structs']['core']['physicalDeviceFeatures'] = null;  
-    $extension['structs']['core']['physicalDeviceProperties'] = null;
+    $extension['structs']['ext']['physicalDeviceFeatures'] = [];
+    $extension['structs']['ext']['physicalDeviceProperties'] = [];
+    $extension['structs']['core']['physicalDeviceFeatures'] = [];
+    $extension['structs']['core']['physicalDeviceProperties'] = [];
     $extension['types'] = [];  
     // echo (string)$ext_node['name'].PHP_EOL;
     foreach ($ext_node->require as $require) {
         foreach ($require as $requirement) {
             if (preg_match('/^VkPhysicalDevice.*Features.*/m', (string)$requirement['name']) > 0) {                
-                $extension['structs']['ext']['physicalDeviceFeatures'] = (string)$requirement['name'];
+                $extension['structs']['ext']['physicalDeviceFeatures'][] = (string)$requirement['name'];
             }
             if (preg_match('/^VkPhysicalDevice.*Properties.*/m', (string)$requirement['name']) > 0) {                
-                $extension['structs']['ext']['physicalDeviceProperties'] = (string)$requirement['name'];
+                $extension['structs']['ext']['physicalDeviceProperties'][] = (string)$requirement['name'];
             }
         }
     }
@@ -146,33 +146,39 @@ foreach ($xml->extensions->extension as $ext_node) {
         // $ext->promotedto = (string)$ext_node['promotedto'];
         $extension['promotedTo'] = (string)$ext_node['promotedto'];
         // Promoted feature/property names
-        if ($extension['structs']['ext']['physicalDeviceFeatures']) {
+        foreach($extension['structs']['ext']['physicalDeviceFeatures'] as $property_feature) {
             $match = null;
-            preg_match('/^VkPhysicalDevice.*Features/m', $extension['structs']['ext']['physicalDeviceFeatures'], $match);
+            preg_match('/^VkPhysicalDevice.*Features/m', $property_feature, $match);
             $name = $match[0];
             if ($type_container->featureTypeExists($name)) {
-                $extension['structs']['core']['physicalDeviceFeatures'] = $name;
+                $extension['structs']['core']['physicalDeviceFeatures'][] = $name;
             }
         }
-        if ($extension['structs']['ext']['physicalDeviceProperties']) {
+        foreach($extension['structs']['ext']['physicalDeviceProperties'] as $property_prop) {
             $match = null;
-            preg_match('/^VkPhysicalDevice.*Properties/m', $extension['structs']['ext']['physicalDeviceProperties'], $match);
+            preg_match('/^VkPhysicalDevice.*Properties/m', $property_prop, $match);
             $name = $match[0];
             if ($type_container->propertyTypeExists($name)) {
-                $extension['structs']['core']['physicalDeviceProperties'] = $name;
+                $extension['structs']['core']['physicalDeviceProperties'][] = $name;
             }
         }
     }
-    $property_type = $type_container->getProperties2Type($extension['structs']['ext']['physicalDeviceProperties']);
-    if ($property_type) {
-        $property_types = [];
-        foreach ($property_type as $member) {
-            if ($member->type) {
-                $property_types[(string)$member->name] = (string)$member->type;
+    // To convert values at profile generation we store a list of property structure members and their types
+    // This can be used at runtime to convert from the database string representation to proper basic or Vk types
+    $property_types = [];
+    foreach($extension['structs']['ext']['physicalDeviceProperties'] as $property_struct_name) {
+        $property_type = $type_container->getProperties2Type($property_struct_name);
+        if ($property_type) {
+            foreach ($property_type as $member) {
+                if ($member->type) {
+                    $property_types[(string)$member->name] = (string)$member->type;
+                }
             }
+        } else {
+            echo "[WARN] Could not get types for $property_struct_name".PHP_EOL;
         }
-        $extension['types'] = $property_types;
     }
+    $extension['types'] = $property_types;
 
     $mappings[$extension['name']] = $extension;
 }
