@@ -3,7 +3,7 @@
 *
 * Vulkan hardware capability database back-end
 *	
-* Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
 *	
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public
@@ -140,14 +140,6 @@ class VkTypes {
         return self::getFlags($flags, $value);
     }
 
-    public static function VkPointClippingBehavior($value) {
-        $flags = [
-            0 => 'VK_POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES',
-            1 => 'VK_POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY',
-        ];          
-        return self::getValue($flags, $value);
-    }
-
     public static function VkSubgroupFeatureFlags($value) {
         $flags = [
             0x00000001 => 'VK_SUBGROUP_FEATURE_BASIC_BIT',
@@ -211,17 +203,6 @@ class VkTypes {
         ];
         return self::getFlags($flags, $value);     
     }
-
-    public static function VkShaderFloatControlsIndependence($value, $extension) {
-        $flags = [
-            0 => 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY',
-            1 => 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL',
-            2 => 'VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE',
-        ];        
-        $value = self::getValue($flags, $value);
-        self::addExtensionSuffix($value, $extension);
-        return $value;     
-    }    
 
     /** Type mappings for Vulkan structures */
     public static $VkPhysicalDeviceProperties = [

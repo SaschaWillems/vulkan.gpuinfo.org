@@ -86,7 +86,7 @@ class VulkanProfile {
         $this->json_schema = json_decode($file, true);
     }
 
-    /** Some fields in the database tables are not part of the spec and need to be skipped at completly or skipped to be remapped later*/
+    /** Some fields in the database tables are not part of the spec and need to be skipped completely or skipped to be remapped later*/
     private function skipField($name, $version) {
         $skip_fields = [
             'reportid',
@@ -140,15 +140,15 @@ class VulkanProfile {
     /** Checks if a feature type is defined in the currently loaded schema */
     private function getSchemaFeatureTypeDefinition($name) {
         if (array_key_exists($name, $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['features']['properties'])) {
-            return $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['features']['properties'];
-        }
+            return $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['features']['properties'][$name];
+        }        
         return null;
     }
 
     /** Checks if a property type is defined in the currently loaded schema */
     private function getSchemaPropertyTypeDefinition($name) {
         if (array_key_exists($name, $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['properties']['properties'])) {
-            return $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['properties']['properties'];
+            return $this->json_schema['properties']['capabilities']['additionalProperties']['properties']['properties']['properties'][$name];
         }
         return null;
     }
@@ -157,6 +157,14 @@ class VulkanProfile {
     private function getExtensionMapping($name) {
         if (array_key_exists($name, $this->extension_mapping)) {
             return $this->extension_mapping[$name];
+        }
+        return null;
+    }
+
+    /** @todo */
+    private function getEnumMapping($name) {
+        if (array_key_exists($name, $this->extension_mapping['enums'])) {
+            return $this->extension_mapping['enums'][$name];
         }
         return null;
     }
@@ -189,6 +197,41 @@ class VulkanProfile {
     /** Applies conversion rules based on value types */
     private function convertValue($value, $type, $name = null, $extension = null) {
         $convert = function($value, $type, $extension) {
+            // Try to automatically convert from mapping based on spec
+            // This should work for most types, esp. for extensions
+            $enum_mapping = self::getEnumMapping($type);
+            if ($enum_mapping) {
+                if ($enum_mapping['type'] == 'enum') {
+                    $idx = array_search($value, $enum_mapping['values']);
+                    if ($idx !== false) {
+                        return $enum_mapping['names'][$idx];
+                    }
+                }
+            }
+            // For flags this is not as easy, since the type does not directly tell us the flag set
+            // e.g. VkOpticalFlowGridSizeFlagsNV -> VkOpticalFlowGridSizeFlagBitsNV
+            // @todo: Check if we can get this from vk.xml somehow
+            $flag_type_mappings = [
+                'VkOpticalFlowGridSizeFlagsNV' => 'VkOpticalFlowGridSizeFlagBitsNV',
+                'VkMemoryDecompressionMethodFlagsNV' => 'VkMemoryDecompressionMethodFlagBitsNV',
+                'VkQueueFlags' => 'VkQueueFlagBits'
+            ];
+            if (array_key_exists($type, $flag_type_mappings) != false) {
+                $enum_mapping = self::getEnumMapping($flag_type_mappings[$type]);
+                if ($enum_mapping) {
+                    $bit_positions = $enum_mapping['bitpos'];
+                    $supported_flags = [];
+                    $index = 0;
+                    foreach ($bit_positions as $bit_pos) {
+                        if ((int)$value & pow(2, $bit_pos)) {
+                            $supported_flags[] = $enum_mapping['bitnames'][$index];
+                        }
+                        $index++;
+                    }
+                    return $supported_flags;                    
+                }
+            }
+            // If we can't convert from the mapping, try to manually convert
             switch($type) {
                 case 'uint8_t':
                 case 'uint16_t':
@@ -199,6 +242,7 @@ class VulkanProfile {
                 case 'size_t':
                     return intval($value);
                 case 'VkDeviceSize':
+                case 'int64_t':
                 case 'uint64_t':
                     // @todo: JS/JSON has limited support for 64 bit values, but probably okay to export them as int here
                     return intval($value);
@@ -212,8 +256,6 @@ class VulkanProfile {
                     return VkTypes::VkShaderStageFlags($value);
                 case 'VkSampleCountFlagBits':
                     return VkTypes::VkSampleCountFlagBits($value);
-                case 'VkPointClippingBehavior':
-                    return VkTypes::VkPointClippingBehavior($value);
                 case 'VkSubgroupFeatureFlags':
                     return VkTypes::VkSubgroupFeatureFlags($value);
                 case 'VkDriverId':
@@ -222,8 +264,6 @@ class VulkanProfile {
                     return VkTypes::VkConformanceVersion($value);
                 case 'VkResolveModeFlags':
                     return VkTypes::VkResolveModeFlags($value);
-                case 'VkShaderFloatControlsIndependence':
-                    return VkTypes::VkShaderFloatControlsIndependence($value, $extension);
                 case 'VkShaderCorePropertiesFlagsAMD':
                     // No flags defined in spec
                     return [];
@@ -395,25 +435,26 @@ class VulkanProfile {
                 continue;
             }
             // Skip if there is no feature struct defined for this extension
-            $struct_name = $ext['structs']['ext']['physicalDeviceFeatures'];
-            if (((!$struct_name) || ($struct_name == ''))) {
-                continue;
-            }            
-            // Skip feature structs that have been promoted to a core version supported by the device
-            if ($this->getExtensionPromoted($ext)) {
-                continue;
-            }
-            // Skip feature structs not defined in the selected schema
-            if ($this->getSchemaFeatureTypeDefinition($struct_name) == null) {
-                $this->warnings[] = "$struct_name not found in selected schema";
-                continue;
-            }
+            foreach ($ext['structs']['ext']['physicalDeviceFeatures'] as $struct_name) {
+                if (((!$struct_name) || ($struct_name == ''))) {
+                    continue;
+                }            
+                // Skip feature structs that have been promoted to a core version supported by the device
+                if ($this->getExtensionPromoted($ext)) {
+                    continue;
+                }
+                // Skip feature structs not defined in the selected schema
+                if ($this->getSchemaFeatureTypeDefinition($struct_name) == null) {
+                    $this->warnings[] = "$struct_name not found in selected schema";
+                    continue;
+                }
 
-            $feature = null;
-            foreach ($values as $value) {
-                $feature[$value['name']] = boolval($value['supported']);
+                $feature = null;
+                foreach ($values as $value) {
+                    $feature[$value['name']] = boolval($value['supported']);
+                }
+                $this->extension_features[$struct_name] = $feature;
             }
-            $this->extension_features[$struct_name] = $feature;
         }
     }
 
@@ -428,43 +469,46 @@ class VulkanProfile {
                 $this->warnings[] = "Could not find a mapping for extension $ext";
                 continue;
             }
-            $struct_name = $ext['structs']['ext']['physicalDeviceProperties'];
-            // Skip if there is no property struct defined for this extension
-            if (((!$struct_name) || ($struct_name == ''))) {
-                continue;
-            }
-            // Skip property structs that have been promoted to a core version supported by the device
-            if ($this->getExtensionPromoted($ext)) {
-                continue;
-            }
-            // Skip property structs not defined in the selected schema
-            if ($this->getSchemaPropertyTypeDefinition($struct_name) == null) {
-                $this->warnings[] = "$struct_name not found in selected schema";
-                continue;
-            }
+            foreach($ext['structs']['ext']['physicalDeviceProperties'] as $struct_name) {
+                // Skip if there is no property struct defined for this extension
+                if (((!$struct_name) || ($struct_name == ''))) {
+                    continue;
+                }
+                // Skip property structs that have been promoted to a core version supported by the device
+                if ($this->getExtensionPromoted($ext)) {
+                    continue;
+                }
+                // Skip property structs not defined in the selected schema
+                $property_type_definition = $this->getSchemaPropertyTypeDefinition($struct_name);
+                if ($property_type_definition == null) {
+                    $this->warnings[] = "$struct_name not found in selected schema";
+                }
 
-            // Convert property values based on their types
-            $property = null;
-            foreach ($values as $value) {
-                $type = null;
-                $value_name = $value['name'];
-                // Some properties are stored in a different format in the database (compared to the struct layouts) and require some transformation
-                if (stripos($struct_name, 'VkPhysicalDeviceSampleLocationsPropertiesEXT') === 0) {
-                    if (in_array($value_name, ['maxSampleLocationGridSize.width', 'maxSampleLocationGridSize.height'])) {
-                        $property['maxSampleLocationGridSize'][str_replace('maxSampleLocationGridSize.', '', $value_name)] = $this->convertValue($value['value'], 'int32_t', null, $key);
-                        continue;
+                // Convert property values based on their types
+                $property = null;
+                foreach ($values as $value) {
+                    $type = null;
+                    $value_name = $value['name'];
+                    // Some properties are stored in a different format in the database (compared to the struct layouts) and require some transformation
+                    if (stripos($struct_name, 'VkPhysicalDeviceSampleLocationsPropertiesEXT') === 0) {
+                        if (in_array($value_name, ['maxSampleLocationGridSize.width', 'maxSampleLocationGridSize.height'])) {
+                            $property['maxSampleLocationGridSize'][str_replace('maxSampleLocationGridSize.', '', $value_name)] = $this->convertValue($value['value'], 'int32_t', null, $key);
+                            continue;
+                        }
+                        if (in_array($value_name, ['sampleLocationCoordinateRange[0]', 'sampleLocationCoordinateRange[1]'])) {
+                            $property['sampleLocationCoordinateRange'][] = $this->convertValue($value['value'], 'float', null, $key);
+                            continue;
+                        }                    
                     }
-                    if (in_array($value_name, ['sampleLocationCoordinateRange[0]', 'sampleLocationCoordinateRange[1]'])) {
-                        $property['sampleLocationCoordinateRange'][] = $this->convertValue($value['value'], 'float', null, $key);
-                        continue;
-                    }                    
+                    if (array_key_exists($value_name, $ext['types'][$struct_name])) {
+                        $type = $ext['types'][$struct_name][$value_name];
+                        $property[$value_name] = $this->convertValue($value['value'], $type, null, $key);
+                    }
                 }
-                if (array_key_exists($value_name, $ext['types'])) {
-                    $type = $ext['types'][$value_name];
+                if ($property) {
+                    $this->extension_properties[$struct_name] = $property;
                 }
-                $property[$value_name] = $this->convertValue($value['value'], $type, null, $key);
             }
-            $this->extension_properties[$struct_name] = $property;
         }
     }        
 
@@ -670,14 +714,14 @@ class VulkanProfile {
             $this->json['capabilities']['device']['queueFamiliesProperties'] = [];
         }
 
-        $this->addManualMappings($this->json);
+        $this->addManualMappings();
         DB::disconnect();
     }
 }
 
 // Profile generation
 try {
-    $profile = new VulkanProfile($reportid, $portability_subset);
+    $profile = new VulkanProfile($reportid);
     $profile->generateJSON();
 
     $filename = $profile->profile_name;
@@ -685,7 +729,7 @@ try {
     $filename = preg_replace("([\.]{2,})", '', $filename);	
     $filename .= ".json";
 
-    header("Content-Disposition: attachment; filename=".strtolower($filename));
+    // header("Content-Disposition: attachment; filename=".strtolower($filename));
     echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 } catch (Exception $e) {
     echo json_encode(['error' => "Could not generate profile"]);
