@@ -3,7 +3,7 @@
 *
 * Vulkan hardware capability database back-end
 *	
-* Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
 *	
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public
@@ -19,7 +19,13 @@
 *
 */
 
-/** Generates a JSON mapping file matching extensions and their structs from the Vulkan XML registry */
+/*
+ Generates a JSON mapping file for extensions and types from the Vulkan XML registry 
+ This is used e.g. in profile generation to convert values from the database to spec
+ compliant types
+
+ This script should be run every time a spec update is released
+*/
 
 error_reporting(E_ERROR | E_PARSE);
 
@@ -198,7 +204,6 @@ foreach ($xml->enums as $enum_node) {
     $enum['type'] = (string)$enum_node['type'];    
     foreach ($enum_node->enum as $enum_childnode) {
         if (isset($enum_childnode['value'])) {
-            // @todo
             $enum['values'][] = (int)$enum_childnode['value'];
             $enum['names'][] = (string)$enum_childnode['name'];
         }
