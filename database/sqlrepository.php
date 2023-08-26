@@ -773,17 +773,17 @@ class SqlRepository {
         $sql .= " GROUP by name";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
-        $instancelayers = [];
+        $profiles = [];
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
             if ((trim($row['name']) == '') || ($row['coverage'] == 0)) {
                 continue;
             }
-            $instancelayers[] = [
+            $profiles[] = [
                 'name' => $row['name'],
                 'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
-        return $instancelayers;        
+        return $profiles;        
     }
 
     /** Check if core limit exists */
