@@ -57,7 +57,8 @@ $filters = [
 	'bufferformat',
 	'featureflagbit',
 	'surfaceusageflag',
-	'profile'
+	'profile',
+	'queuefamilyflags'
 ];
 $filter_list = new FilterList($filters);
 
@@ -213,6 +214,18 @@ if ($filter_list->hasFilter('profile')) {
 	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting profile $profile_name" : "Listing first known driver version support for profile $profile_name";
 	$pageTitle = $profile_name;
 }
+// Queue family flags
+if ($filter_list->hasFilter('queuefamilyflags')) {
+	$flags = join(" | ", getQueueFlags($filter_list->getFilter('queuefamilyflags')));
+	if ($flags == "") {
+		$flags = "0 [none]";
+	}
+	$caption = $inverted ?
+		"Listing devices <span style='color:red;'>not</span> supporting queue family flag combination <code>$flags</code>"
+		:
+		"Listing first known driver version support for queue family flag combination <code>$flags</code>";
+	$pageTitle = "Queue family flags $flags";
+}
 // Submitter
 if ($filter_list->hasFilter('submitter')) {
 	$submitter = $filter_list->getFilter('submitter');
@@ -347,6 +360,7 @@ if ($minApiVersion) {
 						'featureflagbit':				'<?= $filter_list->getFilter('featureflagbit') ?>',
 						'surfaceusageflag':				'<?= $filter_list->getFilter('surfaceusageflag') ?>',
 						'profile':						'<?= $filter_list->getFilter('profile') ?>',
+						'queuefamilyflags':				'<?= $filter_list->getFilter('queuefamilyflags') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {

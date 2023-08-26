@@ -380,6 +380,20 @@ if (isset($_REQUEST['filter']['profile'])) {
         $params['filter_profile'] = $profile;
     }
 }
+// Queue family flag combination
+$queuefamilyflags = $_REQUEST['filter']['queuefamilyflags'];
+if ($queuefamilyflags != '') {
+    $whereClause =
+        "where r.displayname " . ($negate ? "not" : "") . " in
+			(
+				select r.displayname
+				from reports r
+				join devicequeues dq on dq.reportid = r.id
+				where dq.flags = :filter_queuefamilyflags
+                $os_and_clause
+			)";
+    $params['filter_queuefamilyflags'] = $queuefamilyflags;
+}
 
 $orderBy = "order by " . $orderByColumn . " " . $orderByDir;
 
