@@ -775,7 +775,7 @@ class SqlRepository {
         $stmnt->execute($params);        
         $instancelayers = [];
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            if (trim($row['name']) == '') {
+            if ((trim($row['name']) == '') || ($row['coverage'] == 0)) {
                 continue;
             }
             $instancelayers[] = [
