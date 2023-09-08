@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.31';
+$release = '3.32';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -63,6 +63,27 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.32 - 2023-09-08</h4>
+			<ul>
+				<li>Vulkan header 1.3.264</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_KHR_cooperative_matrix</li>
+						<li>VK_EXT_frame_boundary</li>
+						<li>VK_EXT_depth_bias_control</li>
+						<li>VK_EXT_dynamic_rendering_unused_attachments</li>
+						<li>VK_NV_descriptor_pool_overallocation</li>
+						<li>VK_MSFT_layered_driver</li>
+						<li>VK_QCOM_image_processing2</li>
+						<li>VK_QCOM_filter_cubic_weights</li>
+						<li>VK_QCOM_ycbcr_degamma</li>
+						<li>VK_QCOM_filter_cubic_clamp</li>
+						<li>VK_QNX_external_memory_screen_buffer</li>
+					</ul>
+				</li>	
+				<li>Properly display image layouts for VK_EXT_host_image_copy</li>
+				<li>Updated Vulkan profiles library</li>
+			</ul>				
 			<h4>3.31 - 2023-05-27</h4>
 			<ul>
 				<li>Enable VK_EXT_swapchain_colorspace if supported by the implementation
