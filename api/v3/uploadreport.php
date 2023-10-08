@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -160,7 +160,7 @@
 	}
 
 	function importCore13Data($json, $reportid) {
-		if (!array_key_exists('core11', $json)) {
+		if (!array_key_exists('core13', $json)) {
 			return;
 		}
 		// Features
