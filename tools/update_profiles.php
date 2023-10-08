@@ -30,8 +30,10 @@ if (!file_exists('Khronos-Schemas')) {
 }
 $files = glob('Khronos-Schemas/vulkan/profiles*.json');
 foreach ($files as $file) {
-    $dst = str_replace('Khronos-Schemas/vulkan', '../profiles/schema', $file);
-    copy($file, $dst);
+    $dst = str_replace('Khronos-Schemas/vulkan', './profiles/schema', $file);
+    if (copy($file, $dst) == false) {
+        echo "ERROR: Could not copy file!".PHP_EOL;
+    }
     echo $dst.PHP_EOL;
 }
 

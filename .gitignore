@@ -5,3 +5,4 @@ xdebug.log
 .vscode/
 static/*.html
 tools/Khronos-Schemas/
+tools/vk.xml

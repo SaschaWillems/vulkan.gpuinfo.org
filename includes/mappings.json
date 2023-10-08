@@ -1,5 +1,5 @@
 {
-    "headerversion": "261",
+    "headerversion": "267",
     "VK_KHR_surface": {
         "name": "VK_KHR_surface",
         "promotedTo": null,
@@ -6581,12 +6581,14 @@
         },
         "types": []
     },
-    "VK_EXT_extension_376": {
-        "name": "VK_EXT_extension_376",
+    "VK_EXT_frame_boundary": {
+        "name": "VK_EXT_frame_boundary",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": [],
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceFrameBoundaryFeaturesEXT"
+                ],
                 "physicalDeviceProperties": []
             },
             "core": {
@@ -7857,20 +7859,28 @@
         },
         "types": []
     },
-    "VK_NV_extension_452": {
-        "name": "VK_NV_extension_452",
+    "VK_EXT_nested_command_buffer": {
+        "name": "VK_EXT_nested_command_buffer",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": [],
-                "physicalDeviceProperties": []
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceNestedCommandBufferFeaturesEXT"
+                ],
+                "physicalDeviceProperties": [
+                    "VkPhysicalDeviceNestedCommandBufferPropertiesEXT"
+                ]
             },
             "core": {
                 "physicalDeviceFeatures": [],
                 "physicalDeviceProperties": []
             }
         },
-        "types": []
+        "types": {
+            "VkPhysicalDeviceNestedCommandBufferPropertiesEXT": {
+                "maxCommandBufferNestingLevel": "uint32_t"
+            }
+        }
     },
     "VK_ARM_extension_453": {
         "name": "VK_ARM_extension_453",
@@ -8154,20 +8164,30 @@
         },
         "types": []
     },
-    "VK_ANDROID_extension_469": {
-        "name": "VK_ANDROID_extension_469",
+    "VK_ANDROID_external_format_resolve": {
+        "name": "VK_ANDROID_external_format_resolve",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": [],
-                "physicalDeviceProperties": []
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceExternalFormatResolveFeaturesANDROID"
+                ],
+                "physicalDeviceProperties": [
+                    "VkPhysicalDeviceExternalFormatResolvePropertiesANDROID"
+                ]
             },
             "core": {
                 "physicalDeviceFeatures": [],
                 "physicalDeviceProperties": []
             }
         },
-        "types": []
+        "types": {
+            "VkPhysicalDeviceExternalFormatResolvePropertiesANDROID": {
+                "nullColorAttachmentWithExternalFormatResolve": "VkBool32",
+                "externalFormatResolveChromaOffsetX": "VkChromaLocation",
+                "externalFormatResolveChromaOffsetY": "VkChromaLocation"
+            }
+        }
     },
     "VK_AMD_extension_470": {
         "name": "VK_AMD_extension_470",
@@ -8556,20 +8576,30 @@
         },
         "types": []
     },
-    "VK_NV_extension_493": {
-        "name": "VK_NV_extension_493",
+    "VK_NV_extended_sparse_address_space": {
+        "name": "VK_NV_extended_sparse_address_space",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": [],
-                "physicalDeviceProperties": []
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV"
+                ],
+                "physicalDeviceProperties": [
+                    "VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV"
+                ]
             },
             "core": {
                 "physicalDeviceFeatures": [],
                 "physicalDeviceProperties": []
             }
         },
-        "types": []
+        "types": {
+            "VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV": {
+                "extendedSparseAddressSpaceSize": "VkDeviceSize",
+                "extendedSparseImageUsageFlags": "VkImageUsageFlags",
+                "extendedSparseBufferUsageFlags": "VkBufferUsageFlags"
+            }
+        }
     },
     "VK_NV_extension_494": {
         "name": "VK_NV_extension_494",
@@ -8767,8 +8797,8 @@
         },
         "types": []
     },
-    "VK_NV_extension_506": {
-        "name": "VK_NV_extension_506",
+    "VK_NV_low_latency2": {
+        "name": "VK_NV_low_latency2",
         "promotedTo": null,
         "structs": {
             "ext": {
@@ -8972,12 +9002,37 @@
         },
         "types": []
     },
-    "VK_QCOM_extension_519": {
-        "name": "VK_QCOM_extension_519",
+    "VK_QCOM_image_processing2": {
+        "name": "VK_QCOM_image_processing2",
         "promotedTo": null,
         "structs": {
             "ext": {
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceImageProcessing2FeaturesQCOM"
+                ],
+                "physicalDeviceProperties": [
+                    "VkPhysicalDeviceImageProcessing2PropertiesQCOM"
+                ]
+            },
+            "core": {
                 "physicalDeviceFeatures": [],
+                "physicalDeviceProperties": []
+            }
+        },
+        "types": {
+            "VkPhysicalDeviceImageProcessing2PropertiesQCOM": {
+                "maxBlockMatchWindow": "VkExtent2D"
+            }
+        }
+    },
+    "VK_QCOM_filter_cubic_weights": {
+        "name": "VK_QCOM_filter_cubic_weights",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceCubicWeightsFeaturesQCOM"
+                ],
                 "physicalDeviceProperties": []
             },
             "core": {
@@ -8987,12 +9042,14 @@
         },
         "types": []
     },
-    "VK_QCOM_extension_520": {
-        "name": "VK_QCOM_extension_520",
+    "VK_QCOM_ycbcr_degamma": {
+        "name": "VK_QCOM_ycbcr_degamma",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": [],
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceYcbcrDegammaFeaturesQCOM"
+                ],
                 "physicalDeviceProperties": []
             },
             "core": {
@@ -9002,27 +9059,14 @@
         },
         "types": []
     },
-    "VK_QCOM_extension_521": {
-        "name": "VK_QCOM_extension_521",
+    "VK_QCOM_filter_cubic_clamp": {
+        "name": "VK_QCOM_filter_cubic_clamp",
         "promotedTo": null,
         "structs": {
             "ext": {
-                "physicalDeviceFeatures": [],
-                "physicalDeviceProperties": []
-            },
-            "core": {
-                "physicalDeviceFeatures": [],
-                "physicalDeviceProperties": []
-            }
-        },
-        "types": []
-    },
-    "VK_QCOM_extension_522": {
-        "name": "VK_QCOM_extension_522",
-        "promotedTo": null,
-        "structs": {
-            "ext": {
-                "physicalDeviceFeatures": [],
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceCubicClampFeaturesQCOM"
+                ],
                 "physicalDeviceProperties": []
             },
             "core": {
@@ -9156,20 +9200,26 @@
         },
         "types": []
     },
-    "VK_MSFT_extension_531": {
-        "name": "VK_MSFT_extension_531",
+    "VK_MSFT_layered_driver": {
+        "name": "VK_MSFT_layered_driver",
         "promotedTo": null,
         "structs": {
             "ext": {
                 "physicalDeviceFeatures": [],
-                "physicalDeviceProperties": []
+                "physicalDeviceProperties": [
+                    "VkPhysicalDeviceLayeredDriverPropertiesMSFT"
+                ]
             },
             "core": {
                 "physicalDeviceFeatures": [],
                 "physicalDeviceProperties": []
             }
         },
-        "types": []
+        "types": {
+            "VkPhysicalDeviceLayeredDriverPropertiesMSFT": {
+                "underlyingAPI": "VkLayeredDriverUnderlyingApiMSFT"
+            }
+        }
     },
     "VK_KHR_extension_532": {
         "name": "VK_KHR_extension_532",
@@ -9383,6 +9433,53 @@
     },
     "VK_KHR_extension_546": {
         "name": "VK_KHR_extension_546",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": [],
+                "physicalDeviceProperties": []
+            },
+            "core": {
+                "physicalDeviceFeatures": [],
+                "physicalDeviceProperties": []
+            }
+        },
+        "types": []
+    },
+    "VK_NV_descriptor_pool_overallocation": {
+        "name": "VK_NV_descriptor_pool_overallocation",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": [
+                    "VkPhysicalDeviceDescriptorPoolOverallocationFeaturesNV"
+                ],
+                "physicalDeviceProperties": []
+            },
+            "core": {
+                "physicalDeviceFeatures": [],
+                "physicalDeviceProperties": []
+            }
+        },
+        "types": []
+    },
+    "VK_QCOM_extension_548": {
+        "name": "VK_QCOM_extension_548",
+        "promotedTo": null,
+        "structs": {
+            "ext": {
+                "physicalDeviceFeatures": [],
+                "physicalDeviceProperties": []
+            },
+            "core": {
+                "physicalDeviceFeatures": [],
+                "physicalDeviceProperties": []
+            }
+        },
+        "types": []
+    },
+    "VK_NV_extension_549": {
+        "name": "VK_NV_extension_549",
         "promotedTo": null,
         "structs": {
             "ext": {
@@ -12153,7 +12250,8 @@
                 22,
                 23,
                 24,
-                25
+                25,
+                26
             ],
             "names": [
                 "VK_DRIVER_ID_AMD_PROPRIETARY",
@@ -12180,7 +12278,8 @@
                 "VK_DRIVER_ID_MESA_VENUS",
                 "VK_DRIVER_ID_MESA_DOZEN",
                 "VK_DRIVER_ID_MESA_NVK",
-                "VK_DRIVER_ID_IMAGINATION_OPEN_SOURCE_MESA"
+                "VK_DRIVER_ID_IMAGINATION_OPEN_SOURCE_MESA",
+                "VK_DRIVER_ID_MESA_AGXV"
             ]
         },
         "VkConditionalRenderingFlagBitsEXT": {
@@ -13139,6 +13238,16 @@
                 "VK_DEVICE_ADDRESS_BINDING_TYPE_UNBIND_EXT"
             ]
         },
+        "VkFrameBoundaryFlagBitsEXT": {
+            "name": "VkFrameBoundaryFlagBitsEXT",
+            "type": "bitmask",
+            "bitpos": [
+                0
+            ],
+            "bitnames": [
+                "VK_FRAME_BOUNDARY_FRAME_END_BIT_EXT"
+            ]
+        },
         "VkPresentScalingFlagBitsEXT": {
             "name": "VkPresentScalingFlagBitsEXT",
             "type": "bitmask",
@@ -13379,10 +13488,12 @@
             "name": "VkVideoEncodeCapabilityFlagBitsKHR",
             "type": "bitmask",
             "bitpos": [
-                0
+                0,
+                1
             ],
             "bitnames": [
-                "VK_VIDEO_ENCODE_CAPABILITY_PRECEDING_EXTERNALLY_ENCODED_BYTES_BIT_KHR"
+                "VK_VIDEO_ENCODE_CAPABILITY_PRECEDING_EXTERNALLY_ENCODED_BYTES_BIT_KHR",
+                "VK_VIDEO_ENCODE_CAPABILITY_INSUFFICIENT_BITSTREAM_BUFFER_RANGE_DETECTION_BIT_KHR"
             ]
         },
         "VkVideoEncodeFeedbackFlagBitsKHR": {
@@ -13466,7 +13577,9 @@
                 14,
                 15,
                 16,
-                17
+                17,
+                19,
+                20
             ],
             "bitnames": [
                 "VK_VIDEO_ENCODE_H264_STD_SEPARATE_COLOR_PLANE_FLAG_SET_BIT_EXT",
@@ -13486,7 +13599,9 @@
                 "VK_VIDEO_ENCODE_H264_STD_CONSTRAINED_INTRA_PRED_FLAG_SET_BIT_EXT",
                 "VK_VIDEO_ENCODE_H264_STD_DEBLOCKING_FILTER_DISABLED_BIT_EXT",
                 "VK_VIDEO_ENCODE_H264_STD_DEBLOCKING_FILTER_ENABLED_BIT_EXT",
-                "VK_VIDEO_ENCODE_H264_STD_DEBLOCKING_FILTER_PARTIAL_BIT_EXT"
+                "VK_VIDEO_ENCODE_H264_STD_DEBLOCKING_FILTER_PARTIAL_BIT_EXT",
+                "VK_VIDEO_ENCODE_H264_STD_SLICE_QP_DELTA_BIT_EXT",
+                "VK_VIDEO_ENCODE_H264_STD_DIFFERENT_SLICE_QP_DELTA_BIT_EXT"
             ]
         },
         "VkVideoEncodeH264RateControlFlagBitsEXT": {
@@ -13665,7 +13780,9 @@
                 15,
                 16,
                 17,
-                18
+                18,
+                19,
+                20
             ],
             "bitnames": [
                 "VK_VIDEO_ENCODE_H265_STD_SEPARATE_COLOR_PLANE_FLAG_SET_BIT_EXT",
@@ -13686,7 +13803,9 @@
                 "VK_VIDEO_ENCODE_H265_STD_ENTROPY_CODING_SYNC_ENABLED_FLAG_SET_BIT_EXT",
                 "VK_VIDEO_ENCODE_H265_STD_DEBLOCKING_FILTER_OVERRIDE_ENABLED_FLAG_SET_BIT_EXT",
                 "VK_VIDEO_ENCODE_H265_STD_DEPENDENT_SLICE_SEGMENTS_ENABLED_FLAG_SET_BIT_EXT",
-                "VK_VIDEO_ENCODE_H265_STD_DEPENDENT_SLICE_SEGMENT_FLAG_SET_BIT_EXT"
+                "VK_VIDEO_ENCODE_H265_STD_DEPENDENT_SLICE_SEGMENT_FLAG_SET_BIT_EXT",
+                "VK_VIDEO_ENCODE_H265_STD_SLICE_QP_DELTA_BIT_EXT",
+                "VK_VIDEO_ENCODE_H265_STD_DIFFERENT_SLICE_QP_DELTA_BIT_EXT"
             ]
         },
         "VkVideoEncodeH265RateControlFlagBitsEXT": {
@@ -14205,6 +14324,90 @@
                 "VK_COMPONENT_TYPE_UINT16_KHR",
                 "VK_COMPONENT_TYPE_UINT32_KHR",
                 "VK_COMPONENT_TYPE_UINT64_KHR"
+            ]
+        },
+        "VkCubicFilterWeightsQCOM": {
+            "name": "VkCubicFilterWeightsQCOM",
+            "type": "enum",
+            "values": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "names": [
+                "VK_CUBIC_FILTER_WEIGHTS_CATMULL_ROM_QCOM",
+                "VK_CUBIC_FILTER_WEIGHTS_ZERO_TANGENT_CARDINAL_QCOM",
+                "VK_CUBIC_FILTER_WEIGHTS_B_SPLINE_QCOM",
+                "VK_CUBIC_FILTER_WEIGHTS_MITCHELL_NETRAVALI_QCOM"
+            ]
+        },
+        "VkBlockMatchWindowCompareModeQCOM": {
+            "name": "VkBlockMatchWindowCompareModeQCOM",
+            "type": "enum",
+            "values": [
+                0,
+                1
+            ],
+            "names": [
+                "VK_BLOCK_MATCH_WINDOW_COMPARE_MODE_MIN_QCOM",
+                "VK_BLOCK_MATCH_WINDOW_COMPARE_MODE_MAX_QCOM"
+            ]
+        },
+        "VkLayeredDriverUnderlyingApiMSFT": {
+            "name": "VkLayeredDriverUnderlyingApiMSFT",
+            "type": "enum",
+            "values": [
+                0,
+                1
+            ],
+            "names": [
+                "VK_LAYERED_DRIVER_UNDERLYING_API_NONE_MSFT",
+                "VK_LAYERED_DRIVER_UNDERLYING_API_D3D12_MSFT"
+            ]
+        },
+        "VkLatencyMarkerNV": {
+            "name": "VkLatencyMarkerNV",
+            "type": "enum",
+            "values": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11
+            ],
+            "names": [
+                "VK_LATENCY_MARKER_SIMULATION_START_NV",
+                "VK_LATENCY_MARKER_SIMULATION_END_NV",
+                "VK_LATENCY_MARKER_RENDERSUBMIT_START_NV",
+                "VK_LATENCY_MARKER_RENDERSUBMIT_END_NV",
+                "VK_LATENCY_MARKER_PRESENT_START_NV",
+                "VK_LATENCY_MARKER_PRESENT_END_NV",
+                "VK_LATENCY_MARKER_INPUT_SAMPLE_NV",
+                "VK_LATENCY_MARKER_TRIGGER_FLASH_NV",
+                "VK_LATENCY_MARKER_OUT_OF_BAND_RENDERSUBMIT_START_NV",
+                "VK_LATENCY_MARKER_OUT_OF_BAND_RENDERSUBMIT_END_NV",
+                "VK_LATENCY_MARKER_OUT_OF_BAND_PRESENT_START_NV",
+                "VK_LATENCY_MARKER_OUT_OF_BAND_PRESENT_END_NV"
+            ]
+        },
+        "VkOutOfBandQueueTypeNV": {
+            "name": "VkOutOfBandQueueTypeNV",
+            "type": "enum",
+            "values": [
+                0,
+                1
+            ],
+            "names": [
+                "VK_OUT_OF_BAND_QUEUE_TYPE_RENDER_NV",
+                "VK_OUT_OF_BAND_QUEUE_TYPE_PRESENT_NV"
             ]
         }
     }

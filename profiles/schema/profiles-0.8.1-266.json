@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.1-267.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.267",
+    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.1-266.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.266",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -911,15 +911,6 @@
                 }
             }
         },
-        "VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "extendedSparseAddressSpace": {
-                    "type": "boolean"
-                }
-            }
-        },
         "VkPhysicalDeviceExternalFormatResolveFeaturesANDROID": {
             "type": "object",
             "additionalProperties": false,
@@ -1387,21 +1378,6 @@
             "additionalProperties": false,
             "properties": {
                 "mutableDescriptorType": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "VkPhysicalDeviceNestedCommandBufferFeaturesEXT": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "nestedCommandBuffer": {
-                    "type": "boolean"
-                },
-                "nestedCommandBufferRendering": {
-                    "type": "boolean"
-                },
-                "nestedCommandBufferSimultaneousUse": {
                     "type": "boolean"
                 }
             }
@@ -3578,94 +3554,6 @@
                 }
             }
         },
-        "VkBufferUsageFlagBits": {
-            "enum": [
-                "VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR",
-                "VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR",
-                "VK_BUFFER_USAGE_CONDITIONAL_RENDERING_BIT_EXT",
-                "VK_BUFFER_USAGE_EXECUTION_GRAPH_SCRATCH_BIT_AMDX",
-                "VK_BUFFER_USAGE_INDEX_BUFFER_BIT",
-                "VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT",
-                "VK_BUFFER_USAGE_MICROMAP_BUILD_INPUT_READ_ONLY_BIT_EXT",
-                "VK_BUFFER_USAGE_MICROMAP_STORAGE_BIT_EXT",
-                "VK_BUFFER_USAGE_PUSH_DESCRIPTORS_DESCRIPTOR_BUFFER_BIT_EXT",
-                "VK_BUFFER_USAGE_RAY_TRACING_BIT_NV",
-                "VK_BUFFER_USAGE_RESOURCE_DESCRIPTOR_BUFFER_BIT_EXT",
-                "VK_BUFFER_USAGE_SAMPLER_DESCRIPTOR_BUFFER_BIT_EXT",
-                "VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR",
-                "VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT",
-                "VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_EXT",
-                "VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_KHR",
-                "VK_BUFFER_USAGE_STORAGE_BUFFER_BIT",
-                "VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT",
-                "VK_BUFFER_USAGE_TRANSFER_DST_BIT",
-                "VK_BUFFER_USAGE_TRANSFER_SRC_BIT",
-                "VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_BUFFER_BIT_EXT",
-                "VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_COUNTER_BUFFER_BIT_EXT",
-                "VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT",
-                "VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT",
-                "VK_BUFFER_USAGE_VERTEX_BUFFER_BIT",
-                "VK_BUFFER_USAGE_VIDEO_DECODE_DST_BIT_KHR",
-                "VK_BUFFER_USAGE_VIDEO_DECODE_SRC_BIT_KHR",
-                "VK_BUFFER_USAGE_VIDEO_ENCODE_DST_BIT_KHR",
-                "VK_BUFFER_USAGE_VIDEO_ENCODE_SRC_BIT_KHR"
-            ]
-        },
-        "VkBufferUsageFlags": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/VkBufferUsageFlagBits"
-            },
-            "uniqueItems": true
-        },
-        "VkImageUsageFlagBits": {
-            "enum": [
-                "VK_IMAGE_USAGE_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT",
-                "VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT",
-                "VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT",
-                "VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT",
-                "VK_IMAGE_USAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR",
-                "VK_IMAGE_USAGE_HOST_TRANSFER_BIT_EXT",
-                "VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT",
-                "VK_IMAGE_USAGE_INVOCATION_MASK_BIT_HUAWEI",
-                "VK_IMAGE_USAGE_SAMPLED_BIT",
-                "VK_IMAGE_USAGE_SAMPLE_BLOCK_MATCH_BIT_QCOM",
-                "VK_IMAGE_USAGE_SAMPLE_WEIGHT_BIT_QCOM",
-                "VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV",
-                "VK_IMAGE_USAGE_STORAGE_BIT",
-                "VK_IMAGE_USAGE_TRANSFER_DST_BIT",
-                "VK_IMAGE_USAGE_TRANSFER_SRC_BIT",
-                "VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT",
-                "VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR",
-                "VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR",
-                "VK_IMAGE_USAGE_VIDEO_DECODE_SRC_BIT_KHR",
-                "VK_IMAGE_USAGE_VIDEO_ENCODE_DPB_BIT_KHR",
-                "VK_IMAGE_USAGE_VIDEO_ENCODE_DST_BIT_KHR",
-                "VK_IMAGE_USAGE_VIDEO_ENCODE_SRC_BIT_KHR"
-            ]
-        },
-        "VkImageUsageFlags": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/VkImageUsageFlagBits"
-            },
-            "uniqueItems": true
-        },
-        "VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "extendedSparseAddressSpaceSize": {
-                    "$ref": "#/definitions/VkDeviceSize"
-                },
-                "extendedSparseBufferUsageFlags": {
-                    "$ref": "#/definitions/VkBufferUsageFlags"
-                },
-                "extendedSparseImageUsageFlags": {
-                    "$ref": "#/definitions/VkImageUsageFlags"
-                }
-            }
-        },
         "VkChromaLocation": {
             "enum": [
                 "VK_CHROMA_LOCATION_COSITED_EVEN",
@@ -4291,15 +4179,6 @@
                     "$ref": "#/definitions/uint32_t"
                 },
                 "maxMultiviewViewCount": {
-                    "$ref": "#/definitions/uint32_t"
-                }
-            }
-        },
-        "VkPhysicalDeviceNestedCommandBufferPropertiesEXT": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "maxCommandBufferNestingLevel": {
                     "$ref": "#/definitions/uint32_t"
                 }
             }
@@ -6186,9 +6065,6 @@
                             "VK_EXT_mutable_descriptor_type": {
                                 "type": "integer"
                             },
-                            "VK_EXT_nested_command_buffer": {
-                                "type": "integer"
-                            },
                             "VK_EXT_non_seamless_cube_map": {
                                 "type": "integer"
                             },
@@ -6771,9 +6647,6 @@
                             "VK_NV_displacement_micromap": {
                                 "type": "integer"
                             },
-                            "VK_NV_extended_sparse_address_space": {
-                                "type": "integer"
-                            },
                             "VK_NV_external_memory": {
                                 "type": "integer"
                             },
@@ -7096,9 +6969,6 @@
                             "VkPhysicalDeviceExtendedDynamicStateFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceExtendedDynamicStateFeaturesEXT"
                             },
-                            "VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV": {
-                                "$ref": "#/definitions/VkPhysicalDeviceExtendedSparseAddressSpaceFeaturesNV"
-                            },
                             "VkPhysicalDeviceExternalFormatResolveFeaturesANDROID": {
                                 "$ref": "#/definitions/VkPhysicalDeviceExternalFormatResolveFeaturesANDROID"
                             },
@@ -7257,9 +7127,6 @@
                             },
                             "VkPhysicalDeviceMutableDescriptorTypeFeaturesVALVE": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMutableDescriptorTypeFeaturesEXT"
-                            },
-                            "VkPhysicalDeviceNestedCommandBufferFeaturesEXT": {
-                                "$ref": "#/definitions/VkPhysicalDeviceNestedCommandBufferFeaturesEXT"
                             },
                             "VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceNonSeamlessCubeMapFeaturesEXT"
@@ -7646,9 +7513,6 @@
                             "VkPhysicalDeviceExtendedDynamicState3PropertiesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceExtendedDynamicState3PropertiesEXT"
                             },
-                            "VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV": {
-                                "$ref": "#/definitions/VkPhysicalDeviceExtendedSparseAddressSpacePropertiesNV"
-                            },
                             "VkPhysicalDeviceExternalFormatResolvePropertiesANDROID": {
                                 "$ref": "#/definitions/VkPhysicalDeviceExternalFormatResolvePropertiesANDROID"
                             },
@@ -7744,9 +7608,6 @@
                             },
                             "VkPhysicalDeviceMultiviewPropertiesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceMultiviewProperties"
-                            },
-                            "VkPhysicalDeviceNestedCommandBufferPropertiesEXT": {
-                                "$ref": "#/definitions/VkPhysicalDeviceNestedCommandBufferPropertiesEXT"
                             },
                             "VkPhysicalDeviceOpacityMicromapPropertiesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceOpacityMicromapPropertiesEXT"
