@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2022 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2023 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -30,12 +30,12 @@ if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
 
+PageGenerator::header("Formats");
+
 $minapiversion = null;
 if (SqlRepository::getMinApiVersion() !== null) {
     $minapiversion = "_".str_replace(".", "_", SqlRepository::getMinApiVersion());
 }
-
-PageGenerator::header("Formats");
 ?>
 
 <div class='header'>
