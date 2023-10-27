@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -83,7 +83,7 @@ try {
         $formats_combined = [];
         $os_types = [];
         $sql = "SELECT formatid as name, r.ostype as ostype, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
-                where df.$column > 0 and df.$column & :value > 0 and r.ostype > -1
+                where df.$column > 0 and df.$column & :value > 0
                 $api_version_filter                    
                 group by ostype, formatid
                 order by ostype, formatid asc";
@@ -103,7 +103,7 @@ try {
         }
         // Combined listing (all operating systems)
         $sql = "SELECT formatid as name, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
-                where df.$column > 0 and df.$column & :value > 0 and r.ostype > -1
+                where df.$column > 0 and df.$column & :value > 0
                 $api_version_filter                    
                 group by formatid
                 order by formatid asc";
@@ -121,7 +121,7 @@ try {
 
         // Per-OS listing (single operating system)
         foreach ($os_types as $ostype) {
-            $sql_count = "SELECT count(distinct(r.displayname)) from reports r join deviceproperties dp on dp.reportid = r.id";
+            $sql_count = "SELECT count(distinct(r.displayname)) from reports r";
             $sql_count_params = [];
             if ($ostype !== 'all') {
                 $platform = platformname($ostype);
@@ -209,4 +209,3 @@ DB::disconnect();
 $end = microtime(true);
 echo "success".PHP_EOL;
 echo sprintf("Format listing generated: %d queries took %f seconds", $statement_count, $end-$start);
-
