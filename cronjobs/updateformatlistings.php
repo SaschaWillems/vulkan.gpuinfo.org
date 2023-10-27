@@ -131,9 +131,14 @@ try {
                 $platform = 'all';
             }
             if ($api_version_filter) {
-                $sql_count .= " " . $api_version_filter;
+                $api_filter_loc = $api_version_filter;
+                if (stripos($sql_count, 'WHERE') == false) {
+                    $api_filter_loc = str_replace('AND', 'WHERE', $api_filter_loc);
+                }
+                $sql_count .= " " . $api_filter_loc;
                 $sql_count_params['apiversion'] = $apiversion;
             }
+            var_dump($sql_count_params);
             $deviceCount = DB::getCount($sql_count, $sql_count_params);
 
             ob_start();
@@ -187,6 +192,7 @@ try {
 
             echo "  </tbody>";
             echo "</table>";
+            echo "Last updated at ".date("Y-m-d h:i:s");
             echo "</div>";
 
             $html = ob_get_contents();
