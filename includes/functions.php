@@ -424,6 +424,7 @@ function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 				($versionraw) & 0x003f
 			);
 		}
+		// Intel (Windows)
 		if ($vendorid == 0x8086 && $osname == 'windows') {
 			return sprintf(
 				"%d.%d",
@@ -431,6 +432,13 @@ function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 				($versionraw) & 0x3fff
 			);
 		}
+		// Broadcom
+		if ($vendorid == 5348) {
+			// Version encoded as human-readable (10000 * major + 100 * minor)
+			$major = $versionraw / 10000;
+			$minor = ($versionraw % 10000) / 100;
+			return sprintf('%d.%d', $major, $minor);
+		}		
 		// Use Vulkan version conventions if vendor mapping is not available
 		return sprintf(
 			"%d.%d.%d",
@@ -604,8 +612,9 @@ function displayHex($value)
 
 /**
  * Visualize certain properties (e.g. flags) in a more readable way
+ * If $shorten is set to true, values larger than 20 chars are shortened (use for e.g. report compare to not break the layout)
  */
-function getPropertyDisplayValue($key, $value)
+function getPropertyDisplayValue($key, $value, $shorten = false)
 {
 	$displayvalue = $value;
 	switch ($key) {
@@ -761,6 +770,10 @@ function getPropertyDisplayValue($key, $value)
 				$displayvalue = displayBool($value);
 			};
 	}
+	// Some value may contain very long values that break the layout, so we shorten theme for the compare view
+	if ($shorten && (in_array(strtolower($key), ['driverinfo']))) {
+		$displayvalue = shorten($displayvalue);
+	}
 	return $displayvalue;
 }
 
@@ -860,4 +873,12 @@ function getShortFieldName($full_name)
 		return $aliases[$full_name];
 	}
 	return $full_name;
+}
+
+function shorten($value, $length = 20, $add = '...')
+{
+	if (strlen($value) >= $length) {
+		return substr($value, 0, $length - strlen($add)) . $add;
+	}
+	return $value;
 }
