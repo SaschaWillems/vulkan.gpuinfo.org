@@ -59,6 +59,7 @@ if (SqlRepository::getMinApiVersion() !== null) {
             searchHighlight: true,
             dom: 'f',
             bInfo: false,
+            fixedHeader: true,            
             order: [
                 [0, "asc"]
             ],
