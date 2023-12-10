@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -65,20 +65,20 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 
 <div>
 	<ul class='nav nav-tabs nav-level1'>
-		<li class='active'><a data-toggle='tab' href='#formats_linear'>Linear tiling</a></li>
-		<li><a data-toggle='tab' href='#formats_optimal'>Optimal tiling</a></li>
+		<li class='active'><a data-toggle='tab' href='#formats_optimal'>Optimal tiling</a></li>
+		<li><a data-toggle='tab' href='#formats_linear'>Linear tiling</a></li>
 		<li><a data-toggle='tab' href='#formats_buffer'>Buffer</a></li>
 	</ul>
 </div>
 
 <div class='tab-content'>
-	<!-- Linear tiling features -->
-	<div id='formats_linear' class='tab-pane fade in active reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $device_format_flags_tiling); ?>
-	</div>
 	<!-- Optimal tiling features -->
 	<div id='formats_optimal' class='tab-pane fade reportdiv'>
 		<?php insertDeviceFormatTable('deviceformats_optimal', $format_data, 'optimaltilingfeatures', $device_format_flags_tiling); ?>
+	</div>
+	<!-- Linear tiling features -->
+	<div id='formats_linear' class='tab-pane fade in active reportdiv'>
+		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $device_format_flags_tiling); ?>
 	</div>
 	<!-- Buffer features -->
 	<div id='formats_buffer' class='tab-pane fade reportdiv'>
