@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -73,11 +73,11 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 
 <div class='tab-content'>
 	<!-- Optimal tiling features -->
-	<div id='formats_optimal' class='tab-pane fade reportdiv'>
+	<div id='formats_optimal' class='tab-pane fade in active reportdiv'>
 		<?php insertDeviceFormatTable('deviceformats_optimal', $format_data, 'optimaltilingfeatures', $device_format_flags_tiling); ?>
 	</div>
 	<!-- Linear tiling features -->
-	<div id='formats_linear' class='tab-pane fade in active reportdiv'>
+	<div id='formats_linear' class='tab-pane fade reportdiv'>
 		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $device_format_flags_tiling); ?>
 	</div>
 	<!-- Buffer features -->
