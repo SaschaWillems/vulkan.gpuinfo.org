@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.32';
+$release = '3.33';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -63,6 +63,33 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>3.33 - 2024-01-28</h4>
+			<ul>
+				<li>Vulkan header 1.3.276</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_ANDROID_external_format_resolve</li>
+						<li>VK_ARM_render_pass_striped</li>
+						<li>VK_ARM_scheduling_controls</li>
+						<li>VK_EXT_nested_command_buffer</li>
+						<li>VK_IMG_relaxed_line_rasterization</li>
+						<li>VK_KHR_dynamic_rendering_local_read</li>
+						<li>VK_KHR_index_type_uint8</li>
+						<li>VK_KHR_line_rasterization</li>
+						<li>VK_KHR_maintenance6</li>
+						<li>VK_KHR_shader_expect_assume</li>
+						<li>VK_KHR_shader_float_controls2</li>
+						<li>VK_KHR_shader_maximal_reconvergence</li>
+						<li>VK_KHR_shader_quad_control</li>
+						<li>VK_KHR_shader_subgroup_rotate</li>
+						<li>VK_KHR_vertex_attribute_divisor</li>
+						<li>VK_KHR_video_maintenance1</li>
+						<li>VK_NV_cuda_kernel_launch</li>
+						<li>VK_NV_extended_sparse_address_space</li>
+						<li>VK_NV_per_stage_descriptor_set</li>
+					</ul>
+				</li>	
+			</ul>				
 			<h4>3.32 - 2023-09-08</h4>
 			<ul>
 				<li>Vulkan header 1.3.264</li>
