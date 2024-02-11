@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2024s by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -47,7 +47,8 @@
 	// Make sure it's really a text file
 	$finfo = new finfo(FILEINFO_MIME);
 	$mime_type = $finfo->file($_FILES['data']['tmp_name']);
-	if ((!$mime_type) || (stripos($mime_type, 'text') === false)) {
+	$mime_check = ((stripos($mime_type, 'text') !== false) || (stripos($mime_type, 'json') !== false));
+	if ((!$mime_type) || (!$mime_check)) {
 		echo "Uploaded file looks like a binary file!";
 		exit();
 	}
@@ -249,7 +250,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute(array(":reportid" => $reportid, ":profileid" => $profileid, ":specversion" => $profile['specVersion'], ":supported" => $profile['supported']));
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at device extensions)');
+				die('Error while trying to upload report (error at device profiles)');
 			}															
 		}
 	}
