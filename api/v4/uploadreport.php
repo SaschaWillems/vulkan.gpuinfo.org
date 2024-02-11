@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2024s by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -18,6 +18,8 @@
 	 * PURPOSE.  See the GNU AGPL 3.0 for more details.		
 	 *
      */
+
+	// Note: Currently used for manual uploads
 
 	include "./../../includes/functions.php";
 	include './../../database/database.class.php';	
@@ -883,7 +885,14 @@
 					$stmnt->execute($values);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at device extended device features)');
-				}							
+				}
+				// Mark extension to have additional features
+				try {
+					$stmnt = DB::$connection->prepare("UPDATE extension set hasfeatures = 1 where hasfeatures is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
+				} catch (Exception $e) {
+					mailError("Error at marking extension to have additional features: ".$e->getMessage(), $jsonFile);
+				}				
 			}
 		}
 		// Device properties			
@@ -908,7 +917,14 @@
 					$stmnt->execute($values);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at device extended device properties)');
-				}							
+				}
+				// Mark extension to have additional properties
+				try {
+					$stmnt = DB::$connection->prepare("UPDATE extension set hasproperties = 1 where hasproperties is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
+				} catch (Exception $e) {
+					mailError("Error at marking extension to have additional properties: ".$e->getMessage(), $jsonFile);
+				}				
 			}		
 		}		
 	}

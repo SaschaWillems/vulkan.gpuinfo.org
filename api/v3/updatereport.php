@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2020-2022 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2020-2024 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -123,6 +123,9 @@
                         $params['supported'] = $feature['supported'];
                         $stmnt_insert = DB::$connection->prepare("INSERT INTO devicefeatures2 (reportid, name, extension, supported) VALUES (:reportid, :name, :extension, :supported)");
                         $stmnt_insert->execute($params);
+				        // Mark extension to have additional features
+		    			$stmnt_mark = DB::$connection->prepare("UPDATE extension set hasfeatures = 1 where hasproperties is null and name = :extension");
+			    		$stmnt_mark->execute(['extension' => $feature['extension']]);				
                     }
                 }
                 if (count($updated_extenstion_list) > 0) {
@@ -154,6 +157,9 @@
                         $params['value'] = $value;
                         $stmnt_insert = DB::$connection->prepare("INSERT INTO deviceproperties2 (reportid, name, extension, value) VALUES (:reportid, :name, :extension, :value)");
                         $stmnt_insert->execute($params);
+				        // Mark extension to have additional properties
+		    			$stmnt_mark = DB::$connection->prepare("UPDATE extension set hasproperties = 1 where hasproperties is null and name = :extension");
+			    		$stmnt_mark->execute(['extension' => $feature['extension']]);				
                     }
                 }
                 if (count($updated_extenstion_list) > 0) {

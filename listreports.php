@@ -47,6 +47,7 @@ $caption = "Listing all reports";
 $pageTitle = null;
 $inverted = false;
 $platform = "all";
+$order_column = 0;
 
 // Invert
 $inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
@@ -101,6 +102,7 @@ if ($filter_list->hasFilter('displayname')) {
 if ($filter_list->hasFilter('extension')) {
 	$extension = $filter_list->getFilter('extension');
 	$fnAddCaption("supporting device extension <code>$extension</code>");
+	$order_column = 2;	
 }
 // Instance extension
 if ($filter_list->hasFilter('instanceextension')) {
@@ -215,7 +217,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 			"dom": 'lrtip',
 			"pageLength": 25,
 			"order": [
-				[0, 'desc']
+				[<?= $order_column ?>, 'desc']
 			],
 			"columnDefs": [{
 				"searchable": false,
