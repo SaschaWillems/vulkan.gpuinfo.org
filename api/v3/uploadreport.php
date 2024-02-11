@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -19,19 +19,17 @@
 	 *
      */
 
+	// Note: Currently used by the GUI client application
+
 	include "./../../includes/functions.php";
 	include './../../database/database.class.php';	
 	
-	// Check for valid file
-	$path='./';
-	
-	// Reports are pretty small, so limit file size for upload (512 KByte will be more than enough)
-	$MAX_FILESIZE = 512 * 1024;
-	
+	// File validty check
+
 	$file = $_FILES['data']['name'];
 
-	// Check filesize
-	if ($_FILES['data']['size'] > $MAX_FILESIZE)  {
+	// Reports are pretty small, so limit file size for upload to 512 KByte (should be more than enough)
+	if ($_FILES['data']['size'] > 512 * 1024)  {
 		echo "File exceeds size limitation of 512 KByte!";
 		exit();  
 	}
@@ -42,13 +40,29 @@
 	}	
 	
 	// Check file extension 
-	$ext = pathinfo($_FILES['data']['name'], PATHINFO_EXTENSION); 
+	$ext = pathinfo($file, PATHINFO_EXTENSION); 
 	if ($ext != 'json') {
 		echo "Report '$file' is not of file type json!";
 		exit();  
-	} 
+	}
+
+	// Make sure it's really a text file
+	$finfo = new finfo(FILEINFO_MIME);
+	$mime_type = $finfo->file($_FILES['data']['tmp_name']);
+	if ((!$mime_type) || (stripos($mime_type, 'text') === false)) {
+		echo "Uploaded file looks like a binary file!";
+		exit();
+	}
 	
-	move_uploaded_file($_FILES['data']['tmp_name'], $path.$_FILES['data']['name']) or die(''); 
+	move_uploaded_file($_FILES['data']['tmp_name'], './'.$_FILES['data']['name']) or die(''); 
+
+	// Use a closure to exit the script that ensures an uploaded file is always deleted
+	$exitScript = function($message = null) use ($file) {
+		if (file_exists($file)) {
+			unlink($file);
+		}
+		exit($message);
+	};
 
 	function convertValue($val) {
 		if (is_string($val)) {
@@ -246,8 +260,10 @@
 	
 	$jsonFile = file_get_contents($file);
 	$json = json_decode($jsonFile, true, 512, JSON_BIGINT_AS_STRING);
-	$display_name = null;
-	
+	if (json_last_error() !== JSON_ERROR_NONE) {
+		exit('Could not decode JSON Input file');
+	}
+
 	// Check report version
 	$reportversion = floatval($json['environment']['reportversion']);
 	if ($reportversion < 3.0)
@@ -259,7 +275,7 @@
 	
 	// Check if device is blacklisted
 	try {
-		$sql = "select * from blacklist where devicename = :devicename";
+		$sql = "SELECT * from blacklist where devicename = :devicename";
 		$stmnt = DB::$connection->prepare($sql);
 		$stmnt->execute(array(":devicename" => $json['properties']['deviceName']));
 		if ($stmnt->rowCount() > 0) { 
@@ -272,40 +288,38 @@
 	}		
 		
 	// Check if report is already present
-	{
-		$sql = "select id from reports where
-			devicename = :devicename and 
-			driverversion = :driverversion and
-			apiversion = :apiversion and
-			osname = :osname and
-			osversion = :osversion and
-			osarchitecture = :osarchitecture";
-		$params = array(
-			":devicename" => $json['properties']['deviceName'],
-			":driverversion" => $json['properties']['driverVersion'],
-			":apiversion" => $json['properties']['apiVersion'],
-			":osname" => $json['environment']['name'],
-			":osversion" => $json['environment']['version'],
-			":osarchitecture" => $json['environment']['architecture'],
-		);
+	$sql = "SELECT id from reports where
+		devicename = :devicename and 
+		driverversion = :driverversion and
+		apiversion = :apiversion and
+		osname = :osname and
+		osversion = :osversion and
+		osarchitecture = :osarchitecture";
+	$params = array(
+		":devicename" => $json['properties']['deviceName'],
+		":driverversion" => $json['properties']['driverVersionText'],
+		":apiversion" => $json['properties']['apiVersionText'],
+		":osname" => $json['environment']['name'],
+		":osversion" => $json['environment']['version'],
+		":osarchitecture" => $json['environment']['architecture'],
+	);
 
-		try {
-			$stmnt = DB::$connection->prepare($sql);		
-			$stmnt->execute($params);	
-		} catch (Exception $e) {
-			die('Error while trying to upload report (error at device present check)');
-		}		
-		
-		if ($stmnt->rowCount() > 0) {
-			$reportid = $stmnt->fetchColumn();
-			$sql = "UPDATE reports SET counter = counter+1 WHERE id = :reportid";
-			$stmnt = DB::$connection->prepare($sql);		
-			$stmnt->execute(array(":reportid" => $reportid));			
-			echo "Report already present!";
-			DB::disconnect();
-			exit();	  
-		}	
-	}
+	try {
+		$stmnt = DB::$connection->prepare($sql);		
+		$stmnt->execute($params);	
+	} catch (Exception $e) {
+		die('Error while trying to upload report (error at device present check)');
+	}		
+	
+	if ($stmnt->rowCount() > 0) {
+		$reportid = $stmnt->fetchColumn();
+		$sql = "UPDATE reports SET counter = counter+1 WHERE id = :reportid";
+		$stmnt = DB::$connection->prepare($sql);		
+		$stmnt->execute(array(":reportid" => $reportid));			
+		echo "Report already present!";
+		DB::disconnect();
+		$exitScript();
+	}	
 
 	DB::$connection->beginTransaction();
 	
@@ -543,8 +557,9 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute(array(":reportid" => $reportid, ":extensionid" => $extensionid, ":specversion" => $ext['specVersion']));
 			} catch (Exception $e) {
+				mailError("Error at device extensions: ".$e->getMessage(), $jsonFile);
 				die('Error while trying to upload report (error at device extensions)');
-			}															
+			}
 		}	
 	}
 
@@ -698,8 +713,12 @@
 
 	// Surface properties
 	$hassurfacecaps = false;
-	if (array_key_exists('surfacecapabilites', $json)) {
-		$surfacecaps = $json['surfacecapabilites'];
+	if (array_key_exists('surfacecapabilites', $json) || array_key_exists('surfaceCapabilities', $json)) {
+		if (array_key_exists('surfacecapabilites', $json)) {
+			$surfacecaps = $json['surfacecapabilites'];
+		} else {
+			$surfacecaps = $json['surfaceCapabilities'];
+		}
 		$hassurfacecaps = ($surfacecaps['validSurface'] == 1);
 		if ($hassurfacecaps) {
 			// Caps
@@ -756,7 +775,7 @@
 			}																
 
 			// Present modes
-			$jsonnode = $json['surfacecapabilites']['presentmodes']; 
+			$jsonnode = $surfacecaps['presentmodes']; 
 			if (is_array($jsonnode)) {
 				foreach ($jsonnode as $presentmode) {
 					$sql = "INSERT INTO devicesurfacemodes
@@ -773,7 +792,7 @@
 			}	
 
 			// Surface formats	 		
-			$jsonnode = $json['surfacecapabilites']['surfaceformats']; 
+			$jsonnode = $surfacecaps['surfaceformats']; 
 			if (is_array($jsonnode)) {
 				foreach ($jsonnode as $surfaceformat) {
 					$sql = "INSERT INTO devicesurfaceformats
@@ -792,7 +811,8 @@
 	}
 
 	// Platform details
-	{		
+	$display_name = null;
+	if (array_key_exists('platformdetails', $json)) {
 		$jsonnode = $json['platformdetails']; 
 		$index = 0;
 		$platform_model = null;
@@ -864,7 +884,14 @@
 					$stmnt->execute($values);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at device extended device features)');
-				}							
+				}
+				// Mark extension to have additional features
+				try {
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
+				} catch (Exception $e) {
+					die('Error while trying to upload report (error at marking extension to have additional features)');
+				}
 			}
 		}
 		// Device properties			
@@ -889,7 +916,14 @@
 					$stmnt->execute($values);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at device extended device properties)');
-				}							
+				}
+				// Mark extension to have additional properties
+				try {
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
+				} catch (Exception $e) {
+					die('Error while trying to upload report (error at marking extension to have additional properties)');
+				}
 			}		
 		}		
 	}
@@ -985,32 +1019,29 @@
 		
 	echo "res_uploaded";	  	
 
-	try {
-		$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
-		if (false) {
-			$msgtitle = "[DEVELOPMENT] ".$msgtitle;
-			$msg = "New Vulkan hardware report uploaded to the development database\n\n";
-			$msg .= "Link : https://vulkan.gpuinfo.org/dev/displayreport.php?id=$reportid\n\n";
-		} else {
+	if ($mailto) {
+		try {
+			$msgtitle = "New Vulkan report for ".$json['properties']['deviceName']." (".$json['properties']['driverVersionText'].")";
 			$msg = "New Vulkan hardware report uploaded to the database\n\n";
-			$msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";
-		}
-		
-		$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
-		if ($display_name !== null) {
-			$msg .= "Displayname = ".$display_name."\n";
-		}
-		$msg .= "Driver version = ".$json['properties']['driverVersionText']."\n";
-		$msg .= "API version = ".$json['properties']['apiVersionText']."\n";
-		$msg .= "OS = ".$json['environment']['name']."\n";
-		$msg .= "OS version = ".$json['environment']['version']."\n";
-		$msg .= "OS arch = ".$json['environment']['architecture']."\n";
-		$msg .= "Submitter = ".$json['environment']['submitter']."\n";
-		$msg .= "Comment = ".$json['environment']['comment']."\n";
-		$msg .= "Report version = ".$json['environment']['reportversion']."\n";
-		
-		mail($mailto, $msgtitle, $msg);
-	} catch (Exception $e) {
-		// Failure to mail is not critical
-	}	
+			$msg .= "Link : https://vulkan.gpuinfo.org/displayreport.php?id=$reportid\n\n";	
+			$msg .= "Devicename = ".$json['properties']['deviceName']."\n";
+			if ($display_name !== null) {
+				$msg .= "Displayname = ".$display_name."\n";
+			}
+			$msg .= "Driver version = ".$json['properties']['driverVersionText']."\n";
+			$msg .= "API version = ".$json['properties']['apiVersionText']."\n";
+			$msg .= "OS = ".$json['environment']['name']."\n";
+			$msg .= "OS version = ".$json['environment']['version']."\n";
+			$msg .= "OS arch = ".$json['environment']['architecture']."\n";
+			$msg .= "Submitter = ".$json['environment']['submitter']."\n";
+			$msg .= "Comment = ".$json['environment']['comment']."\n";
+			$msg .= "Report version = ".$json['environment']['reportversion']."\n";
+			if (array_key_exists('appvariant', $json['environment'])) {
+				$msg .= "App variant = ".$json['environment']['appvariant']."\n";
+			}			
+			mail($mailto, $msgtitle, $msg);
+		} catch (Exception $e) {
+			// Failure to mail is not critical
+		}	
+	}
 ?>
