@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -73,17 +73,6 @@ $stmnt = DB::$connection->prepare($sql);
 $stmnt->execute($params);
 $deviceCount = $stmnt->fetch(PDO::FETCH_COLUMN);    
 
-// To get additional features and/or properties for an extension, we fetch all extension names with features and/or properties into arrays so we can look them up
-$sql = "SELECT distinct(extension) FROM devicefeatures2";
-$stmnt = DB::$connection->prepare($sql);
-$stmnt->execute();
-$extensionFeatures = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
-
-$sql = "SELECT distinct(extension) FROM deviceproperties2 d";
-$stmnt = DB::$connection->prepare($sql);
-$stmnt->execute();
-$extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);        
-
 // Dates are stored per platform, so we need to fetch from the appropriate column
 $dateColumn = 'date';
 if ($platform !== 'all') {
@@ -91,7 +80,7 @@ if ($platform !== 'all') {
 }
 
 // Fetch extensions with coverage based on unique device names from the database
-$sql ="SELECT e.name as name, date(min(e.$dateColumn)) as date, count(distinct(r.displayname)) as coverage from extensions e 
+$sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(min(e.$dateColumn)) as date, count(distinct(r.displayname)) as coverage from extensions e 
         join deviceextensions de on de.extensionid = e.id 
         join reports r on r.id = de.reportid
         $whereClause
@@ -110,11 +99,11 @@ while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
     $coverage = round($row['coverage'] / $deviceCount * 100, 2);
     $ext = $row['name'];
     $feature_link = null;
-    if (in_array($row['name'], $extensionFeatures)) {
+    if ($row['hasfeatures']) {
         $feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
     }
     $property_link = null;
-    if (in_array($row['name'], $extensionProperties)) {
+    if ($row['hasproperties']) {
         $property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
     }
 
