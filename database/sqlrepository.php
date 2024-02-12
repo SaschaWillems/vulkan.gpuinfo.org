@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -107,21 +107,7 @@ class SqlRepository {
         $deviceCount = self::deviceCount();
         // Fetch extension features and properties to highlight extensions with a detail page
         $params = [];
-        $sql = "SELECT distinct(extension) FROM devicefeatures2 d join reports r on r.id = d.reportid";
-        self::appendFilters($sql, $params);
-        $stmnt = DB::$connection->prepare($sql);
-        $stmnt->execute($params);
-        $extensionFeatures = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
-        //
-        $params = [];
-        $sql = "SELECT distinct(extension) FROM deviceproperties2 d join reports r on r.id = d.reportid";
-        self::appendFilters($sql, $params);
-        $stmnt = DB::$connection->prepare($sql);
-        $stmnt->execute($params);
-        $extensionProperties = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);        
-        //
-        $params = [];
-        $sql ="SELECT e.name, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
+        $sql ="SELECT e.name, e.hasfeatures, e.hasproperties, date(e.date) as date, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
                 join deviceextensions de on de.extensionid = e.id 
                 join reports r on r.id = de.reportid
                 join deviceproperties dp on dp.reportid = de.reportid";
@@ -134,8 +120,9 @@ class SqlRepository {
             $extensions[] = [
                 'name' => $row['name'],
                 'coverage' => round($row['coverage'] / $deviceCount * 100, 2),
-                'hasfeatures' => in_array($row['name'], $extensionFeatures) != false, 
-                'hasproperties' => in_array($row['name'], $extensionProperties) != false
+                'hasfeatures' => $row['hasfeatures'], 
+                'hasproperties' => $row['hasproperties'],
+                'date' => $row['date']
             ];
         }        
         return $extensions;

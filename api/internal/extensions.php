@@ -80,7 +80,7 @@ if ($platform !== 'all') {
 }
 
 // Fetch extensions with coverage based on unique device names from the database
-$sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(min(e.$dateColumn)) as date, count(distinct(r.displayname)) as coverage from extensions e 
+$sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn) as date, count(distinct(r.displayname)) as coverage from extensions e 
         join deviceextensions de on de.extensionid = e.id 
         join reports r on r.id = de.reportid
         $whereClause
