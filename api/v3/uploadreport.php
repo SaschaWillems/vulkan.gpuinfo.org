@@ -1019,7 +1019,7 @@
 	DB::$connection->commit();
 
 	$elapsed = (microtime(true) - $start) * 1000;
-	DB::log('api/internal/v3/uoloadreport.php', $sql, $elapsed);
+	DB::log('api/internal/v3/uploadreport.php', $sql, $elapsed);
 
 	DB::disconnect();
 		
