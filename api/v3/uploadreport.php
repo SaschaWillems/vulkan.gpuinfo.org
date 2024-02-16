@@ -54,6 +54,8 @@
 		exit();
 	}
 	
+	$start = microtime(true);
+
 	move_uploaded_file($_FILES['data']['tmp_name'], './'.$_FILES['data']['name']) or die(''); 
 
 	// Use a closure to exit the script that ensures an uploaded file is always deleted
@@ -887,8 +889,8 @@
 				}
 				// Mark extension to have additional features
 				try {
-					$stmnt = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
-					$stmnt->execute(['extension' => $feature['extension']]);
+					$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
+					$stmnt_mark->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at marking extension to have additional features)');
 				}
@@ -919,8 +921,8 @@
 				}
 				// Mark extension to have additional properties
 				try {
-					$stmnt = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
-					$stmnt->execute(['extension' => $feature['extension']]);
+					$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
+					$stmnt_mark->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at marking extension to have additional properties)');
 				}
@@ -1015,6 +1017,10 @@
 	}	
 	
 	DB::$connection->commit();
+
+	$elapsed = (microtime(true) - $start) * 1000;
+	DB::log('api/internal/v3/uploadreport.php', $sql, $elapsed);
+
 	DB::disconnect();
 		
 	echo "res_uploaded";	  	
@@ -1044,4 +1050,3 @@
 			// Failure to mail is not critical
 		}	
 	}
-?>

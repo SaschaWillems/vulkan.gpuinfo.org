@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -69,7 +69,10 @@ $data = $report->fetchQueueFamilies();
 				foreach ($queue_flag_bits as $flag_enum => $value) {
 					echo "<td class='format-table-support'>";
 					$icon = ($queue_family["flags"] & $flag_enum) ? 'check' : 'missing';
+					$value = ($queue_family["flags"] & $flag_enum) ? 1 : 0;
 					echo "<img src='/images/icons/$icon.png' width='16px'>";
+					// Hidden span with value so column can be sorted
+					echo "<span style='display:none;'>$value</span>";					
 					echo "</td>";
 				}
 				echo "</tr>";

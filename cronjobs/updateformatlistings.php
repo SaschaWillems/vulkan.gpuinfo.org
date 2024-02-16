@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -138,7 +138,6 @@ try {
                 $sql_count .= " " . $api_filter_loc;
                 $sql_count_params['apiversion'] = $apiversion;
             }
-            var_dump($sql_count_params);
             $deviceCount = DB::getCount($sql_count, $sql_count_params);
 
             ob_start();
@@ -210,8 +209,10 @@ try {
     exit();
 }
 
+$elapsed = (microtime(true) - $start) * 1000;
+
+DB::log('cronjobs/updateformatlistings.php', '', $elapsed);
 DB::disconnect();
 
-$end = microtime(true);
 echo "success".PHP_EOL;
-echo sprintf("Format listing generated: %d queries took %f seconds", $statement_count, $end-$start);
+echo sprintf("Format listing generated: %d queries took %f seconds", $statement_count, $elapsed);
