@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -24,7 +24,7 @@ define('VULKAN_CORE_1_0_TEXT', 'Vulkan Core 1.0');
 define('VULKAN_CORE_1_1_TEXT', 'Vulkan Core 1.1');
 define('VULKAN_CORE_1_2_TEXT', 'Vulkan Core 1.2');
 
-define('SESSION_NAME', 'gpuinfo');
+define('SESSION_NAME', 'vulkan');
 
 define('VULKAN_REGISTRY_URL', "https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/");
 
@@ -59,6 +59,7 @@ $device_format_flags_buffer = [
     0x0010 => "STORAGE_TEXEL_BUFFER",
     0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC",
     0x0040 => "VERTEX_BUFFER",
+    0x20000000 => "ACCELERATION_STRUCTURE_VERTEX_BUFFER",
 ];
 
 class SurfaceConstants {
