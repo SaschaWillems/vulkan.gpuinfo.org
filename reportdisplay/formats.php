@@ -47,10 +47,14 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 					foreach ($flags as $flag_enum => $flag_name) {
 						echo "<td class='format-table-support'>";
 						$icon = 'unsupported';
+						$value = null;
 						if ($supported) {
 							$icon = ($format[$column] & $flag_enum ? 'check' : 'missing');
+							$value = ($format[$column] & $flag_enum ? 1 : 0);
 						}
 						echo "<img src='images/icons/$icon.png' width=16px>";
+						// Hidden span with value so column can be sorted
+						echo "<span style='display:none;'>$value</span>";
 						echo "</td>";
 					}
 					echo "</tr>";

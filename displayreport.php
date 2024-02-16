@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -226,11 +226,7 @@ echo "</div>";
 						"sDom": 'flpt',
 						"deferRender": true,
 						"processing": true,
-						"ordering": false,
-						"columnDefs": [{
-							"orderable": true,
-							"targets": 0
-						}],
+						"ordering": true,
 						"fixedHeader": {
 							"header": true,
 							"headerOffset": 50
