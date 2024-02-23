@@ -124,7 +124,7 @@
                         $stmnt_insert = DB::$connection->prepare("INSERT INTO devicefeatures2 (reportid, name, extension, supported) VALUES (:reportid, :name, :extension, :supported)");
                         $stmnt_insert->execute($params);
 				        // Mark extension to have additional features
-		    			$stmnt_mark = DB::$connection->prepare("UPDATE extension set hasfeatures = 1 where hasproperties is null and name = :extension");
+		    			$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasproperties is null and name = :extension");
 			    		$stmnt_mark->execute(['extension' => $feature['extension']]);				
                     }
                 }
@@ -158,7 +158,7 @@
                         $stmnt_insert = DB::$connection->prepare("INSERT INTO deviceproperties2 (reportid, name, extension, value) VALUES (:reportid, :name, :extension, :value)");
                         $stmnt_insert->execute($params);
 				        // Mark extension to have additional properties
-		    			$stmnt_mark = DB::$connection->prepare("UPDATE extension set hasproperties = 1 where hasproperties is null and name = :extension");
+		    			$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
 			    		$stmnt_mark->execute(['extension' => $feature['extension']]);				
                     }
                 }
