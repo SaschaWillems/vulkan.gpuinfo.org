@@ -197,7 +197,7 @@ function update_extensions($json, $reportid, &$update_log)
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute(array(":reportid" => $reportid, ":extensionid" => $extensionid, ":specversion" => $ext_report['specVersion']));
             } catch (Exception $e) {
-                die('Error while trying to upload report (error at device extensions)');
+                throw $e;
             }
             $update_log[] = sprintf('Extension %s added', $ext_report['extensionName']);
         }
@@ -233,7 +233,7 @@ function update_profiles($json, $reportid, &$update_log)
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute([":reportid" => $reportid, ":profileid" => $profileid, ":specversion" => $profile_report['specVersion'], ":supported" => $profile_report['supported']]);
             } catch (Exception $e) {
-                die('Error while trying to upload report (error at device profiles)');
+                throw new Exception('Error while trying to upload report (error at device profiles)', 0, $e);
             }
             $update_log[] = sprintf('Profile %s added', $profile_report['profileName']);
         }
@@ -264,7 +264,7 @@ function update_surface_formats($json, $reportid, &$update_log)
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute(array(":reportid" => $reportid, ":format" => $format_report['format'], ":colorspace" => $format_report['colorSpace']));
             } catch (Exception $e) {
-                die('Error while trying to update report (error at surface present formats)');
+                throw new Exception('Error while trying to update report (error at surface present formats)', 0, $e);
             }
             $update_log[] = sprintf('Surface format %d with colorspace %d added', $format_report['format'], $format_report['colorSpace']);
         }
@@ -348,6 +348,10 @@ try {
     update_profiles($report, $reportid, $update_log);
     update_surface_formats($report, $reportid, $update_log);
     DB::disconnect();
+} catch (Exception $e) {
+    header('HTTP/1.1 500 Devices do not match');
+    mailError("Error while updating report: ".$e->getMessage(), $jsonFile);
+    exit();
 } finally {
     unlink($file_name);
 }
