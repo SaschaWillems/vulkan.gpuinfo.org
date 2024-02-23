@@ -350,7 +350,7 @@ try {
     DB::disconnect();
 } catch (Exception $e) {
     header('HTTP/1.1 500 Devices do not match');
-    mailError("Error while updating report: ".$e->getMessage(), $jsonFile);
+    mailError("Error while updating report: ".$e->getMessage(), $json_file_contents);
     exit();
 } finally {
     unlink($file_name);
