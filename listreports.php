@@ -34,6 +34,7 @@ $filters = [
 	'displayname',
 	'limit',
 	'property',
+	'coreproperty',
 	'core',
 	'corefeature',
 	'value',
@@ -120,13 +121,20 @@ $coreversion = $filter_list->getFilter('core');
 // Core feature
 $corefeature = $filter_list->getFilter('corefeature');
 if ($corefeature) {
-	addCaption("supporting <code>$corefeature</code> (Vulkan $coreversion)");
+	addCaption("supporting feature <code>$corefeature</code> (Vulkan $coreversion)");
 }
 // Core property
 $coreproperty = $filter_list->getFilter('property');
+if (!$coreproperty) {
+	$coreproperty = $filter_list->getFilter('coreproperty');
+}
 if ($coreproperty) {
-	$displayvalue = getPropertyDisplayValue($coreproperty, $filter_list->getFilter('value'));
-	addCaption("property <code>$coreproperty</code> = <code>$displayvalue</code> (Vulkan $coreversion)");
+	if ($filter_list->hasFilter('value')) {
+		$displayvalue = getPropertyDisplayValue($coreproperty, $filter_list->getFilter('value'));
+		addCaption("supporting property <code>$coreproperty</code> = <code>$displayvalue</code> (Vulkan $coreversion)");
+	} else {
+		addCaption("supporting property <code>$coreproperty</code> (Vulkan $coreversion)");
+	}
 }
 // Extension name used for features and properties
 $extensionname = $filter_list->getFilter('extensionname');
@@ -252,7 +260,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						'instancelayer': 		'<?= $filter_list->getFilter('instancelayer') ?>',
 						'platform':				'<?= $filter_list->getFilter('platform') ?>',
 						'corefeature': 			'<?= $filter_list->getFilter('corefeature') ?>',
-						'coreproperty': 		'<?= $filter_list->getFilter('property') ?>',
+						'coreproperty': 		'<?= $filter_list->getFilter('coreproperty') ?>',
 						'corepropertyvalue': 	'<?= $filter_list->getFilter('value') ?>',
 						'core':					'<?= $filter_list->getFilter('core') ?>',
 						'option': 				'<?= $filter_list->getFilter('option') ?>',

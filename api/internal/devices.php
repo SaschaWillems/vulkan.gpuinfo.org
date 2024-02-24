@@ -38,11 +38,22 @@ $params = array();
 $ostype = null;
 $core = '1.0';
 
+// Check if a value is present in the request filter and not empty
+function getRequestFilterValue($name) {
+    if (isset($_REQUEST['filter'][$name]) && ($_REQUEST['filter'][$name] != '')) {
+        return $_REQUEST['filter'][$name];    
+    }
+    return null;
+}
+
 if (isset($_REQUEST["platform"])) {
     $ostype = ostype($_REQUEST["platform"]);
 }
 if (isset($_REQUEST['filter']['core'])) {
     $core = $_REQUEST['filter']['core'];
+    if (empty($core)) {
+        $core = '1.0';
+    }
 }
 
 // Ordering
@@ -114,6 +125,7 @@ if (isset($_REQUEST["platform"])) {
     }
 }
 
+// Used to setup the where clause for filtering the device coverage SQL statement
 $fnAddWhereClause = function($term) use (&$whereClause) {
     if ($whereClause == '') {
         $whereClause = "where $term"; 
@@ -132,40 +144,36 @@ if (isset($_REQUEST['filter']['extension'])) {
             $whereClause = "where r.devicename not in (select r.devicename from reports r join deviceextensions de on de.reportid = r.id join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
         } else {
             $fnAddWhereClause("r.id in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)");
-            $report_filters=['extension' => $extension];
+            $report_filters = ['extension' => $extension];
         }
         $params['filter_extension'] = $extension;
     }
 }
 // Core features
-if (isset($_REQUEST['filter']['feature'])) {
-    $feature = $_REQUEST['filter']['feature'];
-    if ($feature != '') {
-        switch ($core) {
-            case '1.1':
-                $tablename = 'devicefeatures11';
-                break;
-            case '1.2':
-                $tablename = 'devicefeatures12';
-                break;
-            case '1.3':
-                $tablename = 'devicefeatures13';
-                break;
-            default:
-                $tablename = 'devicefeatures';
-        }
-        $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename df on df.reportid = r.id where df.$feature = 1)";
-    }
+$corefeature = getRequestFilterValue('feature');
+if ($corefeature) {
+    $tablename = SqlRepository::getDeviceFeaturesTable($core);
+    $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename df on df.reportid = r.id where df.$corefeature = 1)";
+    $report_filters = ['corefeature' => $corefeature, 'core' => $core];
 }
 // Extension features
-if (isset($_REQUEST['filter']['extensionfeature_name']) && isset($_REQUEST['filter']['extensionfeature_feature'])) {
-    $ext_name = $_REQUEST['filter']['extensionfeature_name'];
-    $ext_feature = $_REQUEST['filter']['extensionfeature_feature'];
-    if (($ext_name != '') && ($ext_feature != '')) {
-        $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join devicefeatures2 df2 on df2.reportid = r.id where df2.extension = :filter_ext_name and df2.name = :filter_ext_feature and df2.supported = 1)";
-        $params['filter_ext_name'] = $ext_name;
-        $params['filter_ext_feature'] = $ext_feature;
+$extensionfeature_name = getRequestFilterValue('extensionfeature_name');
+$extensionfeature_feature = getRequestFilterValue('extensionfeature_feature');
+if ($extensionfeature_name && $extensionfeature_feature) {
+    $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join devicefeatures2 df2 on df2.reportid = r.id where df2.extension = :filter_ext_name and df2.name = :filter_ext_feature and df2.supported = 1)";
+    $params['filter_ext_name'] = $extensionfeature_name;
+    $params['filter_ext_feature'] = $extensionfeature_feature;
+    $report_filters = ['extensionname' => $extensionfeature_name, 'extensionfeature' => $extensionfeature_feature];
+}
+// Core properties
+$coreproperty = getRequestFilterValue('coreproperty');
+if ($coreproperty) {
+    $tablename = SqlRepository::getDevicePropertiesTable($core);
+    if (stripos($coreproperty, 'subgroupProperties.') !== false) {
+        $coreproperty = "`$coreproperty`";
     }
+    $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename dp on dp.reportid = r.id where dp.$coreproperty = 1)";
+    $report_filters = ['coreproperty' => $coreproperty, 'core' => $core];
 }
 // Extension properties
 if (isset($_REQUEST['filter']['extensionproperty_name']) && isset($_REQUEST['filter']['extensionproperty_property'])) {
@@ -177,30 +185,6 @@ if (isset($_REQUEST['filter']['extensionproperty_name']) && isset($_REQUEST['fil
         $params['filter_ext_name'] = $ext_name;
         $params['filter_ext_property'] = $ext_property;
         $params['filter_ext_property_value'] = $ext_property_value;
-    }
-}
-// Core properties
-if (isset($_REQUEST['filter']['coreproperty'])) {
-    $property = $_REQUEST['filter']['coreproperty'];
-    if ($property != '') {
-        switch ($core) {
-            case '1.1':
-                $tablename = 'deviceproperties11';
-                break;
-            case '1.2':
-                $tablename = 'deviceproperties12';
-                break;
-            case '1.3':
-                $tablename = 'deviceproperties13';
-                $property = getShortFieldName($property);
-                break;
-            default:
-                $tablename = 'deviceproperties';
-        }
-        if (stripos($property, 'subgroupProperties.') !== false) {
-            $property = "`$property`";
-        }
-        $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename dp on dp.reportid = r.id where dp.$property = 1)";
     }
 }
 // Submitter

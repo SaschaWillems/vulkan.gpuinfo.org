@@ -229,23 +229,13 @@ if ($corefeature) {
 
 // Core property
 if (isset($_REQUEST['filter']['coreproperty']) && ($_REQUEST['filter']['coreproperty'] != '')) {
-    $params['filter_corepropertyvalue'] = $_REQUEST['filter']['corepropertyvalue'];
-    $tablename = 'deviceproperties';
-    if (isset($_REQUEST['filter']['core'])) {
-        $core = $_REQUEST['filter']['core'];
-        switch ($core) {
-            case '1.1':
-                $tablename = 'deviceproperties11';
-                break;
-            case '1.2':
-                $tablename = 'deviceproperties12';
-                break;
-            case '1.3':
-                $tablename = 'deviceproperties13';
-                break;
-        }
+    // Properties can be true/false and in such cases are treated as boolean values where checking for support needs to compare with 1
+    $prop_value = $_REQUEST['filter']['corepropertyvalue'];
+    if ($prop_value == "") {
+        $prop_value = "1";
     }
-    $whereClause = "where r.id in (select reportid from $tablename where cast(`" . $_REQUEST['filter']['coreproperty'] . "` as char) = :filter_corepropertyvalue)";
+    $tablename = SqlRepository::getDevicePropertiesTable($core);
+    appendWhereClause("r.id in (select reportid from $tablename where cast(`" . $_REQUEST['filter']['coreproperty'] . "` as char) = :filter_corepropertyvalue)", ['filter_corepropertyvalue' => $prop_value]);
 }
 
 // Portability subset
