@@ -41,6 +41,8 @@ $filters = [
 	'extension',
 	'extensionname',
 	'extensionfeature',
+	'extensionproperty',
+	'extensionpropertyvalue',
 	'instanceextension',
 	'instancelayer',
 	'option'
@@ -141,7 +143,13 @@ $extensionname = $filter_list->getFilter('extensionname');
 // Extension feature
 $extensionfeature = $filter_list->getFilter('extensionfeature');
 if ($extensionname && $extensionfeature) {
-	addCaption("supporting <code>$$extensionfeature</code> for <code>$extensionname</code> (Vulkan $coreversion)");
+	addCaption("supporting <code>$$extensionfeature</code> for <code>$extensionname</code>");
+}
+// Extension property
+$extensionproperty = $filter_list->getFilter('extensionproperty');
+$extensionproperty_value = $filter_list->getFilter('extensionpropertyvalue');
+if ($extensionname && $extensionproperty && $extensionproperty_value) {
+	addCaption("supporting <code>$extensionproperty</code> = <code>$extensionproperty_value</code> for <code>$extensionname</code>");
 }
 
 // Platform (os)

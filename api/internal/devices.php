@@ -176,16 +176,15 @@ if ($coreproperty) {
     $report_filters = ['coreproperty' => $coreproperty, 'core' => $core];
 }
 // Extension properties
-if (isset($_REQUEST['filter']['extensionproperty_name']) && isset($_REQUEST['filter']['extensionproperty_property'])) {
-    $ext_name = $_REQUEST['filter']['extensionproperty_name'];
-    $ext_property = $_REQUEST['filter']['extensionproperty_property'];
-    $ext_property_value = $_REQUEST['filter']['extensionproperty_value'];
-    if (($ext_name != '') && ($ext_property != '') && ($ext_property_value != '')) {
-        $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join deviceproperties2 dp2 on dp2.reportid = r.id where dp2.extension = :filter_ext_name and dp2.name = :filter_ext_property and dp2.value = :filter_ext_property_value)";
-        $params['filter_ext_name'] = $ext_name;
-        $params['filter_ext_property'] = $ext_property;
-        $params['filter_ext_property_value'] = $ext_property_value;
-    }
+$extensionproperty_name = getRequestFilterValue('extensionproperty_name');
+$extensionproperty_property = getRequestFilterValue('extensionproperty_property');
+$extensionproperty_property_value = getRequestFilterValue('extensionproperty_value');
+if ($extensionproperty_name && $extensionproperty_property && $extensionproperty_property_value) {
+    $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join deviceproperties2 dp2 on dp2.reportid = r.id where dp2.extension = :filter_ext_name and dp2.name = :filter_ext_property and dp2.value = :filter_ext_property_value)";
+    $params['filter_ext_name'] = $extensionproperty_name;
+    $params['filter_ext_property'] = $extensionproperty_property;
+    $params['filter_ext_property_value'] = $extensionproperty_property_value;
+    $report_filters = ['extensionname' => $extensionproperty_name, 'extensionproperty' => $extensionproperty_property, 'extensionpropertyvalue' => $extensionproperty_property_value];
 }
 // Submitter
 if (isset($_REQUEST['filter']['submitter'])) {

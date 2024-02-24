@@ -204,12 +204,10 @@ if ($instancelayer) {
     appendWhereClause("r.id " . ($negate ? "not" : "") . " in (select distinct(reportid) from deviceinstancelayers de join instancelayers inst on de.layerid = inst.id where inst.name = :filter_instancelayer)", ['filter_instancelayer' => $instancelayer]);
 }
 // Extension property    
-if (isset($_REQUEST['filter']['extensionproperty']) && ($_REQUEST['filter']['extensionpropertyvalue'] != '')) {
-    $extensionproperty = $_REQUEST['filter']['extensionproperty'];
-    $extensionpropertyvalue =  $_REQUEST['filter']['extensionpropertyvalue'];
-    $whereClause = "where r.id in (select reportid from deviceproperties2 where name = :filter_extensionpropertyname and cast(value as char) = :filter_extensionpropertyvalue)";
-    $params['filter_extensionpropertyname'] = $extensionproperty;
-    $params['filter_extensionpropertyvalue'] = $extensionpropertyvalue;
+$extensionproperty = getRequestFilterValue('extensionproperty');
+$extensionpropertyvalue = getRequestFilterValue('extensionpropertyvalue');
+if ($extensionproperty && $extensionpropertyvalue) {
+    appendWhereClause("r.id in (select reportid from deviceproperties2 where name = :filter_extensionpropertyname and cast(value as char) = :filter_extensionpropertyvalue)", ['filter_extensionpropertyname' => $extensionproperty, 'filter_extensionpropertyvalue' => $extensionpropertyvalue]);    
 }
 // Extension feature
 $extensionname = getRequestFilterValue('extensionname');
