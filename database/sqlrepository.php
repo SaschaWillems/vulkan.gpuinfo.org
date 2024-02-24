@@ -29,7 +29,7 @@ class SqlRepository {
     const VK_API_VERSION_1_2 = '1.2';
     const VK_API_VERSION_1_3 = '1.3';
 
-    private static function getDevicePropertiesTable($version) {
+    public static function getDevicePropertiesTable($version) {
         switch ($version) {
             case self::VK_API_VERSION_1_1:
                 return('deviceproperties11');
@@ -40,6 +40,18 @@ class SqlRepository {
         }
         return 'deviceproperties';
     }
+
+    public static function getDeviceFeaturesTable($version) {
+        switch ($version) {
+            case self::VK_API_VERSION_1_1:
+                return('devicefeatures11');
+            case self::VK_API_VERSION_1_2:
+                return('devicefeatures12');
+            case self::VK_API_VERSION_1_3:
+                return('devicefeatures13');
+        }
+        return 'devicefeatures';
+    }    
 
     public static function getMinApiVersion() {
         if (isset($_SESSION['minversion'])) {
