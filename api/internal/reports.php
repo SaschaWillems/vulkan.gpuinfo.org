@@ -191,12 +191,9 @@ if ($displayname) {
     appendWhereClause("r.displayname = :filter_displayname", ['filter_displayname' => $displayname]);
 }
 // Instance extension
-if (isset($_REQUEST['filter']['instanceextension'])) {
-    $instanceextension = $_REQUEST['filter']['instanceextension'];
-    if ($instanceextension != '') {
-        $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select distinct(reportid) from deviceinstanceextensions de join instanceextensions ext on de.extensionid = ext.id where ext.name = :filter_instanceextension)";
-        $params['filter_instanceextension'] = $instanceextension;
-    }
+$instanceextension = getRequestFilterValue('instanceextension');
+if ($instanceextension) {
+    appendWhereClause("r.id " . ($negate ? "not" : "") . " in (select distinct(reportid) from deviceinstanceextensions de join instanceextensions ext on de.extensionid = ext.id where ext.name = :filter_instanceextension)", ['filter_instanceextension' => $instanceextension]);
 }
 // Instance layer
 $instancelayer = getRequestFilterValue('instancelayer');
