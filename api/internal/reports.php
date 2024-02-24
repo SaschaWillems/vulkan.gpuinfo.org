@@ -166,19 +166,11 @@ if ($surfacepresentmode != '') {
     $params['filter_surfacepresentmode'] = $surfacepresentmode;
 }
 // Limit
-$limit = $_REQUEST['filter']['devicelimit'];
-$limitvalue =  $_REQUEST['filter']['devicelimitvalue'];
-if ($limit != '') {
-    $selectAddColumns = ",(select dl.`" . $limit . "` from devicelimits dl where dl.reportid = r.id) as devicelimit";
-    $whereClause = "where r.id in (select reportid from devicelimits where cast(`" . $limit . "` as char) = '" . $limitvalue . "')";
-    // Check if a limit requirement rule has to be applied (see Table 36. of the specs)
-    $sql = "select feature from limitrequirements where limitname = :limit";
-    $reqs = DB::$connection->prepare($sql);
-    $reqs->execute(array(":limit" => $limit));
-    if ($reqs->rowCount() > 0) {
-        $req = $reqs->fetch();
-        //$whereClause = "where r.id in (select distinct(reportid) from devicefeatures df where df.".$req["feature"]." = 1)";
-    }
+$limit = getRequestFilterValue('devicelimit');;
+if ($limit) {
+    $limitvalue =  getRequestFilterValue('devicelimitvalue');
+    $selectAddColumns = ",(select dl.`$limit` from devicelimits dl where dl.reportid = r.id) as devicelimit";
+    appendWhereClause("r.id in (select reportid from devicelimits where cast(`$limit` as char) = '$limitvalue')", []);
 }
 // Devicename (or displayname)
 $devicename = getRequestFilterValue('devicename');
