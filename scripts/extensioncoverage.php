@@ -46,10 +46,12 @@ while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
     ];
 }
 
-// Loop for total coverage and each platform (=ostype from 0 to 4)
+// Loop for total coverage and each platform
 
-// Device
+// Device extensions
 for ($i = 0; $i < 6; $i++) {
+
+    // Device extensions
 
     if ($i == 0) {
         echo "Fetching device extension total coverage".PHP_EOL;
@@ -82,10 +84,8 @@ for ($i = 0; $i < 6; $i++) {
         // Coverage numbers start at index 1
         $coverage_list[$row['name']][$i + 1] = $coverage;
     }
-}
 
-// Instance
-for ($i = 0; $i < 6; $i++) {
+    // Instance extensions
 
     if ($i == 0) {
         echo "Fetching instance extension total coverage".PHP_EOL;
@@ -117,7 +117,7 @@ for ($i = 0; $i < 6; $i++) {
         $coverage = round($row['coverage'] / $deviceCount * 100, 2);
         // Coverage numbers start at index 1
         $coverage_list[$row['name']][$i + 1] = $coverage;
-    }
+    }    
 }
 
 // Save to csv
