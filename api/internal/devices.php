@@ -137,7 +137,7 @@ if (isset($_REQUEST['filter']['extension'])) {
         $params['filter_extension'] = $extension;
     }
 }
-// Feature
+// Core features
 if (isset($_REQUEST['filter']['feature'])) {
     $feature = $_REQUEST['filter']['feature'];
     if ($feature != '') {
@@ -154,7 +154,7 @@ if (isset($_REQUEST['filter']['feature'])) {
             default:
                 $tablename = 'devicefeatures';
         }
-        $whereClause = "where r.devicename " . ($negate ? "not" : "") . " in (select r.devicename from reports r join $tablename df on df.reportid = r.id where df.$feature = 1)";
+        $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join $tablename df on df.reportid = r.id where df.$feature = 1)";
     }
 }
 // Extension features
