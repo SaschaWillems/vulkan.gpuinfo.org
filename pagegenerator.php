@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2020-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2020-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -35,7 +35,7 @@ class PageGenerator
 
 	public static function header($title = null)
 	{
-		$page_title = $title;
+		$page_title = strip_tags($title);
 		include './includes/header.php';
 	}
 
