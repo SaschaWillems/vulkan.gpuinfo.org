@@ -38,6 +38,7 @@ $filters = [
 	'corefeature',
 	'value',
 	'extension',
+	'extensionname',
 	'extensionfeature',
 	'instanceextension',
 	'instancelayer',
@@ -114,7 +115,7 @@ if ($filter_list->hasFilter('instanceextension')) {
 if ($filter_list->hasFilter('instancelayer')) {
 	addCaption("supporting instance layer <code>".$filter_list->getFilter('instancelayer')."</code>");
 }
-// Core versiomn used for features and properties
+// Core version used for features and properties
 $coreversion = $filter_list->getFilter('core');
 // Core feature
 $corefeature = $filter_list->getFilter('corefeature');
@@ -126,6 +127,13 @@ $coreproperty = $filter_list->getFilter('property');
 if ($coreproperty) {
 	$displayvalue = getPropertyDisplayValue($coreproperty, $filter_list->getFilter('value'));
 	addCaption("property <code>$coreproperty</code> = <code>$displayvalue</code> (Vulkan $coreversion)");
+}
+// Extension name used for features and properties
+$extensionname = $filter_list->getFilter('extensionname');
+// Extension feature
+$extensionfeature = $filter_list->getFilter('extensionfeature');
+if ($extensionname && $extensionfeature) {
+	addCaption("supporting <code>$$extensionfeature</code> for <code>$extensionname</code> (Vulkan $coreversion)");
 }
 
 // Platform (os)
@@ -238,6 +246,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						'devicename': 			'<?= $filter_list->getFilter('devicename') ?>',
 						'displayname': 			'<?= $filter_list->getFilter('displayname') ?>',
 						'extension': 			'<?= $filter_list->getFilter('extension') ?>',
+						'extensionname': 		'<?= $filter_list->getFilter('extensionname') ?>',
 						'extensionfeature': 	'<?= $filter_list->getFilter('extensionfeature') ?>',
 						'instanceextension': 	'<?= $filter_list->getFilter('instanceextension') ?>',
 						'instancelayer': 		'<?= $filter_list->getFilter('instancelayer') ?>',
