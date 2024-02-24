@@ -137,21 +137,45 @@ $submitter = getRequestFilterValue('submitter');
 if ($submitter) {
     appendWhereClause("r.submitter = :filter_submitter", ['filter_submitter' => $submitter]);
 }
-// Format support
-$linearformatfeature = $_REQUEST['filter']['linearformat'];
-$optimalformatfeature = $_REQUEST['filter']['optimalformat'];
-$bufferformatfeature = $_REQUEST['filter']['bufferformat'];
-if ($linearformatfeature != '') {
-    $whereClause = "where id " . ($negate ? "not" : "") . " in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_linearformatfeature and df.lineartilingfeatures > 0)";
-    $params['filter_linearformatfeature'] = $linearformatfeature;
-}
-if ($optimalformatfeature != '') {
-    $whereClause = "where id " . ($negate ? "not" : "") . " in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_optimalformatfeature and df.optimaltilingfeatures > 0)";
-    $params['filter_optimalformatfeature'] = $optimalformatfeature;
-}
-if ($bufferformatfeature != '') {
-    $whereClause = "where id " . ($negate ? "not" : "") . " in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformatfeature and df.bufferfeatures > 0)";
-    $params['filter_bufferformatfeature'] = $bufferformatfeature;
+// Format feature support
+$featureflagbit = getRequestFilterValue('featureflagbit');
+if ($featureflagbit) {
+    // For a specific feature flag
+    $lineartilingformat = getRequestFilterValue('lineartilingformat');
+    $optimaltilingformat = getRequestFilterValue('optimaltilingformat');
+    $bufferformat = getRequestFilterValue('bufferformat');
+    if ($lineartilingformat) {
+        $featureflagbit_value = array_search($featureflagbit , $device_format_flags_tiling);
+        assert($featureflagbit_value);
+        appendWhereClause("r.id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_lineartilingformat and df.lineartilingfeatures & $featureflagbit_value = $featureflagbit_value)", ['filter_lineartilingformat' => $lineartilingformat]);
+    }
+    if ($optimaltilingformat) {
+        $featureflagbit_value = array_search($featureflagbit , $device_format_flags_tiling);
+        assert($featureflagbit_value);
+        appendWhereClause("r.id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_optimaltilingformat and df.optimaltilingfeatures & $featureflagbit_value = $featureflagbit_value)", ['filter_optimaltilingformat' => $optimaltilingformat]);
+    }    
+    if ($bufferformat) {
+        $featureflagbit_value = array_search($featureflagbit , $device_format_flags_buffer);
+        assert($featureflagbit_value);
+        appendWhereClause("r.id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformat and df.bufferfeatures & $featureflagbit_value = $featureflagbit_value)", ['filter_bufferformat' => $bufferformat]);
+    }
+} else {
+    // Unspecific (just supported)
+    $linearformatfeature = getRequestFilterValue('linearformat');
+    $optimalformatfeature = getRequestFilterValue('optimalformat');
+    $bufferformatfeature = getRequestFilterValue('bufferformat');
+    if ($linearformatfeature) {
+        $whereClause = "where id " . ($negate ? "not" : "") . " in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_linearformatfeature and df.lineartilingfeatures > 0)";
+        $params['filter_linearformatfeature'] = $linearformatfeature;
+    }
+    if ($optimalformatfeature) {
+        $whereClause = "where id " . ($negate ? "not" : "") . " in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_optimalformatfeature and df.optimaltilingfeatures > 0)";
+        $params['filter_optimalformatfeature'] = $optimalformatfeature;
+    }
+    if ($bufferformatfeature) {
+        $whereClause = "where id " . ($negate ? "not" : "") . " in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformatfeature and df.bufferfeatures > 0)";
+        $params['filter_bufferformatfeature'] = $bufferformatfeature;
+    }
 }
 // Surface format	
 $surfaceformat = $_REQUEST['filter']['surfaceformat'];

@@ -195,14 +195,12 @@ if (isset($_REQUEST['filter']['submitter'])) {
     }
 }
 // Image format and buffer format flag support
-$linear_tiling_format = $_REQUEST['filter']['lineartilingformat'];
-$optimal_tiling_format = $_REQUEST['filter']['optimaltilingformat'];
-$buffer_format = $_REQUEST['filter']['bufferformat'];
-if ($linear_tiling_format != '' || $optimal_tiling_format != '' || $buffer_format != '') {
-    $format_column = null;
-
+$linear_tiling_format = getRequestFilterValue('lineartilingformat');
+$optimal_tiling_format = getRequestFilterValue('optimaltilingformat');
+$buffer_format = getRequestFilterValue('bufferformat');
+if ($linear_tiling_format || $optimal_tiling_format || $buffer_format) {
     $featureflag = null;
-    $featureflagbit = $_REQUEST['filter']['featureflagbit'];
+    $featureflagbit = getRequestFilterValue('featureflagbit');
     if (in_array($featureflagbit, $device_format_flags_tiling)) {
         $featureflag = array_search($featureflagbit , $device_format_flags_tiling);
     }
@@ -211,28 +209,33 @@ if ($linear_tiling_format != '' || $optimal_tiling_format != '' || $buffer_forma
     }
     assert($featureflag != null);
 
+    $format_column = null;
     if ($linear_tiling_format != '') {
         $format_column = 'lineartilingfeatures';
         $params['filter_format_name'] = $linear_tiling_format;
+        $report_filters['lineartilingformat'] = $linear_tiling_format;
     }
     if ($optimal_tiling_format != '') {
         $format_column = 'optimaltilingfeatures';
         $params['filter_format_name'] = $optimal_tiling_format;
+        $report_filters['optimaltilingformat'] = $optimal_tiling_format;
     }
     if ($buffer_format != '') {
         $format_column = 'bufferfeatures';
         $params['filter_format_name'] = $buffer_format;
+        $report_filters['bufferformat'] = $buffer_format;
     }
+    $report_filters['featureflagbit'] = $featureflagbit;
 
     $whereClause = "
-        where r.displayname " . ($negate ? "not" : "") . " in
+        where r.id " . ($negate ? "not" : "") . " in
         (
-            select r.displayname
+            select r.id
             from reports r
             join deviceformats df on df.reportid = r.id
             join VkFormat vf on vf.value = df.formatid where 
             vf.name = :filter_format_name and df.$format_column & $featureflag = $featureflag
-        )";    
+        )";
 }
 // Memory type support
 $memorytype = $_REQUEST['filter']['memorytype'];

@@ -46,6 +46,10 @@ $filters = [
 	'instanceextension',
 	'instancelayer',
 	'profile',
+	'lineartilingformat',
+	'optimaltilingformat',
+	'bufferformat',
+	'featureflagbit',	
 	'option'
 ];
 $filter_list = new FilterList($filters);
@@ -155,6 +159,20 @@ if ($extensionname && $extensionproperty && $extensionproperty_value) {
 // Profile
 if ($filter_list->hasFilter('profile')) {
 	addCaption("supporting profile <code>".$filter_list->getFilter('profile')."</code>");
+}
+// Format features
+$featureflagbit = $filter_list->getFilter('featureflagbit');
+if ($featureflagbit) {
+	$lineartilingformat= $filter_list->getFilter('lineartilingformat');
+	$optimaltilingformat = $filter_list->getFilter('optimaltilingformat');
+	$bufferformat = $filter_list->getFilter('bufferformat');
+	if ($lineartilingformat) {
+		addCaption("supporting feature flag bit <code>$featureflagbit</code> for linear tiling format <code>$lineartilingformat</code>");
+	} elseif ($optimaltilingformat) {
+		addCaption("supporting feature flag bit <code>$featureflagbit</code> for optimal tiling format <code>$optimaltilingformat</code>");	
+	} elseif ($bufferformat) {
+		addCaption("supporting feature flag bit <code>$featureflagbit</code> for buffer format <code>$bufferformat</code>");
+	}
 }
 
 // Platform (os)
@@ -279,6 +297,10 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						'corepropertyvalue': 		'<?= $filter_list->getFilter('value') ?>',
 						'core':						'<?= $filter_list->getFilter('core') ?>',
 						'profile': 					'<?= $filter_list->getFilter('profile') ?>',
+						'lineartilingformat':		'<?= $filter_list->getFilter('lineartilingformat') ?>',
+						'optimaltilingformat':		'<?= $filter_list->getFilter('optimaltilingformat') ?>',
+						'bufferformat':				'<?= $filter_list->getFilter('bufferformat') ?>',
+						'featureflagbit':			'<?= $filter_list->getFilter('featureflagbit') ?>',
 						'option': 					'<?= $filter_list->getFilter('option') ?>',
 					}
 				},
