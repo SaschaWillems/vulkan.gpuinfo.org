@@ -69,37 +69,6 @@ $subcaption = null;
 
 // Invert
 $inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
-// Extension support
-if ($filter_list->hasFilter('extension')) {
-	$ext = $filter_list->getFilter('extension');
-	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting <b>$ext</b>" : "Listing first known driver version support for <code>$ext</code>";
-	$pageTitle = $ext;
-	// Check if extension has features2 or properties2
-	DB::connect();
-	try {
-		$stmnt = DB::$connection->prepare("SELECT
-				(SELECT COUNT(DISTINCT df2.name) FROM devicefeatures2 df2 WHERE (df2.extension = ext.name)) AS features2,
-				(SELECT COUNT(DISTINCT dp2.name) FROM deviceproperties2 dp2 WHERE (dp2.extension = ext.name)) AS properties2
-				FROM extensions ext where ext.name = :extension");
-		$stmnt->execute(['extension' => $ext]);
-		$res = $stmnt->fetch(PDO::FETCH_ASSOC);
-		if ($res) {
-			if ($res['features2'] > 0 || $res['properties2'] > 0) {
-				$links = [];
-				if ($res['features2'] > 0) {
-					$links[] = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'>features</a>";
-				}
-				if ($res['properties2'] > 0) {
-					$links[] = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'>properties</a>";
-				}
-				$linkInfo = implode(' and ', $links);
-				$subcaption = "<div style='margin-top: 10px;'>This extension has additional $linkInfo</div>";
-			}
-		}
-	} catch (Throwable $e) {
-	}
-	DB::disconnect();
-}
 // Feature support
 if ($filter_list->hasFilter('feature')) {
 	$feature = $filter_list->getFilter('feature');
@@ -239,6 +208,50 @@ if ($filter_list->hasFilter('platform')) {
 	if ($pageTitle) {
 		$pageTitle .= " on " . PageGenerator::platformInfo($platform);
 	}
+}
+// Extension support
+if ($filter_list->hasFilter('extension')) {
+	$ext = $filter_list->getFilter('extension');
+	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting <b>$ext</b>" : "Listing first known driver version support for <code>$ext</code>";
+	$pageTitle = $ext;
+	// Visualize additional extension data that may be of interest in this view
+	DB::connect();
+	try {
+		// Display links to additional device features and or properties, so users can easily access them
+		$stmnt = DB::$connection->prepare("SELECT
+				(SELECT COUNT(DISTINCT df2.name) FROM devicefeatures2 df2 WHERE (df2.extension = ext.name)) AS features2,
+				(SELECT COUNT(DISTINCT dp2.name) FROM deviceproperties2 dp2 WHERE (dp2.extension = ext.name)) AS properties2				
+				FROM extensions ext where ext.name = :extension");
+		$stmnt->execute(['extension' => $ext]);
+		$res = $stmnt->fetch(PDO::FETCH_ASSOC);
+		if ($res) {
+			if ($res['features2'] > 0 || $res['properties2'] > 0) {
+				$links = [];
+				if ($res['features2'] > 0) {
+					$links[] = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'>features</a>";
+				}
+				if ($res['properties2'] > 0) {
+					$links[] = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'>properties</a>";
+				}
+				$linkInfo = implode(' and ', $links);
+				$subcaption = "<div style='margin-top: 10px;' class='subcaption-level-1'>This extension has additional $linkInfo</div>";
+			}
+		}
+		// Display the date at which this extension has bee first submitted to the database
+		$dateColumn = 'date';
+		if ($platform !== 'all') {
+			$dateColumn = 'date'.strtolower($platform);
+		}		
+		$stmnt = DB::$connection->prepare("SELECT date(min($dateColumn)) as date FROM extensions ext where ext.name = :extension");
+		$stmnt->execute(['extension' => $ext]);
+		$res = $stmnt->fetch(PDO::FETCH_ASSOC);
+		if ($res['date']) {
+			$subcaption .= "<div style='margin-top: 10px;' class='subcaption-level-2'>Extension was first submitted at ".$res['date']."</div>";
+		}
+	} catch (Throwable $e) {
+		echo $e->getMessage();
+	}
+	DB::disconnect();
 }
 PageGenerator::header($pageTitle);
 

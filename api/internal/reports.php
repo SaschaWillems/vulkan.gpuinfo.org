@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -93,12 +93,21 @@ if (isset($_REQUEST['filter']['option'])) {
         $negate = true;
     }
 }
+
+$fnAddWhereClause = function($term) use (&$whereClause) {
+    if ($whereClause == '') {
+        $whereClause = "where $term"; 
+    } else {
+        $whereClause .= " and $term";
+    }
+};
+
 // Filters
 // Extension
 if (isset($_REQUEST['filter']['extension'])) {
     $extension = $_REQUEST['filter']['extension'];
     if ($extension != '') {
-        $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
+        $fnAddWhereClause("r.id " . ($negate ? "not" : "") . " in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)");
         $params['filter_extension'] = $extension;
     }
 }
@@ -164,7 +173,7 @@ if ($limit != '') {
 if (isset($_REQUEST['filter']['devicename'])) {
     $devicename = $_REQUEST['filter']['devicename'];
     if ($devicename != '') {
-        $whereClause = "where (r.devicename = :filter_devicename or r.displayname = :filter_devicename)";
+        $fnAddWhereClause("(r.devicename = :filter_devicename or r.displayname = :filter_devicename)");
         $params['filter_devicename'] = $devicename;
     }
 }
@@ -274,8 +283,8 @@ $sql = sprintf(
         r.version
         %s
         from reports r
-        left join deviceproperties p on (p.reportid = r.id)
-        left join vendorids v on v.id = p.vendorid     
+        left join deviceproperties p on p.reportid = r.id
+        left join vendorids v on v.id = p.vendorid
         %s
         %s
         %s",

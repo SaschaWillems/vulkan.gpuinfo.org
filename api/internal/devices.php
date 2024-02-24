@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -101,6 +101,9 @@ if (isset($_REQUEST['filter']['option'])) {
     }
 }
 
+// Store filters to narrow down the list of reports 
+$report_filters = [];
+
 // Operating system
 // @todo: use in all places
 $os_and_clause = null;
@@ -111,15 +114,25 @@ if (isset($_REQUEST["platform"])) {
     }
 }
 
+$fnAddWhereClause = function($term) use (&$whereClause) {
+    if ($whereClause == '') {
+        $whereClause = "where $term"; 
+    } else {
+        $whereClause .= "and $term";
+    }
+};
+
 // Filters
 // Extension
+$extension = null;
 if (isset($_REQUEST['filter']['extension'])) {
     $extension = $_REQUEST['filter']['extension'];
     if ($extension != '') {
         if ($negate) {
             $whereClause = "where r.devicename not in (select r.devicename from reports r join deviceextensions de on de.reportid = r.id join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
         } else {
-            $whereClause = "where r.id in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)";
+            $fnAddWhereClause("r.id in (select distinct(reportid) from deviceextensions de join extensions ext on de.extensionid = ext.id where ext.name = :filter_extension)");
+            $report_filters=['extension' => $extension];
         }
         $params['filter_extension'] = $extension;
     }
@@ -356,7 +369,7 @@ if ($limit != '') {
 if (isset($_REQUEST['filter']['devicename'])) {
     $devicename = $_REQUEST['filter']['devicename'];
     if ($devicename != '') {
-        $whereClause = "where r.devicename = :filter_devicename";
+        $fnAddWhereClause("r.devicename = :filter_devicename");
         $params['filter_devicename'] = $devicename;
     }
 }
@@ -471,6 +484,10 @@ $devices->execute($params);
 if ($devices->rowCount() > 0) {
     foreach ($devices as $device) {
         $url = 'listreports.php?devicename=' . urlencode($device["device"]);
+        // Append additional filter criteria (e.g. when coming from the extension listing)
+        foreach ($report_filters as $filter_key => $filter_value) {
+            $url .= '&'.$filter_key.'='.urlencode($filter_value);
+        }
         if ($platform !== 'all') {
             $url .= '&platform=' . $platform;
         }

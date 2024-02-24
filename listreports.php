@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -26,6 +26,7 @@ include './includes/filterlist.class.php';
 include './database/database.class.php';
 include './database/sqlrepository.php';
 
+// Read filters to apply
 $filters = [
 	'platform',
 	'submitter',
@@ -35,6 +36,7 @@ $filters = [
 	'property',
 	'core',
 	'value',
+	'extension',
 	'instanceextension',
 	'instancelayer',
 	'option'
@@ -45,6 +47,7 @@ $caption = "Listing all reports";
 $pageTitle = null;
 $inverted = false;
 $platform = "all";
+$order_column = 0;
 
 // Invert
 $inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
@@ -74,13 +77,32 @@ if ($limit != '') {
 	}
 	DB::disconnect();
 }
+
+// @todo: comment
+$fnAddCaption = function($text) use (&$caption, &$pageTitle) {
+	if ($caption == "Listing all reports") {
+		// First text overwrites default caption
+		$caption = "Reports for $text";
+		$pageTitle = strip_tags($text);
+	} else {
+		// Consecutive texts are appended
+		$caption .= " $text";
+	}	
+};
+
 // Device name
 if ($filter_list->hasFilter('devicename')) {
-	$caption = "Reports for <code>".$filter_list->getFilter('devicename')."</code>";
+	$fnAddCaption("<code>".$filter_list->getFilter('devicename')."</code>");
 }
 // Display name (Android devices)
 if ($filter_list->hasFilter('displayname')) {
 	$caption = "Reports for <code>".$filter_list->getFilter('displayname')."</code>";
+}
+// Device extension
+if ($filter_list->hasFilter('extension')) {
+	$extension = $filter_list->getFilter('extension');
+	$fnAddCaption("supporting device extension <code>$extension</code>");
+	$order_column = 2;	
 }
 // Instance extension
 if ($filter_list->hasFilter('instanceextension')) {
@@ -169,8 +191,8 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 				</tr>
 			</thead>
 		</table>
-		<div id="errordiv" style="color:#D8000C;"></div>
 	</div>
+	<div id="errordiv" style="color:#D8000C;"></div>
 </center>
 
 <script src="js/reportcompare.js"></script>
@@ -195,7 +217,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 			"dom": 'lrtip',
 			"pageLength": 25,
 			"order": [
-				[0, 'desc']
+				[<?= $order_column ?>, 'desc']
 			],
 			"columnDefs": [{
 				"searchable": false,
@@ -212,6 +234,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						'devicelimitvalue' : 	'<?= $filter_list->getFilter('value') ?>',
 						'devicename': 			'<?= $filter_list->getFilter('devicename') ?>',
 						'displayname': 			'<?= $filter_list->getFilter('displayname') ?>',
+						'extension': 			'<?= $filter_list->getFilter('extension') ?>',
 						'instanceextension': 	'<?= $filter_list->getFilter('instanceextension') ?>',
 						'instancelayer': 		'<?= $filter_list->getFilter('instancelayer') ?>',
 						'platform':				'<?= $filter_list->getFilter('platform') ?>',
