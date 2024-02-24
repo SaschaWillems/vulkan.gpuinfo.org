@@ -224,7 +224,6 @@ if ($corefeature) {
     $tablename = SqlRepository::getDeviceFeaturesTable($core);
     appendWhereClause("r.id in (select reportid from $tablename df where df.$corefeature = ".($negate ? "0" : "1").")", []);
 }
-
 // Core property
 if (isset($_REQUEST['filter']['coreproperty']) && ($_REQUEST['filter']['coreproperty'] != '')) {
     // Properties can be true/false and in such cases are treated as boolean values where checking for support needs to compare with 1
@@ -234,6 +233,11 @@ if (isset($_REQUEST['filter']['coreproperty']) && ($_REQUEST['filter']['coreprop
     }
     $tablename = SqlRepository::getDevicePropertiesTable($core);
     appendWhereClause("r.id in (select reportid from $tablename where cast(`" . $_REQUEST['filter']['coreproperty'] . "` as char) = :filter_corepropertyvalue)", ['filter_corepropertyvalue' => $prop_value]);
+}
+// Profile
+$profile = getRequestFilterValue('profile');
+if ($profile) {
+    appendWhereClause("r.id in (select reportid from deviceprofiles dp join profiles on dp.profileid = profiles.id where profiles.name = :filter_profile and supported = 1)", ['filter_profile' => $profile]);
 }
 
 // Portability subset

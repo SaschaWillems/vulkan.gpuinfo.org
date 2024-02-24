@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -180,7 +180,7 @@ if ($filter_list->hasFilter('surfacecompositealphamode')) {
 // Profile 
 if ($filter_list->hasFilter('profile')) {
 	$profile_name = $filter_list->getFilter('profile');
-	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting profile $profile_name" : "Listing first known driver version support for profile $profile_name";
+	$caption = $inverted ? "Listing devices <span style='color:red;'>not</span> supporting profile <code>$profile_name</code>" : "Listing first known driver version support for profile <code>$profile_name</code>";
 	$pageTitle = $profile_name;
 }
 // Queue family flags

@@ -45,6 +45,7 @@ $filters = [
 	'extensionpropertyvalue',
 	'instanceextension',
 	'instancelayer',
+	'profile',
 	'option'
 ];
 $filter_list = new FilterList($filters);
@@ -150,6 +151,10 @@ $extensionproperty = $filter_list->getFilter('extensionproperty');
 $extensionproperty_value = $filter_list->getFilter('extensionpropertyvalue');
 if ($extensionname && $extensionproperty && $extensionproperty_value) {
 	addCaption("supporting <code>$extensionproperty</code> = <code>$extensionproperty_value</code> for <code>$extensionname</code>");
+}
+// Profile
+if ($filter_list->hasFilter('profile')) {
+	addCaption("supporting profile <code>".$filter_list->getFilter('profile')."</code>");
 }
 
 // Platform (os)
@@ -273,6 +278,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						'coreproperty': 			'<?= $filter_list->getFilter('coreproperty') ?>',
 						'corepropertyvalue': 		'<?= $filter_list->getFilter('value') ?>',
 						'core':						'<?= $filter_list->getFilter('core') ?>',
+						'profile': 					'<?= $filter_list->getFilter('profile') ?>',
 						'option': 					'<?= $filter_list->getFilter('option') ?>',
 					}
 				},
