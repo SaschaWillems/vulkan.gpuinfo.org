@@ -35,8 +35,10 @@ $filters = [
 	'limit',
 	'property',
 	'core',
+	'corefeature',
 	'value',
 	'extension',
+	'extensionfeature',
 	'instanceextension',
 	'instancelayer',
 	'option'
@@ -48,6 +50,19 @@ $pageTitle = null;
 $inverted = false;
 $platform = "all";
 $order_column = 0;
+
+function addCaption($text) {
+	global $caption;
+	global $pageTitle;
+	if ($caption == "Listing all reports") {
+		// First text overwrites default caption
+		$caption = "Reports for $text";
+		$pageTitle = strip_tags($text);
+	} else {
+		// Consecutive texts are appended
+		$caption .= " $text";
+	}	
+}
 
 // Invert
 $inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
@@ -78,63 +93,51 @@ if ($limit != '') {
 	DB::disconnect();
 }
 
-// @todo: comment
-$fnAddCaption = function($text) use (&$caption, &$pageTitle) {
-	if ($caption == "Listing all reports") {
-		// First text overwrites default caption
-		$caption = "Reports for $text";
-		$pageTitle = strip_tags($text);
-	} else {
-		// Consecutive texts are appended
-		$caption .= " $text";
-	}	
-};
-
 // Device name
 if ($filter_list->hasFilter('devicename')) {
-	$fnAddCaption("<code>".$filter_list->getFilter('devicename')."</code>");
+	addCaption("<code>".$filter_list->getFilter('devicename')."</code>");
 }
 // Display name (Android devices)
 if ($filter_list->hasFilter('displayname')) {
-	$caption = "Reports for <code>".$filter_list->getFilter('displayname')."</code>";
+	addCaption("<code>".$filter_list->getFilter('displayname')."</code>");
 }
 // Device extension
 if ($filter_list->hasFilter('extension')) {
-	$extension = $filter_list->getFilter('extension');
-	$fnAddCaption("supporting device extension <code>$extension</code>");
+	addCaption("supporting device extension <code>".$filter_list->getFilter('extension')."</code>");
 	$order_column = 2;	
 }
 // Instance extension
 if ($filter_list->hasFilter('instanceextension')) {
-	$instanceextension = $filter_list->getFilter('instanceextension');
-	$caption = "Reports " . ($inverted ? "<b>not</b>" : "") . " supporting instance extension <code>$instanceextension</code>";
-	$caption .= " (<a href='listreports.php?instanceextension=" . $instanceextension . ($inverted ? "" : "&option=not") . "'>toggle</a>)";
-	$pageTitle = $instanceextension;
+	addCaption("supporting instance extension <code>".$filter_list->getFilter('instanceextension')."</code>");
 }
 // Instance layer
 if ($filter_list->hasFilter('instancelayer')) {
-	$instancelayer = $filter_list->getFilter('instancelayer');
-	$caption = "Reports " . ($inverted ? "<b>not</b>" : "") . " supporting instance layer <code>$instancelayer</code>";
-	$caption .= " (<a href='listreports.php?instancelayer=" . $instancelayer . ($inverted ? "" : "&option=not") . "'>toggle</a>)";
-	$pageTitle = $instancelayer;
+	addCaption("supporting instance layer <code>".$filter_list->getFilter('instancelayer')."</code>");
+}
+// Core versiomn used for features and properties
+$coreversion = $filter_list->getFilter('core');
+// Core feature
+$corefeature = $filter_list->getFilter('corefeature');
+if ($corefeature) {
+	addCaption("supporting <code>$corefeature</code> (Vulkan $coreversion)");
 }
 // Core property
 $coreproperty = $filter_list->getFilter('property');
-$corepropertyvalue = null;
-$coreversion = $filter_list->getFilter('core');
-if (isset($coreproperty) && ($coreproperty != '')) {
-	$corepropertyvalue = $filter_list->getFilter('value');
-	$displayvalue = getPropertyDisplayValue($coreproperty, $corepropertyvalue);
-	$caption = "Reports with <code>$coreproperty</code> = $displayvalue";
+if ($coreproperty) {
+	$displayvalue = getPropertyDisplayValue($coreproperty, $filter_list->getFilter('value'));
+	addCaption("property <code>$coreproperty</code> = <code>$displayvalue</code> (Vulkan $coreversion)");
 }
+
 // Platform (os)
 if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !== 'all') {
 	$platform = $filter_list->getFilter('platform');
 	$caption = "Listing " . ($caption ? lcfirst($caption) : "reports") . " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . PageGenerator::platformDisplayName($platform);
 }
+
+// @todo: does not work, called before session start
 $minApiVersion = SqlRepository::getMinApiVersion();
 if ($minApiVersion) {
-	$caption .= " supporting Vulkan $minApiVersion (and up)";
+	addCaption("supporting Vulkan $minApiVersion (and up)");
 }
 
 PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");
@@ -235,9 +238,11 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						'devicename': 			'<?= $filter_list->getFilter('devicename') ?>',
 						'displayname': 			'<?= $filter_list->getFilter('displayname') ?>',
 						'extension': 			'<?= $filter_list->getFilter('extension') ?>',
+						'extensionfeature': 	'<?= $filter_list->getFilter('extensionfeature') ?>',
 						'instanceextension': 	'<?= $filter_list->getFilter('instanceextension') ?>',
 						'instancelayer': 		'<?= $filter_list->getFilter('instancelayer') ?>',
 						'platform':				'<?= $filter_list->getFilter('platform') ?>',
+						'corefeature': 			'<?= $filter_list->getFilter('corefeature') ?>',
 						'coreproperty': 		'<?= $filter_list->getFilter('property') ?>',
 						'corepropertyvalue': 	'<?= $filter_list->getFilter('value') ?>',
 						'core':					'<?= $filter_list->getFilter('core') ?>',
