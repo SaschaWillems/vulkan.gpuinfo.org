@@ -179,7 +179,7 @@ if ($coreproperty) {
 $extensionproperty_name = getRequestFilterValue('extensionproperty_name');
 $extensionproperty_property = getRequestFilterValue('extensionproperty_property');
 $extensionproperty_property_value = getRequestFilterValue('extensionproperty_value');
-if ($extensionproperty_name && $extensionproperty_property && $extensionproperty_property_value) {
+if ($extensionproperty_name && $extensionproperty_property && ($extensionproperty_property_value !== null)) {
     $whereClause = "where r.id " . ($negate ? "not" : "") . " in (select r.id from reports r join deviceproperties2 dp2 on dp2.reportid = r.id where dp2.extension = :filter_ext_name and dp2.name = :filter_ext_property and dp2.value = :filter_ext_property_value)";
     $params['filter_ext_name'] = $extensionproperty_name;
     $params['filter_ext_property'] = $extensionproperty_property;

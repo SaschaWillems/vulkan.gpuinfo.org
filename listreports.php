@@ -293,7 +293,7 @@ PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle")
 						'instancelayer': 			'<?= $filter_list->getFilter('instancelayer') ?>',
 						'platform':					'<?= $filter_list->getFilter('platform') ?>',
 						'corefeature': 				'<?= $filter_list->getFilter('corefeature') ?>',
-						'coreproperty': 			'<?= $filter_list->getFilter('coreproperty') ?>',
+						'coreproperty': 			'<?= $coreproperty ?>',
 						'corepropertyvalue': 		'<?= $filter_list->getFilter('value') ?>',
 						'core':						'<?= $filter_list->getFilter('core') ?>',
 						'profile': 					'<?= $filter_list->getFilter('profile') ?>',
