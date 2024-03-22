@@ -3,7 +3,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -77,6 +77,21 @@ PageGenerator::header('About');
 		</div>
 
 		<div class="entry">
+			<p class="question">Q: Is this an official listing of all devices that support Vulkan?</p>
+			<p class="answer">A: No. It's a community driven database, and devices will only show up if someone uploaded at leart one report. 
+				So for devices not (yet) uploaded you won't find any information. Same for devices where the client application is not available.<br>
+				The official list of conformant Vulkan products can be <a href="https://www.khronos.org/conformance/adopters/conformant-products" target="_blank">found here.</a>				
+			</p>
+		</div>		
+
+		<div class="entry">
+			<p class="question">Q: Are all reports spec conformant?</p>
+			<p class="answer">A: No. It's a community driven database open for submissions by anyone, even people writing their own drivers.
+				As such you will find reports that aren't spec conformant and e.g. won't support
+			</p>
+		</div>
+
+		<div class="entry">
 			<p class="question">Q: Do the numbers in the database represent market share?</p>
 			<p class="answer">A: No, the numbers do <b>in no way represent GPU market shares</b>. The database always
 				only stores one report per gpu/os/driver combination. </p>
@@ -85,6 +100,11 @@ PageGenerator::header('About');
 		<div class="entry">
 			<p class="question">Q: Is the database available for download?</p>
 			<p class="answer">A: No, there is no database download available. I provide access to it through apis, and if you're interested in fetching data from it, please contact me.</p>
+		</div>
+
+		<div class="entry">
+			<p class="question">Q: I found a report that's wrong or has accidentally been uploaded, what can I do about it?</p>
+			<p class="answer">A: Please send a link to that report to <code>webmaster AT saschawillems DOT de</code> (replace the AT and DOT).</p>
 		</div>
 
 		<div class="entry">
