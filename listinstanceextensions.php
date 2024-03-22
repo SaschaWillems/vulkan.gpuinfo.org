@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -45,12 +45,13 @@ PageGenerator::header("Instance extensions");
 			<thead>
 				<tr>
 					<th></th>
-					<th colspan=2 style="text-align: center;">Device coverage</th>
+					<th colspan=2 class="centered">Device coverage</th>
 				</tr>			
 				<tr>			
 					<th>Extensions</th>
-					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>				
+					<th class="centered"><img src='images/icons/check.png' width=16px></th>
+					<th class="centered"><img src='images/icons/missing.png' width=16px></th>
+					<th class="centered"><abbr title="Date at when the extension was first submitted to the database for the current platform selection">First seen</abbr></th>
 				</tr>
 			</thead>
 			<tbody>		
@@ -67,6 +68,7 @@ PageGenerator::header("Instance extensions");
 							echo "<td class='value'>$extensionname</td>";
 							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
 							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+							echo "<td class='value'>".$instanceextension['date']."</td>";
 							echo "</tr>";
 						}
 

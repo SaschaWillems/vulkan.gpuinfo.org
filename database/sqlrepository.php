@@ -708,10 +708,17 @@ class SqlRepository {
 
     /** Global instance extension listing */
     public static function listInstanceExtensions() {
+        // Dates are stored per platform, so we need to fetch from the appropriate column
+        $dateColumn = 'date';
+        $ostype = self::getOSType();
+        if ($ostype !== null) {
+            $dateColumn = 'date'.strtolower(platformname($ostype));
+        }        
         $deviceCount = SqlRepository::deviceCount();
         $sql = "SELECT 
             distinct(name),
-            count(distinct(r.displayname)) as coverage
+            count(distinct(r.displayname)) as coverage,
+            date(ie.$dateColumn) as date
             from deviceinstanceextensions di            
             join instanceextensions ie on di.extensionid = ie.id
             right join reports r on r.id = di.reportid";
@@ -726,7 +733,8 @@ class SqlRepository {
             }
             $instanceextensions[] = [
                 'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2),
+                'date' => $row['date']
             ];
         }
         return $instanceextensions;
