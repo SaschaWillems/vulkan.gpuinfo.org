@@ -31,11 +31,8 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 			<h2>Downloads</h2>
 		</div>
 		<div>
-			The database is populated using the Vulkan Hardware Capability Viewer application, available for multiple platforms. It reads and displays Vulkan related information for a selected implementation, and that data can then be uploaded to the database.
-			<!-- <div>
-				<a href="images/hardware_capability_viewer_3.0.png"><img src="images/hardware_capability_viewer_3.0.png" width="512px"></a>
-			</div> -->
-			The Vulkan Hardware Capability Viewer is open source, you can always build the most recent version yourself using the sources from <a href="https://github.com/SaschaWillems/VulkanCapsViewer">the repository</a>.<br>
+			The database is populated using the Vulkan Hardware Capability Viewer application, available for multiple platforms. It reads and displays Vulkan related information for a selected implementation, and that data can then be uploaded to the database.<br/>			
+			The Vulkan Hardware Capability Viewer is open source and can be found in this public <a href="https://github.com/SaschaWillems/VulkanCapsViewer">repository</a>.<br>
 		</div>
 		<div class="page-header">
 			<h3>Current release <?=$release?></h3>
@@ -148,282 +145,288 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_NV_displacement_micromap</li>						
 					</ul>
 				</li>	
-			</ul>			
-			<h4>3.29 - 2023-03-17</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_ARM_shader_core_properties</li>
-						<li>VK_EXT_image_sliced_view_of_3d</li>
-						<li>VK_EXT_pipeline_library_group_handles</li>
-						<li>VK_QCOM_multiview_per_view_render_areas</li>
-					</ul>
-				</li>
-				<li>Filtering will keep child values displayed</li>
-				<li>Add new queue family flag bits</li>				
-			</ul>
-			<h4>3.28 - 2023-01-25</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_HUAWEI_cluster_culling_shader</li>
-					</ul>
-				</li>
-				<li>Use Vulkan profiles library from LunarG SDK</li>
-			</ul>
-			<h4>3.27 - 2022-11-19</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_descriptor_buffer</li>
-						<li>VK_ARM_shader_core_builtins</li>
-						<li>VK_NV_copy_memory_indirect</li>
-						<li>VK_NV_memory_decompression</li>
-						<li>VK_NV_ray_tracing_invocation_reorder</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>3.26 - 2022-09-30</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_opacity_micromap</li>
-						<li>VK_EXT_extended_dynamic_state3</li>
-						<li>VK_EXT_device_fault</li>
-						<li>VK_EXT_device_address_binding_report</li>
-						<li>VK_EXT_pipeline_protected_access</li>
-						<li>VK_EXT_legacy_dithering</li>
-						<li>VK_EXT_mutable_descriptor_type</li>
-						<li>VK_EXT_rasterization_order_attachment_access</li>
-						<li>VK_NV_present_barrier</li>
-						<li>VK_NV_optical_flow</li>
-					</ul>
-				</li>
-				<li>Updated Vulkan profiles library to the latest version</li>
-				<li>Added detection for Windows 11</li>
-				<li>Fixed a bug with large values for maxTimelineSemaphoreValueDifference</li>
-				</li>
-			</ul>
-			<h4>3.25 - 2022-09-01</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_mesh_shader</li>
-						<li>VK_EXT_depth_clamp_zero_one</li>
-						<li>VK_EXT_rasterization_order_attachment_access</li>
-					</ul>
-				</li>
-				<li>Updated Vulkan profiles library to the latest version</li>
-			</ul>
-			<h4>3.24 - 2022-08-06</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_pipeline_robustness</li>
-						<li>VK_EXT_shader_module_identifier</li>
-						<li>VK_EXT_attachment_feedback_loop_layout</li>
-						<li>VK_EXT_multisampled_render_to_single_sampled</li>
-						<li>VK_QCOM_image_processing</li>
-						<li>VK_QCOM_tile_properties</li>
-						<li>VK_SEC_amigo_profiling</li>
-					</ul>
-				</li>
-				<li>Updated Vulkan profiles library to the latest version</li>
-			</ul>
-			<h4>3.23 - 2022-06-27</h4>
-			<ul>
-				<li>Added support for the VK_KHR_portability_enumeration extension on MacOS</li>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_non_seamless_cube_map</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>3.22 - 2022-05-26</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_image_2d_view_of_3d</li>
-						<li>VK_EXT_image_compression_control</li>
-						<li>VK_EXT_image_compression_control_swapchain</li>
-						<li>VK_EXT_pipeline_properties</li>
-						<li>VK_EXT_subpass_merge_feedback</li>
-						<li>VK_KHR_ray_tracing_maintenance1</li>
-						<li>VK_KHR_fragment_shader_barycentric</li>
-						<li>VK_AMD_shader_early_and_late_fragment_tests</li>
-					</ul>
-				</li>
-				<li>Disabled uploads when feature modifying tools are detected (e.g. an active profiles layer)</li>
-			</ul>
-			<h4>3.21 - 2022-04-03</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_graphics_pipeline_library</li>
-						<li>VK_EXT_primitives_generated_query</li>
-						<li>VK_VALVE_descriptor_set_host_mapping</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>3.2 - 2022-02-19</h4>
-			<ul>
-				<li>Added support for Vulkan profiles</li>
-			</ul>
-			<h4>3.11 - 2022-01-28</h4>
-			<ul>
-				<li>Bugfix for large maxBufferSize values in Vulkan 1.3 core properties</li>
-			</ul>
-			<h4>3.1 - 2022-01-25</h4>
-			<ul>
-				<li>Added support for Vulkan 1.3 core features and properties</li>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_QCOM_fragment_density_map_offset</li>
-						<li>VK_KHR_global_priority</li>
-						<li>VK_NV_linear_color_attachment</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>3.05 - 2021-11-27</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_ARM_rasterization_order_attachment_access</li>
-						<li>VK_KHR_dynamic_rendering</li>
-						<li>VK_EXT_border_color_swizzle</li>
-						<li>VK_EXT_image_view_min_lod</li>
-						<li>VK_EXT_depth_clip_control</li>
-					</ul>
-				</li>
-				<li>Fixed proxy settings not being properly applied and changed proxy type to http.	</li>
-			</ul>
-			<h4>3.04 - 2021-10-12</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_KHR_maintenance4</li>
-						<li>VK_EXT_rgba10x6_formats</li>
-						<li>VK_KHR_shader_integer_dot_product</li>
-						<li>VK_EXT_primitive_topology_list_restart</li>
-						<li>VK_EXT_pageable_device_local_memory</li>
-						<li>VK_KHR_shader_integer_dot_product</li>
-					</ul>
-				</li>
-				<li>Added support for PowerVR image formats</li>
-			</ul>
-			<h4>3.03 - 2021-08-22</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_shader_atomic_float2</li>
-						<li>VK_HUAWEI_invocation_mask</li>
-						<li>VK_KHR_present_wait</li>
-						<li>VK_KHR_present_id</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>3.02 - 2021-08-07</h4>
-			<ul>
-				<li>Fixed queue family present support info on Linux</li>
-				<li>Added filtering on nested values</li>
-				<li>Report upload no longer requires file-access</li>
-				<li>Added 32 bit Windows build</li>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_physical_device_drm</li>
-						<li>VK_EXT_multi_draw</li>
-						<li>VK_EXT_global_priority_query</li>
-						<li>VK_KHR_shader_subgroup_uniform_control_flow</li>
-						<li>VK_HUAWEI_subpass_shading</li>
-						<li>VK_NV_ray_tracing_motion_blur</li>
-						<li>VK_NV_external_memory_rdma</li>
-						<li>VK_EXT_provoking_vertex</li>
-						<li>VK_EXT_extended_dynamic_state2</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>3.01 - 2021-04-24</h4>
-			<ul>
-				<li>Added VK_KHR_video_queue encode and decode flags to queue family display</li>
-				<li>Restructured memory heaps and types display</li>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_ycbcr_2plane_444_formats</li>
-						<li>VK_EXT_vertex_input_dynamic_state</li>
-						<li>VK_EXT_color_write_enable</li>
-						<li>VK_KHR_synchronization2</li>
-						<li>VK_KHR_zero_initialize_workgroup_memory</li>
-						<li>VK_KHR_workgroup_memory_explicit_layout</li>
-						<li>VK_NV_inherited_viewport_scissor</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>3.0 - 2021-01-10</h4>
-			<ul>
-				<li>Added update mechanism for updating reports present in the database with data from newer application versions</li>
-				<li>Added dedicated Vulkan Core 1.1 and Core 1.2 features and properties (requires Vulkan 1.2+ implementation)</li>
-				<li>Restructured layout, moved Core 1.0 limits into properties page</li>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_NV_fragment_shading_rate_enums</li>
-						<li>VK_VALVE_mutable_descriptor_type</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>2.23 - 2020-11-23</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_KHR_acceleration_structure</li>
-						<li>VK_KHR_ray_tracing_pipeline</li>
-						<li>VK_KHR_ray_tracing</li>
-						<li>VK_KHR_ray_query</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>2.21 - 2020-09-26</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_KHR_portability_subset</li>
-						<li>VK_EXT_4444_formats</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>2.2 - 2020-08-02</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_EXT_fragment_density_map2</li>
-						<li>VK_EXT_shader_atomic_float</li>
-						<li>VK_EXT_extended_dynamic_state</li>
-						<li>VK_EXT_private_data</li>
-						<li>VK_EXT_image_robustness</li>
-					</ul>
-				</li>
-			</ul>
-			<h4>2.1 - 2020-03-17</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_KHR_ray_tracing</li>
-						<li>VK_EXT_pipeline_creation_cache_control</li>
-						<li>VK_NV_device_generated_commands</li>
-						<li>VK_NV_device_diagnostics_config</li>
-					</ul>
-				<li>Several tweaks for formatting display values</li>
-				</li>
-			</ul>
-			<h4>2.03 - 2019-12-02</h4>
-			<ul>
-				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
-					<ul>
-						<li>VK_KHR_performance_query</li>
-						<li>VK_KHR_separate_depth_stencil_layouts</li>
-						<li>VK_KHR_buffer_device_address</li>
-					</ul>
-				</li>
-			</ul>
+			</ul>	
+
+			<!-- Old version -->
+
+			<details>
+				<summary style="cursor: pointer;">Click to see release notes for old versions...</summary>
+				<h4>3.29 - 2023-03-17</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_ARM_shader_core_properties</li>
+							<li>VK_EXT_image_sliced_view_of_3d</li>
+							<li>VK_EXT_pipeline_library_group_handles</li>
+							<li>VK_QCOM_multiview_per_view_render_areas</li>
+						</ul>
+					</li>
+					<li>Filtering will keep child values displayed</li>
+					<li>Add new queue family flag bits</li>				
+				</ul>
+				<h4>3.28 - 2023-01-25</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_HUAWEI_cluster_culling_shader</li>
+						</ul>
+					</li>
+					<li>Use Vulkan profiles library from LunarG SDK</li>
+				</ul>
+				<h4>3.27 - 2022-11-19</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_descriptor_buffer</li>
+							<li>VK_ARM_shader_core_builtins</li>
+							<li>VK_NV_copy_memory_indirect</li>
+							<li>VK_NV_memory_decompression</li>
+							<li>VK_NV_ray_tracing_invocation_reorder</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>3.26 - 2022-09-30</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_opacity_micromap</li>
+							<li>VK_EXT_extended_dynamic_state3</li>
+							<li>VK_EXT_device_fault</li>
+							<li>VK_EXT_device_address_binding_report</li>
+							<li>VK_EXT_pipeline_protected_access</li>
+							<li>VK_EXT_legacy_dithering</li>
+							<li>VK_EXT_mutable_descriptor_type</li>
+							<li>VK_EXT_rasterization_order_attachment_access</li>
+							<li>VK_NV_present_barrier</li>
+							<li>VK_NV_optical_flow</li>
+						</ul>
+					</li>
+					<li>Updated Vulkan profiles library to the latest version</li>
+					<li>Added detection for Windows 11</li>
+					<li>Fixed a bug with large values for maxTimelineSemaphoreValueDifference</li>
+					</li>
+				</ul>
+				<h4>3.25 - 2022-09-01</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_mesh_shader</li>
+							<li>VK_EXT_depth_clamp_zero_one</li>
+							<li>VK_EXT_rasterization_order_attachment_access</li>
+						</ul>
+					</li>
+					<li>Updated Vulkan profiles library to the latest version</li>
+				</ul>
+				<h4>3.24 - 2022-08-06</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_pipeline_robustness</li>
+							<li>VK_EXT_shader_module_identifier</li>
+							<li>VK_EXT_attachment_feedback_loop_layout</li>
+							<li>VK_EXT_multisampled_render_to_single_sampled</li>
+							<li>VK_QCOM_image_processing</li>
+							<li>VK_QCOM_tile_properties</li>
+							<li>VK_SEC_amigo_profiling</li>
+						</ul>
+					</li>
+					<li>Updated Vulkan profiles library to the latest version</li>
+				</ul>
+				<h4>3.23 - 2022-06-27</h4>
+				<ul>
+					<li>Added support for the VK_KHR_portability_enumeration extension on MacOS</li>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_non_seamless_cube_map</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>3.22 - 2022-05-26</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_image_2d_view_of_3d</li>
+							<li>VK_EXT_image_compression_control</li>
+							<li>VK_EXT_image_compression_control_swapchain</li>
+							<li>VK_EXT_pipeline_properties</li>
+							<li>VK_EXT_subpass_merge_feedback</li>
+							<li>VK_KHR_ray_tracing_maintenance1</li>
+							<li>VK_KHR_fragment_shader_barycentric</li>
+							<li>VK_AMD_shader_early_and_late_fragment_tests</li>
+						</ul>
+					</li>
+					<li>Disabled uploads when feature modifying tools are detected (e.g. an active profiles layer)</li>
+				</ul>
+				<h4>3.21 - 2022-04-03</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_graphics_pipeline_library</li>
+							<li>VK_EXT_primitives_generated_query</li>
+							<li>VK_VALVE_descriptor_set_host_mapping</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>3.2 - 2022-02-19</h4>
+				<ul>
+					<li>Added support for Vulkan profiles</li>
+				</ul>
+				<h4>3.11 - 2022-01-28</h4>
+				<ul>
+					<li>Bugfix for large maxBufferSize values in Vulkan 1.3 core properties</li>
+				</ul>
+				<h4>3.1 - 2022-01-25</h4>
+				<ul>
+					<li>Added support for Vulkan 1.3 core features and properties</li>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_QCOM_fragment_density_map_offset</li>
+							<li>VK_KHR_global_priority</li>
+							<li>VK_NV_linear_color_attachment</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>3.05 - 2021-11-27</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_ARM_rasterization_order_attachment_access</li>
+							<li>VK_KHR_dynamic_rendering</li>
+							<li>VK_EXT_border_color_swizzle</li>
+							<li>VK_EXT_image_view_min_lod</li>
+							<li>VK_EXT_depth_clip_control</li>
+						</ul>
+					</li>
+					<li>Fixed proxy settings not being properly applied and changed proxy type to http.	</li>
+				</ul>
+				<h4>3.04 - 2021-10-12</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_KHR_maintenance4</li>
+							<li>VK_EXT_rgba10x6_formats</li>
+							<li>VK_KHR_shader_integer_dot_product</li>
+							<li>VK_EXT_primitive_topology_list_restart</li>
+							<li>VK_EXT_pageable_device_local_memory</li>
+							<li>VK_KHR_shader_integer_dot_product</li>
+						</ul>
+					</li>
+					<li>Added support for PowerVR image formats</li>
+				</ul>
+				<h4>3.03 - 2021-08-22</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_shader_atomic_float2</li>
+							<li>VK_HUAWEI_invocation_mask</li>
+							<li>VK_KHR_present_wait</li>
+							<li>VK_KHR_present_id</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>3.02 - 2021-08-07</h4>
+				<ul>
+					<li>Fixed queue family present support info on Linux</li>
+					<li>Added filtering on nested values</li>
+					<li>Report upload no longer requires file-access</li>
+					<li>Added 32 bit Windows build</li>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_physical_device_drm</li>
+							<li>VK_EXT_multi_draw</li>
+							<li>VK_EXT_global_priority_query</li>
+							<li>VK_KHR_shader_subgroup_uniform_control_flow</li>
+							<li>VK_HUAWEI_subpass_shading</li>
+							<li>VK_NV_ray_tracing_motion_blur</li>
+							<li>VK_NV_external_memory_rdma</li>
+							<li>VK_EXT_provoking_vertex</li>
+							<li>VK_EXT_extended_dynamic_state2</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>3.01 - 2021-04-24</h4>
+				<ul>
+					<li>Added VK_KHR_video_queue encode and decode flags to queue family display</li>
+					<li>Restructured memory heaps and types display</li>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_ycbcr_2plane_444_formats</li>
+							<li>VK_EXT_vertex_input_dynamic_state</li>
+							<li>VK_EXT_color_write_enable</li>
+							<li>VK_KHR_synchronization2</li>
+							<li>VK_KHR_zero_initialize_workgroup_memory</li>
+							<li>VK_KHR_workgroup_memory_explicit_layout</li>
+							<li>VK_NV_inherited_viewport_scissor</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>3.0 - 2021-01-10</h4>
+				<ul>
+					<li>Added update mechanism for updating reports present in the database with data from newer application versions</li>
+					<li>Added dedicated Vulkan Core 1.1 and Core 1.2 features and properties (requires Vulkan 1.2+ implementation)</li>
+					<li>Restructured layout, moved Core 1.0 limits into properties page</li>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_NV_fragment_shading_rate_enums</li>
+							<li>VK_VALVE_mutable_descriptor_type</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>2.23 - 2020-11-23</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_KHR_acceleration_structure</li>
+							<li>VK_KHR_ray_tracing_pipeline</li>
+							<li>VK_KHR_ray_tracing</li>
+							<li>VK_KHR_ray_query</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>2.21 - 2020-09-26</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_KHR_portability_subset</li>
+							<li>VK_EXT_4444_formats</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>2.2 - 2020-08-02</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_EXT_fragment_density_map2</li>
+							<li>VK_EXT_shader_atomic_float</li>
+							<li>VK_EXT_extended_dynamic_state</li>
+							<li>VK_EXT_private_data</li>
+							<li>VK_EXT_image_robustness</li>
+						</ul>
+					</li>
+				</ul>
+				<h4>2.1 - 2020-03-17</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_KHR_ray_tracing</li>
+							<li>VK_EXT_pipeline_creation_cache_control</li>
+							<li>VK_NV_device_generated_commands</li>
+							<li>VK_NV_device_diagnostics_config</li>
+						</ul>
+					<li>Several tweaks for formatting display values</li>
+					</li>
+				</ul>
+				<h4>2.03 - 2019-12-02</h4>
+				<ul>
+					<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+						<ul>
+							<li>VK_KHR_performance_query</li>
+							<li>VK_KHR_separate_depth_stencil_layouts</li>
+							<li>VK_KHR_buffer_device_address</li>
+						</ul>
+					</li>
+				</ul>
+			</details>
 		</div>
 	</div>
 </div>
