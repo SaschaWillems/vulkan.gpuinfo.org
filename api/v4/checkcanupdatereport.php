@@ -3,7 +3,7 @@
  *
  * Vulkan hardware capability database back-end
  *	
- * Copyright (C) 2020-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2020-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -35,9 +35,16 @@ include './../../database/database.class.php';
 
 function check_extension_list_updatable($report, $compare_id, &$updatable)
 {
-	$stmnt = DB::$connection->prepare("SELECT count(*) from deviceextensions where reportid = :reportid");
+	$stmnt = DB::$connection->prepare('SELECT count(*) from deviceextensions de join extensions e on de.extensionid = e.id where reportid = :reportid and trim(name) != ""');
 	$stmnt->execute(['reportid' => $compare_id]);
-	$count_report = count($report['extensions']);
+	$count_report = 0;
+	foreach ($report['extensions'] as $ext_report) {
+		// Some devices report empty extensions, skip them	
+		if (trim($ext_report['extensionName']) == "") {
+			continue;
+		}
+		$count_report ++;
+	}
 	$count_database = intval($stmnt->fetchColumn());
 	if ($count_report > $count_database) {
 		$updatable[] = 'Vulkan extension list';

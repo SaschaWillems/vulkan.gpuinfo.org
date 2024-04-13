@@ -180,6 +180,10 @@ function update_extensions($json, $reportid, &$update_log)
     $extensions_db = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
     foreach ($extensions_report as $ext_report) {
         if (!in_array($ext_report['extensionName'], $extensions_db)) {
+			// Some devices report empty extensions, skip them
+			if (trim($ext_report['extensionName']) == "") {
+				continue;
+			}
             // Extension is missing, insert
             // Add to global mapping table (if not already present)
             $sql = "INSERT IGNORE INTO extensions (name) VALUES (:name)";
