@@ -75,17 +75,18 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 	</ul>
 </div>
 
+<!-- @todo: check if device has format feature flag 2 support -->
 <div class='tab-content'>
 	<!-- Optimal tiling features -->
 	<div id='formats_optimal' class='tab-pane fade in active reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_optimal', $format_data, 'optimaltilingfeatures', $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable('deviceformats_optimal', $format_data, 'optimaltilingfeatures', $device_format_flags_2_tiling); ?>
 	</div>
 	<!-- Linear tiling features -->
 	<div id='formats_linear' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $device_format_flags_2_tiling); ?>
 	</div>
 	<!-- Buffer features -->
 	<div id='formats_buffer' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_buffer', $format_data, 'bufferfeatures', $device_format_flags_buffer); ?>
+		<?php insertDeviceFormatTable('deviceformats_buffer', $format_data, 'bufferfeatures', $device_format_flags_2_buffer); ?>
 	</div>
 </div>
