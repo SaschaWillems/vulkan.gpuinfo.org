@@ -328,9 +328,9 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter, hasformatfeatureflags2)
 			VALUES
-				(:submitter, :devicename, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter, :hasformatfeatureflags2)";
 
 		$values = array(
 			":submitter" => $json['environment']['submitter'],
@@ -343,8 +343,13 @@
 			":osarchitecture" => $json['environment']['architecture'],
 			":version" => $json['environment']['reportversion'],
 			":description" => $json['environment']['comment'],
-			":counter" => 0
+			":counter" => 0,
+			":hasformatfeatureflags2" => 0
 		);
+
+		if (array_key_exists('hasFormatFeatureFlags2', $json['properties'])) {
+			$values[':hasformatfeatureflags2'] = $json['properties']['hasFormatFeatureFlags2'];
+		}		
 
 		try {
 			$stmnt = DB::$connection->prepare($sql);
@@ -888,11 +893,11 @@
 				}
 				// Mark extension to have additional features
 				try {
-					$stmnt = DB::$connection->prepare("UPDATE extension set hasfeatures = 1 where hasfeatures is null and name = :extension");
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
 					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
-					mailError("Error at marking extension to have additional features: ".$e->getMessage(), $jsonFile);
-				}				
+					die('Error while trying to upload report (error at marking extension to have additional features)');
+				}
 			}
 		}
 		// Device properties			
@@ -920,11 +925,11 @@
 				}
 				// Mark extension to have additional properties
 				try {
-					$stmnt = DB::$connection->prepare("UPDATE extension set hasproperties = 1 where hasproperties is null and name = :extension");
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
 					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
-					mailError("Error at marking extension to have additional properties: ".$e->getMessage(), $jsonFile);
-				}				
+					die('Error while trying to upload report (error at marking extension to have additional properties)');
+				}
 			}		
 		}		
 	}
