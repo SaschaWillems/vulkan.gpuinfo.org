@@ -104,13 +104,15 @@ $device_format_flags_buffer = [
 ];
 
 $device_format_flags_2_buffer = [
-    0x00000008     => "Uniform texel buffer",
-    0x00000010     => "Storage texel buffer",
-    0x00000020     => "Storage texel buffer atomic",
-    0x00000040     => "Vertex buffer",
-    0x00004000     => "Transfer src",
-    0x00008000     => "Transfer dst",
-    0x20000000     => "Acceleration structure vertex buffer",
+    0x00000008  => "Uniform texel buffer",
+    0x00000010  => "Storage texel buffer",
+    0x00000020  => "Storage texel buffer atomic",
+    0x00000040  => "Vertex buffer",
+    0x00004000  => "Transfer src",
+    0x00008000  => "Transfer dst",
+    0x20000000  => "Acceleration structure vertex buffer",
+    0x80000000  => "Storage read without format",
+    0x100000000 => "Storage write without format",
 ];
 
 class SurfaceConstants {
