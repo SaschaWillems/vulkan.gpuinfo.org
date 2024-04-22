@@ -118,13 +118,13 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 	?>
 
 	<div id='formats_optimal' class='tab-pane fade in active reportdiv'>
-		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_optimal', $format_support->optimal, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_optimal', $format_support->optimal, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<div id='formats_linear' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_linear', $format_support->linear, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_linear', $format_support->linear, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<div id='formats_buffer' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_buffer', $format_support->buffer, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : $device_format_flags_buffer); ?>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_buffer', $format_support->buffer, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags); ?>
 	</div>
 
 	<?php

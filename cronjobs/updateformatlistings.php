@@ -57,17 +57,17 @@ try {
             case 'lineartiling':
                 $column = 'lineartilingfeatures';
                 $parameter_name = 'lineartilingformat';
-                $format_flags = $device_format_flags_tiling;
+                $format_flags = FormatFeatureFlags::TilingFlags;
                 break;
             case 'optimaltiling':
                 $column = 'optimaltilingfeatures';
                 $parameter_name = 'optimaltilingformat';
-                $format_flags = $device_format_flags_tiling;
+                $format_flags = FormatFeatureFlags::TilingFlags;
                 break;
             case 'buffer':
                 $column = 'bufferfeatures';
                 $parameter_name = 'bufferformat';
-                $format_flags = $device_format_flags_buffer;
+                $format_flags = FormatFeatureFlags::BufferFlags;
                 break;
         }
 

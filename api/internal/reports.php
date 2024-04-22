@@ -145,17 +145,17 @@ if ($featureflagbit) {
     $optimaltilingformat = getRequestFilterValue('optimaltilingformat');
     $bufferformat = getRequestFilterValue('bufferformat');
     if ($lineartilingformat) {
-        $featureflagbit_value = array_search($featureflagbit , $device_format_flags_tiling);
+        $featureflagbit_value = array_search($featureflagbit, FormatFeatureFlags::TilingFlags);
         assert($featureflagbit_value);
         appendWhereClause("r.id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_lineartilingformat and df.lineartilingfeatures & $featureflagbit_value = $featureflagbit_value)", ['filter_lineartilingformat' => $lineartilingformat]);
     }
     if ($optimaltilingformat) {
-        $featureflagbit_value = array_search($featureflagbit , $device_format_flags_tiling);
+        $featureflagbit_value = array_search($featureflagbit, FormatFeatureFlags::TilingFlags);
         assert($featureflagbit_value);
         appendWhereClause("r.id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_optimaltilingformat and df.optimaltilingfeatures & $featureflagbit_value = $featureflagbit_value)", ['filter_optimaltilingformat' => $optimaltilingformat]);
     }    
     if ($bufferformat) {
-        $featureflagbit_value = array_search($featureflagbit , $device_format_flags_buffer);
+        $featureflagbit_value = array_search($featureflagbit, FormatFeatureFlags::BufferFlags);
         assert($featureflagbit_value);
         appendWhereClause("r.id in (select reportid from deviceformats df join VkFormat vf on vf.value = df.formatid where vf.name = :filter_bufferformat and df.bufferfeatures & $featureflagbit_value = $featureflagbit_value)", ['filter_bufferformat' => $bufferformat]);
     }
