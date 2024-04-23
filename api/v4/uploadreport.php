@@ -54,6 +54,8 @@
 		echo "Uploaded file looks like a binary file!";
 		exit();
 	}
+
+	$start = microtime(true);
 	
 	move_uploaded_file($_FILES['data']['tmp_name'], './'.$_FILES['data']['name']) or die(''); 
 
@@ -1021,6 +1023,10 @@
 	}	
 	
 	DB::$connection->commit();
+
+	$elapsed = (microtime(true) - $start) * 1000;
+	DB::log('api/internal/v4/uploadreport.php', "", $elapsed);
+
 	DB::disconnect();
 		
 	echo "res_uploaded";	  	
@@ -1050,4 +1056,3 @@
 			// Failure to mail is not critical
 		}	
 	}
-?>
