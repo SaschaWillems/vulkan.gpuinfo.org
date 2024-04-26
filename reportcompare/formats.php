@@ -26,10 +26,11 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 	<table id='<?= $id ?>' class='table table-striped table-bordered table-hover table-header-rotated format-table'>
 		<thead>
 			<tr>
-				<th class='caption' style='border-left: 0px; border-right: 0px;'>Format</th>
+				<th>Device</th>
+				<th>Format</th>
 				<?php
 				foreach ($flags as $key => $value) {
-					echo "<th class='caption rotate-45'><div><span>$value</span></div></th>";
+					echo "<th class='caption-format rotate-45'><div><span>$value</span></div></th>";
 				}
 				?>
 			</tr>
@@ -48,21 +49,22 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 				if (!$format_supported) {
 					continue;
 				}
-				echo "<tr>";
-				$class = 'default';
-				echo "<td colspan='".(count($flags)+1)."' class='format-table-format-name'><span class='$class'>$format_name</span></td>";
-				echo "</tr>";
 				// Display flags per device 
 				foreach ($report_compare->device_infos as $device_index => $device) {
 					echo "<tr>";
 					echo "<td class='format-table-device'>$device->name</td>";
+					echo "<td class='format-table-format-name'>$format_name</td>";
 					foreach ($flags as $flag_enum => $flag_name) {
 						$icon = 'unsupported';
-						if ($format_support[$device_index] != 0) {
-							$icon = ($format_support[$device_index] & $flag_enum) ? 'check' : 'missing';
+						$value = 0;
+						if ($format_support[$device_index] & $flag_enum) {
+							$icon = 'check';
+							$value = 1;
 						}
 						echo "<td class='format-table-support'>";
 						echo "<img src='images/icons/$icon.png' width=16px>";
+						// Hidden span with value so column can be sorted
+						echo "<span style='display:none;'>$value</span>";						
 						echo "</td>";
 					}
 					echo "</tr>";
@@ -129,10 +131,6 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 
 	<?php
 
-	// Generate tables
-	$colspan = count($reportids) + 1;
-
-	$tab_names = ['formats_linear', 'formats_optimal', 'formats_buffer'];
 	$featurearrays = array($linearfeatures, $optimalfeatures, $bufferfeatures);
 	for ($i = 0; $i < sizeof($featurearrays); $i++) {
 		$featurearray = $featurearrays[$i];
