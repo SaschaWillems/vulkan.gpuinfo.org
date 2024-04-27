@@ -211,7 +211,11 @@ try {
 
 $elapsed = (microtime(true) - $start) * 1000;
 
-DB::log('cronjobs/updateformatlistings.php', '', $elapsed);
+$page = 'cronjobs/updateformatlistings.php';
+if ($apiversion) {
+    $page .= "?apiversion=$apiversion";
+}
+DB::log($page, '', $elapsed);
 DB::disconnect();
 
 echo "success".PHP_EOL;
