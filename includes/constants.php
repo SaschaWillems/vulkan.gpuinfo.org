@@ -80,10 +80,10 @@ class FormatFeatureFlags2 {
         0x00008000     => "Transfer dst",
         0x00010000     => "Sampled image filter minmax",
         0x00020000     => "Midpoint chroma samples",
-        0x00040000     => "Sampled image ycbcr conversion linear filter",
-        0x00080000     => "Sampled image ycbcr conversion separate reconstruction filter",
-        0x00100000     => "Sampled image ycbcr conversion chroma reconstruction explicit",
-        0x00200000     => "Sampled image ycbcr conversion chroma reconstruction explicit forceable",
+        0x00040000     => "Sampled image ycbcr conversion<br> linear filter",
+        0x00080000     => "Sampled image ycbcr conversion<br> separate reconstruction filter",
+        0x00100000     => "Sampled image ycbcr conversion<br> chroma reconstruction explicit",
+        0x00200000     => "Sampled image ycbcr conversion<br> chroma reconstruction explicit forceable",
         0x00400000     => "Disjoint",
         0x00800000     => "Cosited chroma samples",
         0x80000000     => "Storage read without format",
@@ -96,6 +96,8 @@ class FormatFeatureFlags2 {
         0x400000000000 => "Host image transfer EXT",
         0x08000000     => "Video encode input KHR",
         0x10000000     => "Video encode dpb KHR",
+        // @todo: disable vendor specific extensions for now
+        /*
         0x4000000000   => "Linear color attachment NV",
         0x400000000    => "Weight image QCOM",
         0x800000000    => "Weight sampled image QCOM",
@@ -104,6 +106,7 @@ class FormatFeatureFlags2 {
         0x10000000000  => "Optical flow image NV",
         0x20000000000  => "Optical flow vector NV",
         0x40000000000  => "Optical flow cost NV",
+        */
     ];
 
     const BufferFlags = [
