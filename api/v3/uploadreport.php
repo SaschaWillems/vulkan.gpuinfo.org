@@ -52,7 +52,7 @@
 	if ((!$mime_type) || (stripos($mime_type, 'text') === false)) {
 		echo "Uploaded file looks like a binary file!";
 		exit();
-	}
+	}	
 	
 	$start = microtime(true);
 
@@ -64,6 +64,10 @@
 			unlink($file);
 		}
 		exit($message);
+	};
+	
+	$log = function($msg) {
+		file_put_contents('log.txt', date("Y-m-d H:i:s")." - ".$msg.PHP_EOL , FILE_APPEND | LOCK_EX);
 	};
 
 	function convertValue($val) {
@@ -287,8 +291,8 @@
 		}
 	} catch (Exception $e) {
 		die('Error while trying to upload report (error at black list check)');
-	}		
-		
+	}
+	
 	// Check if report is already present
 	$sql = "SELECT id from reports where
 		devicename = :devicename and 
@@ -306,6 +310,22 @@
 		":osarchitecture" => $json['environment']['architecture'],
 	);
 
+	// Use device name and/or manufacturer from platform info an Android to further distinguish devices
+	if (array_key_exists('platformdetails', $json)) {
+		$log("Report has platform details");
+		$jsonnode = $json['platformdetails']; 
+		if (array_key_exists('android.ProductManufacturer', $jsonnode)) {
+			$log("Report has android.ProductManufacturer = ".$jsonnode['android.ProductManufacturer']);
+			$params["androidproductmanufacturer"] = $jsonnode['android.ProductManufacturer'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 3 and value = :androidproductmanufacturer)";
+		}
+		if (array_key_exists('android.ProductModel', $jsonnode)) {
+			$log("Report has android.ProductModel = ".$jsonnode['android.ProductModel']);
+			$params["androidproductmodel"] = $jsonnode['android.ProductModel'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 4 and value = :androidproductmodel)";
+		}
+	}	
+
 	try {
 		$stmnt = DB::$connection->prepare($sql);		
 		$stmnt->execute($params);	
@@ -320,8 +340,12 @@
 		$stmnt->execute(array(":reportid" => $reportid));			
 		echo "Report already present!";
 		DB::disconnect();
+		$log('Report already present! ReportId = '.$reportid);
+		$log(print_r($params, true));
 		$exitScript();
-	}	
+	}
+
+	$log('Starting database transaction');
 
 	DB::$connection->beginTransaction();
 	
@@ -543,6 +567,10 @@
 	{
 		$jsonnode = $json['extensions']; 
 		foreach ($jsonnode as $ext) {
+			// Some devices report empty extensions, skip them
+			if (trim($ext['extensionName']) == "") {
+				continue;
+			}
 			// Add to global mapping table (if not already present)
 			$sql = "INSERT IGNORE INTO extensions (name) VALUES (:name)";
 			$stmnt = DB::$connection->prepare($sql);
@@ -1015,12 +1043,12 @@
 			}
 		}			
 	}	
-	
-	DB::$connection->commit();
 
 	$elapsed = (microtime(true) - $start) * 1000;
 	DB::log('api/internal/v3/uploadreport.php', "", $elapsed);
+	$log('Committing database transaction');
 
+	DB::$connection->commit();
 	DB::disconnect();
 		
 	echo "res_uploaded";	  	
@@ -1050,3 +1078,4 @@
 			// Failure to mail is not critical
 		}	
 	}
+?>
