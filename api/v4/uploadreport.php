@@ -307,6 +307,19 @@
 		":osarchitecture" => $json['environment']['architecture'],
 	);
 
+	// Use device name and/or manufacturer from platform info an Android to further distinguish devices
+	if (array_key_exists('platformdetails', $json)) {
+		$jsonnode = $json['platformdetails']; 
+		if (array_key_exists('android.ProductManufacturer', $jsonnode)) {
+			$params["androidproductmanufacturer"] = $jsonnode['android.ProductManufacturer'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 3 and value = :androidproductmanufacturer)";
+		}
+		if (array_key_exists('android.ProductModel', $jsonnode)) {
+			$params["androidproductmodel"] = $jsonnode['android.ProductModel'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 4 and value = :androidproductmodel)";
+		}
+	}	
+
 	try {
 		$stmnt = DB::$connection->prepare($sql);		
 		$stmnt->execute($params);	
