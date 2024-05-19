@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -256,6 +256,55 @@ $repids = implode(",", $reportids);
 					});
 				}
 			}
+
+			// Format tables (grouping, filtering, no sorting)
+			tableNames = [
+				'table_deviceformats_optimal',
+				'table_deviceformats_linear',
+				'table_deviceformats_buffer'
+			];
+
+			// Device properties table with grouping
+			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
+				if (typeof $('#'+tableNames[i]) != undefined) {
+					$('#' + tableNames[i]).dataTable({
+						"pageLength": -1,
+						"paging": false,
+						"order": [],
+						"columnDefs": [{
+							"visible": false,
+							"targets": 1
+						}],
+						"searchHighlight": true,
+						"bAutoWidth": false,
+						"sDom": 'flpt',
+						"deferRender": true,
+						"processing": true,
+						"ordering": false,
+						"fixedHeader": {
+							"header": true,
+							"headerOffset": 50
+						},
+						"drawCallback": function(settings) {
+							var api = this.api();
+							var rows = api.rows({
+								page: 'current'
+							}).nodes();
+							var last = null;
+							api.column(1, {
+								page: 'current'
+							}).data().each(function(group, i) {
+								if (last !== group) {
+									$(rows).eq(i).before(
+										'<tr><td colspan="' + (api.columns().header().length - 1) + '" class="compare-format">' + group + '</td></tr>'
+									);
+									last = group;
+								}
+							});
+						}
+					});
+				}
+			}			
 
 			$('#devices').show();
 			$("#overlay_devices").hide();

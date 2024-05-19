@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -33,6 +33,7 @@ class ReportCompareFlags
     public $has_vulkan_1_3_features = false;
     public $has_vulkan_1_3_properties = false;
     public $has_profiles = false;
+    public $has_format_feature_flags_2 = false;
 }
 
 class ReportCompareDeviceInfo
@@ -101,7 +102,7 @@ class ReportCompare
         $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
         $this->flags->has_vulkan_1_3_features = DB::getCount("SELECT count(*) from devicefeatures13 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
         $this->flags->has_vulkan_1_3_properties = DB::getCount("SELECT count(*) from deviceproperties13 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
-        // DB::disconnect();
+        $this->flags->has_format_feature_flags_2 = DB::getCount("SELECT count(*) from reports where hasformatfeatureflags2 != 0 and id in (" . $this->reportIdsParam() . ")", []) > 0;        
         // Fetch descriptions for devices to be compared
         try {
             $stmnt = DB::$connection->prepare(
