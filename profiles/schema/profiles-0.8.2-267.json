@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.2-273.json#",
-    "title": "Vulkan Profiles Schema for Vulkan 1.3.273",
+    "$id": "https://schema.khronos.org/vulkan/profiles-0.8.1-267.json#",
+    "title": "Vulkan Profiles Schema for Vulkan 1.3.267",
     "additionalProperties": true,
     "required": [
         "capabilities",
@@ -538,15 +538,6 @@
             "additionalProperties": false,
             "properties": {
                 "selectableCubicWeights": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "VkPhysicalDeviceCudaKernelLaunchFeaturesNV": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "cudaKernelLaunchFeatures": {
                     "type": "boolean"
                 }
             }
@@ -1754,24 +1745,6 @@
                 }
             }
         },
-        "VkPhysicalDeviceRelaxedLineRasterizationFeaturesIMG": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "relaxedLineRasterization": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "VkPhysicalDeviceRenderPassStripedFeaturesARM": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "renderPassStriped": {
-                    "type": "boolean"
-                }
-            }
-        },
         "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV": {
             "type": "object",
             "additionalProperties": false,
@@ -1810,15 +1783,6 @@
             "additionalProperties": false,
             "properties": {
                 "scalarBlockLayout": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "VkPhysicalDeviceSchedulingControlsFeaturesARM": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "schedulingControls": {
                     "type": "boolean"
                 }
             }
@@ -2234,7 +2198,7 @@
                 }
             }
         },
-        "VkPhysicalDeviceVertexAttributeDivisorFeaturesKHR": {
+        "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -3209,18 +3173,6 @@
             "properties": {
                 "supportedQueues": {
                     "$ref": "#/definitions/VkQueueFlags"
-                }
-            }
-        },
-        "VkPhysicalDeviceCudaKernelLaunchPropertiesNV": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "computeCapabilityMajor": {
-                    "$ref": "#/definitions/uint32_t"
-                },
-                "computeCapabilityMinor": {
-                    "$ref": "#/definitions/uint32_t"
                 }
             }
         },
@@ -4611,18 +4563,6 @@
                 }
             }
         },
-        "VkPhysicalDeviceRenderPassStripedPropertiesARM": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "maxRenderPassStripes": {
-                    "$ref": "#/definitions/uint32_t"
-                },
-                "renderPassStripeGranularity": {
-                    "$ref": "#/definitions/VkExtent2D"
-                }
-            }
-        },
         "VkPhysicalDeviceRobustness2PropertiesEXT": {
             "type": "object",
             "additionalProperties": false,
@@ -4670,27 +4610,6 @@
                 },
                 "filterMinmaxSingleComponentFormats": {
                     "type": "boolean"
-                }
-            }
-        },
-        "VkPhysicalDeviceSchedulingControlsFlagBitsARM": {
-            "enum": [
-                "VK_PHYSICAL_DEVICE_SCHEDULING_CONTROLS_SHADER_CORE_COUNT_ARM"
-            ]
-        },
-        "VkPhysicalDeviceSchedulingControlsFlagsARM": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/VkPhysicalDeviceSchedulingControlsFlagBitsARM"
-            },
-            "uniqueItems": true
-        },
-        "VkPhysicalDeviceSchedulingControlsPropertiesARM": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "schedulingControlsFlags": {
-                    "$ref": "#/definitions/VkPhysicalDeviceSchedulingControlsFlagsARM"
                 }
             }
         },
@@ -5120,18 +5039,6 @@
             "properties": {
                 "maxVertexAttribDivisor": {
                     "$ref": "#/definitions/uint32_t"
-                }
-            }
-        },
-        "VkPhysicalDeviceVertexAttributeDivisorPropertiesKHR": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "maxVertexAttribDivisor": {
-                    "$ref": "#/definitions/uint32_t"
-                },
-                "supportsNonZeroFirstInstance": {
-                    "type": "boolean"
                 }
             }
         },
@@ -6057,12 +5964,6 @@
                             "VK_ARM_rasterization_order_attachment_access": {
                                 "type": "integer"
                             },
-                            "VK_ARM_render_pass_striped": {
-                                "type": "integer"
-                            },
-                            "VK_ARM_scheduling_controls": {
-                                "type": "integer"
-                            },
                             "VK_ARM_shader_core_builtins": {
                                 "type": "integer"
                             },
@@ -6250,9 +6151,6 @@
                                 "type": "integer"
                             },
                             "VK_EXT_inline_uniform_block": {
-                                "type": "integer"
-                            },
-                            "VK_EXT_layer_settings": {
                                 "type": "integer"
                             },
                             "VK_EXT_legacy_dithering": {
@@ -6498,9 +6396,6 @@
                             "VK_IMG_format_pvrtc": {
                                 "type": "integer"
                             },
-                            "VK_IMG_relaxed_line_rasterization": {
-                                "type": "integer"
-                            },
                             "VK_INTEL_performance_query": {
                                 "type": "integer"
                             },
@@ -6523,9 +6418,6 @@
                                 "type": "integer"
                             },
                             "VK_KHR_buffer_device_address": {
-                                "type": "integer"
-                            },
-                            "VK_KHR_calibrated_timestamps": {
                                 "type": "integer"
                             },
                             "VK_KHR_cooperative_matrix": {
@@ -6771,9 +6663,6 @@
                             "VK_KHR_variable_pointers": {
                                 "type": "integer"
                             },
-                            "VK_KHR_vertex_attribute_divisor": {
-                                "type": "integer"
-                            },
                             "VK_KHR_video_decode_h264": {
                                 "type": "integer"
                             },
@@ -6856,9 +6745,6 @@
                                 "type": "integer"
                             },
                             "VK_NV_coverage_reduction_mode": {
-                                "type": "integer"
-                            },
-                            "VK_NV_cuda_kernel_launch": {
                                 "type": "integer"
                             },
                             "VK_NV_dedicated_allocation": {
@@ -7140,9 +7026,6 @@
                             },
                             "VkPhysicalDeviceCubicWeightsFeaturesQCOM": {
                                 "$ref": "#/definitions/VkPhysicalDeviceCubicWeightsFeaturesQCOM"
-                            },
-                            "VkPhysicalDeviceCudaKernelLaunchFeaturesNV": {
-                                "$ref": "#/definitions/VkPhysicalDeviceCudaKernelLaunchFeaturesNV"
                             },
                             "VkPhysicalDeviceCustomBorderColorFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceCustomBorderColorFeaturesEXT"
@@ -7471,12 +7354,6 @@
                             "VkPhysicalDeviceRayTracingPositionFetchFeaturesKHR": {
                                 "$ref": "#/definitions/VkPhysicalDeviceRayTracingPositionFetchFeaturesKHR"
                             },
-                            "VkPhysicalDeviceRelaxedLineRasterizationFeaturesIMG": {
-                                "$ref": "#/definitions/VkPhysicalDeviceRelaxedLineRasterizationFeaturesIMG"
-                            },
-                            "VkPhysicalDeviceRenderPassStripedFeaturesARM": {
-                                "$ref": "#/definitions/VkPhysicalDeviceRenderPassStripedFeaturesARM"
-                            },
                             "VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV": {
                                 "$ref": "#/definitions/VkPhysicalDeviceRepresentativeFragmentTestFeaturesNV"
                             },
@@ -7494,9 +7371,6 @@
                             },
                             "VkPhysicalDeviceScalarBlockLayoutFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceScalarBlockLayoutFeatures"
-                            },
-                            "VkPhysicalDeviceSchedulingControlsFeaturesARM": {
-                                "$ref": "#/definitions/VkPhysicalDeviceSchedulingControlsFeaturesARM"
                             },
                             "VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures": {
                                 "$ref": "#/definitions/VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures"
@@ -7654,11 +7528,8 @@
                             "VkPhysicalDeviceVariablePointerFeatures": {
                                 "$ref": "#/definitions/VkPhysicalDeviceVariablePointersFeatures"
                             },
-                            "VkPhysicalDeviceVertexAttributeDivisorFeaturesKHR": {
-                                "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorFeaturesKHR"
-                            },
                             "VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT": {
-                                "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorFeaturesKHR"
+                                "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorFeaturesEXT"
                             },
                             "VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT"
@@ -7732,9 +7603,6 @@
                             },
                             "VkPhysicalDeviceCopyMemoryIndirectPropertiesNV": {
                                 "$ref": "#/definitions/VkPhysicalDeviceCopyMemoryIndirectPropertiesNV"
-                            },
-                            "VkPhysicalDeviceCudaKernelLaunchPropertiesNV": {
-                                "$ref": "#/definitions/VkPhysicalDeviceCudaKernelLaunchPropertiesNV"
                             },
                             "VkPhysicalDeviceCustomBorderColorPropertiesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceCustomBorderColorPropertiesEXT"
@@ -7922,9 +7790,6 @@
                             "VkPhysicalDeviceRayTracingPropertiesNV": {
                                 "$ref": "#/definitions/VkPhysicalDeviceRayTracingPropertiesNV"
                             },
-                            "VkPhysicalDeviceRenderPassStripedPropertiesARM": {
-                                "$ref": "#/definitions/VkPhysicalDeviceRenderPassStripedPropertiesARM"
-                            },
                             "VkPhysicalDeviceRobustness2PropertiesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceRobustness2PropertiesEXT"
                             },
@@ -7936,9 +7801,6 @@
                             },
                             "VkPhysicalDeviceSamplerFilterMinmaxPropertiesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceSamplerFilterMinmaxProperties"
-                            },
-                            "VkPhysicalDeviceSchedulingControlsPropertiesARM": {
-                                "$ref": "#/definitions/VkPhysicalDeviceSchedulingControlsPropertiesARM"
                             },
                             "VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM": {
                                 "$ref": "#/definitions/VkPhysicalDeviceShaderCoreBuiltinsPropertiesARM"
@@ -8005,9 +7867,6 @@
                             },
                             "VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT": {
                                 "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorPropertiesEXT"
-                            },
-                            "VkPhysicalDeviceVertexAttributeDivisorPropertiesKHR": {
-                                "$ref": "#/definitions/VkPhysicalDeviceVertexAttributeDivisorPropertiesKHR"
                             },
                             "VkPhysicalDeviceVulkan11Properties": {
                                 "$ref": "#/definitions/VkPhysicalDeviceVulkan11Properties"

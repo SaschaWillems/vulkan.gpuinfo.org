@@ -3,7 +3,7 @@
 *
 * Vulkan hardware capability database back-end
 *	
-* Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
 *	
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public
@@ -76,7 +76,7 @@ class VulkanProfile {
     private function loadSchema($apiversion) {
         // Get profiles schema based on patch level (=header revision)
         $header_version = explode('.', $apiversion)[2];
-        $report_profile_name = "../../profiles/schema/profiles-0.8.1-$header_version.json";
+        $report_profile_name = "../../profiles/schema/profiles-0.8.2-$header_version.json";
         // Use the latest profile if no matching file could be found
         if (!file_exists($report_profile_name)) {
             $report_profile_name = "../../profiles/schema/profiles-0.8-latest.json";
@@ -729,7 +729,7 @@ try {
     $filename = preg_replace("([\.]{2,})", '', $filename);	
     $filename .= ".json";
 
-    // header("Content-Disposition: attachment; filename=".strtolower($filename));
+    header("Content-Disposition: attachment; filename=".strtolower($filename));
     echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 } catch (Exception $e) {
     echo json_encode(['error' => "Could not generate profile"]);
