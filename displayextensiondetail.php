@@ -133,7 +133,7 @@ if ($minApiVersion) {
 				<?php
 					foreach ($extension_coverage as $index => $coverage) {
 						$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
-						$link = "listdevicescoverage.php?extension=$extension_name&platform=".$coverage['platform'];
+						$link = "listdevicescoverage.php?extension=$extension_name&platform=".strtolower($coverage['platform']);
 						echo "<tr>";
 						echo "<td $color_style>".$coverage['platform']."</td>";
 						echo "<td><a href='$link'>".$coverage['coverage']."<span style='font-size:10px;'>%</span></a></td>";						
