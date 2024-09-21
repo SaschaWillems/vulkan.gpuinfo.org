@@ -98,20 +98,21 @@ while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
         continue;
     }
 
-    $coverageLink = "listdevicescoverage.php?extension=" . $row['name'] . "&platform=$platform";
+    $ext = $row['name'];
+    $coverageLink = "listdevicescoverage.php?extension=$ext&platform=$platform";
     $coverage = round($row['coverage'] / $deviceCount * 100, 2);
-    $ext = '<a href="displayextensiondetail.php?extension='.$row['name'].'">'.$row['name'].'</a>';
     $feature_link = null;
     if ($row['hasfeatures']) {
-        $feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
+        $feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a>";
     }
     $property_link = null;
     if ($row['hasproperties']) {
-        $property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
+        $property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a>";
     }
+    $ext_url = "<a href=\"displayextensiondetail.php?extension=$ext\">$ext</a>";
 
     $data[] = [
-        'name' => $ext,
+        'name' => $ext_url,
         'coverage' => "<a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a>",
         'coverageunsupported' => "<a class='na' href=\"$coverageLink&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a>",
         'features' => $feature_link, 
