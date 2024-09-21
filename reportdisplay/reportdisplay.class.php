@@ -207,6 +207,19 @@ class Report
         }
     }
 
+    public function fetchDeviceExtensionsBlacklist()
+    {
+        try {
+            $sql = "SELECT name from deviceextensions_blacklist";
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute();
+            $result = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
+            return $result;
+        } catch (Throwable $e) {
+            return null;
+        }
+    }    
+
     public function fetchFormats()
     {
         try {

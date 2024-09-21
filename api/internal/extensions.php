@@ -79,7 +79,7 @@ if ($platform !== 'all') {
     $dateColumn = 'date'.strtolower($platform);
 }
 
-// Some drivers erroneously report some instance extensions as device extensions
+// Some drivers wrongly report some instance extensions as device extensions
 // To avoid confusion, those entries are hidden
 $whereClause .= ($whereClause ? ' and ' : ' where ') . 'name not in (select name from deviceextensions_blacklist)';
 

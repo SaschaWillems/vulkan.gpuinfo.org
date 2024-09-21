@@ -29,14 +29,22 @@
 	</thead>
 	<tbody>
 		<?php
-		$data = $report->fetchExtensions();
-		if ($data) {
-			foreach ($data as $extension) {
-				$link = "displayextensiondetail.php?extension=".$extension['name'];
-				echo "<tr><td><a href='$link'>" . $extension['name'] . "</a></td>";
+		$extension_list = $report->fetchExtensions();
+		$extension_blacklist = $report->fetchDeviceExtensionsBlacklist();
+		foreach ($extension_list as $extension) {
+			$extension_name = $extension['name'];
+			echo "<tr>";
+			// Some drivers wrongly report some instance extensions as device extensions
+			// To avoid confusion, those entries are marked accordingly
+			if (in_array($extension_name, $extension_blacklist)) {
+				echo "<td class='na'>⚠️ $extension_name (<i>Wrongly reported as device instead of instance extension</i>)</td>";
+				echo "<td class='na'>r.".$extension['specversion']."</td>";
+			} else {
+				$link = "displayextensiondetail.php?extension=$extension_name";
+				echo "<td><a href='$link'>$extension_name</a></td>";
 				echo "<td>r.".$extension['specversion']."</td>";
-				echo "</tr>";
 			}
+			echo "</tr>";
 		}
 		?>
 	</tbody>
