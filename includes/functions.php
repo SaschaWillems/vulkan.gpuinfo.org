@@ -358,7 +358,15 @@ function getDriverId($value)
 		'GGP (Proprietary)' => 11,
 		'Broadcom (Proprietary)' => 12,
 		'Mesa LLVMPIPE' => 13,
-		'MoltenVK' => 14
+		'MoltenVK' => 14,
+		'Mesa Turnip' => 18,
+		'Mesa V3DV' => 19,
+		'Mesa panvk' => 20,
+		'Mesa venus' => 22,
+		'Mesa Dozen' => 23,
+		'Mesa NVK' => 24,
+		'Imagination Mesa (Open Source)' => 25,
+		'Mesa Honeykrisp' => 26
 	];
 	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
