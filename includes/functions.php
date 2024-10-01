@@ -347,18 +347,26 @@ function getDriverId($value)
 	$values = [
 		'AMD (Proprietary)' => 1,
 		'AMD (Open Source)' => 2,
-		'MESA RADV' => 3,
+		'Mesa RADV' => 3,
 		'NVIDIA (Proprietary)' => 4,
 		'Intel Windows (Proprietary)' => 5,
-		'Intel MESA (Open Source)' => 6,
+		'Intel Mesa (Open Source)' => 6,
 		'Imagination (Proprietary)' => 7,
 		'Qualcomm (Proprietary)' => 8,
 		'ARM (Proprietary)' => 9,
 		'Google Swiftshader' => 10,
 		'GGP (Proprietary)' => 11,
 		'Broadcom (Proprietary)' => 12,
-		'MESA LLVMPIPE' => 13,
-		'MoltenVK' => 14
+		'Mesa LLVMPIPE' => 13,
+		'MoltenVK' => 14,
+		'Mesa Turnip' => 18,
+		'Mesa V3DV' => 19,
+		'Mesa panvk' => 20,
+		'Mesa venus' => 22,
+		'Mesa Dozen' => 23,
+		'Mesa NVK' => 24,
+		'Imagination Mesa (Open Source)' => 25,
+		'Mesa Honeykrisp' => 26
 	];
 	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
