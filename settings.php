@@ -24,6 +24,8 @@ require 'pagegenerator.php';
 PageGenerator::header('Global settings');
 ?>
 
+<!-- @todo: fetch and display settings -->
+
 <div class="panel panel-default">
 	<div class="panel-body" style="margin-left:50px; width:65%px;">
 
@@ -59,9 +61,9 @@ PageGenerator::header('Global settings');
             </div>
 
             <div class="form-group">
-                <label for="coverage_os_selection" class="control-label col-sm-4">Default coverage view: </label>
+                <label for="default_os_selection" class="control-label col-sm-4">Default coverage view: </label>
                 <div class="col-sm-6">
-                    <select name="coverage_os_selection" id="coverage_os_selection" class="form-control">
+                    <select name="default_os_selection" id="default_os_selection" class="form-control">
                         <option value="all">All platforms</option>
                         <option value="windows">Windows</option>
                         <option value="linux">Linux</option>
