@@ -878,3 +878,9 @@ code {
 .faq > .entry > .answer::first-letter {
 	font-weight: bold;
 }
+
+.form-control {
+	background-color: var(--background-color-input);
+	border-color: var(--bordercolor);
+	color: var(--textcolor);
+}
