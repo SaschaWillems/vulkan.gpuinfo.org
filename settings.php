@@ -45,6 +45,11 @@ $platform_options = [
     'ios' => 'iOS'
 ];
 
+$device_type_options = [
+    'all' => 'All device types',
+    'no_cpu' => 'Exclude CPU implementations'
+]
+
 ?>
 
 <div class="container">
@@ -86,6 +91,20 @@ $platform_options = [
                         </select>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="device_types" class="control-label col-sm-4">Device types: </label>
+                    <div class="col-sm-6">
+                        <select name="device_types" id="device_types" class="form-control">
+                        <?php
+                            foreach ($device_type_options as $value => $text) {
+                                $select = ($_SESSION['device_types'] == $value) ? 'selected' : '';
+                                echo "<option value=\"$value\" $select>$text</option>";
+                            }
+                            ?>   
+                        </select>
+                    </div>
+                </div>                
 
                 <div class="form-group">
                     <label for="default_os_selection" class="control-label col-sm-4">Default coverage view: </label>
