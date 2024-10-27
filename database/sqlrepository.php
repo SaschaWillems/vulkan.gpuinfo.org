@@ -75,6 +75,12 @@ class SqlRepository {
         if (isset($_GET['platform'])) {
             return ostype(GET_sanitized('platform'));
         }
+		if (isset($_SESSION['default_os_selection'])) {
+			$default_os = sanitize($_SESSION['default_os_selection']);
+            if ($default_os !== 'all') {
+                return $default_os;
+            }
+		};
         return null;
     }
 
