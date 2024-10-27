@@ -60,6 +60,17 @@ class SqlRepository {
         return null;
     }
 
+    public static function getMinStartDate() {
+        if (isset($_SESSION['date_range'])) {
+            $max_report_age = (int)$_SESSION['date_range'];
+            if ($max_report_age !== null) {
+                $start_date = mktime(0, 0, 0, 1, 1, date('Y') - $max_report_age);
+                return date('Y-m-d', $start_date);
+            }
+        }
+        return null;
+    }    
+
     private static function getOSType() {
         if (isset($_GET['platform'])) {
             return ostype(GET_sanitized('platform'));
@@ -92,7 +103,12 @@ class SqlRepository {
         if ($apiversion) {
             self::appendCondition($sql, "r.apiversion >= :apiversion");
             $params['apiversion'] = $apiversion;
-        }      
+        }
+        $start_date = self::getMinStartDate();
+        if ($start_date) {
+            self::appendCondition($sql, "r.submissiondate >= :startdate");
+            $params['startdate'] = $start_date;            
+        }
     }
 
     public static function deviceCount($sqlAppend = null) {
@@ -108,6 +124,11 @@ class SqlRepository {
             self::appendCondition($sql, "r.apiversion >= :apiversion");
             $params['apiversion'] = $apiversion;
         }
+        $start_date = self::getMinStartDate();
+        if ($start_date) {
+            self::appendCondition($sql, "r.submissiondate >= :startdate");
+            $params['startdate'] = $start_date;            
+        }        
         $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);        
