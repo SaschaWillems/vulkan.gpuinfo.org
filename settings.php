@@ -47,69 +47,69 @@ $platform_options = [
 
 ?>
 
-<!-- @todo: fetch and display settings -->
+<div class="container">
+    <div class="center panel panel-default" style="margin: auto; max-width: 70%">
+        <div class="panel-body">
 
-<div class="panel panel-default">
-	<div class="panel-body" style="margin-left:50px; width:65%px;">
+            <div class="page-header">
+                <h2>Global settings</h2>
+            </div>
 
-        <div class="page-header">
-            <h2>Global settings</h2>
+            <div>Changes made on this page are globally applied to all views and can be used to prefilter data</div>
+
+            <form class="form-horizontal" style="max-width: 640px; margin-top: 50px;" action="database/updatesettings.php">
+
+                <div class="form-group">
+                    <label for="vulkan_version" class="control-label col-sm-4">Min. Vulkan version: </label>
+                    <div class="col-sm-6">
+                        <select name="vulkan_version" id="vulkan_version" class="form-control">
+                            <?php
+                            foreach ($version_options as $value => $text) {
+                                $select = ($_SESSION['minversion'] == $value) ? 'selected' : '';
+                                echo "<option value=\"$value\" $select>$text</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="date_range" class="control-label col-sm-4">Min. report age: </label>
+                    <div class="col-sm-6">
+                        <select name="date_range" id="date_range" class="form-control">
+                            <?php
+                            foreach ($date_options as $value => $text) {
+                                $select = ($_SESSION['date_range'] == $value) ? 'selected' : '';
+                                echo "<option value=\"$value\" $select>$text</option>";
+                            }
+                            ?>                        
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="default_os_selection" class="control-label col-sm-4">Default coverage view: </label>
+                    <div class="col-sm-6">
+                        <select name="default_os_selection" id="default_os_selection" class="form-control">
+                        <?php
+                            foreach ($platform_options as $value => $text) {
+                                $select = ($_SESSION['default_os_selection'] == $value) ? 'selected' : '';
+                                echo "<option value=\"$value\" $select>$text</option>";
+                            }
+                            ?>   
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="padding-top: 25px;">
+                    <div class="col-sm-offset-4 col-sm-10">
+                        <button type="submit" value="save" class="btn btn-success">Save settings</button>
+                        <button type="submit" value="reset" class="btn btn-danger">Reset to default</button>
+                    </div>
+                </div>
+
+            </form>
+
         </div>
-
-        <div>Changes made on this page are globally applied to all views and can be used to prefilter data</div>
-
-        <form class="form-horizontal" style="max-width: 640px; margin-top: 50px;" action="database/updatesettings.php">
-
-            <div class="form-group">
-                <label for="vulkan_version" class="control-label col-sm-4">Min. Vulkan version: </label>
-                <div class="col-sm-6">
-                    <select name="vulkan_version" id="vulkan_version" class="form-control">
-                        <?php
-                        foreach ($version_options as $value => $text) {
-                            $select = ($_SESSION['minversion'] == $value) ? 'selected' : '';
-                            echo "<option value=\"$value\" $select>$text</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="date_range" class="control-label col-sm-4">Min. report age: </label>
-                <div class="col-sm-6">
-                    <select name="date_range" id="date_range" class="form-control">
-                        <?php
-                        foreach ($date_options as $value => $text) {
-                            $select = ($_SESSION['date_range'] == $value) ? 'selected' : '';
-                            echo "<option value=\"$value\" $select>$text</option>";
-                        }
-                        ?>                        
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="default_os_selection" class="control-label col-sm-4">Default coverage view: </label>
-                <div class="col-sm-6">
-                    <select name="default_os_selection" id="default_os_selection" class="form-control">
-                    <?php
-                        foreach ($platform_options as $value => $text) {
-                            $select = ($_SESSION['default_os_selection'] == $value) ? 'selected' : '';
-                            echo "<option value=\"$value\" $select>$text</option>";
-                        }
-                        ?>   
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group" style="padding-top: 25px;">
-                <div class="col-sm-offset-4 col-sm-10">
-                    <button type="submit" value="save" class="btn btn-success">Save settings</button>
-                    <button type="submit" value="reset" class="btn btn-danger">Reset to default</button>
-                </div>
-            </div>
-
-        </form>
-
     </div>
 </div>

@@ -58,5 +58,4 @@ if (isset($_GET['default_os_selection'])) {
 }
 
 // Redirect to invoking page
-// @todo: pass update info
 header('Location: ' . $_SERVER['HTTP_REFERER']);
