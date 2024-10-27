@@ -89,25 +89,19 @@ class PageGenerator
 
 	public static function filterInfo()
 	{
-		$platform = null;
-		if (isset($_GET['platform'])) {
-			$platform = GET_sanitized('platform');
-		}
-		// @todo: also take from $_GET
-		$apiversion = null;
-		if (isset($_SESSION['minversion'])) {
-			$apiversion = sanitize($_SESSION['minversion']);
-		}
+		$platform = self::getDefaultOSSelection();
 		$info = '';
 		if ($platform && ($platform !== 'all')) {
 			$info = "<img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . self::platformDisplayName($platform);
 		} else {
 			$info = " all platforms";
 		}
-		if ($apiversion) {
-			$info .= " Vulkan $apiversion (and up)";
-		}
 		return $info;
+	}
+
+	public static function pageCaption($caption)
+	{
+		echo "<div class='header'><h4>$caption for ".PageGenerator::filterInfo()."</h4></div>";
 	}
 
 	/**
@@ -142,15 +136,15 @@ class PageGenerator
 		if ($combined_tab) {
 			// Combined tab for all supported platforms
 			$active = ($active_platform == 'all');
-			$target_url = $base_url;
+			$target_url = $base_url."?platform=all";
 			// Append url parameters
 			if ($url_parameter_string) {
-				$target_url .= '?'.$url_parameter_string;
+				$target_url .= '&'.$url_parameter_string;
 			}			
 			echo "<li" . ($active ? ' class="active"' : null) . "><a href='$target_url'>All platforms</a> </li>";
 		}
 		foreach (self::$platform_list as $navplatform) {
-			$active = ($active_platform == $navplatform);
+			$active = $active_platform == $navplatform;
 			$icon_size = ($navplatform == 'windows') ? 14 : 16;
 			$target_url = $base_url."?platform=".$navplatform;
 			// Append url parameters
@@ -193,4 +187,59 @@ class PageGenerator
 		</script>
 HTML;
 	}
+
+	// Global filter functions
+
+	public static function getDefaultOSSelection()
+    {
+        // Explicit page parameter has precedence over global setting
+        if (isset($_GET['platform'])) {
+            return GET_sanitized('platform');
+        }
+		if (isset($_SESSION['default_os_selection'])) {
+			return sanitize($_SESSION['default_os_selection']);
+		}
+        return 'all';
+    }
+    
+    public static function getGlobalDateRange()
+    {
+        // Explicit page parameter has precedence over global setting
+        if (isset($_GET['date_range'])) {
+            return GET_sanitized('date_range');
+        }
+		if (isset($_SESSION['date_range'])) {
+			return sanitize($_SESSION['date_range']);
+		}
+        return 'all';        
+    }
+
+    public static function getGlobalApiVersion()
+    {
+        // Explicit page parameter has precedence over global setting
+        if (isset($_GET['minversion'])) {
+            return GET_sanitized('minversion');
+        }
+		if (isset($_SESSION['minversion'])) {
+			return sanitize($_SESSION['minversion']);
+		}
+        return 'all';        
+    }    
+
+    // @todo: Function to display global filter
+    public static function globalFilterText()
+    {
+        $date_range = self::getGlobalDateRange();
+        $api_version = self::getGlobalApiVersion();
+        $filters = [];
+        if ($api_version && $api_version !== 'all') {
+            $filters[] = "min. Api version = $api_version";
+        }
+        if ($date_range && $date_range !== 'all') {
+            $filters[] = "date range = $date_range years";
+        }
+        if (count($filters) > 0) {
+            echo "<div class=\"page-filter\"><a href=\"settings.php\">Global filters</a> are applied: " . implode(', ', $filters)."</div>";
+        }
+    }
 }
