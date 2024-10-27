@@ -306,6 +306,22 @@
 		":osarchitecture" => $json['environment']['architecture'],
 	);
 
+	// Use device name and/or manufacturer from platform info an Android to further distinguish devices
+	if (array_key_exists('platformdetails', $json)) {
+		$log("Report has platform details");
+		$jsonnode = $json['platformdetails']; 
+		if (array_key_exists('android.ProductManufacturer', $jsonnode)) {
+			$log("Report has android.ProductManufacturer = ".$jsonnode['android.ProductManufacturer']);
+			$params["androidproductmanufacturer"] = $jsonnode['android.ProductManufacturer'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 3 and value = :androidproductmanufacturer)";
+		}
+		if (array_key_exists('android.ProductModel', $jsonnode)) {
+			$log("Report has android.ProductModel = ".$jsonnode['android.ProductModel']);
+			$params["androidproductmodel"] = $jsonnode['android.ProductModel'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 4 and value = :androidproductmodel)";
+		}
+	}	
+
 	try {
 		$stmnt = DB::$connection->prepare($sql);		
 		$stmnt->execute($params);	
@@ -329,13 +345,14 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
 			VALUES
-				(:submitter, :devicename, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";			
 
 		$values = array(
 			":submitter" => $json['environment']['submitter'],
 			":devicename" => $json['properties']['deviceName'],
+			":devicetype" => $json['properties']['deviceType'],
 			":displayname" => $json['properties']['displayName'],
 			":driverversion" => $json['properties']['driverVersionText'],
 			":apiversion" => $json['properties']['apiVersionText'],
@@ -543,6 +560,10 @@
 	{
 		$jsonnode = $json['extensions']; 
 		foreach ($jsonnode as $ext) {
+			// Some devices report empty extensions, skip them
+			if (trim($ext['extensionName']) == "") {
+				continue;
+			}
 			// Add to global mapping table (if not already present)
 			$sql = "INSERT IGNORE INTO extensions (name) VALUES (:name)";
 			$stmnt = DB::$connection->prepare($sql);
@@ -889,8 +910,8 @@
 				}
 				// Mark extension to have additional features
 				try {
-					$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
-					$stmnt_mark->execute(['extension' => $feature['extension']]);
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at marking extension to have additional features)');
 				}
@@ -921,8 +942,8 @@
 				}
 				// Mark extension to have additional properties
 				try {
-					$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
-					$stmnt_mark->execute(['extension' => $feature['extension']]);
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at marking extension to have additional properties)');
 				}
