@@ -57,5 +57,16 @@ if (isset($_GET['default_os_selection'])) {
     }
 }
 
+if (isset($_GET['device_types'])) {
+    $device_types = ['all', 'no_cpu'];
+    if (in_array($_GET['device_types'], $device_types)) {
+        if ($_GET['device_types'] == 'all') {
+            unset($_SESSION['device_types']);
+        } else {
+            $_SESSION['device_types'] = $_GET['device_types'];
+        }
+    }
+}
+
 // Redirect to invoking page
 header('Location: ' . $_SERVER['HTTP_REFERER']);

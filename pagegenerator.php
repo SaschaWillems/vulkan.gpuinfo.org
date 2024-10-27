@@ -214,6 +214,18 @@ HTML;
         return 'all';        
     }
 
+	public static function getDefaultDeviceTypeSelection()
+    {
+        // Explicit page parameter has precedence over global setting
+        if (isset($_GET['device_types'])) {
+            return GET_sanitized('device_types');
+        }
+		if (isset($_SESSION['device_types'])) {
+			return sanitize($_SESSION['device_types']);
+		}
+        return 'all';
+    }
+
     public static function getGlobalApiVersion()
     {
         // Explicit page parameter has precedence over global setting
@@ -231,12 +243,18 @@ HTML;
     {
         $date_range = self::getGlobalDateRange();
         $api_version = self::getGlobalApiVersion();
+		$device_types = self::getDefaultDeviceTypeSelection();
         $filters = [];
         if ($api_version && $api_version !== 'all') {
             $filters[] = "min. Api version = $api_version";
         }
         if ($date_range && $date_range !== 'all') {
-            $filters[] = "date range = $date_range years";
+            $filters[] = "date range = $date_range year(s)";
+        }
+        if ($device_types && $device_types !== 'all') {
+			if ($device_types == 'no_cpu') {
+            	$filters[] = "excluding CPU based implementations";
+			}
         }
         if (count($filters) > 0) {
             echo "<div class=\"page-filter\"><a href=\"settings.php\">Global filters</a> are applied: " . implode(', ', $filters)."</div>";

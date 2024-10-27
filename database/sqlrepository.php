@@ -69,7 +69,19 @@ class SqlRepository {
             }
         }
         return null;
-    }    
+    }
+
+	public static function getDeviceTypeSelection()
+    {
+        // Explicit page parameter has precedence over global setting
+        if (isset($_GET['device_types'])) {
+            return GET_sanitized('device_types');
+        }
+		if (isset($_SESSION['device_types'])) {
+			return sanitize($_SESSION['device_types']);
+		}
+        return null;
+    }
 
     private static function getOSType() {
         if (isset($_GET['platform'])) {
@@ -115,6 +127,13 @@ class SqlRepository {
             self::appendCondition($sql, "r.submissiondate >= :startdate");
             $params['startdate'] = $start_date;            
         }
+        $device_types = self::getDeviceTypeSelection();
+        if ($device_types) {
+            if ($device_types == 'no_cpu') {
+                self::appendCondition($sql, "r.devicetype != :devicetype");
+                $params['devicetype'] = 4;
+            }
+        }
     }
 
     public static function deviceCount($sqlAppend = null) {
@@ -134,7 +153,14 @@ class SqlRepository {
         if ($start_date) {
             self::appendCondition($sql, "r.submissiondate >= :startdate");
             $params['startdate'] = $start_date;            
-        }        
+        }
+        $device_types = self::getDeviceTypeSelection();
+        if ($device_types) {
+            if ($device_types == 'no_cpu') {
+                self::appendCondition($sql, "dp.devicetype != :devicetype");
+                $params['devicetype'] = 'cpu';
+            }
+        }
         $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);        
