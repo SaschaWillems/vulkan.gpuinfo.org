@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -25,17 +25,11 @@ require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
 PageGenerator::header("Surface formats");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Surface format support");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Surface format support on ".PageGenerator::filterInfo($platform); ?>
-</div>
 
 <div class="centered">
 	<?php PageGenerator::platformNavigation('listsurfaceformats.php', $platform, true); ?>
