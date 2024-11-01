@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -26,17 +26,11 @@ require './database/sqlrepository.php';
 include './includes/constants.php';
 include './includes/functions.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
-PageGenerator::header("Features");
+PageGenerator::header("Core 1.0 features");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Core 1.0 device feature coverage");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Core 1.0 device feature coverage for ".PageGenerator::filterInfo($platform) ?>
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listfeaturescore10.php', $platform, true); ?>
@@ -61,7 +55,7 @@ PageGenerator::header("Features");
 					foreach ($features as $feature => $coverage) {
 						$coverageLink = "listdevicescoverage.php?feature=$feature&platform=$platform";
 						echo "<tr>";
-						echo "<td>" . $feature . "</td>";
+						echo "<td>$feature</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
