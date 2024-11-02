@@ -90,7 +90,7 @@ class SqlRepository {
 		if (isset($_SESSION['default_os_selection'])) {
 			$default_os = sanitize($_SESSION['default_os_selection']);
             if ($default_os !== 'all') {
-                return $default_os;
+                return ostype($default_os);
             }
 		};
         return null;
@@ -209,18 +209,12 @@ class SqlRepository {
 
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
-        $table = 'devicefeatures';
-        switch ($version) {
-            case self::VK_API_VERSION_1_1:
-                $table = 'devicefeatures11';
-                break;
-            case self::VK_API_VERSION_1_2:
-                $table = 'devicefeatures12';
-                break;
-            case self::VK_API_VERSION_1_3:
-                $table = 'devicefeatures13';
-                break;
-        }
+        $table = match($version) {
+            self::VK_API_VERSION_1_1 => 'devicefeatures11',
+            self::VK_API_VERSION_1_2 => 'devicefeatures12',
+            self::VK_API_VERSION_1_3 => 'devicefeatures13',
+            default => 'devicefeatures',
+        };
 
         // Collect feature column names
         $sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = '$table' and COLUMN_NAME not in ('reportid')";
@@ -243,16 +237,7 @@ class SqlRepository {
         // Get device support coverage
         $params = [];
         $sql ="SELECT ifnull(r.displayname, dp.devicename) as device, $sqlColumnList FROM $table df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid";
-        $ostype = self::getOSType();
-        if ($ostype !== null) {            
-            self::appendCondition($sql, "ostype = :ostype");
-            $params['ostype'] = $ostype;
-        }
-        $apiversion = self::getMinApiVersion();
-        if ($apiversion) {
-            self::appendCondition($sql, "r.apiversion >= :apiversion");
-            $params['apiversion'] = $apiversion;
-        }
+        self::appendFilters($sql, $params);
         $sql .= " group by device";
 
         // $supportedCounts = [];
@@ -317,18 +302,12 @@ class SqlRepository {
 
     /** Global core property listings */
     public static function listCoreProperties($version) { 
-        $table = 'deviceproperties';
-        switch ($version) {
-            case self::VK_API_VERSION_1_1:
-                $table = 'deviceproperties11';
-                break;
-            case self::VK_API_VERSION_1_2:
-                $table = 'deviceproperties12';
-                break;
-            case self::VK_API_VERSION_1_3:
-                $table = 'deviceproperties13';
-                break;
-        }
+        $table = match($version) {
+            self::VK_API_VERSION_1_1 => 'deviceproperties11',
+            self::VK_API_VERSION_1_2 => 'deviceproperties12',
+            self::VK_API_VERSION_1_3 => 'deviceproperties13',
+            default => 'deviceproperties',
+        };
 
         // Columns with coverage numbers
         $coverage_columns = [
