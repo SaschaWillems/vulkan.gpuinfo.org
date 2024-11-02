@@ -37,7 +37,7 @@ $platform = PageGenerator::getDefaultOSSelection();
 if ($extension) {
 	echo "<div class='header'><h4>Available extension features for <code>$extension</code> on " . PageGenerator::filterInfo(). "</div>";
 } else {
-	PageGenerator::pageCaption("Core 1.0 device feature coverage");
+	PageGenerator::pageCaption("Extension device feature coverage");
 }
 PageGenerator::globalFilterText();
 ?>
