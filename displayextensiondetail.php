@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2024by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -131,8 +131,8 @@ if ($minApiVersion) {
 				</thead>
 				<tbody>
 				<?php
-					foreach ($extension_coverage as $index => $coverage) {
-						$color_style = "style='border-left: ".Chart::getColor($index)." 3px solid'";
+					foreach ($extension_coverage as $i => $coverage) {
+						$color_style = "style='border-left: ".Chart::platformColors[$i]." 3px solid'";
 						$link = "listdevicescoverage.php?extension=$extension_name&platform=".strtolower($coverage['platform']);
 						echo "<tr>";
 						echo "<td $color_style>".$coverage['platform']."</td>";
