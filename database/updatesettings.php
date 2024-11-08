@@ -22,51 +22,62 @@
 
 session_set_cookie_params(31536000, '/', $_SERVER['SERVER_NAME']);
 session_name('vulkan');
-session_start(); 
+session_start();
 
-if (isset($_GET['vulkan_version'])) {
+if (isset($_POST['reset'])) {
+    unset($_SESSION['minversion']);
+    unset($_SESSION['date_range']);
+    unset($_SESSION['default_os_selection']);
+    unset($_SESSION['device_types']);
+    $_SESSION['message'] = 'Settings reset to default';
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    exit;
+}
+
+if (isset($_POST['vulkan_version'])) {
     $available_versions = ['1.1', '1.2', '1.3', 'all'];
-    if (in_array($_GET['vulkan_version'], $available_versions)) {
-        if ($_GET['vulkan_version'] == 'all') {
+    if (in_array($_POST['vulkan_version'], $available_versions)) {
+        if ($_POST['vulkan_version'] == 'all') {
             unset($_SESSION['minversion']);
         } else {
-            $_SESSION['minversion'] = $_GET['vulkan_version'];
+            $_SESSION['minversion'] = $_POST['vulkan_version'];
         }
     }
 }
 
-if (isset($_GET['date_range'])) {
+if (isset($_POST['date_range'])) {
     $available_date_ranges = ['1', '2', 'all'];
-    if (in_array($_GET['date_range'], $available_date_ranges)) {
-        if ($_GET['date_range'] == 'all') {
+    if (in_array($_POST['date_range'], $available_date_ranges)) {
+        if ($_POST['date_range'] == 'all') {
             unset($_SESSION['date_range']);
         } else {
-            $_SESSION['date_range'] = $_GET['date_range'];
+            $_SESSION['date_range'] = $_POST['date_range'];
         }
     }
 }
 
-if (isset($_GET['default_os_selection'])) {
+if (isset($_POST['default_os_selection'])) {
     $available_os = ['windows', 'linux', 'android', 'macos', 'ios', 'all'];
-    if (in_array($_GET['default_os_selection'], $available_os)) {
-        if ($_GET['default_os_selection'] == 'all') {
+    if (in_array($_POST['default_os_selection'], $available_os)) {
+        if ($_POST['default_os_selection'] == 'all') {
             unset($_SESSION['default_os_selection']);
         } else {
-            $_SESSION['default_os_selection'] = $_GET['default_os_selection'];
+            $_SESSION['default_os_selection'] = $_POST['default_os_selection'];
         }
     }
 }
 
-if (isset($_GET['device_types'])) {
+if (isset($_POST['device_types'])) {
     $device_types = ['all', 'no_cpu'];
-    if (in_array($_GET['device_types'], $device_types)) {
-        if ($_GET['device_types'] == 'all') {
+    if (in_array($_POST['device_types'], $device_types)) {
+        if ($_POST['device_types'] == 'all') {
             unset($_SESSION['device_types']);
         } else {
-            $_SESSION['device_types'] = $_GET['device_types'];
+            $_SESSION['device_types'] = $_POST['device_types'];
         }
     }
 }
 
 // Redirect to invoking page
+$_SESSION['message'] = 'Settings saved';
 header('Location: ' . $_SERVER['HTTP_REFERER']);

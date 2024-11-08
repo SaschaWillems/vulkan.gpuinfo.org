@@ -62,7 +62,7 @@ $device_type_options = [
 
             <div>Changes made on this page are globally applied to all views and can be used to prefilter data</div>
 
-            <form class="form-horizontal" style="max-width: 640px; margin-top: 50px;" action="database/updatesettings.php">
+            <form class="form-horizontal" style="max-width: 640px; margin-top: 50px;" action="database/updatesettings.php" method="POST">
 
                 <div class="form-group">
                     <label for="vulkan_version" class="control-label col-sm-4">Min. Vulkan version: </label>
@@ -122,10 +122,17 @@ $device_type_options = [
 
                 <div class="form-group" style="padding-top: 25px;">
                     <div class="col-sm-offset-4 col-sm-10">
-                        <button type="submit" value="save" class="btn btn-success">Save settings</button>
-                        <button type="submit" value="reset" class="btn btn-danger">Reset to default</button>
+                        <button type="submit" name="save" class="btn btn-success">Save settings</button>
+                        <button type="submit" name="reset" class="btn btn-danger">Reset to default</button>
                     </div>
                 </div>
+
+                <?php
+                    if (isset($_SESSION['message'])) {
+                        echo "<div class=\"col-sm-4\"></div><div class=\"col-sm-6\"><div style=\"margin: 5px 0px 15px 0px;\">".$_SESSION['message']."</div></div>";
+                        unset($_SESSION['message']);
+                    }
+                ?>
 
             </form>
 
