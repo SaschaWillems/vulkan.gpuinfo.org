@@ -133,6 +133,10 @@ class SqlRepository {
                 self::appendCondition($sql, "r.devicetype != :devicetype");
                 $params['devicetype'] = 4;
             }
+            if ($device_types == 'no_virtual') {
+                self::appendCondition($sql, "r.devicetype != :devicetype");
+                $params['devicetype'] = 3;
+            }
         }
     }
 

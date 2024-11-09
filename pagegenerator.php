@@ -255,6 +255,9 @@ HTML;
 			if ($device_types == 'no_cpu') {
             	$filters[] = "excluding CPU based implementations";
 			}
+			if ($device_types == 'no_virtual') {
+            	$filters[] = "excluding virtual implementations";
+			}
         }
         if (count($filters) > 0) {
             echo "<div class=\"page-filter\"><a href=\"settings.php\">Global filters</a> are applied: " . implode(', ', $filters)."</div>";

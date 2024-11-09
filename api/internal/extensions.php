@@ -78,9 +78,15 @@ if ($start_date) {
 }
 
 $device_selection = SqlRepository::getDeviceTypeSelection();
-if ($device_selection && $device_selection == 'no_cpu') {
-    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
-    $params['devicetype'] = 4;    
+if ($device_selection) {
+    if ($device_selection == 'no_cpu') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        $params['devicetype'] = 4;
+    }
+    if ($device_selection == 'no_virtual') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        $params['devicetype'] = 3;
+    }
 }
 
 $filteredCount = 0;

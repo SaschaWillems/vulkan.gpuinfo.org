@@ -47,7 +47,9 @@ $platform_options = [
 
 $device_type_options = [
     'all' => 'All device types',
-    'no_cpu' => 'Exclude CPU implementations'
+    'no_cpu' => 'Exclude CPU implementations',
+    'no_virtual' => 'Exclude virtual implementations'
+    // @todo no cpu & no virtual
 ]
 
 ?>
