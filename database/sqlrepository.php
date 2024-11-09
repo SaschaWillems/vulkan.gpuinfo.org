@@ -129,14 +129,18 @@ class SqlRepository {
         }
         $device_types = self::getDeviceTypeSelection();
         if ($device_types) {
-            if ($device_types == 'no_cpu') {
-                self::appendCondition($sql, "r.devicetype != :devicetype");
-                $params['devicetype'] = 4;
-            }
             if ($device_types == 'no_virtual') {
                 self::appendCondition($sql, "r.devicetype != :devicetype");
                 $params['devicetype'] = 3;
             }
+            if ($device_types == 'no_cpu') {
+                self::appendCondition($sql, "r.devicetype != :devicetype");
+                $params['devicetype'] = 4;
+            }
+            if ($device_types = 'no_cpu_no_virtual') {
+                self::appendCondition($whereClause, "r.devicetype < :devicetype");
+                $params['devicetype'] = 3;
+            }            
         }
     }
 

@@ -68,7 +68,7 @@ if (isset($_POST['default_os_selection'])) {
 }
 
 if (isset($_POST['device_types'])) {
-    $device_types = ['all', 'no_cpu', 'no_virtual'];
+    $device_types = ['all', 'no_cpu', 'no_virtual', 'no_cpu_no_virtual'];
     if (in_array($_POST['device_types'], $device_types)) {
         if ($_POST['device_types'] == 'all') {
             unset($_SESSION['device_types']);
