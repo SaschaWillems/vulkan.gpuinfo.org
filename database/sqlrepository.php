@@ -60,10 +60,39 @@ class SqlRepository {
         return null;
     }
 
+    public static function getMinStartDate() {
+        if (isset($_SESSION['date_range'])) {
+            $max_report_age = (int)$_SESSION['date_range'];
+            if ($max_report_age !== null) {
+                $start_date = mktime(0, 0, 0, 1, 1, date('Y') - $max_report_age);
+                return date('Y-m-d', $start_date);
+            }
+        }
+        return null;
+    }
+
+	public static function getDeviceTypeSelection()
+    {
+        // Explicit page parameter has precedence over global setting
+        if (isset($_GET['device_types'])) {
+            return GET_sanitized('device_types');
+        }
+		if (isset($_SESSION['device_types'])) {
+			return sanitize($_SESSION['device_types']);
+		}
+        return null;
+    }
+
     private static function getOSType() {
         if (isset($_GET['platform'])) {
             return ostype(GET_sanitized('platform'));
         }
+		if (isset($_SESSION['default_os_selection'])) {
+			$default_os = sanitize($_SESSION['default_os_selection']);
+            if ($default_os !== 'all') {
+                return ostype($default_os);
+            }
+		};
         return null;
     }
 
@@ -92,7 +121,27 @@ class SqlRepository {
         if ($apiversion) {
             self::appendCondition($sql, "r.apiversion >= :apiversion");
             $params['apiversion'] = $apiversion;
-        }      
+        }
+        $start_date = self::getMinStartDate();
+        if ($start_date) {
+            self::appendCondition($sql, "r.submissiondate >= :startdate");
+            $params['startdate'] = $start_date;            
+        }
+        $device_types = self::getDeviceTypeSelection();
+        if ($device_types) {
+            if ($device_types == 'no_virtual') {
+                self::appendCondition($sql, "r.devicetype != :devicetype");
+                $params['devicetype'] = 3;
+            }
+            if ($device_types == 'no_cpu') {
+                self::appendCondition($sql, "r.devicetype != :devicetype");
+                $params['devicetype'] = 4;
+            }
+            if ($device_types = 'no_cpu_no_virtual') {
+                self::appendCondition($whereClause, "r.devicetype < :devicetype");
+                $params['devicetype'] = 3;
+            }            
+        }
     }
 
     public static function deviceCount($sqlAppend = null) {
@@ -107,6 +156,18 @@ class SqlRepository {
         if ($apiversion) {
             self::appendCondition($sql, "r.apiversion >= :apiversion");
             $params['apiversion'] = $apiversion;
+        }
+        $start_date = self::getMinStartDate();
+        if ($start_date) {
+            self::appendCondition($sql, "r.submissiondate >= :startdate");
+            $params['startdate'] = $start_date;            
+        }
+        $device_types = self::getDeviceTypeSelection();
+        if ($device_types) {
+            if ($device_types == 'no_cpu') {
+                self::appendCondition($sql, "dp.devicetype != :devicetype");
+                $params['devicetype'] = 'cpu';
+            }
         }
         $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
@@ -156,18 +217,12 @@ class SqlRepository {
 
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
-        $table = 'devicefeatures';
-        switch ($version) {
-            case self::VK_API_VERSION_1_1:
-                $table = 'devicefeatures11';
-                break;
-            case self::VK_API_VERSION_1_2:
-                $table = 'devicefeatures12';
-                break;
-            case self::VK_API_VERSION_1_3:
-                $table = 'devicefeatures13';
-                break;
-        }
+        $table = match($version) {
+            self::VK_API_VERSION_1_1 => 'devicefeatures11',
+            self::VK_API_VERSION_1_2 => 'devicefeatures12',
+            self::VK_API_VERSION_1_3 => 'devicefeatures13',
+            default => 'devicefeatures',
+        };
 
         // Collect feature column names
         $sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = '$table' and COLUMN_NAME not in ('reportid')";
@@ -190,16 +245,7 @@ class SqlRepository {
         // Get device support coverage
         $params = [];
         $sql ="SELECT ifnull(r.displayname, dp.devicename) as device, $sqlColumnList FROM $table df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid";
-        $ostype = self::getOSType();
-        if ($ostype !== null) {            
-            self::appendCondition($sql, "ostype = :ostype");
-            $params['ostype'] = $ostype;
-        }
-        $apiversion = self::getMinApiVersion();
-        if ($apiversion) {
-            self::appendCondition($sql, "r.apiversion >= :apiversion");
-            $params['apiversion'] = $apiversion;
-        }
+        self::appendFilters($sql, $params);
         $sql .= " group by device";
 
         // $supportedCounts = [];
@@ -264,18 +310,12 @@ class SqlRepository {
 
     /** Global core property listings */
     public static function listCoreProperties($version) { 
-        $table = 'deviceproperties';
-        switch ($version) {
-            case self::VK_API_VERSION_1_1:
-                $table = 'deviceproperties11';
-                break;
-            case self::VK_API_VERSION_1_2:
-                $table = 'deviceproperties12';
-                break;
-            case self::VK_API_VERSION_1_3:
-                $table = 'deviceproperties13';
-                break;
-        }
+        $table = match($version) {
+            self::VK_API_VERSION_1_1 => 'deviceproperties11',
+            self::VK_API_VERSION_1_2 => 'deviceproperties12',
+            self::VK_API_VERSION_1_3 => 'deviceproperties13',
+            default => 'deviceproperties',
+        };
 
         // Columns with coverage numbers
         $coverage_columns = [

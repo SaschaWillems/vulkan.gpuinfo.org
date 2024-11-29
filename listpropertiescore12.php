@@ -26,20 +26,11 @@ require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
-PageGenerator::header("Core 1.2 properties");
+PageGenerator::header("Core 1.2 features");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Core 1.2 device feature coverage");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Core 1.2 properties for ".PageGenerator::filterInfo($platform) ?>
-</div>
-<div class="alert alert-info" role="alert" style="text-align: center">
-	<b>Note:</b> Data is based on reports submitted or updated with version 3.0 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listpropertiescore12.php', $platform, true); ?>

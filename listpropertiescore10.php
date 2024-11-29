@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -26,17 +26,11 @@ require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
 PageGenerator::header("Core 1.0 properties");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Core 1.0 device properties coverage");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Core 1.0 properties for ".PageGenerator::filterInfo($platform) ?>
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listpropertiescore10.php', $platform, true); ?>
