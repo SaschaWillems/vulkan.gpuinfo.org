@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -123,7 +123,7 @@ function insertExtensionProperties($report)
 	$report->endTab();
 }
 
-$display_tabs = ($report->flags->has_vulkan_1_1_properties || $report->has_vulkan_1_2_properties || $report->flags->has_extended_properties);
+$display_tabs = ($report->flags->has_vulkan_1_1_properties || $report->flags->has_vulkan_1_2_properties || $report->flags->has_vulkan_1_3_properties || $report->flags->has_vulkan_1_4_properties || $report->flags->has_extended_properties);
 if ($display_tabs) {
 	echo "<div>";
 	echo "	<ul class='nav nav-tabs nav-level1'>";
@@ -137,6 +137,9 @@ if ($display_tabs) {
 	if ($report->flags->has_vulkan_1_3_properties) {
 		echo "<li><a data-toggle='tab' href='#properties_core_13'>Core 1.3</a></li>";
 	}
+	if ($report->flags->has_vulkan_1_4_properties) {
+		echo "<li><a data-toggle='tab' href='#properties_core_14'>Core 1.4</a></li>";
+	}	
 	if ($report->flags->has_extended_properties) {
 		echo "<li><a data-toggle='tab' href='#properties_extensions'>Extensions</a></li>";
 	}
@@ -154,6 +157,9 @@ if ($report->flags->has_vulkan_1_2_properties) {
 }
 if ($report->flags->has_vulkan_1_3_properties) {
 	insertCoreProperties($report, '1.3');
+}
+if ($report->flags->has_vulkan_1_4_properties) {
+	insertCoreProperties($report, '1.4');
 }
 if ($report->flags->has_extended_properties) {
 	insertExtensionProperties($report);

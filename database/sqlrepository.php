@@ -28,6 +28,7 @@ class SqlRepository {
     const VK_API_VERSION_1_1 = '1.1';
     const VK_API_VERSION_1_2 = '1.2';
     const VK_API_VERSION_1_3 = '1.3';
+    const VK_API_VERSION_1_4 = '1.4';
 
     public static function getDevicePropertiesTable($version) {
         switch ($version) {
