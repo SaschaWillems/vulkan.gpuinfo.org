@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -170,6 +170,7 @@ session_start();
 							<li><a href="database/setapiversion.php?version=1.1">Core 1.1 (and up)</a></li>
 							<li><a href="database/setapiversion.php?version=1.2">Core 1.2 (and up)</a></li>
 							<li><a href="database/setapiversion.php?version=1.3">Core 1.3 (and up)</a></li>
+							<li><a href="database/setapiversion.php?version=1.4">Core 1.4 (and up)</a></li>
 						</ul>
 					</li>
 					<li><a href="download.php">Download</a></li>
