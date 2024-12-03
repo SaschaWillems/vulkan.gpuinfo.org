@@ -168,6 +168,9 @@ class SqlRepository {
             case self::VK_API_VERSION_1_3:
                 $table = 'devicefeatures13';
                 break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'devicefeatures14';
+                break;                
         }
 
         // Collect feature column names
@@ -276,6 +279,9 @@ class SqlRepository {
             case self::VK_API_VERSION_1_3:
                 $table = 'deviceproperties13';
                 break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'deviceproperties14';
+                break;
         }
 
         // Columns with coverage numbers
@@ -350,7 +356,20 @@ class SqlRepository {
             'idpAccumulatingSaturating64BitSignedAccelerated',
             'idpAccumulatingSaturating64BitMixedSignednessAccelerated',
             'storageTexelBufferOffsetSingleTexelAlignment',
-            'uniformTexelBufferOffsetSingleTexelAlignment',            
+            'uniformTexelBufferOffsetSingleTexelAlignment',
+            // VK 1.4
+           'supportsNonZeroFirstInstance',
+           'dynamicRenderingLocalReadDepthStencilAttachments',
+           'dynamicRenderingLocalReadMultisampledAttachments',
+           'earlyFragmentMultisampleCoverageAfterSampleCounting',
+           'earlyFragmentSampleMaskTestBeforeSampleCounting',
+           'depthStencilSwizzleOneSupport',
+           'polygonModePointSize',
+           'nonStrictSinglePixelWideLinesUseParallelogram',
+           'nonStrictWideLinesUseParallelogram',
+           'blockTexelViewCompatibleMultipleLayers',
+           'fragmentShadingRateClampCombinerInputs',
+           'identicalMemoryTypeRequirements',
         ];
        
         // Columns to ignore (not part of the api structure)

@@ -31,15 +31,15 @@ if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
 
-PageGenerator::header("Core 1.2 properties");
+PageGenerator::header("Core 1.4 properties");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.2 properties for ".PageGenerator::filterInfo() ?>
+	<?php echo "<h4>Core 1.4 properties for ".PageGenerator::filterInfo() ?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listpropertiescore12.php', $platform, true); ?>
+	<?php PageGenerator::platformNavigation('listpropertiescore14.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-selection">
@@ -54,17 +54,18 @@ PageGenerator::header("Core 1.2 properties");
 				<?php
 				DB::connect();
 				try {
-					$properties = SqlRepository::listCoreProperties(SqlRepository::VK_API_VERSION_1_2);
+					$properties = SqlRepository::listCoreProperties(SqlRepository::VK_API_VERSION_1_4);
 					foreach ($properties as $property => $coverage) {
 						$has_coverage = is_numeric($coverage);
+						$field_name = getFullFieldName($property);
 						echo "<tr>";
-						echo "<td>$property</a></td>";
+						echo "<td>$field_name</a></td>";
 						echo "<td class='text-center'>".($has_coverage ? 'Coverage' : 'Values')."</td>";
 						if ($has_coverage) {
-							$link = "listdevicescoverage.php?core=1.2&coreproperty=$property&platform=$platform";
+							$link = "listdevicescoverage.php?core=1.4&coreproperty=$field_name&platform=$platform";
 							echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						} else {
-							$link = "<a href='displaycoreproperty.php?core=1.2&name=$property&platform=$platform'>";
+							$link = "<a href='displaycoreproperty.php?core=1.4&name=$field_name&platform=$platform'>";
 							echo "<td class='text-center'>".$link."Listing</a></td>";
 						}
 						echo "</tr>";
