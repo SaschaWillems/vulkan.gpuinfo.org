@@ -38,6 +38,8 @@ class SqlRepository {
                 return('deviceproperties12');
             case self::VK_API_VERSION_1_3:
                 return('deviceproperties13');
+            case self::VK_API_VERSION_1_4:
+                return('deviceproperties14');
         }
         return 'deviceproperties';
     }
@@ -50,6 +52,8 @@ class SqlRepository {
                 return('devicefeatures12');
             case self::VK_API_VERSION_1_3:
                 return('devicefeatures13');
+            case self::VK_API_VERSION_1_4:
+                return('devicefeatures14');
         }
         return 'devicefeatures';
     }    
@@ -349,7 +353,7 @@ class SqlRepository {
             'idpAccumulatingSaturating16BitUnsignedAccelerated',
             'idpAccumulatingSaturating16BitSignedAccelerated',
             'idpAccumulatingSaturating16BitMixedSignednessAccelerated',
-            'idpAccumulatingSaturating32BitUnsignedAccelerated',
+            'idpAccumulatingSaturating32BitUnsignedAcceleratdised',
             'idpAccumulatingSaturating32BitSignedAccelerated',
             'idpAccumulatingSaturating32BitMixedSignednessAccelerated',
             'idpAccumulatingSaturating64BitUnsignedAccelerated',
