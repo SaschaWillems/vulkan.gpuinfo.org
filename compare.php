@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -184,8 +184,12 @@ $repids = implode(",", $reportids);
 				'table_features_core_10',
 				'table_features_core_11',
 				'table_features_core_12',
+				'table_features_core_13',
+				'table_features_core_14',
 				'table_properties_core_11',
 				'table_properties_core_12',
+				'table_properties_core_13',
+				'table_properties_core_14',
 				'compareprofiles',
 			];
 			for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
