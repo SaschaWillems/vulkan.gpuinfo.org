@@ -26,6 +26,7 @@
  *  - If the newer report has Core 1.1 features and/or properties that the old report is lacking
  *  - If the newer report has Core 1.2 features and/or properties that the old report is lacking
  *  - If the newer report has Core 1.3 features and/or properties that the old report is lacking
+ *  - If the newer report has Core 1.4 features and/or properties that the old report is lacking
  *  - If the newer report has extension features and/or properties that the old report is lacking
  *  - If the newer report has profiles that the old report is lacking
  *  - If the newer report has surface formats that the old report is lacking (see https://github.com/SaschaWillems/VulkanCapsViewer/issues/177)
@@ -136,6 +137,37 @@ function check_core13_data_updatable($report, $compare_id, &$updatable)
 				$stmnt->execute(['reportid' => $compare_id]);
 				if ($stmnt->rowCount() == 0) {
 					$updatable[] = 'Vulkan core 1.3 properties';
+					$result = true;
+				}
+			}
+		}
+	}
+	return $result;
+}
+
+function check_core14_data_updatable($report, $compare_id, &$updatable)
+{
+	$result = false;
+	if (array_key_exists('core14', $report)) {
+		if (array_key_exists('features', $report['core14'])) {
+			// Update allowed if features are present in new report, but no in old report
+			if ((is_array($report['core14']['features'])) && (count($report['core14']['features']) > 0)) {
+				// Update allowed if no features present in old report 
+				$stmnt = DB::$connection->prepare("SELECT * from devicefeatures14 where reportid = :reportid");
+				$stmnt->execute(['reportid' => $compare_id]);
+				if ($stmnt->rowCount() == 0) {
+					$updatable[] = 'Vulkan core 1.4 features';
+					$result = true;
+				}
+			}
+		}
+		if (array_key_exists('properties', $report['core14'])) {
+			// Update allowed if properties are present in new report, but no in old report
+			if ((is_array($report['core14']['properties'])) && (count($report['core14']['properties']) > 0)) {
+				$stmnt = DB::$connection->prepare("SELECT * from deviceproperties14 where reportid = :reportid");
+				$stmnt->execute(['reportid' => $compare_id]);
+				if ($stmnt->rowCount() == 0) {
+					$updatable[] = 'Vulkan core 1.4 properties';
 					$result = true;
 				}
 			}
@@ -304,6 +336,7 @@ try {
 	check_core11_data_updatable($report, $reportid, $updatable);
 	check_core12_data_updatable($report, $reportid, $updatable);
 	check_core13_data_updatable($report, $reportid, $updatable);
+	check_core14_data_updatable($report, $reportid, $updatable);
 	check_extension_features_updatable($report, $reportid, $updatable);
 	check_extension_properties_updatable($report, $reportid, $updatable);
 	check_profiles_updatable($report, $reportid, $updatable);
