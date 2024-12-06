@@ -63,7 +63,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 			<h4>4.00 - 2024-12-06</h4>
 			<ul>
 				<li>Added support for Vulkan 1.4. (incl. update mechanism for updating reports)</li>
-				<li>Vulkan header 1.4.294</li>
+				<li>Vulkan header 1.4.303</li>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
 					<ul>
 						<li>VK_EXT_vertex_attribute_robustness</li>
