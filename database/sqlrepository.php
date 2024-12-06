@@ -28,6 +28,7 @@ class SqlRepository {
     const VK_API_VERSION_1_1 = '1.1';
     const VK_API_VERSION_1_2 = '1.2';
     const VK_API_VERSION_1_3 = '1.3';
+    const VK_API_VERSION_1_4 = '1.4';
 
     public static function getDevicePropertiesTable($version) {
         switch ($version) {
@@ -37,6 +38,8 @@ class SqlRepository {
                 return('deviceproperties12');
             case self::VK_API_VERSION_1_3:
                 return('deviceproperties13');
+            case self::VK_API_VERSION_1_4:
+                return('deviceproperties14');
         }
         return 'deviceproperties';
     }
@@ -49,6 +52,8 @@ class SqlRepository {
                 return('devicefeatures12');
             case self::VK_API_VERSION_1_3:
                 return('devicefeatures13');
+            case self::VK_API_VERSION_1_4:
+                return('devicefeatures14');
         }
         return 'devicefeatures';
     }    
@@ -167,6 +172,9 @@ class SqlRepository {
             case self::VK_API_VERSION_1_3:
                 $table = 'devicefeatures13';
                 break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'devicefeatures14';
+                break;                
         }
 
         // Collect feature column names
@@ -275,6 +283,9 @@ class SqlRepository {
             case self::VK_API_VERSION_1_3:
                 $table = 'deviceproperties13';
                 break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'deviceproperties14';
+                break;
         }
 
         // Columns with coverage numbers
@@ -342,14 +353,27 @@ class SqlRepository {
             'idpAccumulatingSaturating16BitUnsignedAccelerated',
             'idpAccumulatingSaturating16BitSignedAccelerated',
             'idpAccumulatingSaturating16BitMixedSignednessAccelerated',
-            'idpAccumulatingSaturating32BitUnsignedAccelerated',
+            'idpAccumulatingSaturating32BitUnsignedAcceleratdised',
             'idpAccumulatingSaturating32BitSignedAccelerated',
             'idpAccumulatingSaturating32BitMixedSignednessAccelerated',
             'idpAccumulatingSaturating64BitUnsignedAccelerated',
             'idpAccumulatingSaturating64BitSignedAccelerated',
             'idpAccumulatingSaturating64BitMixedSignednessAccelerated',
             'storageTexelBufferOffsetSingleTexelAlignment',
-            'uniformTexelBufferOffsetSingleTexelAlignment',            
+            'uniformTexelBufferOffsetSingleTexelAlignment',
+            // VK 1.4
+           'supportsNonZeroFirstInstance',
+           'dynamicRenderingLocalReadDepthStencilAttachments',
+           'dynamicRenderingLocalReadMultisampledAttachments',
+           'earlyFragmentMultisampleCoverageAfterSampleCounting',
+           'earlyFragmentSampleMaskTestBeforeSampleCounting',
+           'depthStencilSwizzleOneSupport',
+           'polygonModePointSize',
+           'nonStrictSinglePixelWideLinesUseParallelogram',
+           'nonStrictWideLinesUseParallelogram',
+           'blockTexelViewCompatibleMultipleLayers',
+           'fragmentShadingRateClampCombinerInputs',
+           'identicalMemoryTypeRequirements',
         ];
        
         // Columns to ignore (not part of the api structure)

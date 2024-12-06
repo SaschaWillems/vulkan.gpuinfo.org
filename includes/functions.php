@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -774,8 +774,29 @@ function getPropertyDisplayValue($key, $value, $shorten = false)
 		case 'storageTexelBufferOffsetSingleTexelAlignment':
 		case 'uniformTexelBufferOffsetSingleTexelAlignment':
 			$displayvalue = displayBool($value);
-			break;			
-		// Extensions
+			break;
+		// Core 1.4
+		case 'supportsNonZeroFirstInstance':
+		case 'dynamicRenderingLocalReadDepthStencilAttachments':
+		case 'dynamicRenderingLocalReadMultisampledAttachments':
+		case 'earlyFragmentMultisampleCoverageAfterSampleCounting':
+		case 'earlyFragmentSampleMaskTestBeforeSampleCounting':
+		case 'depthStencilSwizzleOneSupport':
+		case 'polygonModePointSize':
+		case 'nonStrictSinglePixelWideLinesUseParallelogram':
+		case 'nonStrictWideLinesUseParallelogram':
+		case 'blockTexelViewCompatibleMultipleLayers':
+		case 'fragmentShadingRateClampCombinerInputs':
+		case 'identicalMemoryTypeRequirements':
+			$displayvalue = displayBool($value);
+			break;
+		// @todo
+		// VkPipelineRobustnessBufferBehavior    defaultRobustnessStorageBuffers;
+		// VkPipelineRobustnessBufferBehavior    defaultRobustnessUniformBuffers;
+		// VkPipelineRobustnessBufferBehavior    defaultRobustnessVertexInputs;
+		// VkPipelineRobustnessImageBehavior     defaultRobustnessImages;
+
+		// Extensions (partially promoted to core, but same name = same formatting rule)
 		case 'shaderModuleIdentifierAlgorithmUUID':
 		case 'shaderBinaryUUID':
 		case 'optimalTilingLayoutUUID':

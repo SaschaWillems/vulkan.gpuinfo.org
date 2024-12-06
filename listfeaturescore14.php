@@ -1,6 +1,6 @@
 <?php
 
-/**
+/** 		
  *
  * Vulkan hardware capability database server implementation
  *	
@@ -20,26 +20,26 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
 require './database/sqlrepository.php';
-include './includes/constants.php';
-include './includes/functions.php';
+require './includes/functions.php';
+require './includes/constants.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
 
-PageGenerator::header("Features");
+PageGenerator::header("Core 1.4 features");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.0 device feature coverage for ".PageGenerator::filterInfo() ?>
+	<?php echo "<h4>Core 1.4 feature coverage on ".PageGenerator::filterInfo() ?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listfeaturescore10.php', $platform, true); ?>
+	<?php PageGenerator::platformNavigation('listfeaturescore14.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
@@ -57,13 +57,13 @@ PageGenerator::header("Features");
 				<?php
 				DB::connect();
 				try {
-					$features = SqlRepository::listCoreFeatures(SqlRepository::VK_API_VERSION_1_0);
+					$features = SqlRepository::listCoreFeatures(SqlRepository::VK_API_VERSION_1_4);
 					foreach ($features as $feature => $coverage) {
-						$coverageLink = "listdevicescoverage.php?feature=$feature&platform=$platform";
+						$coverageLink = "listdevicescoverage.php?core=1.4&feature=$feature&platform=$platform";
 						echo "<tr>";
 						echo "<td>" . $feature . "</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2023 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2024 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -40,7 +40,7 @@ if (SqlRepository::getMinApiVersion() !== null) {
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Optimal image tiling format support on ".PageGenerator::filterInfo($platform); ?>
+	<?php echo "<h4>Optimal image tiling format support on ".PageGenerator::filterInfo(); ?>
 </div>
 
 <center>
