@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.43';
+$release = '4.00';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -60,6 +60,19 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.00 - 2024-12-06</h4>
+			<ul>
+				<li>Added support for Vulkan 1.4. (incl. update mechanism for updating reports)</li>
+				<li>Vulkan header 1.4.294</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_vertex_attribute_robustness</li>
+						<li>VK_KHR_video_encode_av1</li>
+						<li>VK_KHR_video_encode_quantization_map</li>
+					</ul>
+				</li>
+				<li>Better handling of surface queries on Wayland</li>
+			</ul>				
 			<h4>3.43 - 2024-10-02</h4>
 			<ul>
 				<li>Vulkan header 1.3.296</li>
