@@ -25,7 +25,7 @@ session_name('vulkan');
 session_start();
 
 if (isset($_GET['version'])) {
-    $available_versions = ['1.1', '1.2', '1.4', 'all'];
+    $available_versions = ['1.1', '1.2', '1.3', '1.4', 'all'];
     if (in_array($_GET['version'], $available_versions)) {
         $_SESSION['minversion'] = $_GET['version'];
         if ($_GET['version'] == 'all') {

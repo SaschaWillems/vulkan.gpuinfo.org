@@ -119,6 +119,7 @@ session_start();
 							<li><a href="listfeaturescore10.php">Core 1.0</a></li>
 							<li><a href="listfeaturescore11.php">Core 1.1</a></li>
 							<li><a href="listfeaturescore12.php">Core 1.2</a></li>
+							<li><a href="listfeaturescore13.php">Core 1.3</a></li>
 							<li><a href="listfeaturescore14.php">Core 1.4</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="listfeaturesextensions.php">Extensions</a></li>
