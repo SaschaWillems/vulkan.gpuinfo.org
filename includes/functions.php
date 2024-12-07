@@ -418,14 +418,24 @@ function getColorSpace($value)
 	}
 }
 
-function getPipelineRobustnessBehavior($value) {
-	$enums = [
-		'DEVICE_DEFAULT' => 0,
-		'DISABLED' => 1,
-		'ROBUST_BUFFER_ACCESS' => 2,
-		'ROBUST_BUFFER_ACCESS_2' => 3
-	];
-	return (in_array($value, $enums) ? array_search($value, $enums) : 'unknown');
+function getPipelineRobustnessBufferBehavior($value) {
+	return match($value) {
+		0 => 'DEVICE_DEFAULT',
+		1 => 'DISABLED',
+		2 => 'ROBUST_BUFFER_ACCESS',
+		3 => 'ROBUST_BUFFER_ACCESS_2',
+		default => 'unknown'
+	};
+}
+
+function getPipelineRobustnessImageBehavior($value) {
+	return match($value) {
+		0 => 'DEVICE_DEFAULT',
+		1 => 'DISABLED',
+		2 => 'ROBUST_IMAGE_ACCESS',
+		3 => 'ROBUST_IMAGE_ACCESS_2',
+		default => 'unknown'
+	};
 }
 
 // Convert vendor specific driver version string
@@ -803,8 +813,10 @@ function getPropertyDisplayValue($key, $value, $shorten = false)
 		case 'defaultRobustnessStorageBuffers':
 		case 'defaultRobustnessUniformBuffers':
 		case 'defaultRobustnessVertexInputs':
+			$displayvalue = getPipelineRobustnessBufferBehavior($value);
+			break;
 		case 'defaultRobustnessImages':
-			$displayvalue = getPipelineRobustnessBehavior($value);
+			$displayvalue = getPipelineRobustnessImageBehavior($value);
 			break;
 		// Extensions (partially promoted to core, but same name = same formatting rule)
 		case 'shaderModuleIdentifierAlgorithmUUID':
