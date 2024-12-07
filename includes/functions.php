@@ -418,6 +418,16 @@ function getColorSpace($value)
 	}
 }
 
+function getPipelineRobustnessBehavior($value) {
+	$enums = [
+		'DEVICE_DEFAULT' => 0,
+		'DISABLED' => 1,
+		'ROBUST_BUFFER_ACCESS' => 2,
+		'ROBUST_BUFFER_ACCESS_2' => 3
+	];
+	return (in_array($value, $enums) ? array_search($value, $enums) : 'unknown');
+}
+
 // Convert vendor specific driver version string
 function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 {
@@ -790,12 +800,12 @@ function getPropertyDisplayValue($key, $value, $shorten = false)
 		case 'identicalMemoryTypeRequirements':
 			$displayvalue = displayBool($value);
 			break;
-		// @todo
-		// VkPipelineRobustnessBufferBehavior    defaultRobustnessStorageBuffers;
-		// VkPipelineRobustnessBufferBehavior    defaultRobustnessUniformBuffers;
-		// VkPipelineRobustnessBufferBehavior    defaultRobustnessVertexInputs;
-		// VkPipelineRobustnessImageBehavior     defaultRobustnessImages;
-
+		case 'defaultRobustnessStorageBuffers':
+		case 'defaultRobustnessUniformBuffers':
+		case 'defaultRobustnessVertexInputs':
+		case 'defaultRobustnessImages':
+			$displayvalue = getPipelineRobustnessBehavior($value);
+			break;
 		// Extensions (partially promoted to core, but same name = same formatting rule)
 		case 'shaderModuleIdentifierAlgorithmUUID':
 		case 'shaderBinaryUUID':
