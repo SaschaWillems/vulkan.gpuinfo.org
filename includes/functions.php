@@ -41,27 +41,6 @@ function getFlags($flagList, $flag)
 	return $flags;
 }
 
-function getFormatFlags($flag)
-{
-	$flags = array(
-		0x0001 => "SAMPLED_IMAGE_BIT",
-		0x0002 => "STORAGE_IMAGE_BIT",
-		0x0004 => "STORAGE_IMAGE_ATOMIC_BIT",
-		0x0008 => "UNIFORM_TEXEL_BUFFER_BIT",
-		0x0010 => "STORAGE_TEXEL_BUFFER_BIT",
-		0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
-		0x0040 => "VERTEX_BUFFER_BIT",
-		0x0080 => "COLOR_ATTACHMENT_BIT",
-		0x0100 => "COLOR_ATTACHMENT_BLEND_BIT",
-		0x0200 => "DEPTH_STENCIL_ATTACHMENT_BIT",
-		0x0400 => "BLIT_SRC_BIT",
-		0x0800 => "BLIT_DST_BIT",
-		0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
-		0x4000 => "TRANSFER_SRC_BIT",
-		0x8000 => "TRANSFER_DST_BIT",
-	);
-	return getFlags($flags, $flag);
-}
 
 function getImageUsageFlags($flag)
 {
@@ -143,30 +122,6 @@ function getQueueFlags($flag)
 	return getFlags($flags, $flag);
 }
 
-function getSampleCountFlags($flag)
-{
-	$flags = array();
-	for ($i = 0; $i < 7; ++$i) {
-		$flags[pow(2, $i)] = pow(2, $i);
-	}
-	return getFlags($flags, $flag);
-}
-
-function getStageFlags($flag)
-{
-	$flags = array(
-		0x0001 => "VERTEX",
-		0x0002 => "TESSELLATION_CONTROL",
-		0x0004 => "TESSELLATION_EVALUATION",
-		0x0008 => "GEOMETRY",
-		0x0010 => "FRAGMENT",
-		0x0020 => "COMPUTE",
-		0x0040 => "TASK",
-		0x0080 => "MESH",		
-		0x001F => "ALL_GRAPHICS",
-	);
-	return getFlags($flags, $flag);
-}
 
 function listSubgroupFeatureFlags($flag)
 {
@@ -607,26 +562,6 @@ function _format_json($json, $html = false)
 		}
 	}
 	return $result;
-}
-
-function getDeviceCount($platform, $andWhere = null)
-{
-	if (strcasecmp($platform, 'all') == 0) {
-		$sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id";
-		if ($andWhere) {
-			if (strpos($andWhere, 'and ') === 0) {
-				$andWhere = str_replace('and ', '', $andWhere);
-			}
-			$sql .= " where $andWhere";
-		}
-		return DB::getCount($sql, null);
-	}
-	return DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype $andWhere", ['ostype' => ostype($platform)]);
-}
-
-function setPageTitle(string $title)
-{
-	echo '<script language="javascript">document.title = "' . $title . ' - Vulkan Hardware Database by Sascha Willems";</script>';
 }
 
 function UUIDtoString($uuid)
