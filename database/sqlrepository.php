@@ -133,32 +133,6 @@ class SqlRepository {
         return $count;
     }    
 
-    /** Global extension listing */
-    public static function listExtensions() {        
-        $deviceCount = self::deviceCount();
-        // Fetch extension features and properties to highlight extensions with a detail page
-        $params = [];
-        $sql ="SELECT e.name, e.hasfeatures, e.hasproperties, date(e.date) as date, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
-                join deviceextensions de on de.extensionid = e.id 
-                join reports r on r.id = de.reportid
-                join deviceproperties dp on dp.reportid = de.reportid";
-        self::appendFilters($sql, $params);
-        $sql .= " group by name";
-        $stmnt = DB::$connection->prepare($sql);
-        $stmnt->execute($params);
-        $extensions = [];
-        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            $extensions[] = [
-                'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 2),
-                'hasfeatures' => $row['hasfeatures'], 
-                'hasproperties' => $row['hasproperties'],
-                'date' => $row['date']
-            ];
-        }        
-        return $extensions;
-    }
-
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
         $table = 'devicefeatures';
