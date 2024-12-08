@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -41,27 +41,6 @@ function getFlags($flagList, $flag)
 	return $flags;
 }
 
-function getFormatFlags($flag)
-{
-	$flags = array(
-		0x0001 => "SAMPLED_IMAGE_BIT",
-		0x0002 => "STORAGE_IMAGE_BIT",
-		0x0004 => "STORAGE_IMAGE_ATOMIC_BIT",
-		0x0008 => "UNIFORM_TEXEL_BUFFER_BIT",
-		0x0010 => "STORAGE_TEXEL_BUFFER_BIT",
-		0x0020 => "STORAGE_TEXEL_BUFFER_ATOMIC_BIT",
-		0x0040 => "VERTEX_BUFFER_BIT",
-		0x0080 => "COLOR_ATTACHMENT_BIT",
-		0x0100 => "COLOR_ATTACHMENT_BLEND_BIT",
-		0x0200 => "DEPTH_STENCIL_ATTACHMENT_BIT",
-		0x0400 => "BLIT_SRC_BIT",
-		0x0800 => "BLIT_DST_BIT",
-		0x1000 => "SAMPLED_IMAGE_FILTER_LINEAR_BIT",
-		0x4000 => "TRANSFER_SRC_BIT",
-		0x8000 => "TRANSFER_DST_BIT",
-	);
-	return getFlags($flags, $flag);
-}
 
 function getImageUsageFlags($flag)
 {
@@ -143,30 +122,6 @@ function getQueueFlags($flag)
 	return getFlags($flags, $flag);
 }
 
-function getSampleCountFlags($flag)
-{
-	$flags = array();
-	for ($i = 0; $i < 7; ++$i) {
-		$flags[pow(2, $i)] = pow(2, $i);
-	}
-	return getFlags($flags, $flag);
-}
-
-function getStageFlags($flag)
-{
-	$flags = array(
-		0x0001 => "VERTEX",
-		0x0002 => "TESSELLATION_CONTROL",
-		0x0004 => "TESSELLATION_EVALUATION",
-		0x0008 => "GEOMETRY",
-		0x0010 => "FRAGMENT",
-		0x0020 => "COMPUTE",
-		0x0040 => "TASK",
-		0x0080 => "MESH",		
-		0x001F => "ALL_GRAPHICS",
-	);
-	return getFlags($flags, $flag);
-}
 
 function listSubgroupFeatureFlags($flag)
 {
@@ -347,18 +302,26 @@ function getDriverId($value)
 	$values = [
 		'AMD (Proprietary)' => 1,
 		'AMD (Open Source)' => 2,
-		'MESA RADV' => 3,
+		'Mesa RADV' => 3,
 		'NVIDIA (Proprietary)' => 4,
 		'Intel Windows (Proprietary)' => 5,
-		'Intel MESA (Open Source)' => 6,
+		'Intel Mesa (Open Source)' => 6,
 		'Imagination (Proprietary)' => 7,
 		'Qualcomm (Proprietary)' => 8,
 		'ARM (Proprietary)' => 9,
 		'Google Swiftshader' => 10,
 		'GGP (Proprietary)' => 11,
 		'Broadcom (Proprietary)' => 12,
-		'MESA LLVMPIPE' => 13,
-		'MoltenVK' => 14
+		'Mesa LLVMPIPE' => 13,
+		'MoltenVK' => 14,
+		'Mesa Turnip' => 18,
+		'Mesa V3DV' => 19,
+		'Mesa panvk' => 20,
+		'Mesa venus' => 22,
+		'Mesa Dozen' => 23,
+		'Mesa NVK' => 24,
+		'Imagination Mesa (Open Source)' => 25,
+		'Mesa Honeykrisp' => 26
 	];
 	return (in_array($value, $values) ? array_search($value, $values) : null);
 }
@@ -408,6 +371,26 @@ function getColorSpace($value)
 	} else {
 		return "unknown";
 	}
+}
+
+function getPipelineRobustnessBufferBehavior($value) {
+	return match($value) {
+		0 => 'DEVICE_DEFAULT',
+		1 => 'DISABLED',
+		2 => 'ROBUST_BUFFER_ACCESS',
+		3 => 'ROBUST_BUFFER_ACCESS_2',
+		default => 'unknown'
+	};
+}
+
+function getPipelineRobustnessImageBehavior($value) {
+	return match($value) {
+		0 => 'DEVICE_DEFAULT',
+		1 => 'DISABLED',
+		2 => 'ROBUST_IMAGE_ACCESS',
+		3 => 'ROBUST_IMAGE_ACCESS_2',
+		default => 'unknown'
+	};
 }
 
 // Convert vendor specific driver version string
@@ -581,26 +564,6 @@ function _format_json($json, $html = false)
 	return $result;
 }
 
-function getDeviceCount($platform, $andWhere = null)
-{
-	if (strcasecmp($platform, 'all') == 0) {
-		$sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id";
-		if ($andWhere) {
-			if (strpos($andWhere, 'and ') === 0) {
-				$andWhere = str_replace('and ', '', $andWhere);
-			}
-			$sql .= " where $andWhere";
-		}
-		return DB::getCount($sql, null);
-	}
-	return DB::getCount("SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype $andWhere", ['ostype' => ostype($platform)]);
-}
-
-function setPageTitle(string $title)
-{
-	echo '<script language="javascript">document.title = "' . $title . ' - Vulkan Hardware Database by Sascha Willems";</script>';
-}
-
 function UUIDtoString($uuid)
 {
 	try {
@@ -766,8 +729,31 @@ function getPropertyDisplayValue($key, $value, $shorten = false)
 		case 'storageTexelBufferOffsetSingleTexelAlignment':
 		case 'uniformTexelBufferOffsetSingleTexelAlignment':
 			$displayvalue = displayBool($value);
-			break;			
-		// Extensions
+			break;
+		// Core 1.4
+		case 'supportsNonZeroFirstInstance':
+		case 'dynamicRenderingLocalReadDepthStencilAttachments':
+		case 'dynamicRenderingLocalReadMultisampledAttachments':
+		case 'earlyFragmentMultisampleCoverageAfterSampleCounting':
+		case 'earlyFragmentSampleMaskTestBeforeSampleCounting':
+		case 'depthStencilSwizzleOneSupport':
+		case 'polygonModePointSize':
+		case 'nonStrictSinglePixelWideLinesUseParallelogram':
+		case 'nonStrictWideLinesUseParallelogram':
+		case 'blockTexelViewCompatibleMultipleLayers':
+		case 'fragmentShadingRateClampCombinerInputs':
+		case 'identicalMemoryTypeRequirements':
+			$displayvalue = displayBool($value);
+			break;
+		case 'defaultRobustnessStorageBuffers':
+		case 'defaultRobustnessUniformBuffers':
+		case 'defaultRobustnessVertexInputs':
+			$displayvalue = getPipelineRobustnessBufferBehavior($value);
+			break;
+		case 'defaultRobustnessImages':
+			$displayvalue = getPipelineRobustnessImageBehavior($value);
+			break;
+		// Extensions (partially promoted to core, but same name = same formatting rule)
 		case 'shaderModuleIdentifierAlgorithmUUID':
 		case 'shaderBinaryUUID':
 		case 'optimalTilingLayoutUUID':

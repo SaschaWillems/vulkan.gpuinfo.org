@@ -10,6 +10,7 @@
 	--textcolor-unsupported: #FF0000;	
 	--textcolor-header: #000;
 	--textcolor-na: #BABABA;
+	--textcolor-head: #a31d21;
 	--bordercolor: #DDD;
 	--table-odd-row-background: #f7f7f7;
 	--icon-invert: 0;
@@ -41,6 +42,7 @@
 		--textcolor-unsupported: rgb(200, 30, 32);
 		--textcolor-header: rgb(165, 165, 165);
 		--textcolor-na: #535353;
+		--textcolor-head: #a8a8a8;
 		--bordercolor: rgb(41, 44, 46);
 		--table-even-row-background: rgb(24, 26, 27);
 		--table-odd-row-background: rgb(29, 31, 32);
@@ -606,6 +608,7 @@ h1 {
 	/* width: 85px; */
 	text-align: left;
 	padding-left: 20px;
+	color: var(--textcolor-head);
 }
 
 .format-table {

@@ -139,9 +139,11 @@ echo "</div>";
 					'table_features_core_11',
 					'table_features_core_12',
 					'table_features_core_13',
+					'table_features_core_14',
 					'table_properties_core_11',
 					'table_properties_core_12',
 					'table_properties_core_13',
+					'table_properties_core_14',
 					'table_deviceprofiles',
 					'table_surfaceformats',
 					'table_presentmodes'

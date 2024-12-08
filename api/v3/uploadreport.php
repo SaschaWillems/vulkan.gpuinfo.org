@@ -353,13 +353,14 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
 			VALUES
-				(:submitter, :devicename, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";			
 
 		$values = array(
 			":submitter" => $json['environment']['submitter'],
 			":devicename" => $json['properties']['deviceName'],
+			":devicetype" => $json['properties']['deviceType'],
 			":displayname" => $json['properties']['displayName'],
 			":driverversion" => $json['properties']['driverVersionText'],
 			":apiversion" => $json['properties']['apiVersionText'],
@@ -917,8 +918,8 @@
 				}
 				// Mark extension to have additional features
 				try {
-					$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
-					$stmnt_mark->execute(['extension' => $feature['extension']]);
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at marking extension to have additional features)');
 				}
@@ -949,8 +950,8 @@
 				}
 				// Mark extension to have additional properties
 				try {
-					$stmnt_mark = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
-					$stmnt_mark->execute(['extension' => $feature['extension']]);
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
+					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					die('Error while trying to upload report (error at marking extension to have additional properties)');
 				}

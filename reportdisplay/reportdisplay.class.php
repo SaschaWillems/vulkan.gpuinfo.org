@@ -33,6 +33,8 @@ class ReportFlags
     public $has_vulkan_1_2_properties = false;
     public $has_vulkan_1_3_features = false;
     public $has_vulkan_1_3_properties = false;
+    public $has_vulkan_1_4_features = false;
+    public $has_vulkan_1_4_properties = false;
     public $has_portability_extension = false;
     public $has_update_history = false;
     public $has_profiles = false;
@@ -128,6 +130,8 @@ class Report
         $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
         $this->flags->has_vulkan_1_3_features = DB::getCount("SELECT count(*) from devicefeatures13 where reportid = :reportid", [':reportid' => $this->id]) > 0;
         $this->flags->has_vulkan_1_3_properties = DB::getCount("SELECT count(*) from deviceproperties13 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+        $this->flags->has_vulkan_1_4_features = DB::getCount("SELECT count(*) from devicefeatures14 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+        $this->flags->has_vulkan_1_4_properties = DB::getCount("SELECT count(*) from deviceproperties14 where reportid = :reportid", [':reportid' => $this->id]) > 0;
         $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
         $this->flags->has_update_history = DB::getCount("SELECT count(*) from reportupdatehistory where reportid = :reportid", [':reportid' => $this->id]) > 0;
         $this->flags->has_profiles = DB::getCount("SELECT count(*) from deviceprofiles where reportid = :reportid", [':reportid' => $this->id]) > 0;
@@ -209,6 +213,19 @@ class Report
             return null;
         }
     }
+
+    public function fetchDeviceExtensionsBlacklist()
+    {
+        try {
+            $sql = "SELECT name from deviceextensions_blacklist";
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute();
+            $result = $stmnt->fetchAll(PDO::FETCH_COLUMN, 0);
+            return $result;
+        } catch (Throwable $e) {
+            return null;
+        }
+    }    
 
     public function fetchFormats()
     {
@@ -346,7 +363,10 @@ class Report
             case '1.3':
                 $table = 'devicefeatures13';
                 break;
-        }
+            case '1.4':
+                $table = 'devicefeatures14';
+                break;
+            }
         if (!$table) {
             return null;
         }
@@ -406,6 +426,9 @@ class Report
                 break;
             case '1.3':
                 $table = 'deviceproperties13';
+                break;
+            case '1.4':
+                $table = 'deviceproperties14';
                 break;
         }
         if (!$table) {

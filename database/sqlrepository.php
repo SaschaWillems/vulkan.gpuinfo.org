@@ -28,6 +28,7 @@ class SqlRepository {
     const VK_API_VERSION_1_1 = '1.1';
     const VK_API_VERSION_1_2 = '1.2';
     const VK_API_VERSION_1_3 = '1.3';
+    const VK_API_VERSION_1_4 = '1.4';
 
     public static function getDevicePropertiesTable($version) {
         switch ($version) {
@@ -37,6 +38,8 @@ class SqlRepository {
                 return('deviceproperties12');
             case self::VK_API_VERSION_1_3:
                 return('deviceproperties13');
+            case self::VK_API_VERSION_1_4:
+                return('deviceproperties14');
         }
         return 'deviceproperties';
     }
@@ -49,6 +52,8 @@ class SqlRepository {
                 return('devicefeatures12');
             case self::VK_API_VERSION_1_3:
                 return('devicefeatures13');
+            case self::VK_API_VERSION_1_4:
+                return('devicefeatures14');
         }
         return 'devicefeatures';
     }    
@@ -114,31 +119,19 @@ class SqlRepository {
         return $count;
     }
 
-    /** Global extension listing */
-    public static function listExtensions() {        
-        $deviceCount = self::deviceCount();
-        // Fetch extension features and properties to highlight extensions with a detail page
-        $params = [];
-        $sql ="SELECT e.name, e.hasfeatures, e.hasproperties, date(e.date) as date, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
-                join deviceextensions de on de.extensionid = e.id 
-                join reports r on r.id = de.reportid
-                join deviceproperties dp on dp.reportid = de.reportid";
-        self::appendFilters($sql, $params);
-        $sql .= " group by name";
-        $stmnt = DB::$connection->prepare($sql);
+    public static function deviceCountOsType($osType = 0) {
+        $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype";
+        $params['ostype'] = $osType;
+        $apiversion = self::getMinApiVersion();
+        if ($apiversion) {
+            self::appendCondition($sql, "r.apiversion >= :apiversion");
+            $params['apiversion'] = $apiversion;
+        }
+        $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
-        $extensions = [];
-        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            $extensions[] = [
-                'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 2),
-                'hasfeatures' => $row['hasfeatures'], 
-                'hasproperties' => $row['hasproperties'],
-                'date' => $row['date']
-            ];
-        }        
-        return $extensions;
-    }
+        $count = $stmnt->fetch(PDO::FETCH_COLUMN);        
+        return $count;
+    }    
 
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
@@ -153,6 +146,9 @@ class SqlRepository {
             case self::VK_API_VERSION_1_3:
                 $table = 'devicefeatures13';
                 break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'devicefeatures14';
+                break;                
         }
 
         // Collect feature column names
@@ -261,6 +257,9 @@ class SqlRepository {
             case self::VK_API_VERSION_1_3:
                 $table = 'deviceproperties13';
                 break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'deviceproperties14';
+                break;
         }
 
         // Columns with coverage numbers
@@ -328,14 +327,27 @@ class SqlRepository {
             'idpAccumulatingSaturating16BitUnsignedAccelerated',
             'idpAccumulatingSaturating16BitSignedAccelerated',
             'idpAccumulatingSaturating16BitMixedSignednessAccelerated',
-            'idpAccumulatingSaturating32BitUnsignedAccelerated',
+            'idpAccumulatingSaturating32BitUnsignedAcceleratdised',
             'idpAccumulatingSaturating32BitSignedAccelerated',
             'idpAccumulatingSaturating32BitMixedSignednessAccelerated',
             'idpAccumulatingSaturating64BitUnsignedAccelerated',
             'idpAccumulatingSaturating64BitSignedAccelerated',
             'idpAccumulatingSaturating64BitMixedSignednessAccelerated',
             'storageTexelBufferOffsetSingleTexelAlignment',
-            'uniformTexelBufferOffsetSingleTexelAlignment',            
+            'uniformTexelBufferOffsetSingleTexelAlignment',
+            // VK 1.4
+           'supportsNonZeroFirstInstance',
+           'dynamicRenderingLocalReadDepthStencilAttachments',
+           'dynamicRenderingLocalReadMultisampledAttachments',
+           'earlyFragmentMultisampleCoverageAfterSampleCounting',
+           'earlyFragmentSampleMaskTestBeforeSampleCounting',
+           'depthStencilSwizzleOneSupport',
+           'polygonModePointSize',
+           'nonStrictSinglePixelWideLinesUseParallelogram',
+           'nonStrictWideLinesUseParallelogram',
+           'blockTexelViewCompatibleMultipleLayers',
+           'fragmentShadingRateClampCombinerInputs',
+           'identicalMemoryTypeRequirements',
         ];
        
         // Columns to ignore (not part of the api structure)
@@ -812,7 +824,36 @@ class SqlRepository {
             ];
         }
         return $memorytypes;
-    }    
+    }
+
+    /** Per platform coverage numbers for single extension */
+    public static function getExtensionCoverage($name) {
+        $os_types = [0, 1, 2, 3, 4];
+        foreach ($os_types as $os_type) {
+            $deviceCount = self::deviceCountOsType($os_type);
+            $params = ['extension_name' => $name, 'ostype' => $os_type];
+            $sql ="SELECT count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
+                    join deviceextensions de on de.extensionid = e.id 
+                    join reports r on r.id = de.reportid
+                    join deviceproperties dp on dp.reportid = r.id
+                    where e.name = :extension_name
+                    and r.ostype = :ostype";
+            self::appendFilters($sql, $params);
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute($params);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
+            $coverage = 0;
+            if ($deviceCount > 0) {
+                $coverage = round($row['coverage'] / $deviceCount * 100, 2);
+            }
+            $extension_coverage[] = [
+                'coverage' => $coverage,
+                'ostype' => $os_type,
+                'platform' => ucfirst(platformname($os_type)),
+            ];
+        }
+        return $extension_coverage;
+    }
 
     /** Check if core limit exists */
     public static function coreLimitExists($name) {
@@ -837,6 +878,13 @@ class SqlRepository {
         $result->execute([":name" => $name, ":extension" => $extension]);
         $result->fetch(PDO::FETCH_ASSOC);
         return ($result->rowCount() > 0);
-    }    
+    }
 
+    /** Check if extension exists */
+    public static function extensionExists($name) {
+        $result = DB::$connection->prepare("SELECT * from extensions where name = :name");
+        $result->execute([":name" => $name]);
+        $result->fetch(PDO::FETCH_ASSOC);
+        return $result->rowCount() > 0;
+    }
 }

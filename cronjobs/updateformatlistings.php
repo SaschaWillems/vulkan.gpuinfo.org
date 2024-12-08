@@ -23,6 +23,8 @@
  /*
   * Format listings are updated using a cronjob instead of being generated 
   * on demand due to the complex nature of the data
+  * So in order to generate the format listing pages one needs to set up cronjobs on a server that run these scripts like
+  * http://your_url/cronjobs/updateformatlistings.php?apiversion=1.4
   */
 
 include '../database/database.class.php';

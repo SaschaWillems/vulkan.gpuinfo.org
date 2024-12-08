@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -25,7 +25,7 @@ session_name('vulkan');
 session_start();
 
 if (isset($_GET['version'])) {
-    $available_versions = ['1.1', '1.2', '1.3', 'all'];
+    $available_versions = ['1.1', '1.2', '1.3', '1.4', 'all'];
     if (in_array($_GET['version'], $available_versions)) {
         $_SESSION['minversion'] = $_GET['version'];
         if ($_GET['version'] == 'all') {

@@ -79,6 +79,10 @@ if ($platform !== 'all') {
     $dateColumn = 'date'.strtolower($platform);
 }
 
+// Some drivers wrongly report some instance extensions as device extensions
+// To avoid confusion, those entries are hidden
+$whereClause .= ($whereClause ? ' and ' : ' where ') . 'name not in (select name from deviceextensions_blacklist)';
+
 // Fetch extensions with coverage based on unique device names from the database
 $sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn) as date, count(distinct(r.displayname)) as coverage from extensions e 
         join deviceextensions de on de.extensionid = e.id 
@@ -94,21 +98,21 @@ while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
         continue;
     }
 
-    $coverageLink = "listdevicescoverage.php?extension=" . $row['name'] . "&platform=$platform";
-    $manPageLink = "[<a href='".VULKAN_REGISTRY_URL.$row['name'].".html' target='_blank' title='Show manpage for this extension'>?</a>]";
-    $coverage = round($row['coverage'] / $deviceCount * 100, 2);
     $ext = $row['name'];
+    $coverageLink = "listdevicescoverage.php?extension=$ext&platform=$platform";
+    $coverage = round($row['coverage'] / $deviceCount * 100, 2);
     $feature_link = null;
     if ($row['hasfeatures']) {
-        $feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a";
+        $feature_link = "<a href='listfeaturesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a>";
     }
     $property_link = null;
     if ($row['hasproperties']) {
-        $property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a";
+        $property_link = "<a href='listpropertiesextensions.php?extension=$ext&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a>";
     }
+    $ext_url = "<a href=\"displayextensiondetail.php?extension=$ext\">$ext</a>";
 
     $data[] = [
-        'name' => "$ext $manPageLink",
+        'name' => $ext_url,
         'coverage' => "<a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a>",
         'coverageunsupported' => "<a class='na' href=\"$coverageLink&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a>",
         'features' => $feature_link, 
@@ -118,12 +122,12 @@ while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
 }        
 
 // Return the data in a format suited for data tables AJAX requests
-$results = array(
+$results = [
     "draw" => isset($_REQUEST['draw']) ? intval($_REQUEST['draw']) : 0,
     "recordsTotal" => intval($totalCount),
     "recordsFiltered" => intval($filteredCount),
     "data" => $data
-);
+];
 echo json_encode($results);
 
 $elapsed = (microtime(true) - $start) * 1000;

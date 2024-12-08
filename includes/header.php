@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -29,7 +29,7 @@ session_start();
 <html>
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html" charset="ISO-8859-1">
+	<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
 	<?php echo "<title>" . (isset($page_title) ? ($page_title . " - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems") . "</title>"; ?>
 
 	<link rel="icon" type="image/png" href="/images/Vulkan_LogoBug_32px_Nov17.png" sizes="32x32">
@@ -107,6 +107,7 @@ session_start();
 							<li><a href="listpropertiescore11.php">Core 1.1</a></li>
 							<li><a href="listpropertiescore12.php">Core 1.2</a></li>
 							<li><a href="listpropertiescore13.php">Core 1.3</a></li>
+							<li><a href="listpropertiescore14.php">Core 1.4</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="listpropertiesextensions.php">Extensions</a></li>
 						</ul>
@@ -119,6 +120,7 @@ session_start();
 							<li><a href="listfeaturescore11.php">Core 1.1</a></li>
 							<li><a href="listfeaturescore12.php">Core 1.2</a></li>
 							<li><a href="listfeaturescore13.php">Core 1.3</a></li>
+							<li><a href="listfeaturescore14.php">Core 1.4</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="listfeaturesextensions.php">Extensions</a></li>
 						</ul>
@@ -170,6 +172,7 @@ session_start();
 							<li><a href="database/setapiversion.php?version=1.1">Core 1.1 (and up)</a></li>
 							<li><a href="database/setapiversion.php?version=1.2">Core 1.2 (and up)</a></li>
 							<li><a href="database/setapiversion.php?version=1.3">Core 1.3 (and up)</a></li>
+							<li><a href="database/setapiversion.php?version=1.4">Core 1.4 (and up)</a></li>
 						</ul>
 					</li>
 					<li><a href="download.php">Download</a></li>

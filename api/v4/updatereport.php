@@ -24,6 +24,7 @@
  *  - Core 1.1 features and properties
  *  - Core 1.2 features and properties
  *  - Core 1.3 features and properties
+ *  - Core 1.4 features and properties
  *  - Extension features and properties
  *  - Profiles
  *  - Surface formats
@@ -43,7 +44,7 @@ function update_core_features($version, $json, $reportid, &$update_log)
     $stmnt = DB::$connection->prepare("SELECT * from $table_name where reportid = :reportid");
     $stmnt->execute(['reportid' => $reportid]);
     if ($stmnt->rowCount() == 0) {
-        // Update if target report has no core 1.1 features
+        // Update if target report has no core features
         if (array_key_exists('features', $json[$node_name])) {
             $jsonnode = $json[$node_name]['features'];
             $columns = ['reportid'];
@@ -73,7 +74,7 @@ function update_core_properties($version, $json, $reportid, &$update_log)
     $stmnt = DB::$connection->prepare("SELECT * from $table_name where reportid = :reportid");
     $stmnt->execute(['reportid' => $reportid]);
     if ($stmnt->rowCount() == 0) {
-        // Update if target report has no core 1.1 features
+        // Update if target report has no core features
         if (array_key_exists('features', $json[$node_name])) {
             $jsonnode = $json[$node_name]['properties'];
             $columns = ['reportid'];
@@ -344,9 +345,11 @@ try {
     update_core_features("1.1", $report, $reportid, $update_log);
     update_core_features("1.2", $report, $reportid, $update_log);
     update_core_features("1.3", $report, $reportid, $update_log);
+    update_core_features("1.4", $report, $reportid, $update_log);
     update_core_properties("1.1", $report, $reportid, $update_log);
     update_core_properties("1.2", $report, $reportid, $update_log);
     update_core_properties("1.3", $report, $reportid, $update_log);
+    update_core_properties("1.4", $report, $reportid, $update_log);
     update_extended_data($report, $reportid, $update_log);
     update_extensions($report, $reportid, $update_log);
     update_profiles($report, $reportid, $update_log);

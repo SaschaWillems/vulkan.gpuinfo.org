@@ -20,50 +20,54 @@
  *
  */
 
-include 'pagegenerator.php';
-include './database/database.class.php';
+require 'pagegenerator.php';
+require './database/database.class.php';
 require './database/sqlrepository.php';
-include './includes/constants.php';
-include './includes/functions.php';
+require './includes/functions.php';
+require './includes/constants.php';
 
 $platform = 'all';
 if (isset($_GET['platform'])) {
 	$platform = GET_sanitized('platform');
 }
 
-PageGenerator::header("Features");
+PageGenerator::header("Core 1.4 properties");
 ?>
 
 <div class='header'>
-	<?php echo "<h4>Core 1.0 device feature coverage for ".PageGenerator::filterInfo() ?>
+	<?php echo "<h4>Core 1.4 properties for ".PageGenerator::filterInfo() ?>
 </div>
 
 <center>
-	<?php PageGenerator::platformNavigation('listfeaturescore10.php', $platform, true); ?>
+	<?php PageGenerator::platformNavigation('listpropertiescore14.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
+		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
-				<tr>
-					<th></th>
-					<th colspan=3 style="text-align: center;">Device coverage</th>
 				</tr>
-				<th>Feature</th>
-				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
+				<th>Property</th>
+				<th style="text-align: center;">Type</th>
+				<th style="text-align: center;"></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php
 				DB::connect();
 				try {
-					$features = SqlRepository::listCoreFeatures(SqlRepository::VK_API_VERSION_1_0);
-					foreach ($features as $feature => $coverage) {
-						$coverageLink = "listdevicescoverage.php?feature=$feature&platform=$platform";
+					$properties = SqlRepository::listCoreProperties(SqlRepository::VK_API_VERSION_1_4);
+					foreach ($properties as $property => $coverage) {
+						$has_coverage = is_numeric($coverage);
+						$field_name = getFullFieldName($property);
 						echo "<tr>";
-						echo "<td>" . $feature . "</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td>$field_name</a></td>";
+						echo "<td class='text-center'>".($has_coverage ? 'Coverage' : 'Values')."</td>";
+						if ($has_coverage) {
+							$link = "listdevicescoverage.php?core=1.4&coreproperty=$field_name&platform=$platform";
+							echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						} else {
+							$link = "<a href='displaycoreproperty.php?core=1.4&name=$field_name&platform=$platform'>";
+							echo "<td class='text-center'>".$link."Listing</a></td>";
+						}
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
@@ -77,7 +81,7 @@ PageGenerator::header("Features");
 
 	<script>
 		$(document).ready(function() {
-			var table = $('#features').DataTable({
+			var table = $('#properties').DataTable({
 				"pageLength": -1,
 				"paging": false,
 				"stateSave": false,

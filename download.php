@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '3.40';
+$release = '4.00';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -51,15 +51,56 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 				</li>
 				<li>Android
 					<ul>
-						<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer&hl=en_US">Install from GooglePlay</a></li>
+						<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer&hl=en_US">Install from GooglePlay</a> (Releases may take some time to get updated)</li>
 						<li><a href="<?=$filename_prefix?>_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
 				<li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li>
-				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store, provided by <a href="https://www.lunarg.com/">LunarG</a>)</a></li>
+				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store)</a> (provided by <a href="https://www.lunarg.com/">LunarG</a>)</li>
 			</ul>
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.00 - 2024-12-06</h4>
+			<ul>
+				<li>Added support for Vulkan 1.4. (incl. update mechanism for updating reports)</li>
+				<li>Vulkan header 1.4.303</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_vertex_attribute_robustness</li>
+						<li>VK_KHR_video_encode_av1</li>
+						<li>VK_KHR_video_encode_quantization_map</li>
+					</ul>
+				</li>
+				<li>Better handling of surface queries on Wayland</li>
+			</ul>				
+			<h4>3.43 - 2024-10-02</h4>
+			<ul>
+				<li>Vulkan header 1.3.296</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_KHR_pipeline_binary</li>
+						<li>VK_KHR_compute_shader_derivatives</li>
+						<li>VK_EXT_device_generated_commands</li>
+						<li>VK_EXT_depth_clamp_control</li>
+						<li>VK_AMD_anti_lag</li>
+						<li>VK_NV_command_buffer_inheritance</li>
+					</ul>
+				</li>
+				<li>Fix for missing surface info on macOS and iOS (thanks to LunarG)</li>
+			</ul>				
+			<h4>3.41 - 2024-06-28</h4>
+			<ul>
+				<li>Vulkan header 1.3.289</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_legacy_vertex_attributes</li>
+						<li>VK_EXT_shader_replicated_composites</li>
+						<li>VK_KHR_maintenance7</li>
+						<li>VK_KHR_shader_relaxed_extended_instruction</li>
+						<li>VK_MESA_image_alignment_control</li>
+					</ul>
+				</li>	
+			</ul>			
 			<h4>3.40 - 2024-03-31</h4>
 			<ul>
 				<li>Vulkan header 1.3.280</li>
