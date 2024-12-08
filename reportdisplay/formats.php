@@ -31,7 +31,7 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 				<th>Format</th>
 				<?php
 				foreach ($flags as $key => $value) {
-					echo "<th class='caption rotate-45'><div><span>$value</span></div></th>";
+					echo "<th class='caption-format rotate-45 caption-format'><div><span>$value</span></div></th>";
 				}
 				?>
 			</tr>
@@ -78,14 +78,14 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 <div class='tab-content'>
 	<!-- Optimal tiling features -->
 	<div id='formats_optimal' class='tab-pane fade in active reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_optimal', $format_data, 'optimaltilingfeatures', $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable('deviceformats_optimal', $format_data, 'optimaltilingfeatures', $report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<!-- Linear tiling features -->
 	<div id='formats_linear' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<!-- Buffer features -->
 	<div id='formats_buffer' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_buffer', $format_data, 'bufferfeatures', $device_format_flags_buffer); ?>
+		<?php insertDeviceFormatTable('deviceformats_buffer', $format_data, 'bufferfeatures', $report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags); ?>
 	</div>
 </div>

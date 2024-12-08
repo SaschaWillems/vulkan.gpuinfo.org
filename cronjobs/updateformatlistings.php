@@ -59,17 +59,17 @@ try {
             case 'lineartiling':
                 $column = 'lineartilingfeatures';
                 $parameter_name = 'lineartilingformat';
-                $format_flags = $device_format_flags_tiling;
+                $format_flags = FormatFeatureFlags2::TilingFlags;
                 break;
             case 'optimaltiling':
                 $column = 'optimaltilingfeatures';
                 $parameter_name = 'optimaltilingformat';
-                $format_flags = $device_format_flags_tiling;
+                $format_flags = FormatFeatureFlags2::TilingFlags;
                 break;
             case 'buffer':
                 $column = 'bufferfeatures';
                 $parameter_name = 'bufferformat';
-                $format_flags = $device_format_flags_buffer;
+                $format_flags = FormatFeatureFlags2::BufferFlags;
                 break;
         }
 
@@ -213,7 +213,11 @@ try {
 
 $elapsed = (microtime(true) - $start) * 1000;
 
-DB::log('cronjobs/updateformatlistings.php', '', $elapsed);
+$page = 'cronjobs/updateformatlistings.php';
+if ($apiversion) {
+    $page .= "?apiversion=$apiversion";
+}
+DB::log($page, '', $elapsed);
 DB::disconnect();
 
 echo "success".PHP_EOL;

@@ -17,6 +17,7 @@ CREATE  PROCEDURE `delete_report` (IN `inReportid` INT)   BEGIN
 	delete from `devicefeatures11` where reportID = inReportid;    
 	delete from `devicefeatures12` where reportID = inReportid;    
 	delete from `devicefeatures13` where reportID = inReportid;    
+	delete from `devicefeatures14` where reportID = inReportid;    
 	delete from `devicefeatures2` where reportID = inReportid;
 	delete from `deviceformats` where reportID = inReportid;
 	delete from `devicelayerextensions` where reportID = inReportid;
@@ -29,6 +30,7 @@ CREATE  PROCEDURE `delete_report` (IN `inReportid` INT)   BEGIN
 	delete from `deviceproperties11` where reportid = inReportid;
 	delete from `deviceproperties12` where reportid = inReportid;
 	delete from `deviceproperties13` where reportid = inReportid;
+	delete from `deviceproperties14` where reportid = inReportid;
 	delete from `deviceproperties2` where reportid = inReportid;
 	delete from `devicequeues` where reportid = inReportid;
 	delete from `devicesurfacecapabilities` where reportid = inReportid;
@@ -271,6 +273,33 @@ CREATE TABLE `devicefeatures13` (
   `dynamicRendering` int(11) DEFAULT NULL,
   `shaderIntegerDotProduct` int(11) DEFAULT NULL,
   `maintenance4` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+CREATE TABLE `devicefeatures14` (
+  `reportid` int(11) NOT NULL,
+  `globalPriorityQuery` int(11) DEFAULT NULL,
+  `shaderSubgroupRotate` int(11) DEFAULT NULL,
+  `shaderSubgroupRotateClustered` int(11) DEFAULT NULL,
+  `shaderFloatControls2` int(11) DEFAULT NULL,
+  `shaderExpectAssume` int(11) DEFAULT NULL,
+  `rectangularLines` int(11) DEFAULT NULL,
+  `bresenhamLines` int(11) DEFAULT NULL,
+  `smoothLines` int(11) DEFAULT NULL,
+  `stippledRectangularLines` int(11) DEFAULT NULL,
+  `stippledBresenhamLines` int(11) DEFAULT NULL,
+  `stippledSmoothLines` int(11) DEFAULT NULL,
+  `vertexAttributeInstanceRateDivisor` int(11) DEFAULT NULL,
+  `vertexAttributeInstanceRateZeroDivisor` int(11) DEFAULT NULL,
+  `indexTypeUint8` int(11) DEFAULT NULL,
+  `dynamicRenderingLocalRead` int(11) DEFAULT NULL,
+  `maintenance5` int(11) DEFAULT NULL,
+  `maintenance6` int(11) DEFAULT NULL,
+  `pipelineProtectedAccess` int(11) DEFAULT NULL,
+  `pipelineRobustness` int(11) DEFAULT NULL,
+  `hostImageCopy` int(11) DEFAULT NULL,
+  `pushDescriptor` int(11) DEFAULT NULL,
+  PRIMARY KEY (`reportid`),
+  CONSTRAINT `devicefeatures14_report` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `deviceformats` (
@@ -629,6 +658,37 @@ CREATE TABLE `deviceproperties13` (
   `uniformTexelBufferOffsetAlignmentBytes` bigint(20) DEFAULT NULL,
   `uniformTexelBufferOffsetSingleTexelAlignment` tinyint(1) DEFAULT NULL,
   `maxBufferSize` tinytext DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+CREATE TABLE `deviceproperties14` (
+  `reportid` int(11) NOT NULL,
+  `lineSubPixelPrecisionBits` int(10) unsigned DEFAULT NULL,
+  `maxVertexAttribDivisor` int(10) unsigned DEFAULT NULL,
+  `supportsNonZeroFirstInstance` tinyint(1) DEFAULT NULL,
+  `maxPushDescriptors` int(10) unsigned DEFAULT NULL,
+  `dynamicRenderingLocalReadDepthStencilAttachments` tinyint(1) DEFAULT NULL,
+  `dynamicRenderingLocalReadMultisampledAttachments` tinyint(1) DEFAULT NULL,
+  `earlyFragmentMultisampleCoverageAfterSampleCounting` tinyint(1) DEFAULT NULL,
+  `earlyFragmentSampleMaskTestBeforeSampleCounting` tinyint(1) DEFAULT NULL, 
+  `depthStencilSwizzleOneSupport` tinyint(1) DEFAULT NULL,
+  `polygonModePointSize` tinyint(1) DEFAULT NULL,
+  `nonStrictSinglePixelWideLinesUseParallelogram` tinyint(1) DEFAULT NULL,
+  `nonStrictWideLinesUseParallelogram` tinyint(1) DEFAULT NULL,
+  `blockTexelViewCompatibleMultipleLayers` tinyint(1) DEFAULT NULL,
+  `maxCombinedImageSamplerDescriptorCount` int(10) unsigned DEFAULT NULL,
+  `fragmentShadingRateClampCombinerInputs` tinyint(1) DEFAULT NULL,
+  `defaultRobustnessStorageBuffers` int(10) unsigned DEFAULT NULL,
+  `defaultRobustnessUniformBuffers` int(10) unsigned DEFAULT NULL,
+  `defaultRobustnessVertexInputs` int(10) unsigned DEFAULT NULL,
+  `defaultRobustnessImages` int(10) unsigned DEFAULT NULL,
+  `copySrcLayoutCount` int(10) unsigned DEFAULT NULL,
+  `pCopySrcLayouts` varchar(255) DEFAULT NULL,
+  `copyDstLayoutCount` int(10) unsigned DEFAULT NULL,
+  `pCopyDstLayouts` varchar(255) DEFAULT NULL,
+  `optimalTilingLayoutUUID` text DEFAULT NULL,
+  `identicalMemoryTypeRequirements` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`reportid`),
+  CONSTRAINT `deviceproperties14_report` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `devicequeues` (
@@ -1120,3 +1180,4 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
