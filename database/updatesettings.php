@@ -35,7 +35,7 @@ if (isset($_POST['reset'])) {
 }
 
 if (isset($_POST['vulkan_version'])) {
-    $available_versions = ['1.1', '1.2', '1.3', 'all'];
+    $available_versions = ['1.1', '1.2', '1.3', '1.4', 'all'];
     if (in_array($_POST['vulkan_version'], $available_versions)) {
         if ($_POST['vulkan_version'] == 'all') {
             unset($_SESSION['minversion']);

@@ -27,7 +27,8 @@ $version_options = [
     'all' => 'All Vulkan versions',
     '1.1' => 'Vulkan 1.1 and up',
     '1.2' => 'Vulkan 1.2 and up',
-    '1.3' => 'Vulkan 1.3 and up'
+    '1.3' => 'Vulkan 1.3 and up',
+    '1.4' => 'Vulkan 1.4 and up'
 ];
 
 $date_options = [
