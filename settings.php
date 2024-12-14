@@ -63,7 +63,15 @@ $device_type_options = [
                 <h2>Global settings</h2>
             </div>
 
-            <div>Changes made on this page are globally applied to all views and can be used to prefilter data</div>
+            <div>
+                Changes made on this page are globally applied to all views and can be used to prefilter data
+            </div>
+
+            <div style="padding-top: 25px;">
+        	    <b>Note:</b> Settings use server side sessions. In order to identify your session, a session cookie is stored in your browser.
+                This cookie is <b>only</b> used for settings on this page and is on no way used for user-tracking.
+                As such it is considered a <b>necessary cookie</b>.
+            </div>
 
             <form class="form-horizontal" style="max-width: 640px; margin-top: 50px;" action="database/updatesettings.php" method="POST">
 
