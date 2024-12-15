@@ -254,11 +254,6 @@ if ($filter_list->hasFilter('extension')) {
 	DB::disconnect();
 }
 PageGenerator::header($pageTitle);
-
-$minApiVersion = SqlRepository::getMinApiVersion();
-if ($minApiVersion) {
-	$caption .= " Vulkan $minApiVersion (and up)";
-}
 ?>
 
 <div class="centered">
@@ -270,6 +265,7 @@ if ($minApiVersion) {
 			?>
 		</h4>
 	</div>
+<?php PageGenerator::globalFilterText(); ?>	
 
 	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">

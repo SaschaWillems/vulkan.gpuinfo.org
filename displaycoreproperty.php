@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -39,6 +39,7 @@ if ($filter_list->hasFilter('platform')) {
 }
 
 PageGenerator::header($name);
+$platform = PageGenerator::getDefaultOSSelection();
 
 try {
 	DB::connect();
@@ -52,12 +53,9 @@ try {
 	DB::disconnect();
 }
 
-$caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInfo();
+PageGenerator::pageCaption("Value distribution for <code>$name</code> ");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<h4 class='headercaption'><?= $caption; ?></h4>
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('displaycoreproperty.php', $platform, true, $filter_list->filters); ?>
