@@ -83,7 +83,7 @@ class SqlRepository {
         return null;
     }
 
-    private static function getOSType() {
+    public static function getOSType() {
         if (isset($_GET['platform'])) {
             return ostype(GET_sanitized('platform'));
         }
