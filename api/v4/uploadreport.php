@@ -76,6 +76,11 @@
 
 	}
 
+	function reportError($error) {
+		http_response_code(500);
+		die($error);
+	}
+
 	function importCore11Data($json, $reportid) {
 		if (!array_key_exists('core11', $json)) {
 			return;
@@ -96,7 +101,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at core 1.1 device features)');
+				reportError('Error while trying to upload report (error at core 1.1 device features)');
 			}
 		}
 		// Properties
@@ -120,7 +125,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at core 1.1 device properties)');
+				reportError('Error while trying to upload report (error at core 1.1 device properties)');
 			}
 		}
 	}
@@ -145,7 +150,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at core 1.2 device features)');
+				reportError('Error while trying to upload report (error at core 1.2 device features)');
 			}
 		}
 		// Properties
@@ -169,7 +174,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at core 1.2 device properties)');
+				reportError('Error while trying to upload report (error at core 1.2 device properties)');
 			}
 		}
 	}
@@ -194,7 +199,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at core 1.3 device features)');
+				reportError('Error while trying to upload report (error at core 1.3 device features)');
 			}
 		}
 		// Properties
@@ -223,7 +228,56 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at core 1.3 device properties)');
+				reportError('Error while trying to upload report (error at core 1.3 device properties)');
+			}
+		}
+	}
+
+	function importCore14Data($json, $reportid) {
+		if (!array_key_exists('core14', $json)) {
+			return;
+		}
+		// Features
+		if (array_key_exists('features', $json['core14'])) {
+			$jsonnode = $json['core14']['features'];
+			$columns = ['reportid'];
+			$params = [':reportid'];
+			$values = [':reportid' => $reportid];
+			foreach($jsonnode as $key => $value) {
+				$columns[] = $key;
+				$params[] = ":$key";
+				$values[":$key"] = $value;
+			}
+			$sql = sprintf("INSERT INTO devicefeatures14 (%s) VALUES (%s)", implode(",", $columns), implode(",", $params));
+			try {
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute($values);	
+			} catch (Exception $e) {
+				reportError('Error while trying to upload report (error at core 1.4 device features)');
+			}
+		}
+		// Properties
+		if (array_key_exists('features', $json['core14'])) {
+			$jsonnode = $json['core14']['properties'];
+			$columns = ['reportid'];
+			$params = [':reportid'];
+			$values = [':reportid' => $reportid];
+			foreach($jsonnode as $key => $value) {
+				$columns[] = $key;
+				$params[] = ":$key";
+				if (is_array($value)) {
+					// UUIDs etc. need to be serialized
+					$values[":$key"] = serialize($value);
+				} else {
+					$values[":$key"] = $value;
+				}
+			}
+			$sql = sprintf("INSERT INTO deviceproperties14 (%s) VALUES (%s)", implode(",", $columns), implode(",", $params));
+			try {
+				$stmnt = DB::$connection->prepare($sql);
+				$stmnt->execute($values);	
+			} catch (Exception $e) {
+				reportError('Error while trying to upload report (error at core 1.4 device properties)');
 			}
 		}
 	}
@@ -252,7 +306,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute(array(":reportid" => $reportid, ":profileid" => $profileid, ":specversion" => $profile['specVersion'], ":supported" => $profile['supported']));
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at device profiles)');
+				reportError('Error while trying to upload report (error at device profiles)');
 			}															
 		}
 	}
@@ -285,7 +339,7 @@
 			exit();	  	
 		}
 	} catch (Exception $e) {
-		die('Error while trying to upload report (error at black list check)');
+		reportError('Error while trying to upload report (error at black list check)');
 	}		
 		
 	// Check if report is already present
@@ -309,7 +363,7 @@
 		$stmnt = DB::$connection->prepare($sql);		
 		$stmnt->execute($params);	
 	} catch (Exception $e) {
-		die('Error while trying to upload report (error at device present check)');
+		reportError('Error while trying to upload report (error at device present check)');
 	}		
 	
 	if ($stmnt->rowCount() > 0) {
@@ -328,13 +382,14 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
 			VALUES
-				(:submitter, :devicename, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
 
 		$values = array(
 			":submitter" => $json['environment']['submitter'],
 			":devicename" => $json['properties']['deviceName'],
+			":devicetype" => $json['properties']['deviceType'],
 			":displayname" => $json['properties']['displayName'],
 			":driverversion" => $json['properties']['driverVersionText'],
 			":apiversion" => $json['properties']['apiVersionText'],
@@ -350,7 +405,7 @@
 			$stmnt = DB::$connection->prepare($sql);
 			$stmnt->execute($values);			
 		} catch (Exception $e) {
-			die('Error while trying to upload report (error at report meta data)');
+			reportError('Error while trying to upload report (error at report meta data)');
 		}				
 	}
 
@@ -368,7 +423,7 @@
 	{
 		$jsonnode = $json["properties"]; 
 		if (!$jsonnode) {
-			die("Missing device property node!");
+			reportError("Missing device property node!");
 		}
 
 		$sql = 
@@ -454,7 +509,7 @@
 			$stmnt = DB::$connection->prepare($sql);
 			$stmnt->execute($values);	
 		} catch (Exception $e) {
-			die('Error while trying to upload report (error at device properties)');
+			reportError('Error while trying to upload report (error at device properties)');
 		}				
 	}
 
@@ -485,7 +540,7 @@
 			$stmnt = DB::$connection->prepare($sql);
 			$stmnt->execute($values);					 
 		} catch (Exception $e) {
-			die('Error while trying to upload report (error at device limits)');
+			reportError('Error while trying to upload report (error at device limits)');
 		}							
 	}	
 	
@@ -506,7 +561,7 @@
 			$stmnt = DB::$connection->prepare($sql);
 			$stmnt->execute($values);					 
 		} catch (Exception $e) {
-			die('Error while trying to upload report (error at device features)');
+			reportError('Error while trying to upload report (error at device features)');
 		}									
 	}
 	
@@ -514,7 +569,7 @@
 	{
 		$jsonnode = $json['formats']; 
 		if (!$jsonnode) {
-			die('Report has no image or buffer formats!');
+			reportError('Report has no image or buffer formats!');
 		}
 		foreach ($jsonnode as $format) {
 			$sql = "INSERT INTO deviceformats 
@@ -533,7 +588,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at device formats)');
+				reportError('Error while trying to upload report (error at device formats)');
 			}												
 		}	
 	}
@@ -559,7 +614,7 @@
 				$stmnt->execute(array(":reportid" => $reportid, ":extensionid" => $extensionid, ":specversion" => $ext['specVersion']));
 			} catch (Exception $e) {
 				mailError("Error at device extensions: ".$e->getMessage(), $jsonFile);
-				die('Error while trying to upload report (error at device extensions)');
+				reportError('Error while trying to upload report (error at device extensions)');
 			}															
 		}	
 	}
@@ -609,7 +664,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);	
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at device queues)');
+				reportError('Error while trying to upload report (error at device queues)');
 			}															
 
 			$index++;
@@ -644,7 +699,7 @@
 					":implversion" => $layer['implementationVersion'], 
 					":specversion" => $layer['specVersion']));		
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at device layer)');
+				reportError('Error while trying to upload report (error at device layer)');
 			}												
 			
 			// Layer extensions
@@ -662,7 +717,7 @@
 						":name" => $layerext['extensionName'], 
 						":specversion" => $layerext['specVersion']));				
 				} catch (Exception $e) {
-					die('Error while trying to upload report (error at device layer extension)');
+					reportError('Error while trying to upload report (error at device layer extension)');
 				}																
 			}
 		}
@@ -685,7 +740,7 @@
 						":flags" => $memheap['flags'], 
 						":size" => convertValue($memheap['size'])));				
 				} catch (Exception $e) {
-					die('Error while trying to upload report (error at device memory heap)');
+					reportError('Error while trying to upload report (error at device memory heap)');
 				}																
 			}
 		}
@@ -706,7 +761,7 @@
 						":heapindex" => $memtype['heapIndex'], 
 						":propertyflags" => $memtype['propertyFlags']));				
 				} catch (Exception $e) {
-					die('Error while trying to upload report (error at device memory type)');
+					reportError('Error while trying to upload report (error at device memory type)');
 				}																
 			}
 		}
@@ -772,7 +827,7 @@
 				$stmnt = DB::$connection->prepare($sql);
 				$stmnt->execute($values);				
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at surface properties)');
+				reportError('Error while trying to upload report (error at surface properties)');
 			}																
 
 			// Present modes
@@ -787,7 +842,7 @@
 						$stmnt = DB::$connection->prepare($sql);
 						$stmnt->execute(array(":reportid" => $reportid, ":presentmode" => $presentmode));				
 					} catch (Exception $e) {
-						die('Error while trying to upload report (error at surface present mode)');
+						reportError('Error while trying to upload report (error at surface present mode)');
 					}																					
 				}
 			}	
@@ -804,7 +859,7 @@
 						$stmnt = DB::$connection->prepare($sql);
 						$stmnt->execute(array(":reportid" => $reportid, ":format" => $surfaceformat['format'], ":colorspace" => $surfaceformat['colorSpace']));				
 					} catch (Exception $e) {
-						die('Error while trying to upload report (error at surface present format)');
+						reportError('Error while trying to upload report (error at surface present format)');
 					}																					
 				}
 			}	
@@ -840,7 +895,7 @@
 					":platformdetailid" => $id, 
 					":value" => $value));
 			} catch (Exception $e) {
-				die('Error while trying to upload report (error at platform details)');
+				reportError('Error while trying to upload report (error at platform details)');
 			}													
 		}
 		// Construct display name for Anroid devices, device name only contains GPU name
@@ -884,11 +939,11 @@
 					$stmnt = DB::$connection->prepare($sql);
 					$stmnt->execute($values);
 				} catch (Exception $e) {
-					die('Error while trying to upload report (error at device extended device features)');
+					reportError('Error while trying to upload report (error at device extended device features)');
 				}
 				// Mark extension to have additional features
 				try {
-					$stmnt = DB::$connection->prepare("UPDATE extension set hasfeatures = 1 where hasfeatures is null and name = :extension");
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
 					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					mailError("Error at marking extension to have additional features: ".$e->getMessage(), $jsonFile);
@@ -916,11 +971,11 @@
 					$stmnt = DB::$connection->prepare($sql);
 					$stmnt->execute($values);
 				} catch (Exception $e) {
-					die('Error while trying to upload report (error at device extended device properties)');
+					reportError('Error while trying to upload report (error at device extended device properties)');
 				}
 				// Mark extension to have additional properties
 				try {
-					$stmnt = DB::$connection->prepare("UPDATE extension set hasproperties = 1 where hasproperties is null and name = :extension");
+					$stmnt = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
 					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
 					mailError("Error at marking extension to have additional properties: ".$e->getMessage(), $jsonFile);
@@ -933,6 +988,7 @@
 	importCore11Data($json, $reportid);
 	importCore12Data($json, $reportid);
 	importCore13Data($json, $reportid);
+	importCore14Data($json, $reportid);
 
 	importProfiles($json, $reportid);
 
@@ -960,7 +1016,7 @@
 				$stmnt->execute(array(":reportid" => $reportid, ":extensionid" => $extensionid, ":specversion" => $ext['specVersion']));
 			} catch (Exception $e) {
 				mailError("Error at instance extensions: ".$e->getMessage(), $jsonFile);
-				die('Error while trying to upload report (error at instance extensions)');
+				reportError('Error while trying to upload report (error at instance extensions)');
 			}															
 		}	
 		// Layers
@@ -990,7 +1046,7 @@
 						":implversion" => $layer['implementationVersion'], 
 						":specversion" => $layer['specVersion']));		
 				} catch (Exception $e) {
-					die('Error while trying to upload report (error at instance layer)');
+					reportError('Error while trying to upload report (error at instance layer)');
 				}												
 				
 				// Layer extensions
@@ -1008,7 +1064,7 @@
 							":name" => $layerext['extensionName'], 
 							":specversion" => $layerext['specVersion']));				
 					} catch (Exception $e) {
-						die('Error while trying to upload report (error at instance layer extension)');
+						reportError('Error while trying to upload report (error at instance layer extension)');
 					}																
 				}
 			}

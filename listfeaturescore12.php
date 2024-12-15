@@ -32,6 +32,13 @@ PageGenerator::pageCaption("Core 1.2 device feature coverage");
 PageGenerator::globalFilterText();
 ?>
 
+<<<<<<< HEAD
+=======
+<div class='header'>
+	<?php echo "<h4>Core 1.2 feature coverage on ".PageGenerator::filterInfo() ?>
+</div>
+
+>>>>>>> origin/master
 <center>
 	<?php PageGenerator::platformNavigation('listfeaturescore12.php', $platform, true); ?>
 

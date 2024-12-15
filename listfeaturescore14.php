@@ -1,6 +1,6 @@
 <?php
 
-/**
+/** 		
  *
  * Vulkan hardware capability database server implementation
  *	
@@ -26,48 +26,44 @@ require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
-PageGenerator::header("Core 1.2 features");
-$platform = PageGenerator::getDefaultOSSelection();
-PageGenerator::pageCaption("Core 1.2 device feature coverage");
-PageGenerator::globalFilterText();
+$platform = 'all';
+if (isset($_GET['platform'])) {
+	$platform = GET_sanitized('platform');
+}
+
+PageGenerator::header("Core 1.4 features");
 ?>
 
-<<<<<<< HEAD
-=======
 <div class='header'>
-	<?php echo "<h4>Core 1.2 properties for ".PageGenerator::filterInfo() ?>
+	<?php echo "<h4>Core 1.4 feature coverage on ".PageGenerator::filterInfo() ?>
 </div>
 
->>>>>>> origin/master
 <center>
-	<?php PageGenerator::platformNavigation('listpropertiescore12.php', $platform, true); ?>
+	<?php PageGenerator::platformNavigation('listfeaturescore14.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-selection">
+		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
+				<tr>
+					<th></th>
+					<th colspan=3 style="text-align: center;">Device coverage</th>
 				</tr>
-				<th>Property</th>
-				<th style="text-align: center;">Type</th>
-				<th style="text-align: center;"></th>
+				<th>Feature</th>
+				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
 				</tr>
 			</thead>
 			<tbody>
 				<?php
 				DB::connect();
 				try {
-					$properties = SqlRepository::listCoreProperties(SqlRepository::VK_API_VERSION_1_2);
-					foreach ($properties as $property => $coverage) {
-						$has_coverage = is_numeric($coverage);
+					$features = SqlRepository::listCoreFeatures(SqlRepository::VK_API_VERSION_1_4);
+					foreach ($features as $feature => $coverage) {
+						$coverageLink = "listdevicescoverage.php?core=1.4&feature=$feature&platform=$platform";
 						echo "<tr>";
-						echo "<td>$property</a></td>";
-						echo "<td class='text-center'>".($has_coverage ? 'Coverage' : 'Values')."</td>";
-						if ($has_coverage) {
-							$link = "listdevicescoverage.php?core=1.2&coreproperty=$property&platform=$platform";
-							echo "<td class='text-center'><a class='supported' href=\"$link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						} else {
-							$link = "<a href='displaycoreproperty.php?core=1.2&name=$property&platform=$platform'>";
-							echo "<td class='text-center'>".$link."Listing</a></td>";
-						}
+						echo "<td>" . $feature . "</td>";
+						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 1) . "<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";
 					}
 				} catch (PDOException $e) {
@@ -81,7 +77,7 @@ PageGenerator::globalFilterText();
 
 	<script>
 		$(document).ready(function() {
-			var table = $('#properties').DataTable({
+			var table = $('#features').DataTable({
 				"pageLength": -1,
 				"paging": false,
 				"stateSave": false,

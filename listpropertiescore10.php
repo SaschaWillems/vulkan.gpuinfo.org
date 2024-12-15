@@ -32,6 +32,13 @@ PageGenerator::pageCaption("Core 1.0 device properties coverage");
 PageGenerator::globalFilterText();
 ?>
 
+<<<<<<< HEAD
+=======
+<div class='header'>
+	<?php echo "<h4>Core 1.0 properties for ".PageGenerator::filterInfo() ?>
+</div>
+
+>>>>>>> origin/master
 <center>
 	<?php PageGenerator::platformNavigation('listpropertiescore10.php', $platform, true); ?>
 

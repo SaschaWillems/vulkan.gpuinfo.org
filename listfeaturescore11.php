@@ -32,6 +32,16 @@ PageGenerator::pageCaption("Core 1.1 device feature coverage");
 PageGenerator::globalFilterText();
 ?>
 
+<<<<<<< HEAD
+=======
+<div class='header'>
+	<?php echo "<h4>Core 1.1 feature coverage on ".PageGenerator::filterInfo() ?>
+</div>
+<div class="alert alert-info" role="alert" style="text-align: center">
+	<b>Note:</b> Data is based on reports submitted or updated with version 3.0 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
+</div>
+
+>>>>>>> origin/master
 <center>
 	<?php PageGenerator::platformNavigation('listfeaturescore11.php', $platform, true); ?>
 

@@ -28,6 +28,7 @@ class SqlRepository {
     const VK_API_VERSION_1_1 = '1.1';
     const VK_API_VERSION_1_2 = '1.2';
     const VK_API_VERSION_1_3 = '1.3';
+    const VK_API_VERSION_1_4 = '1.4';
 
     public static function getDevicePropertiesTable($version) {
         switch ($version) {
@@ -37,6 +38,8 @@ class SqlRepository {
                 return('deviceproperties12');
             case self::VK_API_VERSION_1_3:
                 return('deviceproperties13');
+            case self::VK_API_VERSION_1_4:
+                return('deviceproperties14');
         }
         return 'deviceproperties';
     }
@@ -49,6 +52,8 @@ class SqlRepository {
                 return('devicefeatures12');
             case self::VK_API_VERSION_1_3:
                 return('devicefeatures13');
+            case self::VK_API_VERSION_1_4:
+                return('devicefeatures14');
         }
         return 'devicefeatures';
     }    
@@ -189,40 +194,32 @@ class SqlRepository {
         return $count;
     }    
 
-    /** Global extension listing */
-    public static function listExtensions() {        
-        $deviceCount = self::deviceCount();
-        // Fetch extension features and properties to highlight extensions with a detail page
-        $params = [];
-        $sql ="SELECT e.name, e.hasfeatures, e.hasproperties, date(e.date) as date, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
-                join deviceextensions de on de.extensionid = e.id 
-                join reports r on r.id = de.reportid
-                join deviceproperties dp on dp.reportid = de.reportid";
-        self::appendFilters($sql, $params);
-        $sql .= " group by name";
-        $stmnt = DB::$connection->prepare($sql);
-        $stmnt->execute($params);
-        $extensions = [];
-        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            $extensions[] = [
-                'name' => $row['name'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 2),
-                'hasfeatures' => $row['hasfeatures'], 
-                'hasproperties' => $row['hasproperties'],
-                'date' => $row['date']
-            ];
-        }        
-        return $extensions;
-    }
-
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
+<<<<<<< HEAD
         $table = match($version) {
             self::VK_API_VERSION_1_1 => 'devicefeatures11',
             self::VK_API_VERSION_1_2 => 'devicefeatures12',
             self::VK_API_VERSION_1_3 => 'devicefeatures13',
             default => 'devicefeatures',
         };
+=======
+        $table = 'devicefeatures';
+        switch ($version) {
+            case self::VK_API_VERSION_1_1:
+                $table = 'devicefeatures11';
+                break;
+            case self::VK_API_VERSION_1_2:
+                $table = 'devicefeatures12';
+                break;
+            case self::VK_API_VERSION_1_3:
+                $table = 'devicefeatures13';
+                break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'devicefeatures14';
+                break;                
+        }
+>>>>>>> origin/master
 
         // Collect feature column names
         $sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = '$table' and COLUMN_NAME not in ('reportid')";
@@ -310,12 +307,30 @@ class SqlRepository {
 
     /** Global core property listings */
     public static function listCoreProperties($version) { 
+<<<<<<< HEAD
         $table = match($version) {
             self::VK_API_VERSION_1_1 => 'deviceproperties11',
             self::VK_API_VERSION_1_2 => 'deviceproperties12',
             self::VK_API_VERSION_1_3 => 'deviceproperties13',
             default => 'deviceproperties',
         };
+=======
+        $table = 'deviceproperties';
+        switch ($version) {
+            case self::VK_API_VERSION_1_1:
+                $table = 'deviceproperties11';
+                break;
+            case self::VK_API_VERSION_1_2:
+                $table = 'deviceproperties12';
+                break;
+            case self::VK_API_VERSION_1_3:
+                $table = 'deviceproperties13';
+                break;
+            case self::VK_API_VERSION_1_4:
+                $table = 'deviceproperties14';
+                break;
+        }
+>>>>>>> origin/master
 
         // Columns with coverage numbers
         $coverage_columns = [
@@ -382,14 +397,27 @@ class SqlRepository {
             'idpAccumulatingSaturating16BitUnsignedAccelerated',
             'idpAccumulatingSaturating16BitSignedAccelerated',
             'idpAccumulatingSaturating16BitMixedSignednessAccelerated',
-            'idpAccumulatingSaturating32BitUnsignedAccelerated',
+            'idpAccumulatingSaturating32BitUnsignedAcceleratdised',
             'idpAccumulatingSaturating32BitSignedAccelerated',
             'idpAccumulatingSaturating32BitMixedSignednessAccelerated',
             'idpAccumulatingSaturating64BitUnsignedAccelerated',
             'idpAccumulatingSaturating64BitSignedAccelerated',
             'idpAccumulatingSaturating64BitMixedSignednessAccelerated',
             'storageTexelBufferOffsetSingleTexelAlignment',
-            'uniformTexelBufferOffsetSingleTexelAlignment',            
+            'uniformTexelBufferOffsetSingleTexelAlignment',
+            // VK 1.4
+           'supportsNonZeroFirstInstance',
+           'dynamicRenderingLocalReadDepthStencilAttachments',
+           'dynamicRenderingLocalReadMultisampledAttachments',
+           'earlyFragmentMultisampleCoverageAfterSampleCounting',
+           'earlyFragmentSampleMaskTestBeforeSampleCounting',
+           'depthStencilSwizzleOneSupport',
+           'polygonModePointSize',
+           'nonStrictSinglePixelWideLinesUseParallelogram',
+           'nonStrictWideLinesUseParallelogram',
+           'blockTexelViewCompatibleMultipleLayers',
+           'fragmentShadingRateClampCombinerInputs',
+           'identicalMemoryTypeRequirements',
         ];
        
         // Columns to ignore (not part of the api structure)
