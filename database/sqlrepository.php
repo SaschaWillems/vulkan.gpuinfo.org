@@ -31,31 +31,24 @@ class SqlRepository {
     const VK_API_VERSION_1_4 = '1.4';
 
     public static function getDevicePropertiesTable($version) {
-        switch ($version) {
-            case self::VK_API_VERSION_1_1:
-                return('deviceproperties11');
-            case self::VK_API_VERSION_1_2:
-                return('deviceproperties12');
-            case self::VK_API_VERSION_1_3:
-                return('deviceproperties13');
-            case self::VK_API_VERSION_1_4:
-                return('deviceproperties14');
-        }
-        return 'deviceproperties';
+        return match($version) {
+            self::VK_API_VERSION_1_1 => 'deviceproperties11',
+            self::VK_API_VERSION_1_2 => 'deviceproperties12',
+            self::VK_API_VERSION_1_3 => 'deviceproperties13',
+            self::VK_API_VERSION_1_4 => 'deviceproperties14',
+            default => 'deviceproperties',
+        };
+
     }
 
     public static function getDeviceFeaturesTable($version) {
-        switch ($version) {
-            case self::VK_API_VERSION_1_1:
-                return('devicefeatures11');
-            case self::VK_API_VERSION_1_2:
-                return('devicefeatures12');
-            case self::VK_API_VERSION_1_3:
-                return('devicefeatures13');
-            case self::VK_API_VERSION_1_4:
-                return('devicefeatures14');
-        }
-        return 'devicefeatures';
+        return match($version) {
+            self::VK_API_VERSION_1_1 => 'devicefeatures11',
+            self::VK_API_VERSION_1_2 => 'devicefeatures12',
+            self::VK_API_VERSION_1_3 => 'devicefeatures13',
+            self::VK_API_VERSION_1_4 => 'devicefeatures14',
+            default => 'devicefeatures',
+        };
     }    
 
     public static function getMinApiVersion() {
@@ -196,13 +189,7 @@ class SqlRepository {
 
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
-        $table = match($version) {
-            self::VK_API_VERSION_1_1 => 'devicefeatures11',
-            self::VK_API_VERSION_1_2 => 'devicefeatures12',
-            self::VK_API_VERSION_1_3 => 'devicefeatures13',
-            self::VK_API_VERSION_1_4 => 'devicefeatures14',
-            default => 'devicefeatures',
-        };
+        $table = self::getDeviceFeaturesTable($version);
 
         // Collect feature column names
         $sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = '$table' and COLUMN_NAME not in ('reportid')";
@@ -290,13 +277,7 @@ class SqlRepository {
 
     /** Global core property listings */
     public static function listCoreProperties($version) { 
-        $table = match($version) {
-            self::VK_API_VERSION_1_1 => 'deviceproperties11',
-            self::VK_API_VERSION_1_2 => 'deviceproperties12',
-            self::VK_API_VERSION_1_3 => 'deviceproperties13',
-            self::VK_API_VERSION_1_4 => 'deviceproperties14',
-            default => 'deviceproperties',
-        };
+        $table = self::getDevicePropertiesTable($version);
 
         // Columns with coverage numbers
         $coverage_columns = [
