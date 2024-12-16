@@ -157,24 +157,7 @@ session_start();
 						</ul>
 					</li>
 					<li><a href="listprofiles.php">Profiles</a></li>
-					<!-- Global version selection -->
-					<li class="dropdown">
-						<?php
-							$selected_version = "Version selection";
-							if (isset($_SESSION['minversion'])) {
-								$selected_version = "Core ".$_SESSION['minversion']." (and up)";
-							}
-							echo "<a class=\"dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">$selected_version<span class=\"caret\"></span></a>";
-						?>
-						<ul class="dropdown-menu">
-							<li><a href="database/setapiversion.php?version=all">All versions</a></li>
-							<li role="separator" class="divider"></li>
-							<li><a href="database/setapiversion.php?version=1.1">Core 1.1 (and up)</a></li>
-							<li><a href="database/setapiversion.php?version=1.2">Core 1.2 (and up)</a></li>
-							<li><a href="database/setapiversion.php?version=1.3">Core 1.3 (and up)</a></li>
-							<li><a href="database/setapiversion.php?version=1.4">Core 1.4 (and up)</a></li>
-						</ul>
-					</li>
+					<li><a href="settings.php">Settings</a></li>
 					<li><a href="download.php">Download</a></li>
 					<li><a href="about.php">About</a></li>
 				</ul>

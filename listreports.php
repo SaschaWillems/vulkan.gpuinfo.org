@@ -175,10 +175,14 @@ if ($featureflagbit) {
 	}
 }
 
+PageGenerator::header("Report listing");
+
 // Platform (os)
 if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !== 'all') {
 	$platform = $filter_list->getFilter('platform');
 	$caption = "Listing " . ($caption ? lcfirst($caption) : "reports") . " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . PageGenerator::platformDisplayName($platform);
+} else {
+	$platform = PageGenerator::getDefaultOSSelection();	
 }
 
 // @todo: does not work, called before session start
@@ -187,15 +191,17 @@ if ($minApiVersion) {
 	addCaption("supporting Vulkan $minApiVersion (and up)");
 }
 
-PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");
-
 ?>
+
 <center>
 	<div class='header'>
 		<h4>
 			<?= $caption; ?>
 		</h4>
 	</div>
+	<?php
+		PageGenerator::globalFilterText();
+	?>
 
 	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">

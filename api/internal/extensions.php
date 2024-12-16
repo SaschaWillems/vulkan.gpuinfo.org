@@ -51,16 +51,46 @@ if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
 // Platform (os)
 if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
     $platform = $_REQUEST['filter']['platform'];
-    if ($platform !== "all") {
-        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.ostype = :ostype';
-        $params['ostype'] = ostype($platform);
+} else {
+    // @todo: don't duplicate
+    if (isset($_SESSION['default_os_selection'])) {
+        $platform_setting = sanitize($_SESSION['default_os_selection']);
+        if ($platform_setting !== null) {
+            $platform = $platform_setting;
+        }
     }
+}
+if ($platform !== "all") {
+    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.ostype = :ostype';
+    $params['ostype'] = ostype($platform);
 }
 
 // Minimum API version can be set in the session (global option)
 if (isset($_SESSION['minversion'])) {
     $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.apiversion >= :apiversion';
     $params['apiversion'] =$_SESSION['minversion'];
+}
+
+$start_date = SqlRepository::getMinStartDate();
+if ($start_date) {
+    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.submissiondate >= :startdate';
+    $params['startdate'] = $start_date;
+}
+
+$device_selection = SqlRepository::getDeviceTypeSelection();
+if ($device_selection) {
+    if ($device_selection == 'no_virtual') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        $params['devicetype'] = 3;
+    }
+    if ($device_selection == 'no_cpu') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        $params['devicetype'] = 4;
+    }
+    if ($device_selection == 'no_cpu_no_virtual') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype < :devicetype';
+        $params['devicetype'] = 3;
+    }    
 }
 
 $filteredCount = 0;

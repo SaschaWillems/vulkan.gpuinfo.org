@@ -20,6 +20,8 @@
  *
  */
 
+require 'database/sqlrepository.php';
+
 class ReportFlags
 {
     public $has_instance_data = false;
@@ -346,27 +348,7 @@ class Report
 
     public function fetchCoreFeatures($version)
     {
-        $table = null;
-        switch ($version) {
-            case '1.0':
-                $table = 'devicefeatures';
-                break;
-            case '1.1':
-                $table = 'devicefeatures11';
-                break;
-            case '1.2':
-                $table = 'devicefeatures12';
-                break;
-            case '1.3':
-                $table = 'devicefeatures13';
-                break;
-            case '1.4':
-                $table = 'devicefeatures14';
-                break;
-            }
-        if (!$table) {
-            return null;
-        }
+        $table = SqlRepository::getDeviceFeaturesTable($version);
         try {
             $sql = "SELECT * from $table where reportid = :reportid";
             $stmnt = DB::$connection->prepare($sql);
@@ -393,43 +375,25 @@ class Report
 
     public function fetchCoreProperties($version)
     {
-        $table = null;
+        $table = SqlRepository::getDevicePropertiesTable($version);
         $columns = "*";
-        switch ($version) {
-            case '1.0':
-                $table = 'deviceproperties';
-                $columns = "apiVersion,
-                    driverVersion,
-                    vendorID,
-                    deviceID,
-                    deviceType,
-                    deviceName,
-                    pipelineCacheUUID,
-                    residencyAlignedMipSize,
-                    residencyNonResidentStrict, 
-                    residencyStandard2DBlockShape, 
-                    residencyStandard2DMultisampleBlockShape, 
-                    residencyStandard3DBlockShape,
-                    `subgroupProperties.subgroupSize`,
-                    `subgroupProperties.supportedStages`,
-                    `subgroupProperties.supportedOperations`,
-                    `subgroupProperties.quadOperationsInAllStages`";
-                break;
-            case '1.1':
-                $table = 'deviceproperties11';
-                break;
-            case '1.2':
-                $table = 'deviceproperties12';
-                break;
-            case '1.3':
-                $table = 'deviceproperties13';
-                break;
-            case '1.4':
-                $table = 'deviceproperties14';
-                break;
-        }
-        if (!$table) {
-            return null;
+        if ($version == '1.0') {
+            $columns = "apiVersion,
+            driverVersion,
+            vendorID,
+            deviceID,
+            deviceType,
+            deviceName,
+            pipelineCacheUUID,
+            residencyAlignedMipSize,
+            residencyNonResidentStrict, 
+            residencyStandard2DBlockShape, 
+            residencyStandard2DMultisampleBlockShape, 
+            residencyStandard3DBlockShape,
+            `subgroupProperties.subgroupSize`,
+            `subgroupProperties.supportedStages`,
+            `subgroupProperties.supportedOperations`,
+            `subgroupProperties.quadOperationsInAllStages`";
         }
         try {
             $sql = "SELECT $columns from $table where reportid = :reportid";
