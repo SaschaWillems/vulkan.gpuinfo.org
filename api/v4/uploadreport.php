@@ -54,6 +54,8 @@
 		echo "Uploaded file looks like a binary file!";
 		exit();
 	}
+
+	$start = microtime(true);
 	
 	move_uploaded_file($_FILES['data']['tmp_name'], './'.$_FILES['data']['name']) or die(''); 
 
@@ -359,6 +361,19 @@
 		":osarchitecture" => $json['environment']['architecture'],
 	);
 
+	// Use device name and/or manufacturer from platform info an Android to further distinguish devices
+	if (array_key_exists('platformdetails', $json)) {
+		$jsonnode = $json['platformdetails']; 
+		if (array_key_exists('android.ProductManufacturer', $jsonnode)) {
+			$params["androidproductmanufacturer"] = $jsonnode['android.ProductManufacturer'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 3 and value = :androidproductmanufacturer)";
+		}
+		if (array_key_exists('android.ProductModel', $jsonnode)) {
+			$params["androidproductmodel"] = $jsonnode['android.ProductModel'];
+			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 4 and value = :androidproductmodel)";
+		}
+	}	
+
 	try {
 		$stmnt = DB::$connection->prepare($sql);		
 		$stmnt->execute($params);	
@@ -382,9 +397,9 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter, hasformatfeatureflags2)
 			VALUES
-				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter, :hasformatfeatureflags2)";
 
 		$values = array(
 			":submitter" => $json['environment']['submitter'],
@@ -398,8 +413,13 @@
 			":osarchitecture" => $json['environment']['architecture'],
 			":version" => $json['environment']['reportversion'],
 			":description" => $json['environment']['comment'],
-			":counter" => 0
+			":counter" => 0,
+			":hasformatfeatureflags2" => 0
 		);
+
+		if (array_key_exists('hasFormatFeatureFlags2', $json['properties'])) {
+			$values[':hasformatfeatureflags2'] = $json['properties']['hasFormatFeatureFlags2'];
+		}		
 
 		try {
 			$stmnt = DB::$connection->prepare($sql);
@@ -946,8 +966,8 @@
 					$stmnt = DB::$connection->prepare("UPDATE extensions set hasfeatures = 1 where hasfeatures is null and name = :extension");
 					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
-					mailError("Error at marking extension to have additional features: ".$e->getMessage(), $jsonFile);
-				}				
+					die('Error while trying to upload report (error at marking extension to have additional features)');
+				}
 			}
 		}
 		// Device properties			
@@ -978,8 +998,8 @@
 					$stmnt = DB::$connection->prepare("UPDATE extensions set hasproperties = 1 where hasproperties is null and name = :extension");
 					$stmnt->execute(['extension' => $feature['extension']]);
 				} catch (Exception $e) {
-					mailError("Error at marking extension to have additional properties: ".$e->getMessage(), $jsonFile);
-				}				
+					die('Error while trying to upload report (error at marking extension to have additional properties)');
+				}
 			}		
 		}		
 	}
@@ -1072,6 +1092,10 @@
 	}	
 	
 	DB::$connection->commit();
+
+	$elapsed = (microtime(true) - $start) * 1000;
+	DB::log('api/internal/v4/uploadreport.php', "", $elapsed);
+
 	DB::disconnect();
 		
 	echo "res_uploaded";	  	
@@ -1101,4 +1125,3 @@
 			// Failure to mail is not critical
 		}	
 	}
-?>

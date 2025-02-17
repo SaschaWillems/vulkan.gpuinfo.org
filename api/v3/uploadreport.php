@@ -52,7 +52,7 @@
 	if ((!$mime_type) || (stripos($mime_type, 'text') === false)) {
 		echo "Uploaded file looks like a binary file!";
 		exit();
-	}
+	}	
 	
 	$start = microtime(true);
 
@@ -64,6 +64,10 @@
 			unlink($file);
 		}
 		exit($message);
+	};
+	
+	$log = function($msg) {
+		file_put_contents('log.txt', date("Y-m-d H:i:s")." - ".$msg.PHP_EOL , FILE_APPEND | LOCK_EX);
 	};
 
 	function convertValue($val) {
@@ -287,8 +291,8 @@
 		}
 	} catch (Exception $e) {
 		die('Error while trying to upload report (error at black list check)');
-	}		
-		
+	}
+	
 	// Check if report is already present
 	$sql = "SELECT id from reports where
 		devicename = :devicename and 
@@ -336,8 +340,12 @@
 		$stmnt->execute(array(":reportid" => $reportid));			
 		echo "Report already present!";
 		DB::disconnect();
+		$log('Report already present! ReportId = '.$reportid);
+		$log(print_r($params, true));
 		$exitScript();
-	}	
+	}
+
+	$log('Starting database transaction');
 
 	DB::$connection->beginTransaction();
 	
@@ -1036,12 +1044,12 @@
 			}
 		}			
 	}	
-	
-	DB::$connection->commit();
 
 	$elapsed = (microtime(true) - $start) * 1000;
-	DB::log('api/internal/v3/uploadreport.php', $sql, $elapsed);
+	DB::log('api/internal/v3/uploadreport.php', "", $elapsed);
+	$log('Committing database transaction');
 
+	DB::$connection->commit();
 	DB::disconnect();
 		
 	echo "res_uploaded";	  	
@@ -1071,3 +1079,4 @@
 			// Failure to mail is not critical
 		}	
 	}
+?>
