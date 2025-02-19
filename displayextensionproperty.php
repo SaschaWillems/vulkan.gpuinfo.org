@@ -81,7 +81,7 @@ $caption = "Value distribution for <code>$property_name</code> property of <code
 							$link .= "&core=$core";
 						}
 						echo "<tr>";
-						echo "<td $color_style>".$value['value']."</td>";
+						echo "<td $color_style>".$value['displayvalue']."</td>";
 						if ($value['count'] != null) {
 							echo "<td><a href='$link'>".$value['count']."</a></td>";
 						} else {
