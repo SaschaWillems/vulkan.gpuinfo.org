@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -393,6 +393,14 @@ function getPipelineRobustnessImageBehavior($value) {
 	};
 }
 
+function getLayeredDriverUnderlyingApi($value) {
+	return match($value) {
+		0 => 'NONE',
+		1 => 'D3D12',
+		default => 'unknown'
+	};
+}
+
 // Convert vendor specific driver version string
 function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 {
@@ -763,6 +771,9 @@ function getPropertyDisplayValue($key, $value, $shorten = false)
 		case 'pCopySrcLayouts':									
 			$displayvalue = listImageLayouts($value);
 			break;
+		case 'underlyingAPI':
+			$displayvalue = getLayeredDriverUnderlyingApi((int)$value);
+			break;			
 		default:
 			// Serialized arrays
 			if (is_string($value) && (substr($value, 0, 2) == "a:") && (strpos($value, '{') !== false)) {
