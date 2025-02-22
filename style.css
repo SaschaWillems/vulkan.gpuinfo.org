@@ -882,3 +882,11 @@ code {
 .faq > .entry > .answer::first-letter {
 	font-weight: bold;
 }
+
+.ext-prop-table {
+	margin-left: 25px;
+}
+
+.ext-prop-table td {
+	padding: 5px;
+}
