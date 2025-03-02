@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -51,6 +51,11 @@ $device_type_options = [
     'no_cpu' => 'Exclude CPU implementations',
     'no_virtual' => 'Exclude virtual implementations',
     'no_cpu_no_virtual' => 'Exclude CPU and virtual implementations'
+];
+
+$layered_implementation_options= [
+    0 => 'No',
+    1 => 'Yes'
 ]
 
 ?>
@@ -118,6 +123,20 @@ $device_type_options = [
                 </div>                
 
                 <div class="form-group">
+                    <label for="layered_implementations" class="control-label col-sm-4">Include layered impl.: </label>
+                    <div class="col-sm-6">
+                        <select name="layered_implementations" id="layered_implementations" class="form-control">
+                        <?php
+                            foreach ($layered_implementation_options as $value => $text) {
+                                $select = ($_SESSION['layered_implementations'] == $value) ? 'selected' : '';
+                                echo "<option value=\"$value\" $select>$text</option>";
+                            }
+                            ?>   
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="default_os_selection" class="control-label col-sm-4">Default coverage view: </label>
                     <div class="col-sm-6">
                         <select name="default_os_selection" id="default_os_selection" class="form-control">
@@ -129,7 +148,7 @@ $device_type_options = [
                             ?>   
                         </select>
                     </div>
-                </div>
+                </div>                
 
                 <div class="form-group" style="padding-top: 25px;">
                     <div class="col-sm-offset-4 col-sm-10">

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -29,6 +29,7 @@ if (isset($_POST['reset'])) {
     unset($_SESSION['date_range']);
     unset($_SESSION['default_os_selection']);
     unset($_SESSION['device_types']);
+    unset($_SESSION['layered_implementations']);
     $_SESSION['message'] = 'Settings reset to default';
     header('Location: ' . $_SERVER['HTTP_REFERER']);
     exit;
@@ -75,6 +76,12 @@ if (isset($_POST['device_types'])) {
         } else {
             $_SESSION['device_types'] = $_POST['device_types'];
         }
+    }
+}
+
+if (isset($_POST['layered_implementations'])) {
+    if (in_array($_POST['layered_implementations'], [0, 1])) {
+        $_SESSION['layered_implementations'] = $_POST['layered_implementations'];
     }
 }
 
