@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -347,8 +347,8 @@
 		}
 	} catch (Exception $e) {
 		reportError('Error while trying to upload report (error at black list check)');
-	}		
-		
+	}
+	
 	// Check if report is already present
 	$sql = "SELECT id from reports where
 		devicename = :devicename and 
@@ -385,15 +385,26 @@
 
 	DB::$connection->beginTransaction();
 	
+	// Check if it's a layered implementation
+	// Will be marked, so they can be easily selected via database queries
+	$layered = false;
+	$jsonnode = $json['extensions']; 
+	foreach ($jsonnode as $ext) {
+		if (strcasecmp($ext['extensionName'], "VK_MSFT_layered_driver") == 0) {
+			$layered = true;
+			break;
+		}
+	}
+
 	// Report meta data	
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter)
+				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter, layered)
 			VALUES
-				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter)";
+				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter, :layered)";
 
-		$values = array(
+		$values = [
 			":submitter" => $json['environment']['submitter'],
 			":devicename" => $json['properties']['deviceName'],
 			":devicetype" => $json['properties']['deviceType'],
@@ -405,8 +416,9 @@
 			":osarchitecture" => $json['environment']['architecture'],
 			":version" => $json['environment']['reportversion'],
 			":description" => $json['environment']['comment'],
-			":counter" => 0
-		);
+			":counter" => 0,
+			':layered' => (int)$layered
+		];
 
 		try {
 			$stmnt = DB::$connection->prepare($sql);
