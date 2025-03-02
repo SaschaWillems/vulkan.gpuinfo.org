@@ -81,6 +81,18 @@ class SqlRepository {
         return null;
     }
 
+	public static function getLayeredImplementationsOption()
+    {
+        // Explicit page parameter has precedence over global setting
+        if (isset($_GET['layered_implementations'])) {
+            return GET_sanitized('layered_implementations');
+        }
+		if (isset($_SESSION['layered_implementations'])) {
+			return sanitize($_SESSION['layered_implementations']);
+		}
+        return null;
+    }    
+
     public static function getOSType() {
         if (isset($_GET['platform'])) {
             return ostype(GET_sanitized('platform'));

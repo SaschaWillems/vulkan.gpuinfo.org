@@ -274,10 +274,14 @@ if ($platform !== null && $platform !== 'all') {
     $params['ostype'] = $platform;
 }
 
-// Global filters
+// Global filters START
+// @todo: also apply to devices listing
+// @todo: consistent naming (...option), maybe move to separate class
+
 $start_date = SqlRepository::getMinStartDate();
 $api_version = SqlRepository::getMinApiVersion();
 $device_types = SqlRepository::getDeviceTypeSelection();
+$layered_implementations = SqlRepository::getLayeredImplementationsOption();
 
 if ($api_version) {
     SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
@@ -303,6 +307,12 @@ if ($device_types) {
         $params['devicetype'] = 3;
     }
 }
+
+if (!$layered_implementations) {
+    SqlRepository::appendCondition($whereClause, "r.layered <> 1");
+}
+
+// Global filters END
 
 if ($orderByColumn == "api") {
     $orderBy = "order by length($orderByColumn) $orderByDir , $orderByColumn $orderByDir";
