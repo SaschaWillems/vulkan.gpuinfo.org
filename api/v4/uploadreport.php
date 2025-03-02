@@ -338,6 +338,13 @@
 			DB::disconnect();
 			exit();	  	
 		}
+		// Special cases
+		if ((strcasecmp($json['properties']['displayName'], 'Google Pixel 5') == 0) && ($json['properties']['deviceType'] == 2)) {
+			echo "This device and type combination has been black-listed and can't be uploaded to the database!";
+			mailError("Pixel 5 with discrete upload denied", $jsonFile);
+			DB::disconnect();
+			exit();	  	
+		}
 	} catch (Exception $e) {
 		reportError('Error while trying to upload report (error at black list check)');
 	}		
@@ -362,7 +369,7 @@
 	try {
 		$stmnt = DB::$connection->prepare($sql);		
 		$stmnt->execute($params);	
-	} catch (Exception $e) {
+	} catch (Exception $e) { 
 		reportError('Error while trying to upload report (error at device present check)');
 	}		
 	
