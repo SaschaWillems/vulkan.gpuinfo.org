@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2020-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2020-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -244,6 +244,7 @@ HTML;
         $date_range = self::getGlobalDateRange();
         $api_version = self::getGlobalApiVersion();
 		$device_types = self::getDefaultDeviceTypeSelection();
+		$layered_implementations = SqlRepository::getLayeredImplementationsOption();
         $filters = [];
         if ($api_version && $api_version !== 'all') {
             $filters[] = "min. Api version = $api_version";
@@ -262,6 +263,9 @@ HTML;
             	$filters[] = "excluding CPU and virtual implementations";
 			}
         }
+		if ($layered_implementations && (int)$layered_implementations == 1) {
+			$filters[] = "incl. layered impl.";
+		}
         if (count($filters) > 0) {
             echo "<div class=\"page-filter\"><a href=\"settings.php\">Global filters</a> are applied: " . implode(', ', $filters)."</div>";
         }

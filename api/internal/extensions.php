@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -65,7 +65,9 @@ if ($platform !== "all") {
     $params['ostype'] = ostype($platform);
 }
 
-// Minimum API version can be set in the session (global option)
+// Global filters START
+// @todo
+
 if (isset($_SESSION['minversion'])) {
     $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.apiversion >= :apiversion';
     $params['apiversion'] =$_SESSION['minversion'];
@@ -92,6 +94,13 @@ if ($device_selection) {
         $params['devicetype'] = 3;
     }    
 }
+
+$layered_implementations = SqlRepository::getLayeredImplementationsOption();
+if (!$layered_implementations) {
+    SqlRepository::appendCondition($whereClause, "r.layered = 0");
+}
+
+// Global filters END
 
 $filteredCount = 0;
 $stmnt = DB::$connection->prepare("select count(*) from extensions"); // @todo: whereClause?
