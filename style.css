@@ -894,6 +894,15 @@ code {
 	font-weight: bold;
 }
 
+.ext-prop-table {
+	margin-left: 25px;
+}
+
+.ext-prop-table td {
+	padding: 5px;
+}
+
+
 .form-control {
 	background-color: var(--background-color-input);
 	border-color: var(--bordercolor);

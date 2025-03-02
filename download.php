@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '4.00';
+$release = '4.01';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -54,12 +54,29 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer&hl=en_US">Install from GooglePlay</a> (Releases may take some time to get updated)</li>
 						<li><a href="<?=$filename_prefix?>_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
-				<li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li>
+				<!-- <li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li> -->
 				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store)</a> (provided by <a href="https://www.lunarg.com/">LunarG</a>)</li>
 			</ul>
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.01 - 2025-02-06</h4>
+			<ul>
+				<li>Vulkan header 1.4.307</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_KHR_depth_clamp_zero_one</li>
+						<li>VK_KHR_maintenance8</li>
+						<li>VK_KHR_video_maintenance2</li>
+						<li>VK_ARM_pipeline_opacity_micromap</li>
+						<li>VK_NV_cluster_acceleration_structure</li>
+						<li>VK_NV_cooperative_vector</li>
+						<li>VK_NV_partitioned_acceleration_structure</li>
+						<li>VK_NV_ray_tracing_linear_swept_spheres</li>
+					</ul>
+				</li>
+				<li>Better handling of surface queries on Wayland</li>
+			</ul>				
 			<h4>4.00 - 2024-12-06</h4>
 			<ul>
 				<li>Added support for Vulkan 1.4. (incl. update mechanism for updating reports)</li>

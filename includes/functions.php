@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -278,6 +278,34 @@ function listImageLayouts($value) {
 	}
 }
 
+function listCooperativeMatrixProperties($value)
+{
+	$displayValues = [];
+	try {
+		// Value stores an array of VkCooperativeMatrixPropertiesKHR, which have been turned into an array themselves
+		// aaa
+		$arr = unserialize($value);
+		foreach ($arr as $index => &$propArray) {
+			$tableTemplate =
+			"<table class='ext-prop-table'>
+			<tr> <td>MSize</td> <td>$propArray[0]</td> </tr>
+			<tr> <td>NSize</td> <td>$propArray[1]</td> </tr>
+			<tr> <td>KSize</td> <td>$propArray[2]</td> </tr>
+			<tr> <td>AType</td> <td>".getComponentTypeString($propArray[3])."</td> </tr>
+			<tr> <td>BType</td> <td>".getComponentTypeString($propArray[4])."</td> </tr>
+			<tr> <td>CType</td> <td>".getComponentTypeString($propArray[5])."</td> </tr>
+			<tr> <td>ResultType</td> <td>".getComponentTypeString($propArray[6])."</td> </tr>
+			<tr> <td>sat.Accum.</td> <td>".displayBool($propArray[7])."</td> </tr>
+			<tr> <td>scope</td> <td>".getScopString($propArray[8])."</td> </tr>
+			</table>";
+			$displayValues[] = "[$index]<br>$tableTemplate";
+		}
+		return implode('<br>', $displayValues);
+	} catch (Throwable $e) {
+		return null;
+	}	
+}
+
 function getShaderFloatControlsIndependence($value)
 {
 	$values = [
@@ -393,6 +421,14 @@ function getPipelineRobustnessImageBehavior($value) {
 	};
 }
 
+function getLayeredDriverUnderlyingApi($value) {
+	return match($value) {
+		0 => 'NONE',
+		1 => 'D3D12',
+		default => 'unknown'
+	};
+}
+
 // Convert vendor specific driver version string
 function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 {
@@ -451,6 +487,39 @@ function getDriverVersion($versionraw, $versiontext, $vendorid, $osname)
 	}
 
 	return $versiontext;
+}
+
+function getComponentTypeString($value)
+{
+	return match($value) {
+		0 => 'FLOAT16_KHR',
+		1 => 'FLOAT32_KHR',
+		2 => 'FLOAT64_KHR',
+		3 => 'SINT8_KHR',
+		4 => 'SINT16_KHR',
+		5 => 'SINT32_KHR',
+		6 => 'SINT64_KHR',
+		7 => 'UINT8_KHR',
+		8 => 'UINT16_KHR',
+		9 => 'UINT32_KHR',
+		10 => 'UINT64_KHR',
+		1000491000 => 'SINT8_PACKED_NV',
+		1000491001 => 'UINT8_PACKED_NV',
+		1000491002 => 'FLOAT_E4M3_NV',
+		1000491003 => 'FLOAT_E5M2_NV',
+		default => 'unknown'
+	};
+}
+
+function getScopString($value)
+{
+	return match($value) {
+		1 => 'DEVICE_KHR',
+		2 => 'WORKGROUP_KHR',
+		3 => 'SUBGROUP_KHR',
+		5 => 'QUEUE_FAMILY_KHR',
+   		default => 'unknown'
+	};
 }
 
 function mailError($error, $content)
@@ -763,6 +832,12 @@ function getPropertyDisplayValue($key, $value, $shorten = false)
 		case 'pCopySrcLayouts':									
 			$displayvalue = listImageLayouts($value);
 			break;
+		case 'cooperativeMatrixProperties':
+			$displayvalue = listCooperativeMatrixProperties($value);
+			break;
+		case 'underlyingAPI':
+			$displayvalue = getLayeredDriverUnderlyingApi((int)$value);
+			break;			
 		default:
 			// Serialized arrays
 			if (is_string($value) && (substr($value, 0, 2) == "a:") && (strpos($value, '{') !== false)) {
