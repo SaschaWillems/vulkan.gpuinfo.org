@@ -274,45 +274,7 @@ if ($platform !== null && $platform !== 'all') {
     $params['ostype'] = $platform;
 }
 
-// Global filters START
-// @todo: also apply to devices listing
-// @todo: consistent naming (...option), maybe move to separate class
-
-$start_date = SqlRepository::getMinStartDate();
-$api_version = SqlRepository::getMinApiVersion();
-$device_types = SqlRepository::getDeviceTypeSelection();
-$layered_implementations = SqlRepository::getLayeredImplementationsOption();
-
-if ($api_version) {
-    SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
-    $params['apiversion'] = $api_version;
-}
-
-if ($start_date) {
-    SqlRepository::appendCondition($whereClause, 'r.submissiondate >= :startdate');
-    $params['startdate'] = $start_date;
-}
-
-if ($device_types) {
-    if ($device_types = 'no_virtual') {
-        SqlRepository::appendCondition($whereClause, "r.devicetype != :devicetype");
-        $params['devicetype'] = 3;
-    }
-    if ($device_types = 'no_cpu') {
-        SqlRepository::appendCondition($whereClause, "r.devicetype != :devicetype");
-        $params['devicetype'] = 4;
-    }
-    if ($device_types = 'no_cpu_no_virtual') {
-        SqlRepository::appendCondition($whereClause, "r.devicetype < :devicetype");
-        $params['devicetype'] = 3;
-    }
-}
-
-if (!$layered_implementations) {
-    SqlRepository::appendCondition($whereClause, "r.layered <> 1");
-}
-
-// Global filters END
+SqlRepository::appendFilters($whereClause, $params, false);
 
 if ($orderByColumn == "api") {
     $orderBy = "order by length($orderByColumn) $orderByDir , $orderByColumn $orderByDir";

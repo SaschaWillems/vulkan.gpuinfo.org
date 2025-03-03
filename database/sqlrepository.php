@@ -121,11 +121,15 @@ class SqlRepository {
         }
     }
 
-    public static function appendFilters(&$sql, &$params) {
-        $ostype = self::getOSType();
-        if ($ostype !== null) {            
-            self::appendCondition($sql, "ostype = :ostype");
-            $params['ostype'] = $ostype;
+    // Append global filter settings to a given sql statement
+    public static function appendFilters(&$sql, &$params, $includeOsType = true) {
+        if ($includeOsType) {
+            // This can be skipped as some views have separate filter conditions for the os that should not be overriden
+            $ostype = self::getOSType();
+            if ($ostype !== null) {            
+                self::appendCondition($sql, "ostype = :ostype");
+                $params['ostype'] = $ostype;
+            }
         }
         $apiversion = self::getMinApiVersion();
         if ($apiversion) {
@@ -148,9 +152,13 @@ class SqlRepository {
                 $params['devicetype'] = 4;
             }
             if ($device_types = 'no_cpu_no_virtual') {
-                self::appendCondition($whereClause, "r.devicetype < :devicetype");
+                self::appendCondition($sql, "r.devicetype < :devicetype");
                 $params['devicetype'] = 3;
             }            
+        }
+        $layered_implementations = self::getLayeredImplementationsOption();
+        if (!$layered_implementations) {
+            self::appendCondition($sql, "r.layered = 0");
         }
     }
 
