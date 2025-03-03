@@ -39,9 +39,11 @@ $platform = "all";
 $caption = "Devices";
 $showTabs = true;
 
-if ($filter_list->hasFilter('platform')  && $filter_list->hasFilter('platform') != 'all') {
+if ($filter_list->hasFilter('platform')  && $filter_list->getFilter('platform') !== 'all') {
 	$platform = $filter_list->getFilter('platform');
 	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>".PageGenerator::platformDisplayName($platform)." devices";
+} else {
+	$platform = PageGenerator::getDefaultOSSelection();	
 }
 if ($filter_list->hasFilter('extension')) {
 	$caption .= " supporting ".$filter_list->getFilter('extension');
@@ -72,7 +74,7 @@ if ($filter_list->hasFilter('submitter')) {
 
 	<?php
 	if ($showTabs) {
-		PageGenerator::platformNavigation('listdevices.php', $platform, true);
+		PageGenerator::platformNavigation('listdevices.php', $platform, true, $filter_list->filters);
 	}
 	?>
 
