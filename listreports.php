@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -54,7 +54,7 @@ $filters = [
 ];
 $filter_list = new FilterList($filters);
 
-$caption = "Listing all reports";
+$caption = "Reports";
 $pageTitle = null;
 $inverted = false;
 $platform = "all";
@@ -184,21 +184,10 @@ if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !
 } else {
 	$platform = PageGenerator::getDefaultOSSelection();	
 }
-
-// @todo: does not work, called before session start
-$minApiVersion = SqlRepository::getMinApiVersion();
-if ($minApiVersion) {
-	addCaption("supporting Vulkan $minApiVersion (and up)");
-}
-
 ?>
 
 <center>
-	<div class='header'>
-		<h4>
-			<?= $caption; ?>
-		</h4>
-	</div>
+	<div class='header'><h4><?= $caption ?></h4> </div>
 	<?php
 		PageGenerator::globalFilterText();
 	?>
