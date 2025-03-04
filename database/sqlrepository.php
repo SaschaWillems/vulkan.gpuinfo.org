@@ -165,45 +165,21 @@ class SqlRepository {
     public static function deviceCount($sqlAppend = null) {
         // @todo: count(distinct displayname) ? (slightly different numbers)
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $sqlAppend";
-        $ostype = self::getOSType();
-        if ($ostype !== null) {
-            self::appendCondition($sql, "r.ostype = :ostype");
-            $params['ostype'] = $ostype;
-        }
-        $apiversion = self::getMinApiVersion();
-        if ($apiversion) {
-            self::appendCondition($sql, "r.apiversion >= :apiversion");
-            $params['apiversion'] = $apiversion;
-        }
-        $start_date = self::getMinStartDate();
-        if ($start_date) {
-            self::appendCondition($sql, "r.submissiondate >= :startdate");
-            $params['startdate'] = $start_date;            
-        }
-        $device_types = self::getDeviceTypeSelection();
-        if ($device_types) {
-            if ($device_types == 'no_cpu') {
-                self::appendCondition($sql, "dp.devicetype != :devicetype");
-                $params['devicetype'] = 'cpu';
-            }
-        }
+        $params = [];
+        self::appendFilters($sql, $params);
         $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
-        $count = $stmnt->fetch(PDO::FETCH_COLUMN);        
+        $count = $stmnt->fetch(PDO::FETCH_COLUMN);
         return $count;
     }
 
     public static function deviceCountOsType($osType = 0) {
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype";
         $params['ostype'] = $osType;
-        $apiversion = self::getMinApiVersion();
-        if ($apiversion) {
-            self::appendCondition($sql, "r.apiversion >= :apiversion");
-            $params['apiversion'] = $apiversion;
-        }
+        self::appendFilters($sql, $params, false);
         $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
-        $count = $stmnt->fetch(PDO::FETCH_COLUMN);        
+        $count = $stmnt->fetch(PDO::FETCH_COLUMN);
         return $count;
     }    
 
