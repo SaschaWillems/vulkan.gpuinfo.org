@@ -74,7 +74,7 @@ $layered_implementation_options= [
 
             <div style="padding-top: 25px;">
         	    <b>Note:</b> Settings use server side sessions. In order to identify your session, a session cookie is stored in your browser.
-                This cookie is <b>only</b> used for settings on this page and is on no way used for user-tracking.
+                This cookie is <b>only</b> used for settings on this page and is in no way used for user-tracking.
                 As such it is considered a <b>necessary cookie</b>.
             </div>
 
