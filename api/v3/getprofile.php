@@ -3,7 +3,7 @@
 *
 * Vulkan hardware capability database back-end
 *	
-* Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
 *	
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public
@@ -499,6 +499,10 @@ class VulkanProfile {
                             $property['sampleLocationCoordinateRange'][] = $this->convertValue($value['value'], 'float', null, $key);
                             continue;
                         }                    
+                    }
+                    // This should not happen, but the profiles library is hard to deal with and may (deliberately) miss some types
+                    if (!array_key_exists($struct_name, $ext['types'])) {
+                        continue;
                     }
                     if (array_key_exists($value_name, $ext['types'][$struct_name])) {
                         $type = $ext['types'][$struct_name][$value_name];
