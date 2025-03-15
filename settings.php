@@ -56,7 +56,21 @@ $device_type_options = [
 $layered_implementation_options= [
     0 => 'No',
     1 => 'Yes'
-]
+];
+
+function addOption($caption, $label, $options) {
+    $session_id = $label;
+    // Backwards compat. with existing settings
+    if ($label == 'vulkan_version') {
+        $session_id = 'minversion';
+    }
+    echo "<div class=\"form-group\"> <label for=\"$label\" class=\"control-label col-sm-4\">$caption: </label> <div class=\"col-sm-6\"> <select name=\"$label\" id=\"$label\" class=\"form-control\">";               
+    foreach ($options as $value => $text) {
+        $selected = ($_SESSION[$session_id] == $value) ? 'selected' : '';
+        echo "<option value=\"$value\" $selected>$text</option>";
+    };
+    echo "</select></div></div>".PHP_EOL;
+}
 
 ?>
 
@@ -80,76 +94,14 @@ $layered_implementation_options= [
 
             <form class="form-horizontal" style="max-width: 640px; margin-top: 50px;" action="database/updatesettings.php" method="POST">
 
-                <div class="form-group">
-                    <label for="vulkan_version" class="control-label col-sm-4">Min. Vulkan version: </label>
-                    <div class="col-sm-6">
-                        <select name="vulkan_version" id="vulkan_version" class="form-control">
-                            <?php
-                            foreach ($version_options as $value => $text) {
-                                $select = ($_SESSION['minversion'] == $value) ? 'selected' : '';
-                                echo "<option value=\"$value\" $select>$text</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="date_range" class="control-label col-sm-4">Min. report age: </label>
-                    <div class="col-sm-6">
-                        <select name="date_range" id="date_range" class="form-control">
-                            <?php
-                            foreach ($date_options as $value => $text) {
-                                $select = ($_SESSION['date_range'] == $value) ? 'selected' : '';
-                                echo "<option value=\"$value\" $select>$text</option>";
-                            }
-                            ?>                        
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="device_types" class="control-label col-sm-4">Device types: </label>
-                    <div class="col-sm-6">
-                        <select name="device_types" id="device_types" class="form-control">
-                        <?php
-                            foreach ($device_type_options as $value => $text) {
-                                $select = ($_SESSION['device_types'] == $value) ? 'selected' : '';
-                                echo "<option value=\"$value\" $select>$text</option>";
-                            }
-                            ?>   
-                        </select>
-                    </div>
-                </div>                
-
-                <div class="form-group">
-                    <label for="layered_implementations" class="control-label col-sm-4">Include layered impl.: </label>
-                    <div class="col-sm-6">
-                        <select name="layered_implementations" id="layered_implementations" class="form-control">
-                        <?php
-                            foreach ($layered_implementation_options as $value => $text) {
-                                $select = ($_SESSION['layered_implementations'] == $value) ? 'selected' : '';
-                                echo "<option value=\"$value\" $select>$text</option>";
-                            }
-                            ?>   
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="default_os_selection" class="control-label col-sm-4">Default coverage view: </label>
-                    <div class="col-sm-6">
-                        <select name="default_os_selection" id="default_os_selection" class="form-control">
-                        <?php
-                            foreach ($platform_options as $value => $text) {
-                                $select = ($_SESSION['default_os_selection'] == $value) ? 'selected' : '';
-                                echo "<option value=\"$value\" $select>$text</option>";
-                            }
-                            ?>   
-                        </select>
-                    </div>
-                </div>                
-
+                <?php
+                    addOption('Min. Vulkan version', 'vulkan_version', $version_options);
+                    addOption('Min. report age', 'date_range', $date_options);
+                    addOption('Device types', 'device_types', $device_type_options);
+                    addOption('Include layered impl.', 'layered_implementations', $layered_implementation_options);
+                    addOption('Default platform', 'default_os_selection', $platform_options);
+                ?>
+         
                 <div class="form-group" style="padding-top: 25px;">
                     <div class="col-sm-offset-4 col-sm-10">
                         <button type="submit" name="save" class="btn btn-success">Save settings</button>
