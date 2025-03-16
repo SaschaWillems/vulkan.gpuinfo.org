@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -39,6 +39,8 @@ session_start();
 	<link rel="stylesheet" type="text/css" href="external/css/responsive.bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="external/bootstrap-toggle.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/solid.min.css" rel="stylesheet" />
 
 	<link rel="stylesheet" type="text/css" href="style.css">
 
@@ -157,9 +159,9 @@ session_start();
 						</ul>
 					</li>
 					<li><a href="listprofiles.php">Profiles</a></li>
-					<li><a href="settings.php">Settings</a></li>
-					<li><a href="download.php">Download</a></li>
-					<li><a href="about.php">About</a></li>
+					<li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+					<li><a href="download.php"><i class="fas fa-download"> </i> Download</a></li>
+					<li><a href="about.php"><i class="fas fa-question-circle"></i> About</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class="dropdown">
