@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -19,6 +19,8 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.		
  *
  */
+
+require 'database/sqlrepository.php';
 
 class ReportFlags
 {
@@ -82,58 +84,61 @@ class Report
     public function fetchData()
     {
         DB::connect();
-        // Basic report information
-        $sql = "SELECT
-                p.devicename,
-                r.displayname,
-                VendorId(p.vendorid) as 'vendor',
-                r.version as reportversion,
-                r.ostype,
-                p.apiversionraw
-                from reports r
-                left join
-                deviceproperties p on (p.reportid = r.id)
-                where r.id = :reportid";
-        $stmnt = DB::$connection->prepare($sql);
-        $stmnt->execute([':reportid' => $this->id]);
-        $row = $stmnt->fetch(PDO::FETCH_ASSOC);
-        $this->info->version = $row['reportversion'];
-        if ($row['ostype'] == 2) {
-            // Display device name from platform data instead of GPU vendor and name on Android
-            $this->info->device_description = $row['displayname'];
-        } else {
-            if (($row['vendor']) && (stripos($row['devicename'], $row['vendor']) === 0)) {
-                // Don't include vendor name if it's already part of the device name
-                $this->info->device_description = $row['devicename'];
+        try {
+            // Basic report information
+            $sql = "SELECT
+                    p.devicename,
+                    r.displayname,
+                    VendorId(p.vendorid) as 'vendor',
+                    r.version as reportversion,
+                    r.ostype,
+                    p.apiversionraw
+                    from reports r
+                    left join
+                    deviceproperties p on (p.reportid = r.id)
+                    where r.id = :reportid";
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute([':reportid' => $this->id]);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+            $this->info->version = $row['reportversion'];
+            if ($row['ostype'] == 2) {
+                // Display device name from platform data instead of GPU vendor and name on Android
+                $this->info->device_description = $row['displayname'];
             } else {
-                $this->info->device_description = $row['vendor'] . " " . $row['devicename'];
+                if (($row['vendor']) && (stripos($row['devicename'], $row['vendor']) === 0)) {
+                    // Don't include vendor name if it's already part of the device name
+                    $this->info->device_description = $row['devicename'];
+                } else {
+                    $this->info->device_description = $row['vendor'] . " " . $row['devicename'];
+                }
             }
+            $this->apiversion->major = $row['apiversionraw'] >> 22;
+            $this->apiversion->minor = ($row['apiversionraw'] >> 12) & 0x3ff;
+            $this->apiversion->patch = ($row['apiversionraw'] & 0xfff);
+            $this->info->platform = platformname($row['ostype']);
+            // Flags for optional data
+            $this->flags->has_instance_data =  DB::getCount("SELECT (select count(*) from deviceinstanceextensions where reportid = :reportid) + (select count(*) from deviceinstancelayers where reportid = :reportid)", [':reportid' => $this->id]) > 0;
+            $this->flags->has_surface_caps = DB::getCount("SELECT count(*) from devicesurfacecapabilities where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_platform_details = DB::getCount("SELECT count(*) from deviceplatformdetails where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_extended_features = DB::getCount("SELECT count(*) from devicefeatures2 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_extended_properties = DB::getCount("SELECT count(*) from deviceproperties2 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_vulkan_1_1_features = DB::getCount("SELECT count(*) from devicefeatures11 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_vulkan_1_1_properties = DB::getCount("SELECT count(*) from deviceproperties11 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            if ($this->flags->has_vulkan_1_1_properties === false) {
+                $this->flags->has_vulkan_1_1_properties = (($this->apiversion->major >= 1) && ($this->apiversion->minor >= 1));
+            }
+            $this->flags->has_vulkan_1_2_features = DB::getCount("SELECT count(*) from devicefeatures12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_vulkan_1_3_features = DB::getCount("SELECT count(*) from devicefeatures13 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_vulkan_1_3_properties = DB::getCount("SELECT count(*) from deviceproperties13 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_vulkan_1_4_features = DB::getCount("SELECT count(*) from devicefeatures14 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_vulkan_1_4_properties = DB::getCount("SELECT count(*) from deviceproperties14 where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
+            $this->flags->has_update_history = DB::getCount("SELECT count(*) from reportupdatehistory where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_profiles =  DB::getCount("SELECT count(*) from deviceprofiles where reportid = :reportid", [':reportid' => $this->id]) > 0;
+        } finally {
+            DB::disconnect();
         }
-        $this->apiversion->major = $row['apiversionraw'] >> 22;
-        $this->apiversion->minor = ($row['apiversionraw'] >> 12) & 0x3ff;
-        $this->apiversion->patch = ($row['apiversionraw'] & 0xfff);
-        $this->info->platform = platformname($row['ostype']);
-        // Flags for optional data
-        $this->flags->has_instance_data =  DB::getCount("SELECT (select count(*) from deviceinstanceextensions where reportid = :reportid) + (select count(*) from deviceinstancelayers where reportid = :reportid)", [':reportid' => $this->id]) > 0;
-        $this->flags->has_surface_caps = DB::getCount("SELECT count(*) from devicesurfacecapabilities where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_platform_details = DB::getCount("SELECT count(*) from deviceplatformdetails where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_extended_features = DB::getCount("SELECT count(*) from devicefeatures2 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_extended_properties = DB::getCount("SELECT count(*) from deviceproperties2 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_vulkan_1_1_features = DB::getCount("SELECT count(*) from devicefeatures11 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_vulkan_1_1_properties = DB::getCount("SELECT count(*) from deviceproperties11 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        if ($this->flags->has_vulkan_1_1_properties === false) {
-            $this->flags->has_vulkan_1_1_properties = (($this->apiversion->major >= 1) && ($this->apiversion->minor >= 1));
-        }
-        $this->flags->has_vulkan_1_2_features = DB::getCount("SELECT count(*) from devicefeatures12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_vulkan_1_2_properties = DB::getCount("SELECT count(*) from deviceproperties12 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_vulkan_1_3_features = DB::getCount("SELECT count(*) from devicefeatures13 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_vulkan_1_3_properties = DB::getCount("SELECT count(*) from deviceproperties13 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_vulkan_1_4_features = DB::getCount("SELECT count(*) from devicefeatures14 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_vulkan_1_4_properties = DB::getCount("SELECT count(*) from deviceproperties14 where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
-        $this->flags->has_update_history = DB::getCount("SELECT count(*) from reportupdatehistory where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        $this->flags->has_profiles =  DB::getCount("SELECT count(*) from deviceprofiles where reportid = :reportid", [':reportid' => $this->id]) > 0;
-        DB::disconnect();
     }
 
     public function fetchDeviceInfo()
@@ -165,7 +170,7 @@ class Report
                 where r.id = :reportid";
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute([":reportid" => $this->id]);
-            $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+            $result = $stmnt->fetch(PDO::FETCH_ASSOC);
             return $result;
         } catch (Throwable $e) {
             return null;
@@ -346,27 +351,7 @@ class Report
 
     public function fetchCoreFeatures($version)
     {
-        $table = null;
-        switch ($version) {
-            case '1.0':
-                $table = 'devicefeatures';
-                break;
-            case '1.1':
-                $table = 'devicefeatures11';
-                break;
-            case '1.2':
-                $table = 'devicefeatures12';
-                break;
-            case '1.3':
-                $table = 'devicefeatures13';
-                break;
-            case '1.4':
-                $table = 'devicefeatures14';
-                break;
-            }
-        if (!$table) {
-            return null;
-        }
+        $table = SqlRepository::getDeviceFeaturesTable($version);
         try {
             $sql = "SELECT * from $table where reportid = :reportid";
             $stmnt = DB::$connection->prepare($sql);
@@ -393,43 +378,25 @@ class Report
 
     public function fetchCoreProperties($version)
     {
-        $table = null;
+        $table = SqlRepository::getDevicePropertiesTable($version);
         $columns = "*";
-        switch ($version) {
-            case '1.0':
-                $table = 'deviceproperties';
-                $columns = "apiVersion,
-                    driverVersion,
-                    vendorID,
-                    deviceID,
-                    deviceType,
-                    deviceName,
-                    pipelineCacheUUID,
-                    residencyAlignedMipSize,
-                    residencyNonResidentStrict, 
-                    residencyStandard2DBlockShape, 
-                    residencyStandard2DMultisampleBlockShape, 
-                    residencyStandard3DBlockShape,
-                    `subgroupProperties.subgroupSize`,
-                    `subgroupProperties.supportedStages`,
-                    `subgroupProperties.supportedOperations`,
-                    `subgroupProperties.quadOperationsInAllStages`";
-                break;
-            case '1.1':
-                $table = 'deviceproperties11';
-                break;
-            case '1.2':
-                $table = 'deviceproperties12';
-                break;
-            case '1.3':
-                $table = 'deviceproperties13';
-                break;
-            case '1.4':
-                $table = 'deviceproperties14';
-                break;
-        }
-        if (!$table) {
-            return null;
+        if ($version == '1.0') {
+            $columns = "apiVersion,
+            driverVersion,
+            vendorID,
+            deviceID,
+            deviceType,
+            deviceName,
+            pipelineCacheUUID,
+            residencyAlignedMipSize,
+            residencyNonResidentStrict, 
+            residencyStandard2DBlockShape, 
+            residencyStandard2DMultisampleBlockShape, 
+            residencyStandard3DBlockShape,
+            `subgroupProperties.subgroupSize`,
+            `subgroupProperties.supportedStages`,
+            `subgroupProperties.supportedOperations`,
+            `subgroupProperties.quadOperationsInAllStages`";
         }
         try {
             $sql = "SELECT $columns from $table where reportid = :reportid";

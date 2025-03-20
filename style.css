@@ -2,6 +2,7 @@
 	--backgroundcolor: #EEEEEE;
 	--backgroundcolor-full: #FFF;
 	--backgroundcolor-header: #f2f2f2;
+	--backgroundcolor-page-filter: #e2e2e2;
 	--backgroundcolor-textpages: #FFF;
 	--textcolor: #5a5a5a;
 	--textcolor-placeholder: rgb(77, 77, 77);
@@ -34,6 +35,7 @@
 		--backgroundcolor: rgb(17, 17, 17);
 		--backgroundcolor-full: rgb(24, 26, 27);
 		--backgroundcolor-header: rgb(52, 52, 52);
+		--backgroundcolor-page-filter: rgb(30, 30, 30);
 		--backgroundcolor-textpages: rgb(17, 17, 17);
 		--textcolor: rgb(175, 168, 158);
 		--textcolor-placeholder: rgb(120, 117, 113);
@@ -280,6 +282,15 @@ h4 {
 
 .header {
 	background: var(--backgroundcolor-header);
+	border-bottom: 1px solid var(--bordercolor);	
+	color:var(--textcolor-header);
+	padding-top:5px;
+	padding-bottom:5px;
+	text-align:center;
+}
+
+.page-filter {
+	background: var(--backgroundcolor-page-filter);
 	border-bottom: 1px solid var(--bordercolor);	
 	color:var(--textcolor-header);
 	padding-top:5px;
@@ -889,4 +900,11 @@ code {
 
 .ext-prop-table td {
 	padding: 5px;
+}
+
+
+.form-control {
+	background-color: var(--background-color-input);
+	border-color: var(--bordercolor);
+	color: var(--textcolor);
 }

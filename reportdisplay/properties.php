@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -21,7 +21,7 @@
  */
 
 // Combined listing of properties, limits and sparse properties as in VkPhysicalDeviceProperties
-function insertCore10Properties($report)
+function insertCore10Properties(Report $report)
 {
 	$report->beginTab('properties_core_10', true);
 	$report->beginTable('table_properties_core_10', ['Property', 'Value', 'Category']);
@@ -66,7 +66,7 @@ function insertCore10Properties($report)
 	$report->endTab();
 }
 
-function insertCoreProperties($report, $version)
+function insertCoreProperties(Report $report, $version)
 {
 	$report->beginTab('properties_core_' . str_replace('.', '', $version), $version == '1.0');
 	$report->beginTable('table_properties_core_' . str_replace('.', '', $version), ['Property', 'Value']);
@@ -102,7 +102,7 @@ function insertCoreProperties($report, $version)
 	$report->endTab();
 }
 
-function insertExtensionProperties($report)
+function insertExtensionProperties(Report $report)
 {
 	$report->beginTab('properties_extensions', false);
 	$report->beginTable('table_properties_extensions', ['Property', 'Value', 'Extension']);

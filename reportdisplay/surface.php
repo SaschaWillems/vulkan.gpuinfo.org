@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -111,7 +111,6 @@
 					}
 				} catch (Exception $e) {
 					die('Error while fetching report surface present modes');
-					DB::disconnect();
 				}
 				?>
 			</tbody>
