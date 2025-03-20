@@ -267,7 +267,7 @@ HTML;
 			$filters[] = "incl. layered impl.";
 		}
         if (count($filters) > 0) {
-            echo "<div class=\"page-filter\"><a href=\"settings.php\">Global filters</a> are applied: " . implode(', ', $filters)."</div>";
+            echo "<div class=\"page-filter\"><i class=\"fas fa-filter\"></i> <a href=\"settings.php\">Global filters are applied:</a> " . implode(', ', $filters)."</div>";
         }
     }
 }
