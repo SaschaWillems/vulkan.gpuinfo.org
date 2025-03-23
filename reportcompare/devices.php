@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -35,7 +35,6 @@ $column = $captions = $groups = [];
 
 $compare_device_infos = $report_compare->fetchDeviceInfo();
 
-//while ($row = $compare_device_infos) {
 for ($i = 0; $i < count($compare_device_infos); $i++) {
 	$row = $compare_device_infos[$i];
 	$reportdata = [];
@@ -47,7 +46,6 @@ for ($i = 0; $i < count($compare_device_infos); $i++) {
 			case 'vendorid':
 			case 'deviceid':
 				continue 2;
-				break;
 			case 'osname':
 				$group = 'Platform';
 				$display_value = ucfirst($value);

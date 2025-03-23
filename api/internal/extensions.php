@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -51,17 +51,56 @@ if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
 // Platform (os)
 if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
     $platform = $_REQUEST['filter']['platform'];
-    if ($platform !== "all") {
-        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.ostype = :ostype';
-        $params['ostype'] = ostype($platform);
+} else {
+    // @todo: don't duplicate
+    if (isset($_SESSION['default_os_selection'])) {
+        $platform_setting = sanitize($_SESSION['default_os_selection']);
+        if ($platform_setting !== null) {
+            $platform = $platform_setting;
+        }
     }
 }
+if ($platform !== "all") {
+    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.ostype = :ostype';
+    $params['ostype'] = ostype($platform);
+}
 
-// Minimum API version can be set in the session (global option)
+// Global filters START
+// @todo
+
 if (isset($_SESSION['minversion'])) {
     $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.apiversion >= :apiversion';
     $params['apiversion'] =$_SESSION['minversion'];
 }
+
+$start_date = SqlRepository::getMinStartDate();
+if ($start_date) {
+    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.submissiondate >= :startdate';
+    $params['startdate'] = $start_date;
+}
+
+$device_selection = SqlRepository::getDeviceTypeSelection();
+if ($device_selection) {
+    if ($device_selection == 'no_virtual') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        $params['devicetype'] = 3;
+    }
+    if ($device_selection == 'no_cpu') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        $params['devicetype'] = 4;
+    }
+    if ($device_selection == 'no_cpu_no_virtual') {
+        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype < :devicetype';
+        $params['devicetype'] = 3;
+    }    
+}
+
+$layered_implementations = SqlRepository::getLayeredImplementationsOption();
+if (!$layered_implementations) {
+    SqlRepository::appendCondition($whereClause, "r.layered = 0");
+}
+
+// Global filters END
 
 $filteredCount = 0;
 $stmnt = DB::$connection->prepare("select count(*) from extensions"); // @todo: whereClause?
@@ -84,7 +123,7 @@ if ($platform !== 'all') {
 $whereClause .= ($whereClause ? ' and ' : ' where ') . 'name not in (select name from deviceextensions_blacklist)';
 
 // Fetch extensions with coverage based on unique device names from the database
-$sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn) as date, count(distinct(r.displayname)) as coverage from extensions e 
+$sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn) as date, count(ifnull(r.displayname, dp.devicename)) as coverage from extensions e 
         join deviceextensions de on de.extensionid = e.id 
         join reports r on r.id = de.reportid
         $whereClause

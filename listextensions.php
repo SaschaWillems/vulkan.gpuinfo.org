@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -30,19 +30,11 @@ include './includes/filterlist.class.php';
 $filters = ['platform'];
 $filter_list = new FilterList($filters);
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
-$vulkan_html_registry = "https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/";
-
 PageGenerator::header("Extensions");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Extension coverage");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Extension coverage for ".PageGenerator::filterInfo() ?>
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listextensions.php', $platform, true); ?>

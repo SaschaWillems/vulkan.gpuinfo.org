@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -54,7 +54,7 @@ $filters = [
 ];
 $filter_list = new FilterList($filters);
 
-$caption = "Listing all reports";
+$caption = "Reports";
 $pageTitle = null;
 $inverted = false;
 $platform = "all";
@@ -175,27 +175,22 @@ if ($featureflagbit) {
 	}
 }
 
+PageGenerator::header("Report listing");
+
 // Platform (os)
 if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !== 'all') {
 	$platform = $filter_list->getFilter('platform');
 	$caption = "Listing " . ($caption ? lcfirst($caption) : "reports") . " on <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>" . PageGenerator::platformDisplayName($platform);
+} else {
+	$platform = PageGenerator::getDefaultOSSelection();	
 }
-
-// @todo: does not work, called before session start
-$minApiVersion = SqlRepository::getMinApiVersion();
-if ($minApiVersion) {
-	addCaption("supporting Vulkan $minApiVersion (and up)");
-}
-
-PageGenerator::header($pageTitle == null ? "Reports" : "Reports for $pageTitle");
-
 ?>
+
 <center>
-	<div class='header'>
-		<h4>
-			<?= $caption; ?>
-		</h4>
-	</div>
+	<div class='header'><h4><?= $caption ?></h4> </div>
+	<?php
+		PageGenerator::globalFilterText();
+	?>
 
 	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -45,7 +45,7 @@
 		try {
 			$data = $report->fetchDeviceInfo();
 			$group = 'Device';
-			foreach ($data[0] as $key => $value) {
+			foreach ($data as $key => $value) {
 				if ($value == "") {
 					continue;
 				}
@@ -57,11 +57,12 @@
 					case 'deviceid':
 					case 'pipelineCacheUUID':
 						continue 2;
-						break;
 					case 'displayname':
-						if ($value == $data[0]['devicename']) {
+						// Only display when different from devicename (e.g. Android)
+						if ($value == $data['devicename']) {
 							continue 2;
 						}
+						$value = '<a href="listreports.php?displayname=' . $value . '">' . $value . '</a>';
 						break;
 					case 'osname':
 						$group = 'Platform';
@@ -78,12 +79,9 @@
 					case 'devicename':
 						$value = '<a href="listreports.php?devicename=' . $value . '">' . $value . '</a>';
 						break;
-					case 'displayname':
-						$value = '<a href="listreports.php?displayname=' . $value . '">' . $value . '</a>';
-						break;
 					case 'driverversionraw':
 						$key = 'Driver version';
-						$value = getDriverVersion($value, $data[0]['driverversion'], $data[0]['vendorid'], $data[0]['osname']);
+						$value = getDriverVersion($value, $data['driverversion'], $data['vendorid'], $data['osname']);
 						break;
 					case 'lastupdate':
 						$key = 'Last update at';
@@ -92,7 +90,6 @@
 					case 'profile':
 						include 'profile_download.php';
 						continue 2;
-						break;
 				}
 				if (array_key_exists($key, $device_info_field_aliases)) {
 					$key = $device_info_field_aliases[$key];
@@ -109,8 +106,7 @@
 			}
 		} catch (Exception $e) {
 			die('Error while fetching report properties');
-			DB::disconnect();
-		}
+		}		
 		?>
 	</tbody>
 </table>

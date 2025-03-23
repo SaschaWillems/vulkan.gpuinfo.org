@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2024-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -45,7 +45,6 @@ try {
 		PageGenerator::errorMessage("This is not the <strike>droid</strike> extension you are looking for!</strong><br><br>You may have passed a wrong extension name.");
 		DB::disconnect();
 	}
-
 	$extension_coverage = SqlRepository::getExtensionCoverage($extension_name);
 
 	// Link to the manpage
@@ -88,10 +87,6 @@ try {
 }
 
 $caption = "Device coverage for <code>$extension_name</code>";
-$minApiVersion = SqlRepository::getMinApiVersion();
-if ($minApiVersion) {
-	$caption .= " Vulkan $minApiVersion (and up)";
-}
 ?>
 
 <div class='header'>
@@ -100,6 +95,7 @@ if ($minApiVersion) {
 		<?=$extension_detail ? "<br>$extension_detail" : ""?>
 	</h4>
 </div>
+<?= PageGenerator::globalFilterText();?>
 
 <center>
 	<div class='parentdiv'>

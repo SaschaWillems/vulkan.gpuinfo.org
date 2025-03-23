@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -36,12 +36,14 @@ $filter_list = new FilterList($filters);
 PageGenerator::header("Devices");
 
 $platform = "all";
-$caption = 'Listing all devices';
+$caption = "Devices";
 $showTabs = true;
 
-if ($filter_list->hasFilter('platform')) {
+if ($filter_list->hasFilter('platform')  && $filter_list->getFilter('platform') !== 'all') {
 	$platform = $filter_list->getFilter('platform');
 	$caption = "Listing all <img src='images/" . $platform . "logo.png' height='14px' style='padding-right:5px'/>".PageGenerator::platformDisplayName($platform)." devices";
+} else {
+	$platform = PageGenerator::getDefaultOSSelection();	
 }
 if ($filter_list->hasFilter('extension')) {
 	$caption .= " supporting ".$filter_list->getFilter('extension');
@@ -51,19 +53,14 @@ if ($filter_list->hasFilter('submitter')) {
 	$caption .= "Devices submitted by ".$filter_list->getFilter('submitter');
 	$showTabs = false;
 }
-$minApiVersion = SqlRepository::getMinApiVersion();
-if ($minApiVersion) {
-	$caption .= " Vulkan $minApiVersion (and up)";
-}
 ?>
 
 <center>
 
-	<div class='header'>
-		<h4>
-			<?= $caption; ?>
-		</h4>
-	</div>
+	<div class='header'><h4><?= $caption ?></h4> </div>
+	<?php
+		PageGenerator::globalFilterText();
+	?>	
 
 	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">
@@ -77,7 +74,7 @@ if ($minApiVersion) {
 
 	<?php
 	if ($showTabs) {
-		PageGenerator::platformNavigation('listdevices.php', $platform, true);
+		PageGenerator::platformNavigation('listdevices.php', $platform, true, $filter_list->filters);
 	}
 	?>
 
