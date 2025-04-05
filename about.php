@@ -3,7 +3,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -111,6 +111,11 @@ PageGenerator::header('About');
 			<p class="question">Q: Where can I submit feature requests or issues with the database?</p>
 			<p class="answer">A: <a href="https://github.com/SaschaWillems/vulkan.gpuinfo.org/issues">https://github.com/SaschaWillems/vulkan.gpuinfo.org/issues</a></p>
 		</div>
+
+		<div class="entry">
+			<p class="question">Q: Where can I find out about changes to the database?</p>
+			<p class="answer">A: While there is no strict changelog, as a lot of the changes are minor, you can read up on larger changes at my <a href="https://www.saschawillems.de/tags/vulkan-capsviewer/">personal blog</a></p>
+		</div>		
 
 	</div>
 </div>
