@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2021 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -65,11 +65,11 @@
 					}
 					$memory_types = $report->fetchMemoryTypes($heap_index);
 					if ($memory_types) {
-						foreach ($memory_types as $memory_type_index => $memory_types) {
+						foreach ($memory_types as $memory_type_index => $memory_type) {
 							echo "<tr>";
 							echo "<td class='subkey' style='width: 25%'>Memory type $memory_type_index</td>";
 							echo "<td>";
-							$memoryFlags = getMemoryTypeFlags($memory_types['propertyflags']);
+							$memoryFlags = getMemoryTypeFlags($memory_type['propertyflags']);
 							if (sizeof($memoryFlags) > 0) {
 								foreach ($memoryFlags as $flag) {
 									echo $flag . "<br>";

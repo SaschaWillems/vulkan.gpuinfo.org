@@ -263,25 +263,23 @@ if (isset($_REQUEST['filter']['portability'])) {
 }
 
 // Platform (os)
+$platform = 'all';
 if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
-    $platform = $_REQUEST['filter']['platform'];
-    if ($platform !== "all") {
-        $whereClause .= (($whereClause != '') ? ' and ' : ' where ') . 'r.ostype = :ostype';
-        $params['ostype'] = ostype($platform);
-    }
+    $platform = ostype($_REQUEST['filter']['platform']);
+} else {
+    $platform = SqlRepository::getOSType();
+}
+if ($platform !== null && $platform !== 'all') {
+    SqlRepository::appendCondition($whereClause, 'r.ostype = :ostype');
+    $params['ostype'] = $platform;
 }
 
-// Min. api version
-$minApiVersion = SqlRepository::getMinApiVersion();
-if ($minApiVersion) {
-    SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
-    $params['apiversion'] = $minApiVersion;
-}
-
-$orderBy = "order by " . $orderByColumn . " " . $orderByDir;
+SqlRepository::appendFilters($whereClause, $params, false);
 
 if ($orderByColumn == "api") {
-    $orderBy = "order by length(" . $orderByColumn . ") " . $orderByDir . ", " . $orderByColumn . " " . $orderByDir;
+    $orderBy = "order by length($orderByColumn) $orderByDir , $orderByColumn $orderByDir";
+} else {
+    $orderBy = "order by $orderByColumn $orderByDir";
 }
 
 $sql = sprintf(
@@ -312,7 +310,7 @@ $devices->execute($params);
 if ($devices->rowCount() > 0) {
     foreach ($devices as $device) {
         $driver = getDriverVersion($device["driver"], "", $device["vendorid"], $device["osname"]);
-        $data[] = array(
+        $data[] = [
             'id' => $device["id"],
             'devicelimit' => ($limit != '') ? $device["devicelimit"] : null,
             'device' => '<a href="displayreport.php?id=' . $device["id"] . '">' . $device["devicename"] . '</a>',
@@ -325,12 +323,12 @@ if ($devices->rowCount() > 0) {
             'osarchitecture' => $device["osarchitecture"],
             'compare' => '<center><Button onClick="addToCompare('.$device['id'].',\''.$device['devicename'].'\')">Add</Button>',
             'profile' => ($portabilitysubset ? "<center><a href=\"api/v3/getprofile.php?id=".$device["id"]."\">Download</a></center>" : null)
-        );
+        ];
     }
 }
 
 $filteredCount = 0;
-$stmnt = DB::$connection->prepare("select count(*) from reports");
+$stmnt = DB::$connection->prepare("SELECT count(*) from reports");
 $stmnt->execute();
 $totalCount = $stmnt->fetchColumn();
 
@@ -341,12 +339,12 @@ if (($searchClause != '') or ($whereClause != '')) {
     $filteredCount = $stmnt->rowCount();
 }
 
-$results = array(
+$results = [
     "draw" => isset($_REQUEST['draw']) ? intval($_REQUEST['draw']) : 0,
     "recordsTotal" => intval($totalCount),
     "recordsFiltered" => intval($filteredCount),
     "data" => $data
-);
+];
 
 $elapsed = (microtime(true) - $start) * 1000;
 

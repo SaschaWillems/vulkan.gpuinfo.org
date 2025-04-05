@@ -26,17 +26,11 @@ require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
 PageGenerator::header("Core 1.2 features");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Core 1.2 device feature coverage");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Core 1.2 feature coverage on ".PageGenerator::filterInfo() ?>
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listfeaturescore12.php', $platform, true); ?>
@@ -61,7 +55,7 @@ PageGenerator::header("Core 1.2 features");
 					foreach ($features as $feature => $coverage) {
 						$coverageLink = "listdevicescoverage.php?core=1.2&feature=$feature&platform=$platform";
 						echo "<tr>";
-						echo "<td>" . $feature . "</td>";
+						echo "<td>$feature</td>";
 						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
 						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
 						echo "</tr>";

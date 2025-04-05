@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -26,17 +26,11 @@ require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
-PageGenerator::header("Surface transforms");
+PageGenerator::header("Surface transform modes");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Surface transform modes support");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Surface transform flag support on ".PageGenerator::filterInfo($platform); ?>
-</div>
 
 <div class="centered">
 	<?php PageGenerator::platformNavigation('listsurfacetransformmodes.php', $platform, true); ?>

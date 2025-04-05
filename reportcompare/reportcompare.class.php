@@ -20,6 +20,8 @@
  *
  */
 
+require 'database/sqlrepository.php';
+
 class ReportCompareFlags
 {
     public $has_surface_caps = false;
@@ -244,27 +246,7 @@ class ReportCompare
 
     public function fetchFeatures($version)
     {
-        $table = null;
-        switch ($version) {
-            case '1.0':
-                $table = 'devicefeatures';
-                break;
-            case '1.1':
-                $table = 'devicefeatures11';
-                break;
-            case '1.2':
-                $table = 'devicefeatures12';
-                break;
-            case '1.3':
-                $table = 'devicefeatures13';
-                break;
-            case '1.4':
-                $table = 'devicefeatures14';
-                break;
-        }
-        if (!$table) {
-            return null;
-        }
+        $table = SqlRepository::getDeviceFeaturesTable($version);
         try {
             // Need to join with reports to get rows for reports with no row in the properties tabel
             $sql = "SELECT * from reports r left join $table dp on r.id = dp.reportid where r.id in (" . $this->reportIdsParam() . ") order by r.id asc";
@@ -292,43 +274,25 @@ class ReportCompare
 
     public function fetchCoreProperties($version)
     {
-        $table = null;
+        $table = SqlRepository::getDevicePropertiesTable($version);
         $columns = "*";
-        switch ($version) {
-            case '1.0':
-                $table = 'deviceproperties';
-                $columns = "r.apiVersion,
-                        r.driverVersion,
-                        vendorID,
-                        deviceID,
-                        deviceType,
-                        r.deviceName,
-                        pipelineCacheUUID,
-                        residencyAlignedMipSize,
-                        residencyNonResidentStrict, 
-                        residencyStandard2DBlockShape, 
-                        residencyStandard2DMultisampleBlockShape, 
-                        residencyStandard3DBlockShape,
-                        `subgroupProperties.subgroupSize`,
-                        `subgroupProperties.supportedStages`,
-                        `subgroupProperties.supportedOperations`,
-                        `subgroupProperties.quadOperationsInAllStages`";
-                break;
-            case '1.1':
-                $table = 'deviceproperties11';
-                break;
-            case '1.2':
-                $table = 'deviceproperties12';
-                break;
-            case '1.3':
-                $table = 'deviceproperties13';
-                break;
-            case '1.4':
-                $table = 'deviceproperties14';
-                break;
-        }
-        if (!$table) {
-            return null;
+        if ($version == '1.0') {
+            $columns = "r.apiVersion,
+            r.driverVersion,
+            vendorID,
+            deviceID,
+            deviceType,
+            r.deviceName,
+            pipelineCacheUUID,
+            residencyAlignedMipSize,
+            residencyNonResidentStrict, 
+            residencyStandard2DBlockShape, 
+            residencyStandard2DMultisampleBlockShape, 
+            residencyStandard3DBlockShape,
+            `subgroupProperties.subgroupSize`,
+            `subgroupProperties.supportedStages`,
+            `subgroupProperties.supportedOperations`,
+            `subgroupProperties.quadOperationsInAllStages`";            
         }
         try {
             // Need to join with reports to get rows for reports with no row in the properties tabel
@@ -365,7 +329,6 @@ class ReportCompare
                 $features = $stmnt->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
             } catch (Exception $e) {
                 die('Could not fetch extended features for compare!');
-                DB::disconnect();
             }
 
             // Get extended features for each selected report into an array 

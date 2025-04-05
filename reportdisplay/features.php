@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -20,7 +20,7 @@
  *
  */
 
-function insertCoreFeatures($report, $version)
+function insertCoreFeatures(Report $report, $version)
 {
 	$report->beginTab('features_core_' . str_replace('.', '', $version), $version == '1.0');
 	$report->beginTable('table_features_core_' . str_replace('.', '', $version), ['Feature', 'Supported']);
@@ -39,7 +39,7 @@ function insertCoreFeatures($report, $version)
 	$report->endTab();
 }
 
-function insertExtensionFeatures($report)
+function insertExtensionFeatures(Report $report)
 {
 	$report->beginTab('features_extensions', false);
 	$report->beginTable('table_features_extensions', ['Feature', 'Supported', 'Extension']);

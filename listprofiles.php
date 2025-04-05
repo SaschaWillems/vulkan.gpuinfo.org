@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -25,20 +25,11 @@ require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
 PageGenerator::header("Profiles");
+$platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Profile coverage");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Profile coverage for ".PageGenerator::filterInfo($platform) ?>
-</div>
-<div class="alert alert-info" role="alert" style="text-align: center">
-	<b>Note:</b> Data is based on reports submitted or updated with version 3.2 or newer of the Hardware Capability Viewer and does not contain reports from earlier versions.
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listprofiles.php', $platform, true); ?>

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,27 +27,20 @@ require './includes/constants.php';
 require './includes/functions.php';
 require './includes/filterlist.class.php';
 
-$filters = ['platform', 'extension'];
+$filters = ['extension'];
 $filter_list = new FilterList($filters);
-
 $extension = $filter_list->getFilter('extension');
-$platform = 'all';
-if ($filter_list->hasFilter('platform')) {
-	$platform = $filter_list->getFilter('platform');
+
+PageGenerator::header("Extension device properties");
+$platform = PageGenerator::getDefaultOSSelection();
+
+if ($extension) {
+	echo "<div class='header'><h4>Available extension properties for <code>$extension</code> on " . PageGenerator::filterInfo(). "</div>";
+} else {
+	PageGenerator::pageCaption("Extension device properties coverage");
 }
-
-PageGenerator::header("Extension properties listing");
+PageGenerator::globalFilterText();
 ?>
-
-<div class='header'>
-	<?php
-	if ($extension) {
-		echo "<h4>Available extension properties for <code>$extension</code> on " . PageGenerator::filterInfo($platform);
-	} else {
-		echo "<h4>Extension device properties for " . PageGenerator::filterInfo($platform);
-	}
-	?>
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listpropertiesextensions.php', $platform, true, $filter_list->filters); ?>
