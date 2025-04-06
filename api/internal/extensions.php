@@ -123,9 +123,10 @@ if ($platform !== 'all') {
 $whereClause .= ($whereClause ? ' and ' : ' where ') . 'name not in (select name from deviceextensions_blacklist)';
 
 // Fetch extensions with coverage based on unique device names from the database
-$sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn) as date, count(ifnull(r.displayname, dp.devicename)) as coverage from extensions e 
+$sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn) as date, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
         join deviceextensions de on de.extensionid = e.id 
         join reports r on r.id = de.reportid
+        join deviceproperties dp on dp.reportid = r.id
         $whereClause
         group by name";
 $stmnt = DB::$connection->prepare($sql);
