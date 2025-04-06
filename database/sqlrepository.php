@@ -852,7 +852,7 @@ class SqlRepository {
                     join deviceproperties dp on dp.reportid = r.id
                     where e.name = :extension_name
                     and r.ostype = :ostype";
-            self::appendFilters($sql, $params);
+            self::appendFilters($sql, $params, false);
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute($params);
             $row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
