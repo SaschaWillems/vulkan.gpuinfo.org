@@ -54,7 +54,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer&hl=en_US">Install from GooglePlay</a> (Releases may take some time to get updated)</li>
 						<li><a href="<?=$filename_prefix?>_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
-				<!-- <li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li> -->
+				<li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li>
 				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store)</a> (provided by <a href="https://www.lunarg.com/">LunarG</a>)</li>
 			</ul>
 		</div>
