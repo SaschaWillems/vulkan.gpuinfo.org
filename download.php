@@ -60,22 +60,25 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
-			<h4>4.01 - 2025-02-06</h4>
+			<h4>4.01 - 2025-04-19</h4>
 			<ul>
-				<li>Vulkan header 1.4.307</li>
+				<li>Vulkan header 1.4.313</li>
 				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
 					<ul>
+						<li>VK_ARM_pipeline_opacity_micromap</li>
+						<li>VK_EXT_fragment_density_map_offset</li>
 						<li>VK_KHR_depth_clamp_zero_one</li>
 						<li>VK_KHR_maintenance8</li>
+						<li>VK_KHR_shader_bfloat16</li>
 						<li>VK_KHR_video_maintenance2</li>
-						<li>VK_ARM_pipeline_opacity_micromap</li>
 						<li>VK_NV_cluster_acceleration_structure</li>
 						<li>VK_NV_cooperative_vector</li>
 						<li>VK_NV_partitioned_acceleration_structure</li>
+						<li>VK_NV_present_metering</li>
 						<li>VK_NV_ray_tracing_linear_swept_spheres</li>
 					</ul>
 				</li>
-				<li>Better handling of surface queries on Wayland</li>
+				<li>Note for Linux users: Builds were created with Ubuntu 22.04 (instead of 20.04) and might need fuse to properly run.</li>
 			</ul>				
 			<h4>4.00 - 2024-12-06</h4>
 			<ul>
