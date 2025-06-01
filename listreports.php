@@ -77,7 +77,9 @@ function addCaption($text) {
 $inverted = $filter_list->hasFilter('option') && ($filter_list->getFilter('option') == 'not');
 // Submitter
 if ($filter_list->hasFilter('submitter')) {
-	$caption = "Reports submitted by <code>".$filter_list->getFilter('submitter')."</code>";
+	$submitter = $filter_list->getFilter('submitter');
+	$caption = "Reports submitted by $submitter";
+	$caption .= " (<a href=\"listdevices?submitter=$submitter\">Show devices</a>)";
 }
 // List (and order) by limit
 $limit = $filter_list->getFilter('limit');
