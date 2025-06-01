@@ -52,8 +52,7 @@ if ($filter_list->hasFilter('extension')) {
 if ($filter_list->hasFilter('submitter')) {
 	$submitter = $filter_list->getFilter('submitter');
 	$caption .= " submitted by $submitter";
-	$caption .= " (<a href=\"listreports?submitter=$submitter\">Show reports</a>)";
-	$showTabs = false;
+	$caption .= " (<a href=\"listreports.php?submitter=$submitter\">Show reports</a>)";
 }
 ?>
 
