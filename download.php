@@ -45,8 +45,18 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 				</li>
 				<li>Linux
 					<ul>
-						<li><a href="<?=$filename_prefix?>_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
-						<li><a href="<?=$filename_prefix?>_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
+						<li>x86-64
+							<ul>
+								<li><a href="<?=$filename_prefix?>_linux64.AppImage">X11 x86-64</a> (AppImage)</li>
+								<li><a href="<?=$filename_prefix?>_linux64_wayland.AppImage">Wayland x86-64</a> (AppImage)</li>
+							</ul>
+						</li>
+						<li>AArch64 (ARM64)
+							<ul>
+								<li><a href="<?=$filename_prefix?>_linux64_aarch64.AppImage">X11 AArch64</a> (AppImage)</li>
+								<li><a href="<?=$filename_prefix?>_linux64_wayland_aarch64.AppImage">Wayland AArch64</a> (AppImage)</li>
+							</ul>
+						</li>
 					</ul>
 				</li>
 				<li>Android
