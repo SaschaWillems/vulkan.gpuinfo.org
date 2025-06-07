@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -308,15 +308,12 @@
 
 	// Use device name and/or manufacturer from platform info an Android to further distinguish devices
 	if (array_key_exists('platformdetails', $json)) {
-		$log("Report has platform details");
 		$jsonnode = $json['platformdetails']; 
 		if (array_key_exists('android.ProductManufacturer', $jsonnode)) {
-			$log("Report has android.ProductManufacturer = ".$jsonnode['android.ProductManufacturer']);
 			$params["androidproductmanufacturer"] = $jsonnode['android.ProductManufacturer'];
 			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 3 and value = :androidproductmanufacturer)";
 		}
 		if (array_key_exists('android.ProductModel', $jsonnode)) {
-			$log("Report has android.ProductModel = ".$jsonnode['android.ProductModel']);
 			$params["androidproductmodel"] = $jsonnode['android.ProductModel'];
 			$sql .= " and id in (select reportid from deviceplatformdetails where reportid = id and platformdetailid = 4 and value = :androidproductmodel)";
 		}
