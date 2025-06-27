@@ -21,7 +21,7 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '4.01';
+$release = '4.02';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 ?>
 
@@ -70,6 +70,27 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.02 - 2025-06-28</h4>
+			<ul>
+				<li>Vulkan header 1.4.320</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_ARM_tensors</li>
+						<li>VK_ARM_data_graph</li>
+						<li>VK_ARM_format_pack</li>
+						<li>VK_EXT_shader_float8</li>
+						<li>VK_EXT_zero_initialize_device_memory</li>
+						<li>VK_KHR_present_id2</li>
+						<li>VK_KHR_present_wait2</li>
+						<li>VK_KHR_video_decode_vp9</li>
+						<li>VK_KHR_unified_image_layouts</li>
+						<li>VK_KHR_maintenance9</li>
+						<li>VK_KHR_robustness2</li>
+						<li>VK_VALVE_fragment_density_map_layered</li>
+					</ul>
+				</li>
+				<li>Linux AArch64 (ARM64) builds are now available</li>
+			</ul>			
 			<h4>4.01 - 2025-04-19</h4>
 			<ul>
 				<li>Vulkan header 1.4.313</li>
