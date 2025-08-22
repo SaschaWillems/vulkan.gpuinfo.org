@@ -30,6 +30,7 @@ session_start();
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+	<meta name="robots" content="noindex">
 	<?php echo "<title>" . (isset($page_title) ? ($page_title . " - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems") . "</title>"; ?>
 
 	<link rel="icon" type="image/png" href="/images/Vulkan_LogoBug_32px_Nov17.png" sizes="32x32">
