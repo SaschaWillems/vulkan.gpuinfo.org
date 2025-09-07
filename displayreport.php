@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -30,6 +30,19 @@ $reportID = $_GET['id'];
 if (!$reportID) {
 	PageGenerator::errorMessage("<strong>Warning!</strong><br> No report ID set to display!");
 }
+
+$cachedFileName = "reportcache/report_$reportID.html";
+
+// Try to load report from cache first
+// todo: Check when last updated and recreate
+if (file_exists($cachedFileName)) {
+	logToFile("Loading report $reportID from cache");
+	$cachedPage = file_get_contents($cachedFileName);
+	echo $cachedPage;
+	exit;
+}
+
+ob_start();
 
 $report = new Report($reportID);
 $report->fetchData();
@@ -341,3 +354,13 @@ echo "</div>";
 </body>
 
 </html>
+
+<?php
+logToFile("No cache found for $reportID, cached report will be generated");
+$pageContent = ob_get_contents();
+// Store in cache
+file_put_contents($cachedFileName, $pageContent);
+ob_end_clean();
+// Display
+echo $pageContent;
+?>

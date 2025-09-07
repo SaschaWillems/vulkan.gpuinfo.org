@@ -6,3 +6,5 @@ xdebug.log
 static/*.html
 tools/Khronos-Schemas/
 tools/vk.xml
+reportcache/**
+logs/**

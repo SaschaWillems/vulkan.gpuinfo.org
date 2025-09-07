@@ -961,3 +961,9 @@ function shorten($value, $length = 20, $add = '...')
 	}
 	return $value;
 }
+
+function logToFile($msg)
+{
+	$log_msg = "[".date('d-M-Y H:m:s e')."] ".$msg.PHP_EOL;
+	file_put_contents('./logs/log'.date('Y-m-d').'.txt', $log_msg, FILE_APPEND); 	
+}
