@@ -62,18 +62,21 @@ if (file_exists($cachedFileName)) {
 		}
 	}
 	if ($loadFromCache) {
+		$start = microtime(true);
 		$report->fetchDescription();
-		logToFile("Loading report $reportID from cache");
 		$cachedPage = file_get_contents($cachedFileName);
 		PageGenerator::header($report->info->device_description);
 		echo $cachedPage;
 		PageGenerator::footer();
+		$delta = (microtime(true) - $start) * 1000;
+		logToFile("Report $reportID loaded from cache in $delta ms");
 		exit;
 	}
 }
 
-$report->fetchData();
+$start = microtime(true);
 
+$report->fetchData();
 PageGenerator::header($report->info->device_description);
 
 ob_start();
@@ -158,214 +161,7 @@ echo "</div>";
 	}
 	?>
 
-	<script>
-		$(document).ready(
-			function() {
-				var tableNames = [
-					'deviceextensions',
-					'devicelayerextensions',
-					'devicememoryheaps',
-					'devicememorytypes',
-					'devicesurfaceproperties',
-					'deviceinstanceextensions',
-					'deviceinstancelayers',
-					'table_features_core_10',
-					'table_features_core_11',
-					'table_features_core_12',
-					'table_features_core_13',
-					'table_features_core_14',
-					'table_properties_core_11',
-					'table_properties_core_12',
-					'table_properties_core_13',
-					'table_properties_core_14',
-					'table_deviceprofiles',
-					'table_surfaceformats',
-					'table_presentmodes'
-				];
-				for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
-					if (typeof $('#' + tableNames[i]) != undefined) {
-						$('#' + tableNames[i]).dataTable({
-							"pageLength": -1,
-							"paging": false,
-							"order": [],
-							"searchHighlight": true,
-							"bAutoWidth": false,
-							"sDom": 'flpt',
-							"deferRender": true,
-							"processing": true
-						});
-					}
-				}
-
-				// Grouped tables
-				tableNames = [
-					'table_device',
-					'table_properties_core_10',
-					'table_features_extensions',
-					'table_properties_extensions',
-					'deviceproperties',
-					'deviceproperties_extensions',
-					'devicememory'
-				];
-
-				// Device properties table with grouping
-				for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
-					if (typeof $('#' + tableNames[i]) != undefined) {
-						$('#' + tableNames[i]).dataTable({
-							"pageLength": -1,
-							"paging": false,
-							"order": [],
-							"columnDefs": [{
-								"visible": false,
-								"targets": 2
-							}],
-							"searchHighlight": true,
-							"bAutoWidth": false,
-							"sDom": 'flpt',
-							"deferRender": true,
-							"processing": true,
-							"drawCallback": function(settings) {
-								var api = this.api();
-								var rows = api.rows({
-									page: 'current'
-								}).nodes();
-								var last = null;
-								api.column(2, {
-									page: 'current'
-								}).data().each(function(group, i) {
-									if (last !== group) {
-										$(rows).eq(i).before(
-											'<tr><td colspan="2" class="group">' + group + '</td></tr>'
-										);
-										last = group;
-									}
-								});
-							}
-						});
-					}
-				}
-
-				// Feature tables
-				tableNames = [
-					'deviceformats_linear',
-					'deviceformats_optimal',
-					'deviceformats_buffer',
-					'devicequeues'
-				];
-				for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
-					$('#' + tableNames[i]).dataTable({
-						"pageLength": -1,
-						"paging": false,
-						"order": [],
-						"searchHighlight": true,
-						"bAutoWidth": false,
-						"sDom": 'flpt',
-						"deferRender": true,
-						"processing": true,
-						"ordering": true,
-						"fixedHeader": {
-							"header": true,
-							"headerOffset": 50
-						},
-					});
-				}
-
-				// Extended features table with grouping
-				$('#extended_features').dataTable({
-					"pageLength": -1,
-					"paging": false,
-					"order": [],
-					"columnDefs": [{
-						"visible": false,
-						"targets": 2
-					}],
-					"searchHighlight": true,
-					"bAutoWidth": false,
-					"sDom": 'flpt',
-					"deferRender": true,
-					"processing": true,
-					"drawCallback": function(settings) {
-						var api = this.api();
-						var rows = api.rows({
-							page: 'current'
-						}).nodes();
-						var last = null;
-						api.column(2, {
-							page: 'current'
-						}).data().each(function(group, i) {
-							if (last !== group) {
-								$(rows).eq(i).before(
-									'<tr><td colspan="2" class="group">' + group + '</td></tr>'
-								);
-								last = group;
-							}
-						});
-					}
-				});
-
-				// Extended properties table with grouping
-				$('#extended_properties').dataTable({
-					"pageLength": -1,
-					"paging": false,
-					"order": [],
-					"columnDefs": [{
-						"visible": false,
-						"targets": 2
-					}],
-					"searchHighlight": true,
-					"bAutoWidth": false,
-					"sDom": 'flpt',
-					"deferRender": true,
-					"processing": true,
-					"drawCallback": function(settings) {
-						var api = this.api();
-						var rows = api.rows({
-							page: 'current'
-						}).nodes();
-						var last = null;
-						api.column(2, {
-							page: 'current'
-						}).data().each(function(group, i) {
-							if (last !== group) {
-								$(rows).eq(i).before(
-									'<tr><td class="group" colspan="2">' + group + '</td></tr>'
-								);
-								last = group;
-							}
-						});
-					}
-				});
-
-			});
-
-		$(function() {
-			var a = document.location.hash;
-			if (a) {
-				// Nested tabs, need to show parent tab too
-				if ((a === '#features_core') || (a === '#features_extensions')) {
-					$('.nav a[href=\\#features]').tab('show');
-				}
-				if ((a === '#properties_core') || (a === '#properties_extensions')) {
-					$('.nav a[href=\\#properties]').tab('show');
-				}
-				if ((a === '#formats_linear') || (a === '#formats_optimal') || (a === '#formats_buffer')) {
-					$('.nav a[href=\\#formats]').tab('show');
-				}
-				if ((a === '#instanceextensions') || (a === '#instancelayers')) {
-					$('.nav a[href=\\#instance]').tab('show');
-				}
-				if ((a === '#surfaceproperties') || (a === '#surfaceformats') || (a === '#presentmodes')) {
-					$('.nav a[href=\\#surface]').tab('show');
-				}
-				// @todo: jump to feature/props table (e.g. 1.3)
-				$('.nav a[href=\\' + a + ']').tab('show');
-			}
-
-			$('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
-				window.location.hash = e.target.hash;
-			});
-		});
-	</script>
+	<script type="text/javascript" src="js/reportdisplay.js"></script>
 </div>
 
 <?php
@@ -383,4 +179,9 @@ echo $pageContent;
 </center>
 </body>
 </html>
+
+<?php
+$delta = (microtime(true) - $start) * 1000;
+logToFile("Report $reportID not present in cache, cache generated and displayed in $delta ms");
+?>
 
