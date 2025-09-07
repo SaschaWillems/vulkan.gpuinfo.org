@@ -34,12 +34,31 @@ if (!$reportID) {
 $cachedFileName = "reportcache/report_$reportID.html";
 
 // Try to load report from cache first
-// todo: Check when last updated and recreate
 if (file_exists($cachedFileName)) {
-	logToFile("Loading report $reportID from cache");
-	$cachedPage = file_get_contents($cachedFileName);
-	echo $cachedPage;
-	exit;
+	$loadFromCache = true;
+	// Check if report has been updated since it was cached
+	$reportDate = null;
+	try {
+		DB::connect();
+		$reportDate = DB::getReportDate($reportID);
+	} finally {
+		DB::disconnect();
+	}
+	if ($reportDate) {
+		$cachedFileDate = filemtime($cachedFileName);
+		$dbDate = new DateTime($reportDate);
+		$fileDate = new DateTime('@'.$cachedFileDate);
+		if ($fileDate < $dbDate) {
+			logToFile("Cached report $reportID is outdated");
+			$loadFromCache = false;
+		}
+	}
+	if ($loadFromCache) {
+		logToFile("Loading report $reportID from cache");
+		$cachedPage = file_get_contents($cachedFileName);
+		echo $cachedPage;
+		exit;
+	}
 }
 
 ob_start();

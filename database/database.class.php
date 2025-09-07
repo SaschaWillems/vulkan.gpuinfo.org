@@ -49,6 +49,13 @@ class DB
         return $stmnt->fetchColumn();
     }
 
+    public static function getReportDate($reportID)
+    {
+        $stmnt = DB::$connection->prepare("SELECT max(date) from reportupdatehistory where reportid = :reportid");
+        $stmnt->execute(["reportid" => $reportID]);
+        return $stmnt->fetchColumn();
+    }
+
     public static function log($page, $statement, $executiontime)
     {
         $sql ="INSERT INTO log (page, statement, execution_time) VALUES (:page, :statement, :executiontime)";
