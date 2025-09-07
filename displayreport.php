@@ -31,9 +31,17 @@ if (!$reportID) {
 	PageGenerator::errorMessage("<strong>Warning!</strong><br> No report ID set to display!");
 }
 
-$cachedFileName = "reportcache/report_$reportID.html";
+$report = new Report($reportID);
+if (!$report->exists()) {
+	PageGenerator::errorMessage("
+		<strong>This is not the <strike>droid</strike> report you are looking for!</strong><br><br>
+		Could not find report with ID <?php echo $reportID; ?> in database.<br>
+		It may have been removed due to faulty data."
+	);
+}
 
 // Try to load report from cache first
+$cachedFileName = "reportcache/report_$reportID.inc";
 if (file_exists($cachedFileName)) {
 	$loadFromCache = true;
 	// Check if report has been updated since it was cached
@@ -54,27 +62,21 @@ if (file_exists($cachedFileName)) {
 		}
 	}
 	if ($loadFromCache) {
+		$report->fetchDescription();
 		logToFile("Loading report $reportID from cache");
 		$cachedPage = file_get_contents($cachedFileName);
+		PageGenerator::header($report->info->device_description);
 		echo $cachedPage;
+		PageGenerator::footer();
 		exit;
 	}
 }
 
-ob_start();
-
-$report = new Report($reportID);
 $report->fetchData();
 
-if (!$report->exists()) {
-	PageGenerator::errorMessage("
-		<strong>This is not the <strike>droid</strike> report you are looking for!</strong><br><br>
-		Could not find report with ID <?php echo $reportID; ?> in database.<br>
-		It may have been removed due to faulty data."
-	);
-}
-
 PageGenerator::header($report->info->device_description);
+
+ob_start();
 
 // Counters
 try {
@@ -366,14 +368,6 @@ echo "</div>";
 	</script>
 </div>
 
-<?php PageGenerator::footer(); ?>
-
-</center>
-
-</body>
-
-</html>
-
 <?php
 logToFile("No cache found for $reportID, cached report will be generated");
 $pageContent = ob_get_contents();
@@ -383,3 +377,10 @@ ob_end_clean();
 // Display
 echo $pageContent;
 ?>
+
+<?php PageGenerator::footer(); ?>
+
+</center>
+</body>
+</html>
+

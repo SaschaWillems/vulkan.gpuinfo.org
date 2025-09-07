@@ -81,6 +81,33 @@ class Report
         return $result;
     }
 
+    // Fetch basic description info, used e.g. in caching of reports
+    public function fetchDescription()
+    {
+        DB::connect();
+        try {
+            // Basic report information
+            $sql = "SELECT
+                    p.devicename,
+                    r.displayname,
+                    r.ostype
+                    from reports r
+                    left join
+                    deviceproperties p on (p.reportid = r.id)
+                    where r.id = :reportid";
+            $stmnt = DB::$connection->prepare($sql);
+            $stmnt->execute([':reportid' => $this->id]);
+            $row = $stmnt->fetch(PDO::FETCH_ASSOC);
+            if ($row['ostype'] == 2) {
+                $this->info->device_description = $row['displayname'];
+            } else {
+                $this->info->device_description = $row['devicename'];
+            }
+        } finally {
+            DB::disconnect();
+        }        
+    }
+
     public function fetchData()
     {
         DB::connect();
@@ -105,12 +132,7 @@ class Report
                 // Display device name from platform data instead of GPU vendor and name on Android
                 $this->info->device_description = $row['displayname'];
             } else {
-                if (($row['vendor']) && (stripos($row['devicename'], $row['vendor']) === 0)) {
-                    // Don't include vendor name if it's already part of the device name
-                    $this->info->device_description = $row['devicename'];
-                } else {
-                    $this->info->device_description = $row['vendor'] . " " . $row['devicename'];
-                }
+                $this->info->device_description = $row['devicename'];
             }
             $this->apiversion->major = $row['apiversionraw'] >> 22;
             $this->apiversion->minor = ($row['apiversionraw'] >> 12) & 0x3ff;
