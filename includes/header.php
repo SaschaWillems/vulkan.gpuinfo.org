@@ -23,18 +23,13 @@
 session_set_cookie_params(0, '/', $_SERVER['SERVER_NAME']);
 session_name('vulkan');
 session_start();
-
-
 ?>
 <html>
-
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
 	<meta name="robots" content="noindex">
 	<?php echo "<title>" . (isset($page_title) ? ($page_title . " - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems") . "</title>"; ?>
-
 	<link rel="icon" type="image/png" href="/images/Vulkan_LogoBug_32px_Nov17.png" sizes="32x32">
-
 	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="external/css/dataTables.bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="external/css/responsive.bootstrap.min.css" />
@@ -42,9 +37,7 @@ session_start();
 	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/solid.min.css" rel="stylesheet" />
-
 	<link rel="stylesheet" type="text/css" href="style.css">
-
 	<script type="text/javascript" src="external/jquery-2.2.0.min.js"></script>
 	<script type="text/javascript" src="external/bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/jquery.dataTables.min.js"></script>
@@ -52,12 +45,8 @@ session_start();
 	<script type="text/javascript" src="external/dataTables.bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/bootstrap-toggle.min.js"></script>
 	<script type="text/javascript" src="external/dataTables.fixedHeader.min.js"></script>
-
 	<script src="external/apexcharts/apexcharts.js"></script>
-
-	<!--	<script type="text/javascript" src="external/dataTables.responsive.min.js"></script> -->
 	<script type="text/javascript" src="external/responsive.bootstrap.min.js"></script>
-
 	<script>
 		$(document).ready(function() {
 			$.each($('#navbar').find('li'), function() {
@@ -72,20 +61,8 @@ session_start();
 			$('body').css('padding-top', parseInt($('#main-navbar').css("height")));
 		});
 	</script>
-
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:site" content="gpuinfo.org" />
-	<meta name="twitter:creator" content="Sascha Willems" />
-
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:site" content="@SaschaWillems2" />
-	<meta name="twitter:title" content="Vulkan on gpuinfo.org" />
-	<meta name="twitter:description" content="Vulkan hardware capability database." />
-	<meta name="twitter:image" content="https://vulkan.gpuinfo.org/images/vulkanlogoscene.png" />
 </head>
-
 <body>
-	<!-- Bootstrap nav bar -->
 	<nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -102,7 +79,6 @@ session_start();
 				<ul class="nav navbar-nav">
 					<li><a href="listdevices.php">Devices</a></li>
 					<li><a href="listreports.php">Reports</a></li>
-
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties<span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -115,7 +91,6 @@ session_start();
 							<li><a href="listpropertiesextensions.php">Extensions</a></li>
 						</ul>
 					</li>
-
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Features<span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -128,7 +103,6 @@ session_start();
 							<li><a href="listfeaturesextensions.php">Extensions</a></li>
 						</ul>
 					</li>
-
 					<li><a href="listextensions.php">Extensions</a></li>
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Formats
