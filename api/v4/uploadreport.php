@@ -445,7 +445,15 @@
 	$reportid = DB::$connection->lastInsertId();
 	
 	// Store json for api calls (or later reference)
-	file_put_contents(getReportJsonFileName($reportid), $json_file_contents);
+	try {
+		$folder = getReportJsonFolderName($reportid);
+		if (!is_dir($folder)) {
+			mkdir($folder);
+		}		
+		file_put_contents($folder.$reportid.'.json', $jsonFile);			
+	} catch (Exception $e) {
+		reportError('Error while trying to upload report (save report to disk)');
+	}				
 
 	// Properties
 	{

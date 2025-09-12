@@ -26,7 +26,7 @@
 	
 	$reportid = (int)($_GET['id']);	
 	$json = null;
-	$filename = getReportJsonFileName($reportid);
+	$filename = getReportJsonFolderName($reportid).$reportid.'.json';
 
 	if (file_exists($filename)) {
 		$json = file_get_contents($filename);
