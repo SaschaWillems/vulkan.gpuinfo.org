@@ -373,11 +373,7 @@
 	$reportid = DB::$connection->lastInsertId();
 	
 	// Store json for api calls (or later reference)
-	{
-		$sql = "INSERT INTO reportsjson (reportid, json) VALUES (:reportid, :json)";
-		$stmnt = DB::$connection->prepare($sql);
-		$stmnt->execute(array(":reportid" => $reportid, ":json" => $jsonFile));			
-	}
+	file_put_contents("./../../json/$reportid.json", $json_file_contents);
 
 	// Properties
 	{

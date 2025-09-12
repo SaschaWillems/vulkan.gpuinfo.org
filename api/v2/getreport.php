@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database back-end
 	*	
-	* Copyright (C) 2011-2017 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2011-2025 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -22,35 +22,41 @@
 	// Return report as json (uploaded from client application)
 	
 	include './../../database/database.class.php';
+	include './../../includes/functions.php';
 	
-	DB::connect();
-
 	if (!isset($_GET['id'])) {
 		header('HTTP/ 400 missing_or');
 		echo "No report id specified!";
 		die();
 	}
 
-	$reportid = $_GET['id'];	
+	$reportid = $_GET['id'];
+	$json = null;
+	$filename = "./../../json/$reportid.json";
 
-	$sql = "SELECT json FROM reportsjson WHERE reportid = :reportid";
-	try {
-		$stmnt = DB::$connection->prepare($sql);
-		$stmnt->execute(array(":reportid" => $reportid));
-		if ($stmnt->rowCount() > 0) {
-			header('Content-Type: application/json');
+	if (file_exists($filename)) {
+		$json = file_get_contents($filename);
+		logToFile("Json for report $reportid served from file");
+	} else {
+		DB::connect();
+		logToFile("Json for report $reportid served from database");
+		try {
+			$stmnt = DB::$connection->prepare("SELECT json FROM reportsjson WHERE reportid = :reportid");
+			$stmnt->execute([":reportid" => $reportid]);
 			$json = $stmnt->fetchColumn();
-			echo $json;
-		} 
-		else {
-			header('HTTP/ 404 report_not_present');
-			echo "report not present";
+		} catch (Exception $e) {
+			header('HTTP/ 500 server_error');
+			echo "Could not get report from database";
+			die();
 		}
-	} catch (Exception $e) {
-		header('HTTP/ 500 server_error');
-		echo "Could not get report from database";
-		die();
-	}		
+		DB::disconnect();
+	}
 
-	DB::disconnect();
+	if ($json) {
+		header('Content-Type: application/json');
+		echo $json;
+	} else {
+		header('HTTP/ 404 report_not_present');
+		echo "report not present";
+	}	
 ?>

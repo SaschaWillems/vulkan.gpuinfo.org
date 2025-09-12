@@ -8,3 +8,4 @@ tools/Khronos-Schemas/
 tools/vk.xml
 reportcache/**
 logs/**
+json/**
