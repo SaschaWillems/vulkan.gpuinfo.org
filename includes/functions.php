@@ -962,6 +962,12 @@ function shorten($value, $length = 20, $add = '...')
 	return $value;
 }
 
+function getReportJsonFileName($reportid)
+{
+	$folder = $_SERVER['DOCUMENT_ROOT']."/json/".floor($reportid / 1000);
+	return $folder.'/'.$reportid.'.json';
+}
+
 function logToFile($msg)
 {
 	$log_msg = "[".date('d-M-Y H:m:s e')."] ".$msg.PHP_EOL;
