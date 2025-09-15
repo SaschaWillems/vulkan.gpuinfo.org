@@ -21,7 +21,6 @@
 
 	// Return report as json (uploaded from client application)
 	
-	include './../../database/database.class.php';
 	include './../../includes/functions.php';
 	
 	if (!isset($_GET['id'])) {
@@ -38,18 +37,7 @@
 		$json = file_get_contents($filename);
 		logToFile("Json for report $reportid served from file");
 	} else {
-		DB::connect();
-		logToFile("Json for report $reportid served from database");
-		try {
-			$stmnt = DB::$connection->prepare("SELECT json FROM reportsjson WHERE reportid = :reportid");
-			$stmnt->execute([":reportid" => $reportid]);
-			$json = $stmnt->fetchColumn();
-		} catch (Exception $e) {
-			header('HTTP/ 500 server_error');
-			echo "Could not get report from database";
-			die();
-		}
-		DB::disconnect();
+		logToFile("Json for report $reportid not found");
 	}
 
 	if ($json) {
