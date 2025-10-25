@@ -21,8 +21,10 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '4.02';
+$release = '4.03';
+$release_android = '4.02';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
+$filename_android = "downloads/vulkancapsviewer_".$release_android;
 ?>
 
 <div class="panel panel-default">
@@ -31,7 +33,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 			<h2>Downloads</h2>
 		</div>
 		<div>
-			The database is populated using the Vulkan Hardware Capability Viewer application, available for multiple platforms. It reads and displays Vulkan related information for a selected implementation, and that data can then be uploaded to the database.<br/>			
+			The database is populated using the Vulkan Hardware Capability Viewer application, available for multiple platforms. It reads and displays Vulkan related information for a selected implementation, and that data can then be uploaded to the database.<br/>
 			The Vulkan Hardware Capability Viewer is open source and can be found in this public <a href="https://github.com/SaschaWillems/VulkanCapsViewer">repository</a>.<br>
 		</div>
 		<div class="page-header">
@@ -59,10 +61,10 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						</li>
 					</ul>
 				</li>
-				<li>Android
+				<li>Android (4.02)
 					<ul>
 						<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer&hl=en_US">Install from GooglePlay</a> (Releases may take some time to get updated)</li>
-						<li><a href="<?=$filename_prefix?>_arm.apk">Android arm-v8 (apk)</a></li>
+						<li><a href="<?=$filename_android?>_arm.apk">Android arm-v8 (apk)</a></li>
 					</ul>
 				<li><a href="<?=$filename_prefix?>_osx.dmg">Mac OSX (dmg)</a></li>
 				<li><a href="https://apps.apple.com/us/app/vulkan-capabilities-viewer/id1552796816">iOS (App Store)</a> (provided by <a href="https://www.lunarg.com/">LunarG</a>)</li>
@@ -70,6 +72,35 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.03 - 2025-10-26</h4>
+			<ul>
+				<li>Vulkan header 1.4.330</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_memory_decompression</li>
+						<li>VK_EXT_shader_64bit_indexing</li>
+						<li>VK_EXT_shader_uniform_buffer_unsized_array</li>
+						<li>VK_KHR_copy_memory_indirect</li>
+						<li>VK_KHR_maintenance10</li>
+						<li>VK_KHR_present_mode_fifo_latest_ready</li>
+						<li>VK_KHR_shader_fma</li>
+						<li>VK_KHR_shader_untyped_pointers</li>
+						<li>VK_KHR_swapchain_maintenance1</li>
+						<li>VK_KHR_video_encode_intra_refresh</li>
+						<li>VK_AMDX_dense_geometry_format</li>
+						<li>VK_ANDROID_native_buffer</li>
+						<li>VK_OHOS_native_buffer</li>
+						<li>VK_SEC_pipeline_cache_incremental_mode</li>
+						<li>VK_VALVE_video_encode_rgb_conversion</li>
+					</ul>
+				</li>
+				<li>Other changes:
+					<ul>
+						<li>The MacOS version now also supports implementations that don't use the portability subset (like KosmicKrisp), thanks to a contribution by LunarG</li>
+						<li>Added several new flags</li>
+					</ul>
+				</li>
+			</ul>
 			<h4>4.02 - 2025-06-28</h4>
 			<ul>
 				<li>Vulkan header 1.4.320</li>
@@ -90,7 +121,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 				<li>Linux AArch64 (ARM64) builds are now available</li>
-			</ul>			
+			</ul>
 			<h4>4.01 - 2025-04-19</h4>
 			<ul>
 				<li>Vulkan header 1.4.313</li>
@@ -110,7 +141,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 				<li>Note for Linux users: Builds were created with Ubuntu 22.04 (instead of 20.04) and might need fuse to properly run.</li>
-			</ul>				
+			</ul>
 			<h4>4.00 - 2024-12-06</h4>
 			<ul>
 				<li>Added support for Vulkan 1.4. (incl. update mechanism for updating reports)</li>
@@ -123,7 +154,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 				<li>Better handling of surface queries on Wayland</li>
-			</ul>				
+			</ul>
 			<h4>3.43 - 2024-10-02</h4>
 			<ul>
 				<li>Vulkan header 1.3.296</li>
@@ -138,7 +169,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 				<li>Fix for missing surface info on macOS and iOS (thanks to LunarG)</li>
-			</ul>				
+			</ul>
 			<h4>3.41 - 2024-06-28</h4>
 			<ul>
 				<li>Vulkan header 1.3.289</li>
@@ -150,8 +181,8 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_KHR_shader_relaxed_extended_instruction</li>
 						<li>VK_MESA_image_alignment_control</li>
 					</ul>
-				</li>	
-			</ul>			
+				</li>
+			</ul>
 			<h4>3.40 - 2024-03-31</h4>
 			<ul>
 				<li>Vulkan header 1.3.280</li>
@@ -164,7 +195,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 					<li>Updated Vulkan profiles library to SDK 1.3.280</li>
 					<li>Minor changes to report JSON to avoid issues with e.g. large VkFormat feature values</li>
-				</li>	
+				</li>
 			</ul>
 			<h4>3.33 - 2024-01-28</h4>
 			<ul>
@@ -191,7 +222,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_NV_extended_sparse_address_space</li>
 						<li>VK_NV_per_stage_descriptor_set</li>
 					</ul>
-				</li>	
+				</li>
 			</ul>
 			<h4>3.32 - 2023-09-08</h4>
 			<ul>
@@ -210,10 +241,10 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_QCOM_filter_cubic_clamp</li>
 						<li>VK_QNX_external_memory_screen_buffer</li>
 					</ul>
-				</li>	
+				</li>
 				<li>Properly display image layouts for VK_EXT_host_image_copy</li>
 				<li>Updated Vulkan profiles library</li>
-			</ul>				
+			</ul>
 			<h4>3.31 - 2023-05-27</h4>
 			<ul>
 				<li>Enable VK_EXT_swapchain_colorspace if supported by the implementation
@@ -223,7 +254,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 					</ul>
 				</li>
 				<li>Fixes a bug that stopped the application from working on certain Linux platforms using wayland</li>
-			</ul>			
+			</ul>
 			<h4>3.30 - 2023-05-13</h4>
 			<ul>
 				<li><b>Important note for Linux users:</b> Due to changes with automated builds, this version may no longer work on older eol Linux versions (e.g. Ubuntu < 20)</li>
@@ -234,10 +265,10 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						<li>VK_EXT_attachment_feedback_loop_dynamic_state</li>
 						<li>VK_EXT_shader_tile_image</li>
 						<li>VK_EXT_shader_object</li>
-						<li>VK_NV_displacement_micromap</li>						
+						<li>VK_NV_displacement_micromap</li>
 					</ul>
-				</li>	
-			</ul>	
+				</li>
+			</ul>
 
 			<!-- Old version -->
 
@@ -254,7 +285,7 @@ $filename_prefix = "downloads/vulkancapsviewer_".$release;
 						</ul>
 					</li>
 					<li>Filtering will keep child values displayed</li>
-					<li>Add new queue family flag bits</li>				
+					<li>Add new queue family flag bits</li>
 				</ul>
 				<h4>3.28 - 2023-01-25</h4>
 				<ul>
