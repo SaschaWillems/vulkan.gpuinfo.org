@@ -21,8 +21,8 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '4.03';
-$release_android = '4.02';
+$release = '4.10';
+$release_android = '4.10';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 $filename_android = "downloads/vulkancapsviewer_".$release_android;
 ?>
@@ -61,7 +61,7 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 						</li>
 					</ul>
 				</li>
-				<li>Android (4.02)
+				<li>Android
 					<ul>
 						<li><a href="https://play.google.com/store/apps/details?id=de.saschawillems.vulkancapsviewer&hl=en_US">Install from GooglePlay</a> (Releases may take some time to get updated)</li>
 						<li><a href="<?=$filename_android?>_arm.apk">Android arm-v8 (apk)</a></li>
@@ -72,6 +72,21 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.10 - 2025-11-xx</h4>
+			<ul>
+				<li>Vulkan header 1.4.333</li>
+				<li><b>The application has been updated to Qt6</b></li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_ray_tracing_invocation_reorder</li>
+						<li>VK_EXT_custom_resolve</li>
+						<li>VK_QCOM_data_graph_model</li>
+					</ul>
+				</li>
+				<li>Several Android related fixes</li>
+				<li>Linux builds now use a different way of creating the AppImage binaries</li>
+				<li>Updated Vulkan profiles library (including new profiles)</li>
+			</ul>
 			<h4>4.03 - 2025-10-26</h4>
 			<ul>
 				<li>Vulkan header 1.4.330</li>
