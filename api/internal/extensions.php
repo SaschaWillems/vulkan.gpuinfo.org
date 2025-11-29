@@ -54,11 +54,6 @@ if (isset($_REQUEST['order'])) {
     }
 }
 
-// Paging
-if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
-    $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
-}
-
 // Platform (os)
 if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] != '')) {
     $platform = $_REQUEST['filter']['platform'];
@@ -111,11 +106,21 @@ if (!$layered_implementations) {
 
 // Global filters END
 
+// Counts (required for pagination)
 $filteredCount = 0;
-// @todo: Add whereClause, required for proper paging
-$stmnt = DB::$connection->prepare("SELECT count(*) from extensions");
-$stmnt->execute();
-$filteredCount = $totalCount = $stmnt->fetchColumn();
+$countParams = [];
+$sql = "SELECT count(*) from extensions";
+$stmnt = DB::$connection->prepare($sql);
+$stmnt->execute($countParams);
+$totalCount = $filteredCount = $stmnt->fetchColumn();
+// Filter by extension name
+if (isset($_REQUEST['search']) && $_REQUEST['search']['value'] != '') {
+    SqlRepository::appendCondition($sql, 'name like :globalsearch');
+    $countParams['globalsearch'] = '%'.$_REQUEST['search']['value'].'%';
+    $stmnt = DB::$connection->prepare($sql);
+    $stmnt->execute($countParams);
+    $filteredCount = $stmnt->fetchColumn();
+}
 
 $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $whereClause";
 $stmnt = DB::$connection->prepare($sql);
@@ -136,6 +141,11 @@ SqlRepository::appendCondition($whereClause, 'name not in (select name from devi
 if (isset($_REQUEST['search']) && $_REQUEST['search']['value'] != '') {
     SqlRepository::appendCondition($whereClause, 'name like :globalsearch');
     $params['globalsearch'] = '%'.$_REQUEST['search']['value'].'%';
+}
+
+// Paging
+if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
+    $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
 }
 
 // Fetch extensions with coverage based on unique device names from the database
@@ -171,7 +181,6 @@ while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
     $data[] = [
         'name' => $ext_url,
         'coverage' => "<a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a>",
-        'coverageunsupported' => "<a class='na' href=\"$coverageLink&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a>",
         'features' => $feature_link, 
         'properties' => $property_link,
         'date' => $row['date']
