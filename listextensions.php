@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2025 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -42,16 +42,16 @@ PageGenerator::globalFilterText();
 	<div class='tablediv' style='width:auto; display: inline-block;'>
 		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
-				<tr>
+				<!-- <tr>
 					<th></th>
-					<th class="centered" colspan=2>Device coverage</th>
+					<th class="centered">Coverage</th>
 					<th class="centered">First seen</th>
 					<th class="centered" colspan=2>Additional</th>
-				</tr>
+				</tr> -->
 				<tr>
 					<th>Extension</th>
-					<th class="centered"><img src='images/icons/check.png' width=16px></th>
-					<th class="centered"><img src='images/icons/missing.png' width=16px></th>
+					<th class="centered">Coverage</th>
+					<!-- <th class="centered"><img src='images/icons/missing.png' width=16px></th> -->
 					<th class="centered"><abbr title="Date at when the extension was first submitted to the database for the current platform selection">Date</abbr></th>
 					<th><abbr title="Extension-related features">F.</abbr></th>
 					<th><abbr title="Extension-related properties">P.</abbr></th>
@@ -63,23 +63,28 @@ PageGenerator::globalFilterText();
 	<script>
 		$(document).ready(function() {
 			var table = $('#extensions').DataTable({
-				pageLength: -1,
-				paging: false,
+				paging: true,
+				pageLength: 25,
 				stateSave: false,
-				searchHighlight: true,
+				serverSide: true,
 				processing: true,
-				dom: 'f',
-				bInfo: false,
-				fixedHeader: {
-					header: true,
-					headerOffset: 50
-				},
+				searching: true,
+				searchHighlight: true,
+				dom: 'fpr',
+				searchDelay: 750,
+				// bInfo: false,
+				// fixedHeader: {
+				// 	header: true,
+				// 	headerOffset: 50
+				// },
 				order: [
 					[0, "asc"]
 				],
-				columnDefs: [{
-					targets: [1, 2],
-				}],
+				columnDefs: [
+					{ 
+						searchable: false, targets: [1, 2, 3, 4],
+					}
+				],				
 				ajax: {
 					url: "api/internal/extensions.php",
 					data: {
@@ -98,10 +103,6 @@ PageGenerator::globalFilterText();
 					},
 					{
 						data: 'coverage',
-						className: 'centered',
-					},
-					{
-						data: 'coverageunsupported',
 						className: 'centered',
 					},
 					{
