@@ -72,7 +72,7 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
-			<h4>4.10 - 2025-11-xx</h4>
+			<h4>4.10 - 2025-12-07</h4>
 			<ul>
 				<li>Vulkan header 1.4.333</li>
 				<li><b>The application has been updated to Qt6</b></li>
@@ -86,6 +86,7 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 				<li>Several Android related fixes</li>
 				<li>Linux builds now use a different way of creating the AppImage binaries</li>
 				<li>Updated Vulkan profiles library (including new profiles)</li>
+				<li>The Windows 32 build has been deprecated</li>
 			</ul>
 			<h4>4.03 - 2025-10-26</h4>
 			<ul>
