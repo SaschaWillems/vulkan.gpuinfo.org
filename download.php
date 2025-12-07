@@ -42,7 +42,6 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 				<li>Windows
 					<ul>
 						<li><a href="<?=$filename_prefix?>_win64.zip">Windows 64-bit (zip)</a></li>
-						<li><a href="<?=$filename_prefix?>_winx86.zip">Windows 32-bit (zip)</a><br/><b>Please note:</b> The 32-bit windows release should only be run on platforms that don't support 64-bit!<br/>Some Vulkan implementations may not expose all hardware capabilities when run under 32 bits.</li>
 					</ul>
 				</li>
 				<li>Linux
