@@ -455,7 +455,7 @@ class SqlRepository {
     }
 
     /** Value listing for given core property */
-    public static function listCorePropertyValues($version, $name) {
+    public static function listCorePropertyValues($version, $name, $options = []) {
         $table = self::getDevicePropertiesTable($version);
         $params = [];
         switch ($name) {
@@ -464,7 +464,11 @@ class SqlRepository {
                 break;
             default:
                 $sql = "SELECT dp.`$name` as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
-        }                
+        } 
+        // @todo:
+        if (($name == 'apiversion') && array_key_exists('short', $options) && ($options['short'] == 'true')) {
+            $sql = "SELECT left(dp.`$name`, 3) as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
+        }
         self::appendFilters($sql, $params);
         $sql .= " group by 1 order by 3 desc";
         $stmnt = DB::$connection->prepare($sql);
