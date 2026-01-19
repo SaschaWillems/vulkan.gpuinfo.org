@@ -41,11 +41,17 @@ $start = microtime(true);
 $paging = null;
 $params = [];
 $whereClause = null;
+$orderByClause = null;
 $platform = 'all';
 
-// Paging
-if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
-    $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
+// Ordering
+if (isset($_REQUEST['order'])) {
+    $columnNames = ['name', 'coverage', 'date', 'hasfeatures', 'hasproperties'];
+    $orderByColumn = $columnNames[$_REQUEST['order'][0]['column']];
+    $orderByDir = $_REQUEST['order'][0]['dir'];
+    if (!empty($orderByColumn)) {
+        $orderByClause = "order by ".$orderByColumn." ".$orderByDir;
+    }
 }
 
 // Platform (os)
@@ -61,36 +67,34 @@ if (isset($_REQUEST['filter']['platform']) && ($_REQUEST['filter']['platform'] !
     }
 }
 if ($platform !== "all") {
-    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.ostype = :ostype';
+    SqlRepository::appendCondition($whereClause, 'r.ostype = :ostype');
     $params['ostype'] = ostype($platform);
 }
 
 // Global filters START
-// @todo
-
 if (isset($_SESSION['minversion'])) {
-    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.apiversion >= :apiversion';
-    $params['apiversion'] =$_SESSION['minversion'];
+    SqlRepository::appendCondition($whereClause, 'r.apiversion >= :apiversion');
+    $params['apiversion'] = $_SESSION['minversion'];
 }
 
 $start_date = SqlRepository::getMinStartDate();
 if ($start_date) {
-    $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.submissiondate >= :startdate';
+    SqlRepository::appendCondition($whereClause, 'r.submissiondate >= :startdate');
     $params['startdate'] = $start_date;
 }
 
 $device_selection = SqlRepository::getDeviceTypeSelection();
 if ($device_selection) {
     if ($device_selection == 'no_virtual') {
-        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        SqlRepository::appendCondition($whereClause, 'r.devicetype != :devicetype');
         $params['devicetype'] = 3;
     }
     if ($device_selection == 'no_cpu') {
-        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype != :devicetype';
+        SqlRepository::appendCondition($whereClause, 'r.devicetype != :devicetype');
         $params['devicetype'] = 4;
     }
     if ($device_selection == 'no_cpu_no_virtual') {
-        $whereClause .= ($whereClause ? ' and ' : ' where ') . 'r.devicetype < :devicetype';
+        SqlRepository::appendCondition($whereClause, 'r.devicetype < :devicetype');
         $params['devicetype'] = 3;
     }    
 }
@@ -102,10 +106,21 @@ if (!$layered_implementations) {
 
 // Global filters END
 
+// Counts (required for pagination)
 $filteredCount = 0;
-$stmnt = DB::$connection->prepare("select count(*) from extensions"); // @todo: whereClause?
-$stmnt->execute();
-$filteredCount = $totalCount = $stmnt->fetchColumn();
+$countParams = [];
+$sql = "SELECT count(*) from extensions";
+$stmnt = DB::$connection->prepare($sql);
+$stmnt->execute($countParams);
+$totalCount = $filteredCount = $stmnt->fetchColumn();
+// Filter by extension name
+if (isset($_REQUEST['search']) && $_REQUEST['search']['value'] != '') {
+    SqlRepository::appendCondition($sql, 'name like :globalsearch');
+    $countParams['globalsearch'] = '%'.$_REQUEST['search']['value'].'%';
+    $stmnt = DB::$connection->prepare($sql);
+    $stmnt->execute($countParams);
+    $filteredCount = $stmnt->fetchColumn();
+}
 
 $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $whereClause";
 $stmnt = DB::$connection->prepare($sql);
@@ -120,7 +135,18 @@ if ($platform !== 'all') {
 
 // Some drivers wrongly report some instance extensions as device extensions
 // To avoid confusion, those entries are hidden
-$whereClause .= ($whereClause ? ' and ' : ' where ') . 'name not in (select name from deviceextensions_blacklist)';
+SqlRepository::appendCondition($whereClause, 'name not in (select name from deviceextensions_blacklist)');
+
+// Filter by extension name
+if (isset($_REQUEST['search']) && $_REQUEST['search']['value'] != '') {
+    SqlRepository::appendCondition($whereClause, 'name like :globalsearch');
+    $params['globalsearch'] = '%'.$_REQUEST['search']['value'].'%';
+}
+
+// Paging
+if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
+    $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
+}
 
 // Fetch extensions with coverage based on unique device names from the database
 $sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn) as date, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
@@ -128,8 +154,9 @@ $sql ="SELECT e.name as name, e.hasfeatures, e.hasproperties, date(e.$dateColumn
         join reports r on r.id = de.reportid
         join deviceproperties dp on dp.reportid = r.id
         $whereClause
-        group by name";
-$stmnt = DB::$connection->prepare($sql);
+        group by name
+        $orderByClause";
+$stmnt = DB::$connection->prepare($sql." ".$paging);
 $stmnt->execute($params);
 
 $data = [];
@@ -154,7 +181,6 @@ while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
     $data[] = [
         'name' => $ext_url,
         'coverage' => "<a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a>",
-        'coverageunsupported' => "<a class='na' href=\"$coverageLink&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a>",
         'features' => $feature_link, 
         'properties' => $property_link,
         'date' => $row['date']
