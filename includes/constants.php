@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -36,6 +36,8 @@ $queue_flag_bits = [
     0x0010 => "PROTECTED_BIT",
     0x0020 => "VIDEO_DECODE_BIT_KHR",
     0x0040 => "VIDEO_ENCODE_BIT_KHR",
+    0x0100 => "QUEUE_OPTICAL_FLOW_BIT_NV",
+    0x0400 => "QUEUE_DATA_GRAPH_BIT_ARM"
 ];
 
 $platforms = ['windows', 'linux', 'android'];
