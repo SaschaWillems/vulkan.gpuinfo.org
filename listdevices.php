@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2025 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -30,6 +30,7 @@ $filters = [
 	'platform',
 	'extension',
 	'submitter',
+	'apiversion'
 ];
 $filter_list = new FilterList($filters);
 
@@ -53,6 +54,10 @@ if ($filter_list->hasFilter('submitter')) {
 	$submitter = $filter_list->getFilter('submitter');
 	$caption .= " submitted by $submitter";
 	$caption .= " (<a href=\"listreports.php?submitter=$submitter\">Show reports</a>)";
+}
+if ($filter_list->hasFilter('apiversion')) {
+	$apiversion = $filter_list->getFilter('apiversion');
+	$caption .= " with api version $apiversion and up";
 }
 ?>
 
@@ -164,6 +169,7 @@ if ($filter_list->hasFilter('submitter')) {
 					"filter": {
 						'extension': 	'<?= $filter_list->getFilter('extension') ?>',
 						'submitter':	'<?= $filter_list->getFilter('submitter') ?>',
+						'apiversion':	'<?= $filter_list->getFilter('apiversion') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {

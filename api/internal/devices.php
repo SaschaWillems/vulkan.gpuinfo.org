@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -410,10 +410,16 @@ if (isset($_REQUEST["platform"])) {
 }
 
 // Min. api version
+// Global filter
 $minApiVersion = SqlRepository::getMinApiVersion();
 if ($minApiVersion) {
     SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
     $params['apiversion'] = $minApiVersion;
+}
+// Explicit
+if (isset($_REQUEST['filter']['apiversion'])) {
+    SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
+    $params['apiversion'] = $_REQUEST['filter']['apiversion'];
 }
 
 SqlRepository::appendFilters($whereClause, $params, false);
