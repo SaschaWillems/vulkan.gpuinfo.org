@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -21,8 +21,8 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '4.10';
-$release_android = '4.10';
+$release = '4.11';
+$release_android = '4.11';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 $filename_android = "downloads/vulkancapsviewer_".$release_android;
 ?>
@@ -71,6 +71,21 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.11 - 2026-02-01</h4>
+			<ul>
+				<li>Vulkan header 1.4.340</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_EXT_descriptor_heap</li>
+						<li>VK_EXT_texture_compression_astc_3d</li>
+						<li>VK_EXT_shader_long_vector</li>
+						<li>VK_EXT_shader_subgroup_partitioned</li>
+						<li>VK_KHR_internally_synchronized_queues</li>
+						<li>VK_NV_push_constant_bank</li>
+						<li>VK_NV_compute_occupancy_priority</li>
+					</ul>
+				</li>
+			</ul>
 			<h4>4.10 - 2025-12-07</h4>
 			<ul>
 				<li>Vulkan header 1.4.333</li>
