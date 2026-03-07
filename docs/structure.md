@@ -29,6 +29,7 @@ The following Javascript are used in this project. They need to be put in the [e
 | images | Image files used for the frontend |
 | js | Contains JavaScript used by the frontend |
 | profiles | Contains schemas for the [Vulkan profile report export](profiles.md) |
+| reportcache | Stores cached HTML files for single reports |
 | reportcompare | Files used for displaying multiple reports |
 | reportdisplay | Files used to display a single report |
 | services | Assorted api services (outdated) |
