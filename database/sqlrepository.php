@@ -182,6 +182,22 @@ class SqlRepository {
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);
         return $count;
     }    
+    public static function deviceCountOsApi($ostype = null, $apiversion = '1.0') {
+        $whereClause = "";
+        if (!is_null($ostype)) {
+            self::appendCondition($whereClause, "r.ostype = :ostype");
+            $params['ostype'] = $ostype;
+        }
+        self::appendCondition($whereClause, "r.apiversion >= :apiversion");
+        $params['apiversion'] = is_null($apiversion) ? '1.0' : $apiversion;
+        $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $whereClause";
+        // @todo
+        // self::appendFilters($sql, $params, false);
+        $stmnt= DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $count = $stmnt->fetch(PDO::FETCH_COLUMN);
+        return $count;
+    }      
 
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
@@ -842,6 +858,41 @@ class SqlRepository {
             ];
         }
         return $memorytypes;
+    }
+
+    /** @todo */
+    public static function listExtensionCoverage($ostype, $apiversion) {
+        $deviceCount = self::deviceCountOsApi($ostype, $apiversion);
+        $params = [];
+        $whereClause = "";
+        if (is_null($ostype)) {
+            SqlRepository::appendCondition($whereClause, "ostype is :ostype");
+        } else {
+            SqlRepository::appendCondition($whereClause, "ostype = :ostype");
+        }
+        $params['ostype'] = $ostype;
+        SqlRepository::appendCondition($whereClause, "apiversion = :apiversion");
+        $params['apiversion'] = '1.0';
+        if (!is_null($apiversion)) {
+            $params['apiversion'] = $apiversion;
+        }
+        $sql = "SELECT name, coverage                
+                FROM extension_stats
+                $whereClause
+                order by name asc";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $extCoverage = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            if (trim($row['name']) == '') {
+                continue;
+            }
+            $extCoverage[] = [
+                'name' => $row['name'],
+                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
+            ];
+        }
+        return $extCoverage;
     }
 
     /** Per platform coverage numbers for single extension */
