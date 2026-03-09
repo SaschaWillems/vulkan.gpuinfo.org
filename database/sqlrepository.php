@@ -864,7 +864,7 @@ class SqlRepository {
     public static function listExtensionCoverage($ostype, $apiversion) {
         $deviceCount = self::deviceCountOsApi($ostype, $apiversion);
         $params = [];
-        $whereClause = "";
+        $whereClause = "where state = 0";
         if (is_null($ostype)) {
             SqlRepository::appendCondition($whereClause, "ostype is :ostype");
         } else {
@@ -876,7 +876,7 @@ class SqlRepository {
         if (!is_null($apiversion)) {
             $params['apiversion'] = $apiversion;
         }
-        $sql = "SELECT name, coverage                
+        $sql = "SELECT name, coverage, firstseen, hasfeatures, hasproperties                
                 FROM extension_stats
                 $whereClause
                 order by name asc";
@@ -889,6 +889,9 @@ class SqlRepository {
             }
             $extCoverage[] = [
                 'name' => $row['name'],
+                'firstseen' => $row['firstseen'],
+                'hasfeatures' => $row['hasfeatures'],
+                'hasproperties' => $row['hasproperties'],
                 'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }

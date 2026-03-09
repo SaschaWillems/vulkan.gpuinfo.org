@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -57,68 +57,71 @@ PageGenerator::globalFilterText();
 					<th><abbr title="Extension-related properties">P.</abbr></th>
 				</tr>
 			</thead>
+			<tbody>
+				<?php
+				DB::connect();
+				try {
+					$ostype = null;
+					$apiversion = null;
+					if ($filter_list->hasFilter('platform')) {
+						$ostype = ostype($filter_list->getFilter('platform'));
+					}
+					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion);
+					foreach ($extensions as $extension) {
+    					$extension_link = "displayextensiondetail.php?extension=".$extension['name'];
+						$coverage_link = "listdevicescoverage.php?extension=".$extension['name']."&platform=$platform";
+						$feature_link = null;
+						if ($extension['hasfeatures']) {
+							$feature_link = "<a href='listfeaturesextensions.php?extension=".$extension['name']."&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a>";
+						}
+						$property_link = null;
+						if ($extension['hasproperties']) {
+							$property_link = "<a href='listpropertiesextensions.php?extension=".$extension['name']."&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a>";
+						}				
+						$coverage = $extension['coverage'];
+						$class = null;
+						if ($coverage > 75.0) {
+							$class .= ' format-coverage-high';
+						} elseif ($coverage > 50.0) {
+							$class .= ' format-coverage-medium';
+						} elseif ($coverage > 0.0) {
+							$class .= ' format-coverage-low';
+						}									
+						echo "<tr>";
+						echo "<td><a href=".$extension_link.">".$extension['name']."</a></td>";
+						echo "<td class='centered'><a class='$class' href=\"$coverage_link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'><a class='na' href=\"$coverage_link&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'>".$extension['firstseen']."</td>";
+						echo "<td class='centered'>$feature_link</td>";
+						echo "<td class='centered'>$property_link</td>";			
+						echo "</tr>";
+					}
+				} catch (PDOException $e) {
+					echo "<b>Error while fetching data!</b><br>";
+				}
+				DB::disconnect();
+				// @todo: last updated
+				?>
+			</tbody>			
 		</table>
 	</div>
 
 	<script>
 		$(document).ready(function() {
 			var table = $('#extensions').DataTable({
-				pageLength: -1,
-				paging: false,
-				stateSave: false,
-				searchHighlight: true,
-				processing: true,
-				dom: 'f',
-				bInfo: false,
-				fixedHeader: {
-					header: true,
-					headerOffset: 50
-				},
-				order: [
+				"pageLength": -1,
+				"paging": false,
+				"stateSave": false,
+				"searchHighlight": true,
+				"dom": 'f',
+				"bInfo": false,
+				"order": [
 					[0, "asc"]
 				],
-				columnDefs: [{
-					targets: [1, 2],
-				}],
-				ajax: {
-					url: "api/internal/extensions.php",
-					data: {
-						"filter": {
-							'platform': '<?= $filter_list->getFilter('platform') ?>',
-						}
-					},
-					error: function(xhr, error, thrown) {
-						$('#errordiv').html('Could not fetch data (' + error + ')');
-						$('#extensions_processing').hide();
-					}
-				},
-				columns: [
-					{
-						data: 'name'
-					},
-					{
-						data: 'coverage',
-						className: 'centered',
-					},
-					{
-						data: 'coverageunsupported',
-						className: 'centered',
-					},
-					{
-						data: 'date',
-						className: 'centered',
-					},
-					{
-						data: 'features',
-						className: 'centered',
-					},
-					{
-						data: 'properties',
-						className: 'centered',
-					},
-				],				
+				"columnDefs": [{
+					"targets": [1, 2]
+				}]
 			});
-
 		});
 	</script>
 
