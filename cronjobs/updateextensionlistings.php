@@ -38,8 +38,10 @@ $start = microtime(true);
 $age = NULL;
 
 try {
-    DB::$connection->beginTransaction();
+    // @todo: only update if new/changed report with data newer than what's stored in cache
 
+    DB::$connection->beginTransaction();
+   
     // Update stats
     $ostypes = [null, 0, 1, 2, 3, 4];
     $apiversions = ['1.0', '1.1', '1.2', '1.3', '1.4'];
@@ -75,6 +77,10 @@ try {
 
     // Mark new rows as active
     $stmnt = DB::$connection->prepare("UPDATE extension_stats set state = 0 where state = 1");
+    $stmnt->execute();
+
+    // Update cache info
+    $stmnt = DB::$connection->prepare("REPLACE into cacheinfo (identifier, date) values ('extension_stats', now())");
     $stmnt->execute();
 
     DB::$connection->commit();         
