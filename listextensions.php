@@ -27,19 +27,53 @@ require './includes/functions.php';
 require './includes/constants.php';
 include './includes/filterlist.class.php';
 
-$filters = ['platform'];
+$filters = ['platform', 'age', 'apiversion', 'namefilter'];
 $filter_list = new FilterList($filters);
 
 PageGenerator::header("Extensions");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Extension coverage");
 PageGenerator::globalFilterText();
+
+function addOption($caption, $label, $options) {
+	global $filter_list;
+	echo "<div>$caption: <select name='$label' id='$label' class='form-control' onchange='this.form.submit()'></div>";
+    foreach ($options as $value => $text) {
+        $selected = ($filter_list->hasFilter($label) && $filter_list->getFilter($label) == $value) ? 'selected' : '';
+        echo "<option value=\"$value\" $selected>$text</option>";
+    };
+    echo "</select>";
+}
+
 ?>
 
 <center>
 	<?php PageGenerator::platformNavigation('listextensions.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
+		<div class='table-options'>
+			<form method="get">
+				<?php
+					addOption('Age', 'age', [
+						'recent' => 'Recent',
+						'historic' => 'Historic'
+					]);
+					addOption('API', 'apiversion', [
+						'all' => 'All Vulkan versions',
+						'1.1' => 'Vulkan 1.1 and up',
+						'1.2' => 'Vulkan 1.2 and up',
+						'1.3' => 'Vulkan 1.3 and up',
+						'1.4' => 'Vulkan 1.4 and up'
+					]);					
+					if ($filter_list->hasFilter('platform')) {
+						echo "<input type='hidden' name='platform' value='".$filter_list->getFilter('platform')."' />";
+					}
+					if ($filter_list->hasFilter('namefilter')) {
+						echo "<input type='hidden' name='namefilter' value='".$filter_list->getFilter('namefilter')."' />";
+					}
+				?>
+			</form>
+		</div>
 		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				<tr>
@@ -61,15 +95,15 @@ PageGenerator::globalFilterText();
 				<?php
 				DB::connect();
 				try {
-$updated_at = null;
+					$updated_at = null;
 					$ostype = null;
 					$apiversion = null;
-$age = null;
+					$age = null;
 					$namefilter = null;
 					if ($filter_list->hasFilter('platform')) {
 						$ostype = ostype($filter_list->getFilter('platform'));
 					}
-if ($filter_list->hasFilter('apiversion')) {
+					if ($filter_list->hasFilter('apiversion')) {
 						$apiversion = $filter_list->getFilter('apiversion');
 						if ($apiversion == 'all') {
 							$apiversion = null;
@@ -81,7 +115,7 @@ if ($filter_list->hasFilter('apiversion')) {
 					if ($filter_list->hasFilter('namefilter')) {
 						$namefilter = $filter_list->getFilter('namefilter');
 					}
-					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion);
+					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion, $age, $namefilter);
 					foreach ($extensions as $extension) {
     					$extension_link = "displayextensiondetail.php?extension=".$extension['name'];
 						$coverage_link = "listdevicescoverage.php?extension=".$extension['name']."&platform=$platform";
