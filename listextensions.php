@@ -98,7 +98,7 @@ function addOption($caption, $label, $options) {
 					$updated_at = null;
 					$ostype = null;
 					$apiversion = null;
-					$age = null;
+					$age = 1;
 					$namefilter = null;
 					if ($filter_list->hasFilter('platform')) {
 						$ostype = ostype($filter_list->getFilter('platform'));
