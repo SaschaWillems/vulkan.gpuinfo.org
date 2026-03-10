@@ -45,31 +45,36 @@ try {
     // Update stats
     $ostypes = [null, 0, 1, 2, 3, 4];
     $apiversions = ['1.0', '1.1', '1.2', '1.3', '1.4'];
-    foreach ($ostypes as $ostype) {
-        foreach ($apiversions as $apiversion) {
-            echo $apiversion."</br>";
-            $whereClause = "where left(apiversion, 3) >= '$apiversion'";
-            $dateColumn = 'date';
-            if (!is_null($ostype)) {
-                $whereClause .= " and ostype = $ostype";
-                $dateColumn = 'date'.strtolower(platformname($ostype));
-            }
-            $whereClause .= " and r.layered = 0";
-            $sql = "INSERT into extension_stats (name, ostype, apiversion, age, firstseen, hasfeatures, hasproperties, coverage, state)
-                    SELECT e.name, :ostype, :apiversion, :age,  min(date(e.$dateColumn)), e.hasfeatures, e.hasproperties, count(distinct(r.displayname)) as coverage, 1
-                    from deviceextensions de join extensions e on e.id = de.extensionid join reports r on r.id = de.reportid
-                    $whereClause
-                    group by e.name";
-            $params = [
-                "ostype" => $ostype,
-                "age" => $age,
-                "apiversion" => $apiversion
-            ];
-            $stmnt = DB::$connection->prepare($sql);
-            $stmnt->execute($params);
-        }   
+    $ages = [null, 1];
+    foreach ($ages as $age) {
+        foreach ($ostypes as $ostype) {
+            foreach ($apiversions as $apiversion) {
+                echo "apiversion = $apiversion / ostype = $ostype / age = $age</br>";
+                $params = [
+                    "ostype" => $ostype,
+                    "age" => $age,
+                    "apiversion" => $apiversion
+                ];
+                $whereClause = "where left(apiversion, 3) >= '$apiversion'";
+                $dateColumn = 'date';
+                if (!is_null($ostype)) {
+                    $whereClause .= " and ostype = $ostype";
+                    $dateColumn = 'date'.strtolower(platformname($ostype));
+                }
+                if (!is_null($age)) {
+                    $whereClause .= " and date(r.submissiondate) >= DATE_ADD(CURDATE(), interval -$age YEAR)";
+                }
+                $whereClause .= " and r.layered = 0";
+                $sql = "INSERT into extension_stats (name, ostype, apiversion, age, firstseen, hasfeatures, hasproperties, coverage, state)
+                        SELECT e.name, :ostype, :apiversion, :age,  min(date(e.$dateColumn)), e.hasfeatures, e.hasproperties, count(distinct(r.displayname)) as coverage, 1
+                        from deviceextensions de join extensions e on e.id = de.extensionid join reports r on r.id = de.reportid
+                        $whereClause
+                        group by e.name";
+                $stmnt = DB::$connection->prepare($sql);
+                $stmnt->execute($params);
+            }   
+        }
     }
-
     // Delete old rows
     echo "Deleting old rows<br/>";
     $stmnt = DB::$connection->prepare("DELETE FROM extension_stats where state = 0");
