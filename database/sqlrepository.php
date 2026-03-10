@@ -182,7 +182,8 @@ class SqlRepository {
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);
         return $count;
     }    
-    public static function deviceCountOsApi($ostype = null, $apiversion = '1.0') {
+
+    public static function deviceCountOsApiAge($ostype = null, $apiversion = '1.0', $age = null) {
         $whereClause = "";
         if (!is_null($ostype)) {
             self::appendCondition($whereClause, "r.ostype = :ostype");
@@ -190,6 +191,9 @@ class SqlRepository {
         }
         self::appendCondition($whereClause, "r.apiversion >= :apiversion");
         $params['apiversion'] = is_null($apiversion) ? '1.0' : $apiversion;
+if (!is_null($age)) {
+            self::appendCondition($whereClause, "date(r.submissiondate) >= DATE_ADD(CURDATE(), interval -$age YEAR)");
+        }
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $whereClause";
         // @todo
         // self::appendFilters($sql, $params, false);
@@ -861,8 +865,8 @@ class SqlRepository {
     }
 
     /** @todo */
-    public static function listExtensionCoverage($ostype, $apiversion) {
-        $deviceCount = self::deviceCountOsApi($ostype, $apiversion);
+    public static function listExtensionCoverage($ostype, $apiversion, $age, $name) {
+        $deviceCount = self::deviceCountOsApiAge($ostype, $apiversion, $age);
         $params = [];
         $whereClause = "where state = 0";
         if (is_null($ostype)) {
@@ -875,6 +879,16 @@ class SqlRepository {
         $params['apiversion'] = '1.0';
         if (!is_null($apiversion)) {
             $params['apiversion'] = $apiversion;
+        }
+if (is_null($age)) {
+            SqlRepository::appendCondition($whereClause, "age is :age");
+        } else {
+            SqlRepository::appendCondition($whereClause, "age = :age");
+        }
+        $params['age'] = $age;
+        if (!is_null($name)) {
+            SqlRepository::appendCondition($whereClause, "name like :name");
+            $params['name'] = "%$name%";
         }
         $sql = "SELECT name, coverage, firstseen, hasfeatures, hasproperties                
                 FROM extension_stats
@@ -925,6 +939,15 @@ class SqlRepository {
             ];
         }
         return $extension_coverage;
+    }
+
+    /** @todo */
+    public static function getCacheInfo($identifier) {
+        $sql = "SELECT date from cacheinfo where identifier = :identifier";
+        $stmnt= DB::$connection->prepare($sql);
+        $stmnt->execute(['identifier' => $identifier]);
+        $value = $stmnt->fetch(PDO::FETCH_COLUMN);
+        return $value;
     }
 
     /** Check if core limit exists */

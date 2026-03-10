@@ -61,10 +61,25 @@ PageGenerator::globalFilterText();
 				<?php
 				DB::connect();
 				try {
+$updated_at = null;
 					$ostype = null;
 					$apiversion = null;
+$age = null;
+					$namefilter = null;
 					if ($filter_list->hasFilter('platform')) {
 						$ostype = ostype($filter_list->getFilter('platform'));
+					}
+if ($filter_list->hasFilter('apiversion')) {
+						$apiversion = $filter_list->getFilter('apiversion');
+						if ($apiversion == 'all') {
+							$apiversion = null;
+						}
+					}
+					if ($filter_list->hasFilter('age')) {
+						$age = $filter_list->getFilter('age') == 'recent' ? 1 : null;
+					}
+					if ($filter_list->hasFilter('namefilter')) {
+						$namefilter = $filter_list->getFilter('namefilter');
 					}
 					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion);
 					foreach ($extensions as $extension) {
@@ -99,12 +114,14 @@ PageGenerator::globalFilterText();
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";
 				}
+				$updated_at = SqlRepository::getCacheInfo('extension_stats');
 				DB::disconnect();
 				// @todo: last updated
 				?>
 			</tbody>			
 		</table>
 	</div>
+	<div><?= "Last updated at $updated_at" ?></div>
 
 	<script>
 		$(document).ready(function() {
