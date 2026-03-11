@@ -33,12 +33,16 @@ DB::connect();
 
 $start = microtime(true);
 
-// todo: rows for age (all, recent (1y))
-
-$age = NULL;
+// We don't need to update the stats if no reports have been uploaded since the last generation
+$stmnt = DB::$connection->prepare("select TIMESTAMPDIFF(SECOND, max(r.submissiondate), (select date from cacheinfo where identifier = 'extension_stats')) from reports r");
+$stmnt->execute();
+$delta = $stmnt->fetchColumn(0);
+if ($delta > 0) {
+    logToFile("No new report since last extension stats generation run");
+    exit;
+}
 
 try {
-    // @todo: only update if new/changed report with data newer than what's stored in cache
 
     DB::$connection->beginTransaction();
    
