@@ -44,6 +44,25 @@ function addOption($caption, $label, $options) {
     echo "</select>";
 }
 
+function applyUrlFilter($url) {
+	global $filter_list;
+	$filters = [];
+	if ($filter_list->hasFilter('platform')) {
+		$filters[] = "platform=".$filter_list->getFilter('platform');
+	}
+	if ($filter_list->hasFilter('apiversion')) {
+		$filters[] = "minapiversion=".$filter_list->getFilter('apiversion');
+	}
+	if (sizeof($filters) > 0) {
+		$filter_string = implode('&', $filters);
+		if (strpos($url, '?') === false) {
+			return $url.'?'.$filter_string;
+		} else {
+			return $url.'&'.$filter_string;
+		}
+	}
+}
+
 ?>
 
 <center>
@@ -54,10 +73,10 @@ function addOption($caption, $label, $options) {
 			<form method="get">
 				<?php
 					addOption('Age', 'age', [
-						'recent' => 'Recent',
-						'historic' => 'Historic'
+						'recent' => 'Recent (1y)',
+						'historic' => 'Historic (All)'
 					]);
-					addOption('API', 'apiversion', [
+					addOption('Versions', 'apiversion', [
 						'all' => 'All Vulkan versions',
 						'1.1' => 'Vulkan 1.1 and up',
 						'1.2' => 'Vulkan 1.2 and up',
@@ -117,7 +136,7 @@ function addOption($caption, $label, $options) {
 					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion, $age, $namefilter);
 					foreach ($extensions as $extension) {
     					$extension_link = "displayextensiondetail.php?extension=".$extension['name'];
-						$coverage_link = "listdevicescoverage.php?extension=".$extension['name']."&platform=$platform";
+						$coverage_link = applyUrlFilter("listdevicescoverage.php?extension=".$extension['name']);
 						$feature_link = null;
 						if ($extension['hasfeatures']) {
 							$feature_link = "<a href='listfeaturesextensions.php?extension=".$extension['name']."&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a>";
