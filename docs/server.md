@@ -22,6 +22,10 @@ Getting global format support is slow due to how the database handles bitwise fi
 * SERVER_NAME/cronjobs/updateformatlistings.php?apiversion=1.2
 * SERVER_NAME/cronjobs/updateformatlistings.php?apiversion=1.3
 
+## Cronjob for extension statistics
+
+Similarly, real-time database queries on extension coverage statistics has become too slow due to the large amount of data. Instead extension statitics are aggregated using a a cronjob that runs the ``..\cronjobs\updateextensionlistings.php` script. This fills the `extension_stats` table that is used for the extension listing then.
+
 ## Caching
 
 The database implements a simple caching mechanism for reports. First time a report is displayed, the generated output (HTML) will be stored to disk and is loaded for consecutive displays. If a report is updated, the cache will be invalidated. This decreases the number of database queries. If anything changes about how reports are display, the cache should be deleted (remove all files in the reportcache folder).
