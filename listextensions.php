@@ -33,7 +33,6 @@ $filter_list = new FilterList($filters);
 PageGenerator::header("Extensions");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Extension coverage");
-PageGenerator::globalFilterText();
 
 function addOption($caption, $label, $options) {
 	global $filter_list;
