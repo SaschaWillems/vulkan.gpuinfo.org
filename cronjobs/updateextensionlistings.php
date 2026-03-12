@@ -70,7 +70,7 @@ try {
                 }
                 $whereClause .= " and r.layered = 0";
                 $sql = "INSERT into extension_stats (name, ostype, apiversion, age, firstseen, hasfeatures, hasproperties, coverage, state)
-                        SELECT e.name, :ostype, :apiversion, :age,  min(date(e.$dateColumn)), e.hasfeatures, e.hasproperties, count(distinct(r.displayname)) as coverage, 1
+                        SELECT e.name, :ostype, :apiversion, :age,  date(e.$dateColumn), e.hasfeatures, e.hasproperties, count(distinct(r.displayname)) as coverage, 1
                         from deviceextensions de join extensions e on e.id = de.extensionid join reports r on r.id = de.reportid
                         $whereClause
                         group by e.name";
