@@ -66,6 +66,10 @@ class SqlRepository {
                 return date('Y-m-d', $start_date);
             }
         }
+        // @todo
+        // Limit to max. 2 years by default
+        // $start_date = mktime(0, 0, 0, 1, 1, date('Y') - 2);
+        // return date('Y-m-d', $start_date);
         return null;
     }
 
@@ -184,14 +188,14 @@ class SqlRepository {
     }    
 
     public static function deviceCountOsApiAge($ostype = null, $apiversion = '1.0', $age = null) {
-        $whereClause = "";
+        $whereClause = "where r.layered = 0 ";
         if (!is_null($ostype)) {
             self::appendCondition($whereClause, "r.ostype = :ostype");
             $params['ostype'] = $ostype;
         }
         self::appendCondition($whereClause, "r.apiversion >= :apiversion");
         $params['apiversion'] = is_null($apiversion) ? '1.0' : $apiversion;
-if (!is_null($age)) {
+        if (!is_null($age)) {
             self::appendCondition($whereClause, "date(r.submissiondate) >= DATE_ADD(CURDATE(), interval -$age YEAR)");
         }
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $whereClause";
@@ -864,9 +868,8 @@ if (!is_null($age)) {
         return $memorytypes;
     }
 
-    /** @todo */
+    /** Global extension coverage from aggregated extension stats table */
     public static function listExtensionCoverage($ostype, $apiversion, $age, $name) {
-        $deviceCount = self::deviceCountOsApiAge($ostype, $apiversion, $age);
         $params = [];
         $whereClause = "where state = 0";
         if (is_null($ostype)) {
@@ -880,7 +883,7 @@ if (!is_null($age)) {
         if (!is_null($apiversion)) {
             $params['apiversion'] = $apiversion;
         }
-if (is_null($age)) {
+        if (is_null($age)) {
             SqlRepository::appendCondition($whereClause, "age is :age");
         } else {
             SqlRepository::appendCondition($whereClause, "age = :age");
@@ -906,7 +909,7 @@ if (is_null($age)) {
                 'firstseen' => $row['firstseen'],
                 'hasfeatures' => $row['hasfeatures'],
                 'hasproperties' => $row['hasproperties'],
-                'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
+                'coverage' => $row['coverage']
             ];
         }
         return $extCoverage;

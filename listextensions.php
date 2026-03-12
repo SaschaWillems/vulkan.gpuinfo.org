@@ -95,7 +95,6 @@ function addOption($caption, $label, $options) {
 				<?php
 				DB::connect();
 				try {
-					$updated_at = null;
 					$ostype = null;
 					$apiversion = null;
 					$age = 1;
@@ -115,6 +114,7 @@ function addOption($caption, $label, $options) {
 					if ($filter_list->hasFilter('namefilter')) {
 						$namefilter = $filter_list->getFilter('namefilter');
 					}
+					$devicecount = SqlRepository::deviceCountOsApiAge($ostype, $apiversion, $age);
 					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion, $age, $namefilter);
 					foreach ($extensions as $extension) {
     					$extension_link = "displayextensiondetail.php?extension=".$extension['name'];
@@ -127,7 +127,7 @@ function addOption($caption, $label, $options) {
 						if ($extension['hasproperties']) {
 							$property_link = "<a href='listpropertiesextensions.php?extension=".$extension['name']."&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a>";
 						}				
-						$coverage = $extension['coverage'];
+						$coverage = round($extension['coverage'] / $devicecount * 100, 2);
 						$class = null;
 						if ($coverage > 75.0) {
 							$class .= ' format-coverage-high';
@@ -150,12 +150,14 @@ function addOption($caption, $label, $options) {
 				}
 				$updated_at = SqlRepository::getCacheInfo('extension_stats');
 				DB::disconnect();
-				// @todo: last updated
 				?>
 			</tbody>			
 		</table>
 	</div>
-	<div><?= "Last updated at $updated_at" ?></div>
+	<div>
+		<?= "$devicecount devices" ?><br/>
+		<?= "Last updated at $updated_at" ?>
+	</div>
 
 	<script>
 		$(document).ready(function() {

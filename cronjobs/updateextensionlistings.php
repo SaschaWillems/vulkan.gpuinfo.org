@@ -38,7 +38,7 @@ $stmnt = DB::$connection->prepare("select TIMESTAMPDIFF(SECOND, max(r.submission
 $stmnt->execute();
 $delta = $stmnt->fetchColumn(0);
 if ($delta > 0) {
-    logToFile("No new report since last extension stats generation run");
+    logToFile("[Extension stats] Skipping generation, no new report since last generation run");
     exit;
 }
 
@@ -95,7 +95,7 @@ try {
     DB::$connection->commit();         
 } catch (PDOException $e) {
     echo $e->getMessage();
-    logToFile("Error while generating extension stats: ".$e->getMessage());
+    logToFile("Extension stats] Error: ".$e->getMessage());
     exit();
 }
 
@@ -103,7 +103,7 @@ $delta = (microtime(true) - $start) * 1000;
 echo "Took $delta ms".PHP_EOL;
 echo "success";
 
-logToFile("Generating extension stats took $delta ms");
+logToFile("Extension stats] Generating took $delta ms");
 
 DB::disconnect();
 
