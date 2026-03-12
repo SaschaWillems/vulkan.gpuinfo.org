@@ -95,7 +95,7 @@ try {
     DB::$connection->commit();         
 } catch (PDOException $e) {
     echo $e->getMessage();
-    logToFile("Extension stats] Error: ".$e->getMessage());
+    logToFile("[Extension stats] Error: ".$e->getMessage());
     exit();
 }
 
@@ -103,7 +103,7 @@ $delta = (microtime(true) - $start) * 1000;
 echo "Took $delta ms".PHP_EOL;
 echo "success";
 
-logToFile("Extension stats] Generating took $delta ms");
+logToFile("[Extension stats] Generating took $delta ms");
 
 DB::disconnect();
 
