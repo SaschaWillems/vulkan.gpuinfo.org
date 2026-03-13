@@ -27,7 +27,9 @@ The Vulkan Hardware Database offers several API endpoints for fetching data base
 # <a name='Note'></a>Note
 Please note that the API is **not designed to allow full database access** but rather offers different data sets based on requests from different IHVs and ISVs.
 
-Also note that if you plan on using the API, **don't use it for creating your own applications** and **don't excessively request data** without asking me for consent. 
+Also note that if you plan on using the API, **don't use it for creating your own applications** and **don't excessively request data** without asking me for consent.
+
+APIs in the internal folder are not supposed to be used outside of the database. They aren't stable and may be changed or even removed at any time.
 
 All hosting is paid by myself, so please ask before using the API in such a way.
 
