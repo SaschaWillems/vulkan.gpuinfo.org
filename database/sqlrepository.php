@@ -199,8 +199,6 @@ class SqlRepository {
             self::appendCondition($whereClause, "date(r.submissiondate) >= DATE_ADD(CURDATE(), interval -$age YEAR)");
         }
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $whereClause";
-        // @todo
-        // self::appendFilters($sql, $params, false);
         $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);
