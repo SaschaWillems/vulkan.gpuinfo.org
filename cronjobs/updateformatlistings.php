@@ -206,9 +206,14 @@ try {
             file_put_contents($filename, $html);
         }
     }
+
+    // Update cache info
+    $stmnt = DB::$connection->prepare("REPLACE into cacheinfo (identifier, date) values ('format_stats_$apiversion', now())");
+    $stmnt->execute();   
+
 } catch (Exception $e) {
     echo "Error at generating format listings: ". $e->getMessage();
-    logToFile("[Format stats] Error: ".$e->getMessage());
+    logToFile("[Format stats $apiversion] Error: ".$e->getMessage());
     exit();
 }
 
