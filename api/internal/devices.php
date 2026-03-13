@@ -72,6 +72,9 @@ $paging = '';
 if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
     $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
 }
+if (trim($paging) == "") {
+    exit("No pagination parameters specified");
+}
 
 // Filtering
 $searchColumns = ['device', 'api', 'driverversion', 'reportcount'];
