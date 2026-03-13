@@ -477,7 +477,7 @@ class SqlRepository {
     }
 
     /** Value listing for given core property */
-    public static function listCorePropertyValues($version, $name, $options = []) {
+    public static function listCorePropertyValues($version, $name) {
         $table = self::getDevicePropertiesTable($version);
         $params = [];
         switch ($name) {
@@ -487,8 +487,7 @@ class SqlRepository {
             default:
                 $sql = "SELECT dp.`$name` as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         } 
-        // @todo:
-        if (($name == 'apiversion') && array_key_exists('short', $options) && ($options['short'] == 'true')) {
+        if ($name == 'apiversion') {
             $sql = "SELECT left(dp.`$name`, 3) as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         }
         self::appendFilters($sql, $params);
