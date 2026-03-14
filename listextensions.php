@@ -60,6 +60,8 @@ function applyUrlFilter($url) {
 		} else {
 			return $url.'&'.$filter_string;
 		}
+	} else {
+		return $url;
 	}
 }
 
