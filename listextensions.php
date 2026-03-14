@@ -68,7 +68,7 @@ function applyUrlFilter($url) {
 <center>
 	<?php PageGenerator::platformNavigation('listextensions.php', $platform, true); ?>
 
-	<div class='tablediv' style='width:auto; display: inline-block;'>
+	<div id='extensionsTableContainer' class='tablediv' style='width:auto; display: inline-block; visibility: hidden;'>
 		<div class='table-options'>
 			<form method="get">
 				<?php
@@ -186,6 +186,9 @@ function applyUrlFilter($url) {
 				"searchHighlight": true,
 				"dom": 'f',
 				"bInfo": false,
+				"initComplete": function() {
+					$('#extensionsTableContainer').css('visibility', 'visible');
+				},
 				"order": [
 					[0, "asc"]
 				],
