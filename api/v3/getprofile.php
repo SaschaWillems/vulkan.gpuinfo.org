@@ -249,7 +249,11 @@ class VulkanProfile {
                 case 'float':
                     return floatval($value);
                 case 'VkBool32':
-                    return boolval($value);
+                    if (is_string($value)) {
+                        return strtolower($value) == 'true' ? true : false;
+                    } else {
+                        return boolval($value);
+                    }
                 case 'VkSampleCountFlags':
                     return VkTypes::VkSampleCountFlags($value);
                 case 'VkShaderStageFlags':
