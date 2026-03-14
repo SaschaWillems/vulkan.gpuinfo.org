@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,19 +27,71 @@ require './includes/functions.php';
 require './includes/constants.php';
 include './includes/filterlist.class.php';
 
-$filters = ['platform'];
+$filters = ['platform', 'age', 'apiversion', 'namefilter'];
 $filter_list = new FilterList($filters);
 
 PageGenerator::header("Extensions");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Extension coverage");
-PageGenerator::globalFilterText();
+
+function addOption($caption, $label, $options) {
+	global $filter_list;
+	echo "<div>$caption: <select name='$label' id='$label' class='form-control' onchange='this.form.submit()'></div>";
+    foreach ($options as $value => $text) {
+        $selected = ($filter_list->hasFilter($label) && $filter_list->getFilter($label) == $value) ? 'selected' : '';
+        echo "<option value=\"$value\" $selected>$text</option>";
+    };
+    echo "</select>";
+}
+
+function applyUrlFilter($url) {
+	global $filter_list;
+	$filters = [];
+	if ($filter_list->hasFilter('platform')) {
+		$filters[] = "platform=".$filter_list->getFilter('platform');
+	}
+	if ($filter_list->hasFilter('apiversion')) {
+		$filters[] = "minapiversion=".$filter_list->getFilter('apiversion');
+	}
+	if (sizeof($filters) > 0) {
+		$filter_string = implode('&', $filters);
+		if (strpos($url, '?') === false) {
+			return $url.'?'.$filter_string;
+		} else {
+			return $url.'&'.$filter_string;
+		}
+	}
+}
+
 ?>
 
 <center>
 	<?php PageGenerator::platformNavigation('listextensions.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
+		<div class='table-options'>
+			<form method="get">
+				<?php
+					addOption('Age', 'age', [
+						'recent' => 'Recent (1y)',
+						'historic' => 'Historic (All)'
+					]);
+					addOption('Versions', 'apiversion', [
+						'all' => 'All Vulkan versions',
+						'1.1' => 'Vulkan 1.1 and up',
+						'1.2' => 'Vulkan 1.2 and up',
+						'1.3' => 'Vulkan 1.3 and up',
+						'1.4' => 'Vulkan 1.4 and up'
+					]);					
+					if ($filter_list->hasFilter('platform')) {
+						echo "<input type='hidden' name='platform' value='".$filter_list->getFilter('platform')."' />";
+					}
+					if ($filter_list->hasFilter('namefilter')) {
+						echo "<input type='hidden' name='namefilter' value='".$filter_list->getFilter('namefilter')."' />";
+					}
+				?>
+			</form>
+		</div>
 		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				<tr>
@@ -57,68 +109,90 @@ PageGenerator::globalFilterText();
 					<th><abbr title="Extension-related properties">P.</abbr></th>
 				</tr>
 			</thead>
+			<tbody>
+				<?php
+				DB::connect();
+				try {
+					$ostype = null;
+					$apiversion = null;
+					$age = 1;
+					$namefilter = null;
+					if ($filter_list->hasFilter('platform')) {
+						$ostype = ostype($filter_list->getFilter('platform'));
+					}
+					if ($filter_list->hasFilter('apiversion')) {
+						$apiversion = $filter_list->getFilter('apiversion');
+						if ($apiversion == 'all') {
+							$apiversion = null;
+						}
+					}
+					if ($filter_list->hasFilter('age')) {
+						$age = $filter_list->getFilter('age') == 'recent' ? 1 : null;
+					}
+					if ($filter_list->hasFilter('namefilter')) {
+						$namefilter = $filter_list->getFilter('namefilter');
+					}
+					$devicecount = SqlRepository::deviceCountOsApiAge($ostype, $apiversion, $age);
+					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion, $age, $namefilter);
+					foreach ($extensions as $extension) {
+    					$extension_link = "displayextensiondetail.php?extension=".$extension['name'];
+						$coverage_link = applyUrlFilter("listdevicescoverage.php?extension=".$extension['name']);
+						$feature_link = null;
+						if ($extension['hasfeatures']) {
+							$feature_link = "<a href='listfeaturesextensions.php?extension=".$extension['name']."&platform=$platform'><span class='glyphicon glyphicon-search' title='Display features for this extension'/></a>";
+						}
+						$property_link = null;
+						if ($extension['hasproperties']) {
+							$property_link = "<a href='listpropertiesextensions.php?extension=".$extension['name']."&platform=$platform'><span class='glyphicon glyphicon-search' title='Display properties for this extension'/></a>";
+						}				
+						$coverage = round($extension['coverage'] / $devicecount * 100, 2);
+						$class = null;
+						if ($coverage > 75.0) {
+							$class .= ' format-coverage-high';
+						} elseif ($coverage > 50.0) {
+							$class .= ' format-coverage-medium';
+						} elseif ($coverage > 0.0) {
+							$class .= ' format-coverage-low';
+						}									
+						echo "<tr>";
+						echo "<td><a href=".$extension_link.">".$extension['name']."</a></td>";
+						echo "<td class='centered'><a class='$class' href=\"$coverage_link\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'><a class='na' href=\"$coverage_link&option=not\">".round(100.0 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='centered'>".$extension['firstseen']."</td>";
+						echo "<td class='centered'>$feature_link</td>";
+						echo "<td class='centered'>$property_link</td>";			
+						echo "</tr>";
+					}
+				} catch (PDOException $e) {
+					echo "<b>Error while fetching data!</b><br>";
+				}
+				$updated_at = SqlRepository::getCacheInfo('extension_stats');
+				DB::disconnect();
+				?>
+			</tbody>			
 		</table>
+	</div>
+	<div>
+		<?= "$devicecount devices" ?><br/>
+		<?= "Last updated at $updated_at" ?>
 	</div>
 
 	<script>
 		$(document).ready(function() {
 			var table = $('#extensions').DataTable({
-				pageLength: -1,
-				paging: false,
-				stateSave: false,
-				searchHighlight: true,
-				processing: true,
-				dom: 'f',
-				bInfo: false,
-				fixedHeader: {
-					header: true,
-					headerOffset: 50
-				},
-				order: [
+				"pageLength": -1,
+				"paging": false,
+				"stateSave": false,
+				"searchHighlight": true,
+				"dom": 'f',
+				"bInfo": false,
+				"order": [
 					[0, "asc"]
 				],
-				columnDefs: [{
-					targets: [1, 2],
-				}],
-				ajax: {
-					url: "api/internal/extensions.php",
-					data: {
-						"filter": {
-							'platform': '<?= $filter_list->getFilter('platform') ?>',
-						}
-					},
-					error: function(xhr, error, thrown) {
-						$('#errordiv').html('Could not fetch data (' + error + ')');
-						$('#extensions_processing').hide();
-					}
-				},
-				columns: [
-					{
-						data: 'name'
-					},
-					{
-						data: 'coverage',
-						className: 'centered',
-					},
-					{
-						data: 'coverageunsupported',
-						className: 'centered',
-					},
-					{
-						data: 'date',
-						className: 'centered',
-					},
-					{
-						data: 'features',
-						className: 'centered',
-					},
-					{
-						data: 'properties',
-						className: 'centered',
-					},
-				],				
+				"columnDefs": [{
+					"targets": [1, 2]
+				}]
 			});
-
 		});
 	</script>
 

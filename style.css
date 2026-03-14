@@ -908,3 +908,15 @@ code {
 	border-color: var(--bordercolor);
 	color: var(--textcolor);
 }
+
+.table-options .form-control {
+	display:inline;
+	width: auto;
+	padding-left: 10px;
+}
+
+.table-options div {
+	display:inline;
+	width: auto;
+	padding-left: 10px;
+}

@@ -66,6 +66,10 @@ class SqlRepository {
                 return date('Y-m-d', $start_date);
             }
         }
+        // @todo
+        // Limit to max. 2 years by default
+        // $start_date = mktime(0, 0, 0, 1, 1, date('Y') - 2);
+        // return date('Y-m-d', $start_date);
         return null;
     }
 
@@ -182,6 +186,24 @@ class SqlRepository {
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);
         return $count;
     }    
+
+    public static function deviceCountOsApiAge($ostype = null, $apiversion = '1.0', $age = null) {
+        $whereClause = "where r.layered = 0 ";
+        if (!is_null($ostype)) {
+            self::appendCondition($whereClause, "r.ostype = :ostype");
+            $params['ostype'] = $ostype;
+        }
+        self::appendCondition($whereClause, "r.apiversion >= :apiversion");
+        $params['apiversion'] = is_null($apiversion) ? '1.0' : $apiversion;
+        if (!is_null($age)) {
+            self::appendCondition($whereClause, "date(r.submissiondate) >= DATE_ADD(CURDATE(), interval -$age YEAR)");
+        }
+        $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $whereClause";
+        $stmnt= DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $count = $stmnt->fetch(PDO::FETCH_COLUMN);
+        return $count;
+    }      
 
     /** Global core feature listings */
     public static function listCoreFeatures($version) { 
@@ -455,7 +477,7 @@ class SqlRepository {
     }
 
     /** Value listing for given core property */
-    public static function listCorePropertyValues($version, $name, $options = []) {
+    public static function listCorePropertyValues($version, $name) {
         $table = self::getDevicePropertiesTable($version);
         $params = [];
         switch ($name) {
@@ -465,8 +487,7 @@ class SqlRepository {
             default:
                 $sql = "SELECT dp.`$name` as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         } 
-        // @todo:
-        if (($name == 'apiversion') && array_key_exists('short', $options) && ($options['short'] == 'true')) {
+        if ($name == 'apiversion') {
             $sql = "SELECT left(dp.`$name`, 3) as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         }
         self::appendFilters($sql, $params);
@@ -844,6 +865,53 @@ class SqlRepository {
         return $memorytypes;
     }
 
+    /** Global extension coverage from aggregated extension stats table */
+    public static function listExtensionCoverage($ostype, $apiversion, $age, $name) {
+        $params = [];
+        $whereClause = "where state = 0";
+        if (is_null($ostype)) {
+            SqlRepository::appendCondition($whereClause, "ostype is :ostype");
+        } else {
+            SqlRepository::appendCondition($whereClause, "ostype = :ostype");
+        }
+        $params['ostype'] = $ostype;
+        SqlRepository::appendCondition($whereClause, "apiversion = :apiversion");
+        $params['apiversion'] = '1.0';
+        if (!is_null($apiversion)) {
+            $params['apiversion'] = $apiversion;
+        }
+        if (is_null($age)) {
+            SqlRepository::appendCondition($whereClause, "age is :age");
+        } else {
+            SqlRepository::appendCondition($whereClause, "age = :age");
+        }
+        $params['age'] = $age;
+        if (!is_null($name)) {
+            SqlRepository::appendCondition($whereClause, "name like :name");
+            $params['name'] = "%$name%";
+        }
+        $sql = "SELECT name, coverage, firstseen, hasfeatures, hasproperties                
+                FROM extension_stats
+                $whereClause
+                order by name asc";
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $extCoverage = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            if (trim($row['name']) == '') {
+                continue;
+            }
+            $extCoverage[] = [
+                'name' => $row['name'],
+                'firstseen' => $row['firstseen'],
+                'hasfeatures' => $row['hasfeatures'],
+                'hasproperties' => $row['hasproperties'],
+                'coverage' => $row['coverage']
+            ];
+        }
+        return $extCoverage;
+    }
+
     /** Per platform coverage numbers for single extension */
     public static function getExtensionCoverage($name) {
         $os_types = [0, 1, 2, 3, 4];
@@ -871,6 +939,15 @@ class SqlRepository {
             ];
         }
         return $extension_coverage;
+    }
+
+    /** @todo */
+    public static function getCacheInfo($identifier) {
+        $sql = "SELECT date from cacheinfo where identifier = :identifier";
+        $stmnt= DB::$connection->prepare($sql);
+        $stmnt->execute(['identifier' => $identifier]);
+        $value = $stmnt->fetch(PDO::FETCH_COLUMN);
+        return $value;
     }
 
     /** Check if core limit exists */

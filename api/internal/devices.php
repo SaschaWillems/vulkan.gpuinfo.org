@@ -72,6 +72,9 @@ $paging = '';
 if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
     $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
 }
+if (trim($paging) == "") {
+    exit("No pagination parameters specified");
+}
 
 // Filtering
 $searchColumns = ['device', 'api', 'driverversion', 'reportcount'];
@@ -256,85 +259,38 @@ if ($memorytype != '') {
 $surfaceformat = $_REQUEST['filter']['surfaceformat'];
 $surfaceformat_colorspace = $_REQUEST['filter']['surfaceformatcolorspace'];
 if ($surfaceformat != '') {
-    $whereClause =
-        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
-            (
-                SELECT ifnull(r.displayname, r.devicename)
-                from reports r
-                join devicesurfaceformats dsf on dsf.reportid = r.id	
-                join VkFormat f on dsf.format = f.value
-                where f.name = :filter_surfaceformat";
+    $whereClause = "left join devicesurfaceformats dsf on dsf.reportid = r.id left join VkFormat f on dsf.format = f.value where f.name = :filter_surfaceformat and r.version >= '1.2'";
     if ($surfaceformat_colorspace !== null) {
         $whereClause .= " and dsf.colorspace = :filter_surfacecolorspace";
         $params['filter_surfacecolorspace'] = $surfaceformat_colorspace;
     }                           
-    $whereClause .= " $os_and_clause) and r.version >= '1.2'";
     $params['filter_surfaceformat'] = $surfaceformat;
 }
 // Surface present mode	
 $surfacepresentmode = $_REQUEST['filter']['surfacepresentmode'];
 if ($surfacepresentmode != '') {
-    $whereClause =
-        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
-            (
-                select ifnull(r.displayname, r.devicename)
-                from reports r
-                join devicesurfacemodes dsm on dsm.reportid = r.id	
-                join VkPresentMode m on dsm.presentmode = m.value 
-                where m.name = :filter_surfacepresentmode
-                $os_and_clause
-            )
-            and r.version >= '1.2'";
+    $whereClause = "left join devicesurfacemodes dsm on dsm.reportid = r.id left join VkPresentMode m on dsm.presentmode = m.value where m.name = :filter_surfacepresentmode and r.version >= '1.2'";
     $params['filter_surfacepresentmode'] = $surfacepresentmode;
 }
 // Surface usage flag
 $surface_usage_flag = $_REQUEST['filter']['surfaceusageflag'];
 if ($surface_usage_flag != '') {
     $surface_usage_flag_value = array_search($surface_usage_flag , SurfaceConstants::UsageFlags);
-    $whereClause =
-        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
-            (
-                select ifnull(r.displayname, r.devicename)
-                from reports r
-                join devicesurfacecapabilities dsf on dsf.reportid = r.id
-                where dsf.supportedUsageFlags & :filter_surface_usage_flag = :filter_surface_usage_flag
-                $os_and_clause
-            )
-            and r.version >= '1.2'";
+    $whereClause = "left join devicesurfacecapabilities dsf on dsf.reportid = r.id where dsf.supportedUsageFlags & :filter_surface_usage_flag = :filter_surface_usage_flag and r.version >= '1.2'";
     $params['filter_surface_usage_flag'] = $surface_usage_flag_value;
 }
-
 // Surface transform mode
 $surface_transform_mode = $_REQUEST['filter']['surfacetransformmode'];
 if ($surface_transform_mode != '') {
     $surface_transform_mode_value = array_search($surface_transform_mode , SurfaceConstants::TransformFlags);
-    $whereClause =
-        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
-            (
-                select ifnull(r.displayname, r.devicename)
-                from reports r
-                join devicesurfacecapabilities dsf on dsf.reportid = r.id
-                where dsf.supportedTransforms & :filter_surface_transform_mode = :filter_surface_transform_mode
-                $os_and_clause
-            )
-            and r.version >= '1.2'";
+    $whereClause = "join devicesurfacecapabilities dsf on dsf.reportid = r.id where dsf.supportedTransforms & :filter_surface_transform_mode = :filter_surface_transform_mode and r.version >= '1.2'";
     $params['filter_surface_transform_mode'] = $surface_transform_mode_value;
 }
-
 // Surface composite alpha mode
 $surface_composite_alpha_mode = $_REQUEST['filter']['surfacecompositealphamode'];
 if ($surface_composite_alpha_mode != '') {
     $surface_composite_alpha_mode_value = array_search($surface_composite_alpha_mode , SurfaceConstants::CompositeAlphaFlags);
-    $whereClause =
-        "where ifnull(r.displayname, r.devicename) " . ($negate ? "not" : "") . " in
-            (
-                select ifnull(r.displayname, r.devicename)
-                from reports r
-                join devicesurfacecapabilities dsf on dsf.reportid = r.id
-                where dsf.supportedCompositeAlpha & :filter_surface_composite_alpha_mode = :filter_surface_composite_alpha_mode
-                $os_and_clause
-            )
-            and r.version >= '1.2'";
+    $whereClause = "join devicesurfacecapabilities dsf on dsf.reportid = r.id where dsf.supportedCompositeAlpha & :filter_surface_composite_alpha_mode = :filter_surface_composite_alpha_mode and r.version >= '1.2'";
     $params['filter_surface_composite_alpha_mode'] = $surface_composite_alpha_mode_value;
 }
 

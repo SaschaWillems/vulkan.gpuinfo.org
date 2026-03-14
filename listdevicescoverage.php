@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -58,7 +58,8 @@ $filters = [
 	'featureflagbit',
 	'surfaceusageflag',
 	'profile',
-	'queuefamilyflags'
+	'queuefamilyflags',
+	'minapiversion'
 ];
 $filter_list = new FilterList($filters);
 
@@ -370,6 +371,7 @@ PageGenerator::header($pageTitle);
 						'surfaceusageflag':				'<?= $filter_list->getFilter('surfaceusageflag') ?>',
 						'profile':						'<?= $filter_list->getFilter('profile') ?>',
 						'queuefamilyflags':				'<?= $filter_list->getFilter('queuefamilyflags') ?>',
+						'apiversion':					'<?= $filter_list->getFilter('minapiversion') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {

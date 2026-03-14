@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -37,7 +37,7 @@ session_start();
 	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/solid.min.css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="style.css?ver=2">
 	<script type="text/javascript" src="external/jquery-2.2.0.min.js"></script>
 	<script type="text/javascript" src="external/bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/jquery.dataTables.min.js"></script>

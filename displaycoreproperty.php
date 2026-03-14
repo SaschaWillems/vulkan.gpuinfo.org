@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,7 +27,7 @@ require './includes/functions.php';
 require './includes/chart.php';
 include './includes/filterlist.class.php';
 
-$filters = ['platform', 'name', 'core', 'short'];
+$filters = ['platform', 'name', 'core'];
 $filter_list = new FilterList($filters);
 
 $extension = $filter_list->getFilter('extension');
@@ -36,11 +36,6 @@ $core = $filter_list->getFilter('core');
 $platform = 'all';
 if ($filter_list->hasFilter('platform')) {
 	$platform = $filter_list->getFilter('platform');
-}
-// For API version coverage
-$short = false;
-if ($filter_list->hasFilter('short')) {
-	$short = ($filter_list->getFilter('short') == 'true');
 }
 
 PageGenerator::header($name);
@@ -51,7 +46,7 @@ try {
 	if (!SqlRepository::corePropertyExists($core, $name)) {
 		PageGenerator::errorMessage("<strong>This is not the <strike>droid</strike> device property you are looking for!</strong><br><br>You may have passed a wrong device property name.");
 	}
-	$values = SqlRepository::listCorePropertyValues($core, $name, ['short' => $short]);
+	$values = SqlRepository::listCorePropertyValues($core, $name);
 } catch (PDOException $e) {
 	PageGenerator::databaseErrorMessage();
 } finally {

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -240,12 +240,17 @@ if ($corefeature) {
 // Core property
 if (isset($_REQUEST['filter']['coreproperty']) && ($_REQUEST['filter']['coreproperty'] != '')) {
     // Properties can be true/false and in such cases are treated as boolean values where checking for support needs to compare with 1
+    $prop_name = $_REQUEST['filter']['coreproperty'];
     $prop_value = $_REQUEST['filter']['corepropertyvalue'];
     if ($prop_value == "") {
         $prop_value = "1";
     }
     $tablename = SqlRepository::getDevicePropertiesTable($core);
-    appendWhereClause("r.id in (select reportid from $tablename where cast(`" . $_REQUEST['filter']['coreproperty'] . "` as char) = :filter_corepropertyvalue)", ['filter_corepropertyvalue' => $prop_value]);
+    if ($prop_name == "apiversion") {
+        appendWhereClause("r.id in (select reportid from $tablename where left($prop_name, 3) = :filter_corepropertyvalue)", ['filter_corepropertyvalue' => $prop_value]);
+    } else {
+        appendWhereClause("r.id in (select reportid from $tablename where cast($prop_name as char) = :filter_corepropertyvalue)", ['filter_corepropertyvalue' => $prop_value]);
+    }
 }
 // Profile
 $profile = getRequestFilterValue('profile');

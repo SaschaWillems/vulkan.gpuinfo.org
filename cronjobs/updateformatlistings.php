@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -206,8 +206,14 @@ try {
             file_put_contents($filename, $html);
         }
     }
+
+    // Update cache info
+    $stmnt = DB::$connection->prepare("REPLACE into cacheinfo (identifier, date) values ('format_stats_$apiversion', now())");
+    $stmnt->execute();   
+
 } catch (Exception $e) {
     echo "Error at generating format listings: ". $e->getMessage();
+    logToFile("[Format stats $apiversion] Error: ".$e->getMessage());
     exit();
 }
 
@@ -217,4 +223,5 @@ DB::log('cronjobs/updateformatlistings.php', '', $elapsed);
 DB::disconnect();
 
 echo "success".PHP_EOL;
-echo sprintf("Format listing generated: %d queries took %f seconds", $statement_count, $elapsed);
+echo sprintf("Format listing generated: %d queries took %f ms", $statement_count, $elapsed);
+logToFile("[Format stats] Generating took $elapsed ms");
