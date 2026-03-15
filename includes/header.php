@@ -79,6 +79,7 @@ session_start();
 				<ul class="nav navbar-nav">
 					<li><a href="listdevices.php">Devices</a></li>
 					<li><a href="listreports.php">Reports</a></li>
+					<li><a href="listextensions.php">Extensions</a></li>
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties<span class="caret"></span></a>
 						<ul class="dropdown-menu">
@@ -103,7 +104,6 @@ session_start();
 							<li><a href="listfeaturesextensions.php">Extensions</a></li>
 						</ul>
 					</li>
-					<li><a href="listextensions.php">Extensions</a></li>
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Formats
 							<span class="caret"></span></a>
