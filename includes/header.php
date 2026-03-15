@@ -37,7 +37,7 @@ session_start();
 	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/solid.min.css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="style.css?ver=2">
+	<link rel="stylesheet" type="text/css" href="style.css?ver=3">
 	<script type="text/javascript" src="external/jquery-2.2.0.min.js"></script>
 	<script type="text/javascript" src="external/bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/jquery.dataTables.min.js"></script>

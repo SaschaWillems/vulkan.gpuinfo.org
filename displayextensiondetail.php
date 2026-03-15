@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2024-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2024-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -32,8 +32,7 @@ require './includes/filterlist.class.php';
 require './includes/chart.php';
 require './includes/constants.php';
 
-$filters = ['extension'];
-$filter_list = new FilterList($filters);
+$filter_list = new FilterList(['extension', 'age', 'minapiversion']);
 $extension_name = $filter_list->getFilter('extension');
 
 PageGenerator::header($extension_name);
@@ -45,7 +44,22 @@ try {
 		PageGenerator::errorMessage("This is not the <strike>droid</strike> extension you are looking for!</strong><br><br>You may have passed a wrong extension name.");
 		DB::disconnect();
 	}
-	$extension_coverage = SqlRepository::getExtensionCoverage($extension_name);
+	$ostype = null;
+	$apiversion = '1.0';
+	$age = 1;
+	if ($filter_list->hasFilter('platform')) {
+		$ostype = ostype($filter_list->getFilter('platform'));
+	}
+	if ($filter_list->hasFilter('minapiversion')) {
+		$apiversion = $filter_list->getFilter('minapiversion');
+		if ($apiversion == 'all') {
+			$apiversion = '1.0';
+		}
+	}
+	if ($filter_list->hasFilter('age')) {
+		$age = $filter_list->getFilter('age') == 'recent' ? 1 : null;
+	}
+	$extension_coverage = SqlRepository::getExtensionCoverage($extension_name, $apiversion, $age);
 
 	// Link to the manpage
 	// Note: Some extensions don't have a man page and may lead to a 404
@@ -94,6 +108,11 @@ $caption = "Device coverage for <code>$extension_name</code>";
 		<?=$caption?>
 		<?=$extension_detail ? "<br>$extension_detail" : ""?>
 	</h4>
+	<div class='default-filter-options'>
+		<div class='table-options'>
+			<?php $filter_list->addDefaultFilterOptions() ?>
+		</div>
+	</div>
 </div>
 <?= PageGenerator::globalFilterText();?>
 

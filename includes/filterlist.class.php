@@ -93,6 +93,9 @@ class FilterList
         if ($this->hasFilter('namefilter')) {
             echo "<input type='hidden' name='namefilter' value='".$this->getFilter('namefilter')."' />";
         }
+        if ($this->hasFilter('extension')) {
+            echo "<input type='hidden' name='extension' value='".$this->getFilter('extension')."' />";
+        }        
         echo "</form>";
     }
 

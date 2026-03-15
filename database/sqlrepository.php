@@ -913,24 +913,21 @@ class SqlRepository {
     }
 
     /** Per platform coverage numbers for single extension */
-    public static function getExtensionCoverage($name) {
+    public static function getExtensionCoverage($name, $apiversion = '1.0', $age = null) {
+        // @todo: convert into single statement
         $os_types = [0, 1, 2, 3, 4];
         foreach ($os_types as $os_type) {
-            $deviceCount = self::deviceCountOsType($os_type);
-            $params = ['extension_name' => $name, 'ostype' => $os_type];
-            $sql ="SELECT count(distinct(ifnull(r.displayname, dp.devicename))) as coverage from extensions e 
-                    join deviceextensions de on de.extensionid = e.id 
-                    join reports r on r.id = de.reportid
-                    join deviceproperties dp on dp.reportid = r.id
-                    where e.name = :extension_name
-                    and r.ostype = :ostype";
-            self::appendFilters($sql, $params, false);
+	        $devicecount = SqlRepository::deviceCountOsApiAge($os_type, $apiversion, $age);	
+            $params = ['extension_name' => $name, 'ostype' => $os_type, 'apiversion' => $apiversion, 'age' => $age];
+            $sql ="SELECT * from extension_stats where name = :extension_name and ostype = :ostype and apiversion >= :apiversion and";
+            $sql .= ($age == null) ? " age is :age" : " age = :age";
+//            self::appendFilters($sql, $params, false);
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute($params);
             $row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT);
             $coverage = 0;
-            if ($deviceCount > 0) {
-                $coverage = round($row['coverage'] / $deviceCount * 100, 2);
+            if ($devicecount > 0) {
+                $coverage = round($row['coverage'] / $devicecount * 100, 2);
             }
             $extension_coverage[] = [
                 'coverage' => $coverage,

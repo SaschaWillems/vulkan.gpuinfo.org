@@ -915,6 +915,12 @@ code {
 	padding-left: 10px;
 }
 
+.default-filter-options .form-control {
+	display:inline;
+	width: auto;
+	padding-left: 10px;
+}
+
 .table-options div {
 	display:inline;
 	width: auto;
