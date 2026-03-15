@@ -32,7 +32,7 @@ require './includes/filterlist.class.php';
 require './includes/chart.php';
 require './includes/constants.php';
 
-$filter_list = new FilterList(['extension', 'age', 'minapiversion']);
+$filter_list = new FilterList(['extension', 'age', 'minapiversion', 'apiversion']);
 $extension_name = $filter_list->getFilter('extension');
 
 PageGenerator::header($extension_name);
@@ -50,12 +50,18 @@ try {
 	if ($filter_list->hasFilter('platform')) {
 		$ostype = ostype($filter_list->getFilter('platform'));
 	}
+	if ($filter_list->hasFilter('apiversion')) {
+		$apiversion = $filter_list->getFilter('apiversion');
+		if ($apiversion == 'all') {
+			$apiversion = '1.0';
+		}
+	}
 	if ($filter_list->hasFilter('minapiversion')) {
 		$apiversion = $filter_list->getFilter('minapiversion');
 		if ($apiversion == 'all') {
 			$apiversion = '1.0';
 		}
-	}
+	}	
 	if ($filter_list->hasFilter('age')) {
 		$age = $filter_list->getFilter('age') == 'recent' ? 1 : null;
 	}
@@ -114,7 +120,6 @@ $caption = "Device coverage for <code>$extension_name</code>";
 		</div>
 	</div>
 </div>
-<?= PageGenerator::globalFilterText();?>
 
 <center>
 	<div class='parentdiv'>

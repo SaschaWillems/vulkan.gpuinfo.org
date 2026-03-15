@@ -110,7 +110,7 @@ class FilterList
         }
         // @todo: rename?
         if ($this->hasFilter('apiversion')) {
-            $filters[] = "minapiversion=".$this->getFilter('apiversion');
+            $filters[] = "apiversion=".$this->getFilter('apiversion');
         }
         if (sizeof($filters) > 0) {
             $filter_string = implode('&', $filters);

@@ -85,7 +85,7 @@ PageGenerator::pageCaption("Extension coverage");
 					$devicecount = SqlRepository::deviceCountOsApiAge($ostype, $apiversion, $age);
 					$extensions = SqlRepository::listExtensionCoverage($ostype, $apiversion, $age, $namefilter);
 					foreach ($extensions as $extension) {
-    					$extension_link = "displayextensiondetail.php?extension=".$extension['name'];
+    					$extension_link = $filter_list->applyDefaultUrlFilter("displayextensiondetail.php?extension=".$extension['name']);
 						$coverage_link = $filter_list->applyDefaultUrlFilter("listdevicescoverage.php?extension=".$extension['name']);
 						$feature_link = null;
 						if ($extension['hasfeatures']) {

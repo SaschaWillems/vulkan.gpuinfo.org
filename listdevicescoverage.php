@@ -59,7 +59,8 @@ $filters = [
 	'surfaceusageflag',
 	'profile',
 	'queuefamilyflags',
-	'minapiversion'
+	'minapiversion',
+	'apiversion'
 ];
 $filter_list = new FilterList($filters);
 
@@ -371,7 +372,7 @@ PageGenerator::header($pageTitle);
 						'surfaceusageflag':				'<?= $filter_list->getFilter('surfaceusageflag') ?>',
 						'profile':						'<?= $filter_list->getFilter('profile') ?>',
 						'queuefamilyflags':				'<?= $filter_list->getFilter('queuefamilyflags') ?>',
-						'apiversion':					'<?= $filter_list->getFilter('minapiversion') ?>',
+						'apiversion':					'<?= $filter_list->hasFilter('minapiversion') ? $filter_list->getFilter('minapiversion') : $filter_list->getFilter('apiversion') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {
