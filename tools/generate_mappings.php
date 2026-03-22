@@ -129,6 +129,10 @@ $type_container = new TypeContainer($xml);
 foreach ($xml->extensions->extension as $ext_node) {
     $features2_node = null;
     $properties2_node = null;
+    if ($ext_node['supported'] == 'disabled') {
+        echo "Skipping disabled extension ".$ext_node['name'].PHP_EOL;
+        continue;
+    }
     $extension = [];
     $extension['name'] = (string)$ext_node['name'];
     $extension['promotedTo'] = null;  
