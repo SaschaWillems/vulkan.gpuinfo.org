@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -26,7 +26,7 @@ require './includes/functions.php';
 require './includes/constants.php';
 require './reportdisplay/reportdisplay.class.php';
 
-$reportID = $_GET['id'];
+$reportID = (int)$_GET['id'];
 if (!$reportID) {
 	PageGenerator::errorMessage("<strong>Warning!</strong><br> No report ID set to display!");
 }
@@ -161,7 +161,7 @@ echo "</div>";
 	}
 	?>
 
-	<script type="text/javascript" src="js/reportdisplay.js"></script>
+	<script type="text/javascript" src="js/reportdisplay.js?ver=2"></script>
 </div>
 
 <?php
