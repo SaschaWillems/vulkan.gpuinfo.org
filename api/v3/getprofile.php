@@ -3,7 +3,7 @@
 *
 * Vulkan hardware capability database back-end
 *	
-* Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+* Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
 *	
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public
@@ -34,7 +34,7 @@ if (!isset($_GET['id'])) {
 }
 
 DB::connect();
-$reportid = $_GET['id'];	
+$reportid = (int)$_GET['id'];	
 $stmnt = DB::$connection->prepare("SELECT * from reports where id = :reportid");
 $stmnt->execute([":reportid" => $reportid]);
 if ($stmnt->rowCount() == 0) {
