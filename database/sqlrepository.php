@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -480,6 +480,7 @@ class SqlRepository {
     public static function listCorePropertyValues($version, $name) {
         $table = self::getDevicePropertiesTable($version);
         $params = [];
+        $orderByIndex = 3;
         switch ($name) {
             case 'vendorid':
                 $sql = "SELECT dp.`$name`as value, VendorId(vendorid) as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
@@ -488,10 +489,11 @@ class SqlRepository {
                 $sql = "SELECT dp.`$name` as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         } 
         if ($name == 'apiversion') {
+            $orderByIndex = 1;
             $sql = "SELECT left(dp.`$name`, 3) as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         }
         self::appendFilters($sql, $params);
-        $sql .= " group by 1 order by 3 desc";
+        $sql .= " group by 1 order by $orderByIndex desc";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);
         $values = [];

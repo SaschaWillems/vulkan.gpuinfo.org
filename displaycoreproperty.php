@@ -103,9 +103,6 @@ PageGenerator::globalFilterText();
 			"searchHighlight": true,
 			"dom": '',
 			"bInfo": false,
-			"order": [
-				[0, "asc"]
-			]
 		});
 	});
 	<?php
