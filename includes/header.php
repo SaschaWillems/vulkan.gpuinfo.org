@@ -27,7 +27,8 @@ session_start();
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
-	<meta name="robots" content="noindex">
+	<meta name="description" content="Vulkan GPU hardware database">	
+	<meta name="robots" content="index, nofollow">
 	<?php echo "<title>" . (isset($page_title) ? ($page_title . " - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems") . "</title>"; ?>
 	<link rel="icon" type="image/png" href="/images/Vulkan_LogoBug_32px_Nov17.png" sizes="32x32">
 	<link rel="stylesheet" type="text/css" href="external/css/bootstrap.min.css" />
@@ -80,6 +81,7 @@ session_start();
 					<li><a href="listdevices.php">Devices</a></li>
 					<li><a href="listreports.php">Reports</a></li>
 					<li><a href="listextensions.php">Extensions</a></li>
+					<li><a href="displaycoreproperty.php?name=apiversion">Versions</a></li>
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties<span class="caret"></span></a>
 						<ul class="dropdown-menu">
