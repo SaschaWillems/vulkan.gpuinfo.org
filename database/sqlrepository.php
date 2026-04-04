@@ -483,15 +483,15 @@ class SqlRepository {
         $orderByIndex = 3;
         switch ($name) {
             case 'vendorid':
-                $sql = "SELECT dp.`$name`as value, VendorId(vendorid) as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
+                $sql = "SELECT dp.vendorid as value, ifnull(name, hex(cast(dp.vendorid as int))) as displayvalue, count(0) as count from deviceproperties dp join reports r on r.id = dp.reportid left join vendorids v on v.id = dp.vendorid";
+                break;
+            case 'apiversion':
+                $orderByIndex = 1;
+                $sql = "SELECT left(dp.`$name`, 3) as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
                 break;
             default:
                 $sql = "SELECT dp.`$name` as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         } 
-        if ($name == 'apiversion') {
-            $orderByIndex = 1;
-            $sql = "SELECT left(dp.`$name`, 3) as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
-        }
         self::appendFilters($sql, $params);
         $sql .= " group by 1 order by $orderByIndex desc";
         $stmnt = DB::$connection->prepare($sql);
