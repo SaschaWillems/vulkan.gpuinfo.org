@@ -73,6 +73,7 @@ try {
                         SELECT e.name, :ostype, :apiversion, :age,  date(e.$dateColumn), e.hasfeatures, e.hasproperties, count(distinct(r.displayname)) as coverage, 1
                         from deviceextensions de join extensions e on e.id = de.extensionid join reports r on r.id = de.reportid
                         $whereClause
+                        and e.name not in (select name from deviceextensions_blacklist)
                         group by e.name";
                 $stmnt = DB::$connection->prepare($sql);
                 $stmnt->execute($params);
