@@ -271,6 +271,12 @@ class VulkanProfile {
                 case 'VkShaderCorePropertiesFlagsAMD':
                     // No flags defined in spec
                     return [];
+                case 'VkIndirectCommandsInputModeFlagsEXT':
+                    return VkTypes::VkIndirectCommandsInputModeFlagsEXT($value);
+                case 'VkMemoryDecompressionMethodFlagsEXT':
+                    return VkTypes::VkMemoryDecompressionMethodFlagsEXT($value);
+                case 'VkMemoryDecompressionMethodFlagsNV':
+                    return VkTypes::VkMemoryDecompressionMethodFlagsNV($value);
                 case 'VkExtent2D':
                     $arr = unserialize($value);                
                     return ['width' => $arr[0], 'height' => $arr[1]];

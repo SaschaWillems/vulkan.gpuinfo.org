@@ -204,6 +204,28 @@ class VkTypes {
         return self::getFlags($flags, $value);
     }
 
+    public static function VkMemoryDecompressionMethodFlagsEXT($value) {
+        $flags = [
+            0x00000001 => 'VK_MEMORY_DECOMPRESSION_METHOD_GDEFLATE_1_0_BIT_EXT',
+        ];
+        return self::getFlags($flags, $value);        
+    }
+
+    public static function VkMemoryDecompressionMethodFlagsNV($value) {
+        $flags = [
+            0x00000001 => 'VK_MEMORY_DECOMPRESSION_METHOD_GDEFLATE_1_0_BIT_NV',
+        ];
+        return self::getFlags($flags, $value);        
+    }
+    
+    public static function VkIndirectCommandsInputModeFlagsEXT($value) {
+        $flags = [
+            0x00000001 => 'VK_INDIRECT_COMMANDS_INPUT_MODE_VULKAN_INDEX_BUFFER_EXT',
+            0x00000002 => 'VK_INDIRECT_COMMANDS_INPUT_MODE_DXGI_INDEX_BUFFER_EXT',
+        ];
+        return self::getFlags($flags, $value);        
+    }
+
     /** Type mappings for Vulkan structures */
     public static $VkPhysicalDeviceProperties = [
         'apiVersion' => 'uint32_t',
