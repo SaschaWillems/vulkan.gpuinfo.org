@@ -1,21 +1,21 @@
 <?php
-/* 		
+/*
 *
 * Vulkan hardware capability database back-end
-*	
-* Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
-*	
+*
+* Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
+*
 * This code is free software, you can redistribute it and/or
 * modify it under the terms of the GNU Affero General Public
 * License version 3 as published by the Free Software Foundation.
-*	
+*
 * Please review the following information to ensure the GNU Lesser
 * General Public License version 3 requirements will be met:
 * http://www.gnu.org/licenses/agpl-3.0.de.html
-*	
+*
 * The code is distributed WITHOUT ANY WARRANTY; without even the
 * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-* PURPOSE.  See the GNU AGPL 3.0 for more details.		
+* PURPOSE.  See the GNU AGPL 3.0 for more details.
 *
 */
 
@@ -32,7 +32,7 @@ class VkTypes {
         }
         return $supported_flags;
     }
-    
+
     private static function getValue($lookup, $value) {
         return $lookup[$value];
     }
@@ -41,7 +41,7 @@ class VkTypes {
         if (strpos($extension, '_KHR_') !== false) {
             $value .= '_KHR';
             return;
-        };        
+        };
         if (strpos($extension, '_EXT_') !== false) {
             $value .= '_EXT';
             return;
@@ -90,7 +90,7 @@ class VkTypes {
         ];
         return self::getFlags($flags, $value);
     }
-    
+
     public static function VkSampleCountFlags($value) {
         $flags = [
             0x00000001 => 'VK_SAMPLE_COUNT_1_BIT',
@@ -116,7 +116,7 @@ class VkTypes {
         ];
         return self::getValue($flags, $value);
     }
-    
+
     public static function VkShaderStageFlags($value) {
         $flags = [
             0x00000001 => 'VK_SHADER_STAGE_VERTEX_BIT',
@@ -151,7 +151,7 @@ class VkTypes {
             0x00000040 => 'VK_SUBGROUP_FEATURE_CLUSTERED_BIT',
             0x00000080 => 'VK_SUBGROUP_FEATURE_QUAD_BIT',
             0x00000100 => 'VK_SUBGROUP_FEATURE_PARTITIONED_BIT_NV',
-        ];          
+        ];
         return self::getFlags($flags, $value);
     }
 
@@ -178,7 +178,7 @@ class VkTypes {
             19 => 'VK_DRIVER_ID_MESA_V3DV',
             20 => 'VK_DRIVER_ID_MESA_PANVK',
         ];
-        $value = self::getValue($flags, $value);   
+        $value = self::getValue($flags, $value);
         self::addExtensionSuffix($value, $extension);
         return $value;
     }
@@ -201,7 +201,7 @@ class VkTypes {
             0x00000004 => 'VK_RESOLVE_MODE_MIN_BIT',
             0x00000008 => 'VK_RESOLVE_MODE_MAX_BIT',
         ];
-        return self::getFlags($flags, $value);     
+        return self::getFlags($flags, $value);
     }
 
     /** Type mappings for Vulkan structures */
@@ -336,6 +336,35 @@ class VkTypes {
         'uniformTexelBufferOffsetAlignmentBytes' => 'VkDeviceSize',
         'uniformTexelBufferOffsetSingleTexelAlignment' => 'VkBool32',
         'maxBufferSize' => 'VkDeviceSize',
+    ];
+
+    public static $VkPhysicalDeviceVulkan14Properties = [
+        'lineSubPixelPrecisionBits' => 'uint32_t',
+        'maxVertexAttribDivisor' => 'uint32_t',
+        'supportsNonZeroFirstInstance' => 'VkBool32',
+        'maxPushDescriptors' => 'uint32_t',
+        'dynamicRenderingLocalReadDepthStencilAttachments' => 'VkBool32',
+        'dynamicRenderingLocalReadMultisampledAttachments' => 'VkBool32',
+        'earlyFragmentMultisampleCoverageAfterSampleCounting' => 'VkBool32',
+        'earlyFragmentSampleMaskTestBeforeSampleCounting' => 'VkBool32',
+        'depthStencilSwizzleOneSupport' => 'VkBool32',
+        'polygonModePointSize' => 'VkBool32',
+        'nonStrictSinglePixelWideLinesUseParallelogram' => 'VkBool32',
+        'nonStrictWideLinesUseParallelogram' => 'VkBool32',
+        'blockTexelViewCompatibleMultipleLayers' => 'VkBool32',
+        'maxCombinedImageSamplerDescriptorCount' => 'uint32_t',
+        'fragmentShadingRateClampCombinerInputs' => 'VkBool32',
+        'defaultRobustnessStorageBuffers' => 'VkPipelineRobustnessBufferBehavior',
+        'defaultRobustnessUniformBuffers' => 'VkPipelineRobustnessBufferBehavior',
+        'defaultRobustnessVertexInputs' => 'VkPipelineRobustnessBufferBehavior',
+        'defaultRobustnessImages' => 'VkPipelineRobustnessImageBehavior',
+        // Not exported due to bad API design
+        // 'copySrcLayoutCount' => 'uint32_t',
+        // 'pCopySrcLayouts' => 'VkImageLayout'*,
+        // 'copyDstLayoutCount' => 'uint32_t',
+        // 'pCopyDstLayouts' => 'VkImageLayout'*,
+        'optimalTilingLayoutUUID[VK_UUID_SIZE]' => 'uint8_t',
+        'identicalMemoryTypeRequirements' => 'VkBool32',
     ];
 
     public static $VkPhysicalDeviceLimits = [

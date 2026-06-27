@@ -303,6 +303,7 @@ class VulkanProfile {
             '1.1' => 'devicefeatures11',
             '1.2' => 'devicefeatures12',
             '1.3' => 'devicefeatures13',
+            '1.4' => 'devicefeatures14',
         ];
         $table = $table_names[$version];
         $stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
@@ -376,6 +377,10 @@ class VulkanProfile {
             case '1.3':
                 $table = 'deviceproperties13';
                 $type_mappings = VkTypes::$VkPhysicalDeviceVulkan13Properties;
+                break;
+            case '1.4':
+                $table = 'deviceproperties14';
+                $type_mappings = VkTypes::$VkPhysicalDeviceVulkan14Properties;
                 break;
         }
         $stmnt = DB::$connection->prepare("SELECT * from $table where reportid = :reportid");
@@ -616,7 +621,7 @@ class VulkanProfile {
 
     /** Generate the profile JSON file */
     function generateJSON() {
-        $api_versions =  ['1.0', '1.1', '1.2', '1.3'];
+        $api_versions =  ['1.0', '1.1', '1.2', '1.3', '1.4'];
 
         DB::connect();
         $this->readDeviceInfo();
@@ -663,6 +668,7 @@ class VulkanProfile {
                 '1.1' => ['requirement' => 'vulkan11requirements', 'struct' => 'VkPhysicalDeviceVulkan11Features'],
                 '1.2' => ['requirement' => 'vulkan12requirements', 'struct' => 'VkPhysicalDeviceVulkan12Features'],
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Features'],
+                '1.4' => ['requirement' => 'vulkan14requirements', 'struct' => 'VkPhysicalDeviceVulkan14Features'],
             ];
             if (array_key_exists($version, $this->features) && ($this->features[$version] !== null) && count($this->features[$version]) > 0) {
                 // Skip if not part of the schema (for reports with invalid api versions)
@@ -687,6 +693,7 @@ class VulkanProfile {
                 '1.1' => ['requirement' => 'vulkan11requirements', 'struct' => 'VkPhysicalDeviceVulkan11Properties'],
                 '1.2' => ['requirement' => 'vulkan12requirements', 'struct' => 'VkPhysicalDeviceVulkan12Properties'],
                 '1.3' => ['requirement' => 'vulkan13requirements', 'struct' => 'VkPhysicalDeviceVulkan13Properties'],
+                '1.4' => ['requirement' => 'vulkan14requirements', 'struct' => 'VkPhysicalDeviceVulkan14Properties'],
             ];
             if (array_key_exists($version, $this->properties) && ($this->properties[$version] !== null) && count($this->properties[$version]) > 0) {
                 // Skip if not part of the schema (for reports with invalid api versions)
