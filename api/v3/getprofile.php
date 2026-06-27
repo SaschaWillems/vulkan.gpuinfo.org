@@ -126,6 +126,12 @@ class VulkanProfile {
                 'lineWidthRange[1]',
             ]);
         }
+        if ($version == '1.4') {
+            $skip_fields = array_merge($skip_fields, [
+                'pCopyDstLayouts',
+                'pCopySrcLayouts'
+            ]);
+        }
         return in_array($name, $skip_fields);
     }
 
