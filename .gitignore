@@ -9,3 +9,4 @@ tools/vk.xml
 reportcache/**
 logs/**
 json/**
+profiles/schema/**
