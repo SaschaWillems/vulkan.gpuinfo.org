@@ -509,6 +509,10 @@ class VulkanProfile {
                             continue;
                         }                    
                     }
+                    // Skip src and dst layouts for host image copy. API design is weird for those and there is no easy automated way to generate proper profile JSON for them
+                    if ((stripos($struct_name, 'VkPhysicalDeviceHostImageCopyPropertiesEXT') === 0) && (($value_name == "pCopyDstLayouts") || ($value_name == "pCopySrcLayouts"))) {
+                        continue;
+                    }
                     // This should not happen, but the profiles library is hard to deal with and may (deliberately) miss some types
                     if (!array_key_exists($struct_name, $ext['types'])) {
                         continue;
