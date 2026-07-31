@@ -21,8 +21,8 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '4.11';
-$release_android = '4.11';
+$release = '4.12';
+$release_android = '4.12';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 $filename_android = "downloads/vulkancapsviewer_".$release_android;
 ?>
@@ -71,6 +71,38 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.12 - 2026-07-31</h4>
+			<ul>
+				<li>Vulkan header 1.4.357</li>
+				<li>This version explicitly enables specific instance extensions (if present) to make sure that device extensions depending on them will show up</li>
+				<li>Added support for new features and properties provided via&nbsp;VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2:
+					<ul>
+						<li>VK_ARM_data_graph_neural_accelerator_statistics</li>
+						<li>VK_ARM_data_graph_optical_flow</li>
+						<li>VK_ARM_shader_instrumentation</li>
+						<li>VK_EXT_multisampled_render_to_swapchain</li>
+						<li>VK_EXT_primitive_restart_index</li>
+						<li>VK_EXT_shader_ocp_microscaling_types</li>
+						<li>VK_EXT_shader_split_barrier</li>
+						<li>VK_KHR_device_address_commands</li>
+						<li>VK_KHR_device_fault</li>
+						<li>VK_KHR_extended_flags</li>
+						<li>VK_KHR_maintenance11</li>
+						<li>VK_KHR_opacity_micromap</li>
+						<li>VK_KHR_shader_abort</li>
+						<li>VK_KHR_shader_constant_data</li>
+						<li>VK_KHR_video_encode_feedback2</li>
+						<li>VK_NV_cooperative_matrix_decode_vector</li>
+						<li>VK_QCOM_cooperative_matrix_conversion</li>
+						<li>VK_QCOM_elapsed_timer_query</li>
+						<li>VK_QCOM_image_processing3</li>
+						<li>VK_QCOM_queue_perf_hint</li>
+						<li>VK_QCOM_shader_multiple_wait_queues</li>
+						<li>VK_SEC_throttle_hint</li>
+						<li>VK_VALVE_shader_mixed_float_dot_product</li>
+					</ul>
+				</li>
+			</ul>
 			<h4>4.11 - 2026-02-01</h4>
 			<ul>
 				<li>Vulkan header 1.4.340</li>
