@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -29,49 +29,47 @@ PageGenerator::header("Instance layers");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Listing available instance layers");
 PageGenerator::globalFilterText();
+PageGenerator::platformNavigation('listinstancelayers.php', $platform, true);
 ?>
 
-<center>	
-	<?php PageGenerator::platformNavigation('listinstancelayers.php', $platform, true); ?>
-
-	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="instancelayers" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
-			<thead>
-				<tr>
-					<th></th>
-					<th colspan=2 style="text-align: center;">Device coverage</th>
-				</tr>			
-				<tr>			
-					<th>Layers</th>
-					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>				
-				</tr>
-			</thead>
-			<tbody>		
-				<?php
-					DB::connect();
-					$start = microtime(true);
-					try {
-						$instancelayers = SqlRepository::listInstanceLayers();
-						foreach($instancelayers as $instancelayer) {
-							$layername = $instancelayer['name'];
-							$coverageLink = "listreports.php?instancelayer=$layername&platform=$platform";
-							$coverage = $instancelayer['coverage'];							
-							echo "<tr>";
-							echo "<td class='value'>$layername</td>";
-							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "</tr>";
-						}
-					} catch (PDOException $e) {
-						echo "<b>Error while fetching data!</b><br>";
+<div class='tablediv' style='width:auto; display: inline-block;'>
+	<table id="instancelayers" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<thead>
+			<tr>
+				<th></th>
+				<th colspan=2 style="text-align: center;">Device coverage</th>
+			</tr>			
+			<tr>			
+				<th>Layer</th>
+				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>				
+			</tr>
+		</thead>
+		<tbody>		
+			<?php
+				DB::connect();
+				$start = microtime(true);
+				try {
+					$instancelayers = SqlRepository::listInstanceLayers();
+					foreach($instancelayers as $instancelayer) {
+						$layername = $instancelayer['name'];
+						$coverageLink = "listreports.php?instancelayer=$layername&platform=$platform";
+						$coverage = $instancelayer['coverage'];							
+						echo "<tr>";
+						echo "<td class='value'>$layername</td>";
+						echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "</tr>";
 					}
-					DB::log('listinstancelayers.php', null, (microtime(true) - $start) * 1000);
-					DB::disconnect();
-				?>   
-			</tbody>
-		</table>  
-	</div>
+				} catch (PDOException $e) {
+					echo "<b>Error while fetching data!</b><br>";
+				}
+				DB::log('listinstancelayers.php', null, (microtime(true) - $start) * 1000);
+				DB::disconnect();
+			?>   
+		</tbody>
+	</table>  
+</div>
 
 <script>
 	$(document).ready(function() {
@@ -94,6 +92,5 @@ PageGenerator::globalFilterText();
 
 <?php PageGenerator::footer(); ?>
 
-</center>
 </body>
 </html>
