@@ -27,6 +27,7 @@ session_start();
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="Vulkan GPU hardware database">	
 	<meta name="robots" content="index, nofollow">
 	<?php echo "<title>" . (isset($page_title) ? ($page_title . " - Vulkan Hardware Database by Sascha Willems") : "Vulkan Hardware Database by Sascha Willems") . "</title>"; ?>
@@ -49,17 +50,33 @@ session_start();
 	<script src="external/apexcharts/apexcharts.js"></script>
 	<script type="text/javascript" src="external/responsive.bootstrap.min.js"></script>
 	<script>
+		function updateBodyOffset() {
+			var navbar = $('#main-navbar');
+			if ($(window).width() >= 768) {
+				$('body').css({
+					'padding-top': 0,
+					'padding-left': parseInt(navbar.outerWidth(), 10)
+				});
+			} else {
+				$('body').css({
+					'padding-top': parseInt(navbar.outerHeight(), 10),
+					'padding-left': 0
+				});
+			}
+		}
+
 		$(document).ready(function() {
 			$.each($('#navbar').find('li'), function() {
 				$(this).toggleClass('active',
 					'/' + $(this).find('a').attr('href') == window.location.pathname);
 			});
+			updateBodyOffset();
 		});
 		$(window).resize(function() {
-			$('body').css('padding-top', parseInt($('#main-navbar').css("height")));
+			updateBodyOffset();
 		});
 		$(window).load(function() {
-			$('body').css('padding-top', parseInt($('#main-navbar').css("height")));
+			updateBodyOffset();
 		});
 	</script>
 </head>
@@ -72,9 +89,8 @@ session_start();
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a href="./listdevices.php">
-					<img src="./images/vulkan48.png" class="vulkanlogo">
-				</a>
+				<a href="./listdevices.php"><img src="./images/vulkan48.png" class="vulkanlogo"></a><br/>
+				Hardware Database
 			</div>
 			<div class="collapse navbar-collapse" id="myNavbar">
 				<ul class="nav navbar-nav">
