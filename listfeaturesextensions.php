@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -40,86 +40,82 @@ if ($extension) {
 	PageGenerator::pageCaption("Extension device feature coverage");
 }
 PageGenerator::globalFilterText();
+PageGenerator::platformNavigation('listfeaturesextensions.php', $platform, true, $filter_list->filters);
 ?>
 
-<center>
-	<?php PageGenerator::platformNavigation('listfeaturesextensions.php', $platform, true, $filter_list->filters); ?>
+<div class='tablediv' style='width:auto; display: inline-block;'>
+	<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
+		<thead>
+			<tr>
+				<th></th>
+				<th>Feature</th>
+				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			DB::connect();
+			$start = microtime(true);
+			try {
+				$features = SqlRepository::listExtensionFeatures($extension);
+				foreach($features as $feature) {
+					$coverageLink = "listdevicescoverage.php?extensionname=" . $feature['extension'] . "&extensionfeature=" . $feature['name'] . "&platform=$platform";
+					$coverage = $feature['coverage'];
+					echo "<tr>";
+					echo "<td>" . $feature['extension'] . "</td>";
+					echo "<td class='subkey'>" . $feature['name'] . "</td>";
+					echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+					echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
+					echo "</tr>";
+				}
+			} catch (PDOException $e) {
+				echo "<b>Error while fetching data!</b><br>";
+			}
+			DB::log('api/listfeaturesextensions.php', null, (microtime(true) - $start) * 1000);
+			DB::disconnect();
+			?>
+		</tbody>
+	</table>
+</div>
 
-	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Feature</th>
-					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				DB::connect();
-				$start = microtime(true);
-				try {
-					$features = SqlRepository::listExtensionFeatures($extension);
-					foreach($features as $feature) {
-						$coverageLink = "listdevicescoverage.php?extensionname=" . $feature['extension'] . "&extensionfeature=" . $feature['name'] . "&platform=$platform";
-						$coverage = $feature['coverage'];
-						echo "<tr>";
-						echo "<td>" . $feature['extension'] . "</td>";
-						echo "<td class='subkey'>" . $feature['name'] . "</td>";
-						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">".round(100 - $coverage, 2)."<span style='font-size:10px;'>%</span></a></td>";
-						echo "</tr>";
+<script>
+	$(document).ready(function() {
+		var table = $('#features').DataTable({
+			"pageLength": -1,
+			"paging": false,
+			"order": [],
+			"columnDefs": [{
+				"visible": false,
+				"targets": 0
+			}],
+			"searchHighlight": true,
+			"bAutoWidth": false,
+			"sDom": <?= $extension ? "''" : "'flpt'" ?>,
+			"deferRender": true,
+			"processing": true,
+			"drawCallback": function(settings) {
+				var api = this.api();
+				var rows = api.rows({
+					page: 'current'
+				}).nodes();
+				var last = null;
+				api.column(0, {
+					page: 'current'
+				}).data().each(function(group, i) {
+					if (last !== group) {
+						$(rows).eq(i).before(
+							'<tr><td colspan="3" class="group">' + group + '</td></tr>'
+						);
+						last = group;
 					}
-				} catch (PDOException $e) {
-					echo "<b>Error while fetching data!</b><br>";
-				}
-				DB::log('api/listfeaturesextensions.php', null, (microtime(true) - $start) * 1000);
-				DB::disconnect();
-				?>
-			</tbody>
-		</table>
-	</div>
-
-	<script>
-		$(document).ready(function() {
-			var table = $('#features').DataTable({
-				"pageLength": -1,
-				"paging": false,
-				"order": [],
-				"columnDefs": [{
-					"visible": false,
-					"targets": 0
-				}],
-				"searchHighlight": true,
-				"bAutoWidth": false,
-				"sDom": <?= $extension ? "''" : "'flpt'" ?>,
-				"deferRender": true,
-				"processing": true,
-				"drawCallback": function(settings) {
-					var api = this.api();
-					var rows = api.rows({
-						page: 'current'
-					}).nodes();
-					var last = null;
-					api.column(0, {
-						page: 'current'
-					}).data().each(function(group, i) {
-						if (last !== group) {
-							$(rows).eq(i).before(
-								'<tr><td colspan="3" class="group">' + group + '</td></tr>'
-							);
-							last = group;
-						}
-					});
-				}
-			});
+				});
+			}
 		});
-	</script>
+	});
+</script>
 
-	<?php PageGenerator::footer(); ?>
+<?php PageGenerator::footer(); ?>
 
-</center>
 </body>
-
 </html>
