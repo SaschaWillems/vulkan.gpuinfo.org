@@ -159,10 +159,11 @@ class PageGenerator
 
 	/**
 	 * Inserts the default JavaScript setup script for a datatable that can be filtered
-	 * 
 	 * @param string $table_id ID of the table for which to insert the JavaScript settings block
+	 * @param string $order_column_index Index of the column to order the table by
+	 * @param string $order_dir Direction of the ordering (asc, desc)
 	 */		
-	public static function dataTablesScript($table_id)
+	public static function dataTablesScript($table_id, $order_column_index = 1, $order_dir = 'desc')
 	{
 		echo <<<HTML
 		<script>
@@ -175,7 +176,7 @@ class PageGenerator
 					"dom": 'f',
 					"bInfo": false,
 					"order": [
-						[1, "desc"]
+						["{$order_column_index}", "{$order_dir}"]
 					]
 				});
 				

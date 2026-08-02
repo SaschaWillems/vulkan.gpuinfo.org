@@ -67,26 +67,10 @@ PageGenerator::platformNavigation('listfeaturescore14.php', $platform, true);
 	</table>
 </div>
 
-<script>
-	$(document).ready(function() {
-		var table = $('#features').DataTable({
-			"pageLength": -1,
-			"paging": false,
-			"stateSave": false,
-			"searchHighlight": true,
-			"dom": 'f',
-			"bInfo": false,
-			"order": [
-				[0, "asc"]
-			],
-			"columnDefs": [{
-				"targets": [1, 2]
-			}]
-		});
-	});
-</script>
-
-<?php PageGenerator::footer(); ?>
+<?php
+PageGenerator::footer();
+PageGenerator::dataTablesScript('features', 0, 'asc');
+?>
 
 </body>
 </html>
