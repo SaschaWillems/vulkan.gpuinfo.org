@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2024 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2026 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -30,55 +30,51 @@ PageGenerator::header("usage flags");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Surface usage flag support");
 PageGenerator::globalFilterText();
+PageGenerator::platformNavigation('listsurfaceusageflags.php', $platform, true);
 ?>
 
-<div class="centered">
-	<?php PageGenerator::platformNavigation('listsurfaceusageflags.php', $platform, true); ?>
-
-		<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="usageflags" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
-			<thead>
-				<tr>
-					<th></th>
-					<th colspan=2 style="text-align: center;">Device coverage</th>
-				</tr>
-				<tr>
-					<th>Mode</th>
-					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				DB::connect();
-				try {
-					$surfaceusageflags = SqlRepository::listSurfaceUsageFlags(SurfaceConstants::UsageFlags);
-					foreach ($surfaceusageflags as $surfaceusageflag) {
-						$coverageLink = "listdevicescoverage.php?surfaceusageflag=".$surfaceusageflag['name']."&platform=$platform";
-						$coverage = $surfaceusageflag['coverage'];
-						if ($coverage > 0) {
-							echo "<tr>";
-							echo "<td class='value'>".$surfaceusageflag['name']."</td>";
-							echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "</tr>";
-						}
-					}
-				} catch (PDOException $e) {
-					echo "<b>Error while fetching data!</b><br>";
+<div class='tablediv' style='width:auto; display: inline-block;'>
+<table id="usageflags" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
+	<thead>
+		<tr>
+			<th></th>
+			<th colspan=2 style="text-align: center;">Device coverage</th>
+		</tr>
+		<tr>
+			<th>Mode</th>
+			<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+			<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php
+		DB::connect();
+		try {
+			$surfaceusageflags = SqlRepository::listSurfaceUsageFlags(SurfaceConstants::UsageFlags);
+			foreach ($surfaceusageflags as $surfaceusageflag) {
+				$coverageLink = "listdevicescoverage.php?surfaceusageflag=".$surfaceusageflag['name']."&platform=$platform";
+				$coverage = $surfaceusageflag['coverage'];
+				if ($coverage > 0) {
+					echo "<tr>";
+					echo "<td class='value'>".$surfaceusageflag['name']."</td>";
+					echo "<td class='text-center'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+					echo "<td class='text-center'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+					echo "</tr>";
 				}
-				DB::disconnect();
-				?>
-			</tbody>
-		</table>
-	</div>
-
-	<?php 
-		PageGenerator::dataTablesScript('usageflags');
-		PageGenerator::footer(); 
-	?>
-
+			}
+		} catch (PDOException $e) {
+			echo "<b>Error while fetching data!</b><br>";
+		}
+		DB::disconnect();
+		?>
+	</tbody>
+</table>
 </div>
-</body>
 
+<?php 
+PageGenerator::dataTablesScript('usageflags');
+PageGenerator::footer(); 
+?>
+
+</body>
 </html>

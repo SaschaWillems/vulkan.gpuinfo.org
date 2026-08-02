@@ -29,53 +29,49 @@ PageGenerator::header("Surface present modes");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Surface present mode support");
 PageGenerator::globalFilterText();
+PageGenerator::platformNavigation('listsurfacepresentmodes.php', $platform, true);
 ?>
 
-<div class="centered">
-	<?php PageGenerator::platformNavigation('listsurfacepresentmodes.php', $platform, true); ?>
-
-	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
-			<thead>
-				<tr>
-					<th></th>
-					<th colspan=2 class="centered">Device coverage</th>
-				</tr>
-				<tr>
-					<th>Mode</th>
-					<th class="centered"><img src='images/icons/check.png' width=16px></th>
-					<th class="centered"><img src='images/icons/missing.png' width=16px></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				DB::connect();
-				try {
-					$surfacepresentmodes = SqlRepository::listSurfacePresentModes();
-					foreach ($surfacepresentmodes as $surfacepresentmode) {
-						$coverageLink = "listdevicescoverage.php?" . $type . "surfacepresentmode=" . $surfacepresentmode['mode'] . "&platform=$platform";
-						$coverage = $surfacepresentmode['coverage'] ;
-						echo "<tr>";
-						echo "<td class='value'>" . $surfacepresentmode['mode'] . "</td>";
-						echo "<td class='centered'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "<td class='centered'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-						echo "</tr>";
-					}
-				} catch (PDOException $e) {
-					echo "<b>Error while fetching data!</b><br>";
+<div class='tablediv' style='width:auto; display: inline-block;'>
+	<table id="presentmodes" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
+		<thead>
+			<tr>
+				<th></th>
+				<th colspan=2 class="centered">Device coverage</th>
+			</tr>
+			<tr>
+				<th>Mode</th>
+				<th class="centered"><img src='images/icons/check.png' width=16px></th>
+				<th class="centered"><img src='images/icons/missing.png' width=16px></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			DB::connect();
+			try {
+				$surfacepresentmodes = SqlRepository::listSurfacePresentModes();
+				foreach ($surfacepresentmodes as $surfacepresentmode) {
+					$coverageLink = "listdevicescoverage.php?" . $type . "surfacepresentmode=" . $surfacepresentmode['mode'] . "&platform=$platform";
+					$coverage = $surfacepresentmode['coverage'] ;
+					echo "<tr>";
+					echo "<td class='value'>" . $surfacepresentmode['mode'] . "</td>";
+					echo "<td class='centered'><a class='supported' href='$coverageLink'>" . round($coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+					echo "<td class='centered'><a class='na' href='$coverageLink&option=not'>" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+					echo "</tr>";
 				}
-				DB::disconnect();
-				?>
-			</tbody>
-		</table>
-	</div>
-
-	<?php 
-		PageGenerator::dataTablesScript('presentmodes');
-		PageGenerator::footer(); 
-	?>
-
+			} catch (PDOException $e) {
+				echo "<b>Error while fetching data!</b><br>";
+			}
+			DB::disconnect();
+			?>
+		</tbody>
+	</table>
 </div>
-</body>
 
+<?php 
+	PageGenerator::dataTablesScript('presentmodes');
+	PageGenerator::footer(); 
+?>
+
+</body>
 </html>
