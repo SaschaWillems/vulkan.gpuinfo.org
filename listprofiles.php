@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,82 +27,78 @@ require './includes/functions.php';
 
 PageGenerator::header("Profiles");
 $platform = PageGenerator::getDefaultOSSelection();
-PageGenerator::pageCaption("Profile coverage");
+PageGenerator::pageCaption("Supported Vulkan profiles");
 PageGenerator::globalFilterText();
+PageGenerator::platformNavigation('listprofiles.php', $platform, true);
 ?>
 
-<center>
-	<?php PageGenerator::platformNavigation('listprofiles.php', $platform, true); ?>
-
-	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="profiles" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
-			<thead>
-				<tr>
-					<th></th>
-					<th colspan=2 style="text-align: center;">Device coverage</th>
-				</tr>
-				<tr>
-					<th>Profile</th>
-					<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
-					<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-					DB::connect();
-					$start = microtime(true);
-					try {
-						$profiles = SqlRepository::listProfiles();
-						foreach ($profiles as $profile) {
-							$coverageLink = "listdevicescoverage.php?profile=".$profile['name']."&platform=$platform";
-							$coverage = $profile['coverage'];
-							echo "<tr>";
-							echo "<td>".$profile['name']."</td>";
-							echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
-							echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
-							echo "</tr>";
-						}
-					} catch (PDOException $e) {
-						echo "<b>Error while fetching data!</b><br>";
+<div class='tablediv' style='width:auto; display: inline-block;'>
+	<table id="profiles" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+		<thead>
+			<tr>
+				<th></th>
+				<th colspan=2 style="text-align: center;">Device coverage</th>
+			</tr>
+			<tr>
+				<th>Profile</th>
+				<th style="text-align: center;"><img src='images/icons/check.png' width=16px></th>
+				<th style="text-align: center;"><img src='images/icons/missing.png' width=16px></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+				DB::connect();
+				$start = microtime(true);
+				try {
+					$profiles = SqlRepository::listProfiles();
+					foreach ($profiles as $profile) {
+						$coverageLink = "listdevicescoverage.php?profile=".$profile['name']."&platform=$platform";
+						$coverage = $profile['coverage'];
+						echo "<tr>";
+						echo "<td>".$profile['name']."</td>";
+						echo "<td class='text-center'><a class='supported' href=\"$coverageLink\">$coverage<span style='font-size:10px;'>%</span></a></td>";
+						echo "<td class='text-center'><a class='na' href=\"$coverageLink&option=not\">" . round(100 - $coverage, 2) . "<span style='font-size:10px;'>%</span></a></td>";
+						echo "</tr>";
 					}
-					DB::log('listprofiles.php', null, (microtime(true) - $start) * 1000);
-					DB::disconnect();
-				?>
-			</tbody>
-		</table>
-	</div>
+				} catch (PDOException $e) {
+					echo "<b>Error while fetching data!</b><br>";
+				}
+				DB::log('listprofiles.php', null, (microtime(true) - $start) * 1000);
+				DB::disconnect();
+			?>
+		</tbody>
+	</table>
+</div>
 
-	<script>
-		$(document).ready(function() {
-			var table = $('#profiles').DataTable({
-				"pageLength": -1,
-				"paging": false,
-				"stateSave": false,
-				"searchHighlight": true,
-				"dom": 'f',
-				"bInfo": false,
-				"fixedHeader": {
-					"header": true,
-					"headerOffset": 50
-				},
-				"order": [
-					[0, "asc"]
-				],
-				"columnDefs": [{
-					"targets": [1, 2],
-				}]
-			});
-
-			$("#searchbox").on("keyup search input paste cut", function() {
-				table.search(this.value).draw();
-			});
-
+<script>
+	$(document).ready(function() {
+		var table = $('#profiles').DataTable({
+			"pageLength": -1,
+			"paging": false,
+			"stateSave": false,
+			"searchHighlight": true,
+			"dom": 'f',
+			"bInfo": false,
+			"fixedHeader": {
+				"header": true,
+				"headerOffset": 50
+			},
+			"order": [
+				[0, "asc"]
+			],
+			"columnDefs": [{
+				"targets": [1, 2],
+			}]
 		});
-	</script>
 
-	<?php PageGenerator::footer(); ?>
+		$("#searchbox").on("keyup search input paste cut", function() {
+			table.search(this.value).draw();
+		});
 
-</center>
+	});
+</script>
+
+<?php PageGenerator::footer(); ?>
 </body>
 
 </html>

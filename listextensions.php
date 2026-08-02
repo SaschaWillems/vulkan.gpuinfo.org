@@ -33,16 +33,15 @@ $filter_list = new FilterList($filters);
 PageGenerator::header("Extensions");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Extension coverage");
+PageGenerator::platformNavigation('listextensions.php', $platform, true);
 ?>
 
-<center>
-	<?php PageGenerator::platformNavigation('listextensions.php', $platform, true); ?>
-
-	<div id='extensionsTableContainer' class='tablediv' style='width:auto; display: inline-block; visibility: hidden;'>
-		<div class='table-options'>
-			<?php $filter_list->addDefaultFilterOptions() ?>
-		</div>
-		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
+	<div class='table-options'>
+		<?php $filter_list->addDefaultFilterOptions() ?>
+	</div>
+	<div class='tablediv tab-content' style='display: inline-flex;'>
+		<div id='extensionsTableContainer' class='tab-pane fade in active'>
+		<table id="extensions" class="table table-striped table-bordered table-hover responsive" style='width:auto'>
 			<thead>
 				<tr>
 					<th></th>
@@ -122,6 +121,7 @@ PageGenerator::pageCaption("Extension coverage");
 			</tbody>			
 		</table>
 	</div>
+</div>
 	<div>
 		<?= "$devicecount devices" ?><br/>
 		<?= "Last updated at $updated_at" ?>
@@ -134,11 +134,10 @@ PageGenerator::pageCaption("Extension coverage");
 				"paging": false,
 				"stateSave": false,
 				"searchHighlight": true,
+				"scrollX": true,
+				// "autoWidth": false,
 				"dom": 'f',
 				"bInfo": false,
-				"initComplete": function() {
-					$('#extensionsTableContainer').css('visibility', 'visible');
-				},
 				"order": [
 					[0, "asc"]
 				],
@@ -151,7 +150,6 @@ PageGenerator::pageCaption("Extension coverage");
 
 	<?php PageGenerator::footer(); ?>
 
-</center>
 </body>
 
 </html>

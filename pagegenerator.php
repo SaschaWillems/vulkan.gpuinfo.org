@@ -101,7 +101,7 @@ class PageGenerator
 
 	public static function pageCaption($caption)
 	{
-		echo "<div class='header'><h4>$caption for ".PageGenerator::filterInfo()."</h4></div>";
+		echo "<div class='header'><h2>$caption for ".PageGenerator::filterInfo()."</h2></div>";
 	}
 
 	/**
@@ -132,7 +132,7 @@ class PageGenerator
 		}
 
 		echo "<div>";
-		echo "	<ul class='nav nav-tabs'>";
+		echo "	<ul class='nav nav-pills'>";
 		if ($combined_tab) {
 			// Combined tab for all supported platforms
 			$active = ($active_platform == 'all');
