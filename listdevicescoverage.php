@@ -258,14 +258,14 @@ if ($filter_list->hasFilter('extension')) {
 PageGenerator::header($pageTitle);
 ?>
 
-<div class="centered">
+<div>
 	<div class='header'>
-		<h4>
+		<h2>
 			<?php
 			echo $caption ? $caption : "Listing available devices";
 			echo $subcaption ? "<br>$subcaption" : "";
 			?>
-		</h4>
+		</h2>
 	</div>
 <?php PageGenerator::globalFilterText(); ?>	
 
@@ -324,11 +324,8 @@ PageGenerator::header($pageTitle);
 			"serverSide": true,
 			"paging": true,
 			"searching": true,
-			"lengthChange": true,
-			"lengthMenu": [
-				[10, 25, 50, 100, -1],
-				[10, 25, 50, 100, "All"]
-			],
+			"lengthChange": false,
+			"pageLength": 25,
 			"dom": 'lrtip',
 			"pageLength": 50,
 			"order": [
