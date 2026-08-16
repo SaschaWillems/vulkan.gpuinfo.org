@@ -59,6 +59,8 @@ if ($filter_list->hasFilter('apiversion')) {
 	$apiversion = $filter_list->getFilter('apiversion');
 	$caption .= " with api version $apiversion and up";
 }
+
+$order_column = ($platform == 'android') ? 4 : 3;
 ?>
 
 <center>
@@ -94,7 +96,6 @@ if ($filter_list->hasFilter('apiversion')) {
 						<th></th>
 						<th></th>
 						<th></th>
-						<th></th>
 						<?php 
 							if ($platform == 'android') {
 								echo "<th></th>";
@@ -111,7 +112,6 @@ if ($filter_list->hasFilter('apiversion')) {
 						<th>Max. API version</th>
 						<th>Latest Driver version</th>
 						<th>Last submission</th>
-						<th>Count</th>
 						<th>Compare</th>
 					</tr>
 				</thead>
@@ -143,23 +143,23 @@ if ($filter_list->hasFilter('apiversion')) {
 			"dom": 'lrtip',
 			"pageLength": 25,
 			"order": [
-				[3, 'desc']
+				[<?= $order_column ?>, 'desc']
 			],
 			"columnDefs": [{
 				"searchable": false,
 				<?php 
 					if ($platform == 'android') { 
-						echo '"targets": [4, 5, 6],'; 
+						echo '"targets": [4, 5],'; 
 					} else {
-						echo '"targets": [3, 4, 5],';
+						echo '"targets": [3, 4],';
 					}
 				?>
 				"orderable": false,
 				<?php 
 					if ($platform == 'android') { 
-						echo '"targets": [6],'; 
+						echo '"targets": [5],'; 
 					} else {
-						echo '"targets": [5],';
+						echo '"targets": [4],';
 					}
 				?>				
 			}],
@@ -193,9 +193,6 @@ if ($filter_list->hasFilter('apiversion')) {
 				},
 				{
 					data: 'submissiondate'
-				},
-				{
-					data: 'reportcount'
 				},
 				{
 					data: 'compare'

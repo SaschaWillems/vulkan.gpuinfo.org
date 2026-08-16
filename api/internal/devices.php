@@ -77,7 +77,7 @@ if (trim($paging) == "") {
 }
 
 // Filtering
-$searchColumns = ['device', 'api', 'driverversion', 'reportcount'];
+$searchColumns = ['device', 'api', 'driverversion'];
 if ($ostype == 2) {
     array_splice($searchColumns, 1, 0, ['gpuname']);
 }
@@ -389,7 +389,6 @@ if ($minversion) {
             min(dp.apiversionraw) as api,
             min(dp.driverversion) as driverversion,
             min(dp.driverversionraw) as driverversionraw, 
-            0 as reportcount,
             min(submissiondate) as submissiondate,
             v.name as vendor,
             dp.vendorid as vendorid,
@@ -413,7 +412,6 @@ if ($minversion) {
             max(dp.apiversionraw) as api,
             max(dp.driverversion) as driverversion,
             max(dp.driverversionraw) as driverversionraw, 
-            count(distinct r.id) as reportcount,
             v.name as vendor,
             dp.vendorid as vendorid,
             max(r.submissiondate) as submissiondate,
@@ -445,7 +443,6 @@ if ($devices->rowCount() > 0) {
             'gpuname' => $device['gpuname'],
             'api' => versionToString($device["api"]),
             'driver' =>  getDriverVersion($device["driverversionraw"], "", $device["vendorid"], $device["osname"]),
-            'reportcount' => $device["reportcount"],
             'submissiondate' => $device["submissiondate"],
             'vendor' => $device["vendor"],
             'compare' => '<center><Button onClick="addToCompare(\''.$device['device'].'\','.($ostype !== null ? $ostype : '').')">Add</Button>',
