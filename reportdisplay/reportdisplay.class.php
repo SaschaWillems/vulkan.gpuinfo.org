@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -40,6 +40,7 @@ class ReportFlags
     public $has_portability_extension = false;
     public $has_update_history = false;
     public $has_profiles = false;
+    public $has_format_feature_flags_2 = false;
 }
 
 class ReportApiVersion
@@ -119,7 +120,8 @@ class Report
                     VendorId(p.vendorid) as 'vendor',
                     r.version as reportversion,
                     r.ostype,
-                    p.apiversionraw
+                    p.apiversionraw,
+                    r.hasformatfeatureflags2
                     from reports r
                     left join
                     deviceproperties p on (p.reportid = r.id)
@@ -158,6 +160,7 @@ class Report
             $this->flags->has_portability_extension = DB::getCount("SELECT count(*) from deviceextensions de right join extensions e on de.extensionid = e.id where reportid = :reportid and name = :extension", [':reportid' => $this->id, ':extension' => 'VK_KHR_portability_subset']) > 0;
             $this->flags->has_update_history = DB::getCount("SELECT count(*) from reportupdatehistory where reportid = :reportid", [':reportid' => $this->id]) > 0;
             $this->flags->has_profiles =  DB::getCount("SELECT count(*) from deviceprofiles where reportid = :reportid", [':reportid' => $this->id]) > 0;
+            $this->flags->has_format_feature_flags_2 = $row['hasformatfeatureflags2'] == 1;
         } finally {
             DB::disconnect();
         }
