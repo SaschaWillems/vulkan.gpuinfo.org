@@ -3,7 +3,7 @@
 	 *
 	 * Vulkan hardware capability database back-end
 	 *	
-	 * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+	 * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
 	 *	
 	 * This code is free software, you can redistribute it and/or
 	 * modify it under the terms of the GNU Affero General Public
@@ -413,9 +413,14 @@
 	{
 		$sql = 
 			"INSERT INTO reports
-				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter, layered)
+				(submitter, devicename, devicetype, displayname, driverversion, apiversion, osname, osversion, osarchitecture, version, description, counter, layered, hasFormatFeatureFlags2)
 			VALUES
-				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter, :layered)";
+				(:submitter, :devicename, :devicetype, :displayname, :driverversion, :apiversion, :osname, :osversion, :osarchitecture, :version, :description, :counter, :layered, :hasFormatFeatureFlags2)";
+
+		$hasFormatFeatureFlags2 = 0;
+		if (array_key_exists('hasFormatFeatureFlags2', $json['properties'])) {
+			$hasFormatFeatureFlags2 = (int)$json['properties']['hasFormatFeatureFlags2'];
+		}
 
 		$values = [
 			":submitter" => $json['environment']['submitter'],
@@ -430,7 +435,8 @@
 			":version" => $json['environment']['reportversion'],
 			":description" => $json['environment']['comment'],
 			":counter" => 0,
-			':layered' => (int)$layered
+			':layered' => (int)$layered,
+			':hasFormatFeatureFlags2' => $hasFormatFeatureFlags2
 		];
 
 		try {
@@ -484,7 +490,7 @@
 				`subgroupProperties.subgroupSize`,
 				`subgroupProperties.supportedStages`,
 				`subgroupProperties.supportedOperations`,
-				`subgroupProperties.quadOperationsInAllStages`				
+				`subgroupProperties.quadOperationsInAllStages`
 			)
 			VALUES
 			(
