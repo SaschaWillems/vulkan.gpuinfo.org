@@ -268,7 +268,7 @@
 
 	// Check report version
 	$reportversion = floatval($json['environment']['reportversion']);
-	if ($reportversion < 3.0)
+	if ($reportversion < 4.0)
 	{
 		echo "This version of the Vulkan Hardware Capability is no longer supported!\nPlease download a recent version from https://www.gpuinfo.org";
 		DB::disconnect();

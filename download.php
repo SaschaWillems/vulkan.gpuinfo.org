@@ -71,7 +71,7 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
-			<h4>4.13 - 2026-08-23</h4>
+			<h4>4.13 - 2026-08-22</h4>
 			<ul>
 				<li>This version adds support for extended format feature flags using VK_KHR_format_feature_flags2</li>
 			</ul>
