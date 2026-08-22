@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -73,6 +73,18 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 	</table>
 <?php
 }
+
+if (!$report_compare->allReportSupportFormatFeatureFlags2()) {
+	echo '<div class="alert alert-warning">';
+	echo '<strong>Not all reports contain additional format feature flag information</strong>:<br/>';
+	foreach ($report_compare->device_infos as $device) {
+		if (!$device->has_format_feature_flags_2) {
+			echo $device->displayname.'<br/>';
+		}
+	}
+	echo '</div>';
+}
+
 ?>
 
 <div>
@@ -118,13 +130,13 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 	?>
 
 	<div id='formats_optimal' class='tab-pane fade in active reportdiv'>
-		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_optimal', $format_support->optimal, $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_optimal', $format_support->optimal, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<div id='formats_linear' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_linear', $format_support->linear, $device_format_flags_tiling); ?>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_linear', $format_support->linear, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<div id='formats_buffer' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_buffer', $format_support->buffer, $device_format_flags_buffer); ?>
+		<?php insertDeviceFormatTable($report_compare, 'table_deviceformats_buffer', $format_support->buffer, $report_compare->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags); ?>
 	</div>
 
 	<?php

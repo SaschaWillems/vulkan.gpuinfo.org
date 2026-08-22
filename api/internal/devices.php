@@ -204,11 +204,11 @@ $buffer_format = getRequestFilterValue('bufferformat');
 if ($linear_tiling_format || $optimal_tiling_format || $buffer_format) {
     $featureflag = null;
     $featureflagbit = getRequestFilterValue('featureflagbit');
-    if (in_array($featureflagbit, $device_format_flags_tiling)) {
-        $featureflag = array_search($featureflagbit , $device_format_flags_tiling);
+    if (in_array($featureflagbit, FormatFeatureFlags2::TilingFlags)) {
+        $featureflag = array_search($featureflagbit , FormatFeatureFlags2::TilingFlags);
     }
     if (!$featureflag) {
-        $featureflag = array_search($featureflagbit , $device_format_flags_buffer);
+        $featureflag = array_search($featureflagbit , FormatFeatureFlags2::BufferFlags);
     }
     assert($featureflag != null);
 

@@ -37,6 +37,26 @@ $start = microtime(true);
 
 $statement_count = 0;
 
+function buildPerDeviceFlagColumns($featureColumn, $formatFlags)
+{
+    $columns = [];
+    foreach ($formatFlags as $flagValue => $flagName) {
+        $columns[] = "max((df.$featureColumn & $flagValue) > 0) as flag_$flagValue";
+    }
+
+    return implode(",\n                    ", $columns);
+}
+
+function buildFlagAggregateColumns($formatFlags)
+{
+    $columns = [];
+    foreach ($formatFlags as $flagValue => $flagName) {
+        $columns[] = "sum(flag_$flagValue) as flag_$flagValue";
+    }
+
+    return implode(",\n                ", $columns);
+}
+
 DB::connect();
 
 // Get the list of all currently available formats
@@ -59,17 +79,17 @@ try {
             case 'lineartiling':
                 $column = 'lineartilingfeatures';
                 $parameter_name = 'lineartilingformat';
-                $format_flags = $device_format_flags_tiling;
+                $format_flags = FormatFeatureFlags2::TilingFlags;
                 break;
             case 'optimaltiling':
                 $column = 'optimaltilingfeatures';
                 $parameter_name = 'optimaltilingformat';
-                $format_flags = $device_format_flags_tiling;
+                $format_flags = FormatFeatureFlags2::TilingFlags;
                 break;
             case 'buffer':
                 $column = 'bufferfeatures';
                 $parameter_name = 'bufferformat';
-                $format_flags = $device_format_flags_buffer;
+                $format_flags = FormatFeatureFlags2::BufferFlags;
                 break;
         }
 
@@ -84,41 +104,65 @@ try {
         $formats = [];
         $formats_combined = [];
         $os_types = [];
-        $sql = "SELECT formatid as name, r.ostype as ostype, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
-                where df.$column > 0 and df.$column & :value > 0
-                $api_version_filter                    
-                group by ostype, formatid
-                order by ostype, formatid asc";
+        $per_device_columns = buildPerDeviceFlagColumns($column, $format_flags);
+        $aggregate_columns = buildFlagAggregateColumns($format_flags);
+
+        $sql = "SELECT name, ostype,
+                $aggregate_columns
+                FROM (
+                SELECT df.formatid as name, r.ostype as ostype, r.displayname,
+                $per_device_columns
+                    FROM reports r
+                    JOIN deviceformats df ON df.reportid = r.id
+                    WHERE df.$column > 0
+                    $api_version_filter
+                    GROUP BY df.formatid, r.ostype, r.displayname
+                ) grouped_formats
+                GROUP BY ostype, name
+                ORDER BY ostype, name ASC";
         $stmnt = DB::$connection->prepare($sql);
-        foreach ($format_flags as $key => $format_name) {
-            $params['value'] = $key;
-            $stmnt->execute($params);
-            $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
-            foreach ($result as $row) {
-                $format_os = $row['ostype'];
-                if (!in_array($format_os, $os_types)) {
-                    $os_types[] = $format_os;
+        $stmnt->execute($params);
+        $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($result as $row) {
+            $format_os = $row['ostype'];
+            if (!in_array($format_os, $os_types)) {
+                $os_types[] = $format_os;
+            }
+            foreach ($format_flags as $key => $format_name) {
+                $coverage_key = 'flag_' . $key;
+                if ((int) $row[$coverage_key] > 0) {
+                    $formats[$format_os][$row['name']][$format_name] = $row[$coverage_key];
                 }
-                $formats[$format_os][$row['name']][$format_name] = $row['coverage'];
             }
-            $statement_count++;
         }
+        $statement_count++;
+
         // Combined listing (all operating systems)
-        $sql = "SELECT formatid as name, count(distinct(r.displayname)) as coverage from reports r join deviceformats df on df.reportid = r.id
-                where df.$column > 0 and df.$column & :value > 0
-                $api_version_filter                    
-                group by formatid
-                order by formatid asc";
+        $sql = "SELECT name,
+                $aggregate_columns
+                FROM (
+                    SELECT df.formatid as name, r.displayname,
+                    $per_device_columns
+                    FROM reports r
+                    JOIN deviceformats df ON df.reportid = r.id
+                    WHERE df.$column > 0
+                    $api_version_filter
+                    GROUP BY df.formatid, r.displayname
+                ) grouped_formats
+                GROUP BY name
+                ORDER BY name ASC";
         $stmnt = DB::$connection->prepare($sql);
-        foreach ($format_flags as $key => $format_name) {
-            $params['value'] = $key;
-            $stmnt->execute($params);
-            $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
-            foreach ($result as $row) {
-                $formats_combined[$row['name']][$format_name] = $row['coverage'];
+        $stmnt->execute($params);
+        $result = $stmnt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($result as $row) {
+            foreach ($format_flags as $key => $format_name) {
+                $coverage_key = 'flag_' . $key;
+                if ((int) $row[$coverage_key] > 0) {
+                    $formats_combined[$row['name']][$format_name] = $row[$coverage_key];
+                }
             }
-            $statement_count++;
         }
+        $statement_count++;
         $os_types[] = 'all';
 
         // Per-OS listing (single operating system)

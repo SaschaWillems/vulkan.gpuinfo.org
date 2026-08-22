@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2025 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2026 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -37,6 +37,11 @@ PageGenerator::globalFormatPageFilterText();
 <center>
 	<?php 
         PageGenerator::platformNavigation('listlineartilingformats.php', $platform, true);
+    ?>
+	<div class="alert alert-warning">
+	Additional format feature flags have been added recently (August 2026) and are not available for all reports. Coverage numbers for those do not match actual support yet.
+	</div>
+    <?php
         include "./static/lineartilingformat_".$platform.$minapiversion.".html";
 		PageGenerator::footer();
 	?>

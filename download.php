@@ -21,8 +21,8 @@
  */
 require 'pagegenerator.php';
 PageGenerator::header('Download');
-$release = '4.12';
-$release_android = '4.12';
+$release = '4.13';
+$release_android = '4.13';
 $filename_prefix = "downloads/vulkancapsviewer_".$release;
 $filename_android = "downloads/vulkancapsviewer_".$release_android;
 ?>
@@ -71,6 +71,10 @@ $filename_android = "downloads/vulkancapsviewer_".$release_android;
 		</div>
 		<div class="page-header">
 			<h3>Release notes</h3>
+			<h4>4.13 - 2026-08-22</h4>
+			<ul>
+				<li>This version adds support for extended format feature flags using VK_KHR_format_feature_flags2</li>
+			</ul>
 			<h4>4.12 - 2026-07-31</h4>
 			<ul>
 				<li>Vulkan header 1.4.357</li>

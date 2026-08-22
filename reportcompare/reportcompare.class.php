@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -37,6 +37,7 @@ class ReportCompareFlags
     public $has_vulkan_1_4_features = false;
     public $has_vulkan_1_4_properties = false;
     public $has_profiles = false;
+    public $has_format_feature_flags_2 = false;
 }
 
 class ReportCompareDeviceInfo
@@ -48,6 +49,7 @@ class ReportCompareDeviceInfo
     public $platform;
     public $ostype;
     public $reportid;
+    public $has_format_feature_flags_2 = false;
 }
 
 class ReportCompareData
@@ -107,6 +109,7 @@ class ReportCompare
         $this->flags->has_vulkan_1_3_properties = DB::getCount("SELECT count(*) from deviceproperties13 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
         $this->flags->has_vulkan_1_4_features = DB::getCount("SELECT count(*) from devicefeatures14 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
         $this->flags->has_vulkan_1_4_properties = DB::getCount("SELECT count(*) from deviceproperties14 where reportid in (" . $this->reportIdsParam() . ")", []) > 0;
+        $this->flags->has_format_feature_flags_2 = DB::getCount("SELECT count(*) from reports where hasformatfeatureflags2 != 0 and id in (" . $this->reportIdsParam() . ")", []) > 0;       
         // DB::disconnect();
         // Fetch descriptions for devices to be compared
         try {
@@ -118,7 +121,8 @@ class ReportCompare
                     p.apiversion,
                     concat(r.osname, ' ', r.osversion, ' (',  r.osarchitecture, ')'),
                     r.ostype,
-                    r.id
+                    r.id,
+                    r.hasformatfeatureflags2
                 from reports r left join deviceproperties p on (p.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ")"
             );
             $stmnt->execute();
@@ -134,6 +138,7 @@ class ReportCompare
             $device_info->platform = $device[4];
             $device_info->ostype = $device[5];
             $device_info->reportid = $device[6];
+            $device_info->has_format_feature_flags_2 = (int)$device[7] == 1;
             $this->device_infos[] = $device_info;
         }
     }
@@ -637,7 +642,17 @@ class ReportCompare
         } catch (Throwable $e) {
             return [];
         }    
-    }       
+    }
+
+    public function allReportSupportFormatFeatureFlags2()
+    {
+        foreach ($this->device_infos as $device_info) {
+            if (!$device_info->has_format_feature_flags_2) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public function beginTable($id)
     {
