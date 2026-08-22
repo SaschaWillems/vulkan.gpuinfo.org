@@ -49,6 +49,7 @@ class ReportCompareDeviceInfo
     public $platform;
     public $ostype;
     public $reportid;
+    public $has_format_feature_flags_2 = false;
 }
 
 class ReportCompareData
@@ -120,7 +121,8 @@ class ReportCompare
                     p.apiversion,
                     concat(r.osname, ' ', r.osversion, ' (',  r.osarchitecture, ')'),
                     r.ostype,
-                    r.id
+                    r.id,
+                    r.hasformatfeatureflags2
                 from reports r left join deviceproperties p on (p.reportid = r.id) where r.id in (" . $this->reportIdsParam() . ")"
             );
             $stmnt->execute();
@@ -136,6 +138,7 @@ class ReportCompare
             $device_info->platform = $device[4];
             $device_info->ostype = $device[5];
             $device_info->reportid = $device[6];
+            $device_info->has_format_feature_flags_2 = (int)$device[7] == 1;
             $this->device_infos[] = $device_info;
         }
     }
@@ -639,7 +642,17 @@ class ReportCompare
         } catch (Throwable $e) {
             return [];
         }    
-    }       
+    }
+
+    public function allReportSupportFormatFeatureFlags2()
+    {
+        foreach ($this->device_infos as $device_info) {
+            if (!$device_info->has_format_feature_flags_2) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public function beginTable($id)
     {

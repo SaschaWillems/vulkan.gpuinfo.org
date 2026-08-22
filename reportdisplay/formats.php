@@ -65,6 +65,12 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 	</table>
 <?php
 }
+
+if (!$report->flags->has_format_feature_flags_2) {
+	echo '<div class="alert alert-warning">';
+	echo 'This report does not contain additional format feature flags. Only core feature flags are displayed.';
+	echo '</div>';
+}
 ?>
 
 <div>

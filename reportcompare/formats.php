@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -73,6 +73,18 @@ function insertDeviceFormatTable($report_compare, $id, $format_data, $flags)
 	</table>
 <?php
 }
+
+if (!$report_compare->allReportSupportFormatFeatureFlags2()) {
+	echo '<div class="alert alert-warning">';
+	echo '<strong>Not all reports contain additional format feature flag information</strong>:<br/>';
+	foreach ($report_compare->device_infos as $device) {
+		if (!$device->has_format_feature_flags_2) {
+			echo $device->displayname.'<br/>';
+		}
+	}
+	echo '</div>';
+}
+
 ?>
 
 <div>
