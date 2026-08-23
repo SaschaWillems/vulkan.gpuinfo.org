@@ -220,6 +220,14 @@ $(function() {
         $('.nav a[href=\\' + a + ']').tab('show');
     }
 
+    $('#format-detail-toggle-event').change(function() {
+        if ($(this).prop('checked')) {
+            $('.format-detail-column').show();
+        } else {
+            $('.format-detail-column').hide();
+        }
+    });
+
     $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
         window.location.hash = e.target.hash;
     });

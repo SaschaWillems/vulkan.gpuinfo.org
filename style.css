@@ -926,3 +926,14 @@ code {
 	width: auto;
 	padding-left: 10px;
 }
+
+.format-detail-column {
+	display: none;
+	width: 240px !important;
+}
+
+td.format-detail-column {
+	text-align: left !important;
+	font-size: 10px !important;
+	width: 240px !important;
+}

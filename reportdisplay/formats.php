@@ -22,7 +22,7 @@
 
 $format_data = $report->fetchFormats();
 
-function insertDeviceFormatTable($id, $format_data, $column, $flags)
+function insertDeviceFormatTable($id, $format_data, $column, $flags, $flags_all)
 {
 ?>
 	<table id='<?= $id ?>' class='table table-striped table-bordered table-hover table-header-rotated format-table'>
@@ -34,6 +34,7 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 					echo "<th class='caption rotate-45'><div><span>$value</span></div></th>";
 				}
 				?>
+				<th class="format-detail-column">Full format flags</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -57,6 +58,16 @@ function insertDeviceFormatTable($id, $format_data, $column, $flags)
 						echo "<span style='display:none;'>$value</span>";
 						echo "</td>";
 					}
+					echo "<td class='format-detail-column'>";
+					if ($supported) {
+						echo "0x".dechex($format[$column]).":<br/>";
+						foreach ($flags_all as $flag_enum => $flag_name) {
+							if ($format[$column] & $flag_enum) {
+								echo $flag_name."<br/>";
+							}
+						}
+					}
+					echo "</td>";
 					echo "</tr>";
 				}
 			}
@@ -74,6 +85,9 @@ if (!$report->flags->has_format_feature_flags_2) {
 ?>
 
 <div>
+	<label id="toggle-label" class="checkbox-inline">
+		<input id="format-detail-toggle-event" type="checkbox" data-toggle="toggle" data-size="small" data-onstyle="success"> Display additional format info
+	</label>
 	<ul class='nav nav-tabs nav-level1'>
 		<li class='active'><a data-toggle='tab' href='#formats_optimal'>Optimal tiling</a></li>
 		<li><a data-toggle='tab' href='#formats_linear'>Linear tiling</a></li>
@@ -84,14 +98,27 @@ if (!$report->flags->has_format_feature_flags_2) {
 <div class='tab-content'>
 	<!-- Optimal tiling features -->
 	<div id='formats_optimal' class='tab-pane fade in active reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_optimal', $format_data, 'optimaltilingfeatures', $report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
+		<?php insertDeviceFormatTable(
+			'deviceformats_optimal',
+			$format_data,
+			'optimaltilingfeatures',
+			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags,
+			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlagsAll : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<!-- Linear tiling features -->
 	<div id='formats_linear' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_linear', $format_data, 'lineartilingfeatures', $report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags); ?>
+		<?php insertDeviceFormatTable('deviceformats_linear',
+			$format_data,
+			'lineartilingfeatures',
+			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlags : FormatFeatureFlags::TilingFlags,
+			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::TilingFlagsAll : FormatFeatureFlags::TilingFlags); ?>
 	</div>
 	<!-- Buffer features -->
 	<div id='formats_buffer' class='tab-pane fade reportdiv'>
-		<?php insertDeviceFormatTable('deviceformats_buffer', $format_data, 'bufferfeatures', $report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags); ?>
+		<?php insertDeviceFormatTable('deviceformats_buffer',
+			$format_data,
+			'bufferfeatures',
+			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags,
+			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags); ?>
 	</div>
 </div>
