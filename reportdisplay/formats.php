@@ -119,6 +119,6 @@ if (!$report->flags->has_format_feature_flags_2) {
 			$format_data,
 			'bufferfeatures',
 			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags,
-			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlags : FormatFeatureFlags::BufferFlags); ?>
+			$report->flags->has_format_feature_flags_2 ? FormatFeatureFlags2::BufferFlagsAll : FormatFeatureFlags::BufferFlags); ?>
 	</div>
 </div>

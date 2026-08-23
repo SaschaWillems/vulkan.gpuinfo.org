@@ -148,7 +148,7 @@ class FormatFeatureFlags2 {
         // 0x400000000000000 => 'DATA_GRAPH_OPTICAL_FLOW_COST_ARM',
     ];
 
-    // Used in detail views to show all formats
+    // Used in detail views for showing all flags
     const TilingFlagsAll = [
         0x00000001 => 'SAMPLED_IMAGE',
         0x00000002 => 'STORAGE_IMAGE',
@@ -181,7 +181,6 @@ class FormatFeatureFlags2 {
         0x08000000 => 'VIDEO_ENCODE_INPUT',
         0x10000000 => 'VIDEO_ENCODE_DPB',
         0x100000000000 => 'BLOCK_MATCHING_SXD_QCOM',
-        0x8000000000000 => 'ACCELERATION_STRUCTURE_RADIUS_BUFFER_NV',
         0x4000000000 => 'LINEAR_COLOR_ATTACHMENT_NV',
         0x400000000 => 'WEIGHT_IMAGE_QCOM',
         0x800000000 => 'WEIGHT_SAMPLED_IMAGE_QCOM',
@@ -217,6 +216,20 @@ class FormatFeatureFlags2 {
         0x80000000  => "STORAGE_READ_WITHOUT_FORMAT",
         0x100000000 => "STORAGE_WRITE_WITHOUT_FORMAT",
     ];
+
+    // Used in detail views for showing all flags
+    const BufferFlagsAll = [
+        0x00000008  => "UNIFORM_TEXEL_BUFFER",
+        0x00000010  => "STORAGE_TEXEL_BUFFER",
+        0x00000020  => "STORAGE_TEXEL_BUFFER_ATOMIC",
+        0x00000040  => "VERTEX_BUFFER",
+        0x00004000  => "TRANSFER_SRC",
+        0x00008000  => "TRANSFER_DST",
+        0x20000000  => "ACCELERATION_STRUCTURE_VERTEX_BUFFER",
+        0x80000000  => "STORAGE_READ_WITHOUT_FORMAT",
+        0x100000000 => "STORAGE_WRITE_WITHOUT_FORMAT",
+        0x8000000000000 => 'ACCELERATION_STRUCTURE_RADIUS_BUFFER_NV',
+    ];    
 }
 
 class SurfaceConstants {
