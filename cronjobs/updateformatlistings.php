@@ -117,6 +117,7 @@ try {
         $per_device_columns = buildPerDeviceFlagColumns($column, $format_flags);
         $aggregate_columns = buildFlagAggregateColumns($format_flags);
 
+        // Gaher per-OS data
         $sql = "SELECT name, ostype,
                 $aggregate_columns
                 FROM (
@@ -148,7 +149,7 @@ try {
         }
         $statement_count++;
 
-        // Combined listing (all operating systems)
+        // Gather global data (all OS combined)
         $sql = "SELECT name,
                 $aggregate_columns
                 FROM (
@@ -183,6 +184,9 @@ try {
             $sql_count_params = [];
             if ($ostype !== 'all') {
                 $platform = platformname($ostype);
+                if ($platform == null) {
+                    continue;
+                }
                 $sql_count .= ' where r.ostype = :ostype';
                 $sql_count_params = ['ostype' => $ostype];
             } else {
