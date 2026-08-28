@@ -211,6 +211,11 @@ if ($filter_list->hasFilter('platform')) {
 		$pageTitle .= " on " . PageGenerator::platformInfo($platform);
 	}
 }
+// API Version
+if ($filter_list->hasFilter('apiversion')) {
+	$caption = "Listing devices supporting Vulkan ".$filter_list->getFilter('apiversion')." and up";
+	$pageTitle = "Vulkan ".$filter_list->getFilter('apiversion');
+}
 // Extension support
 if ($filter_list->hasFilter('extension')) {
 	$ext = $filter_list->getFilter('extension');
