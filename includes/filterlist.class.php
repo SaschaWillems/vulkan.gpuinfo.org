@@ -63,29 +63,33 @@ class FilterList
     }
 
     private function addOption($caption, $label, $options) {
-        echo "<div>$caption: <select name='$label' id='$label' class='form-control' onchange='this.form.submit()'></div>";
+        echo "<div>$caption: <select name='$label' id='$label' class='form-control' onchange='this.form.submit()'>";
         foreach ($options as $value => $text) {
             $selected = ($this->hasFilter($label) && $this->getFilter($label) == $value) ? 'selected' : '';
             echo "<option value=\"$value\" $selected>$text</option>";
         };
-        echo "</select>";
+        echo "</select></div>";
     }
 
     /** Adds HTML select elements for age and api version */
-    public function addDefaultFilterOptions()
+    public function addDefaultFilterOptions($options = ['age', 'apiversion'])
     {
         echo "<form method='get'>";
-        $this->addOption('Age', 'age', [
-            'recent' => 'Recent (1y)',
-            'historic' => 'Historic (All)'
-        ]);
-        $this->addOption('Versions', 'apiversion', [
-            'all' => 'All Vulkan versions',
-            '1.1' => 'Vulkan 1.1 and up',
-            '1.2' => 'Vulkan 1.2 and up',
-            '1.3' => 'Vulkan 1.3 and up',
-            '1.4' => 'Vulkan 1.4 and up'
-        ]);			        
+        if (in_array('age', $options)) {
+            $this->addOption('Age', 'age', [
+                'recent' => 'Recent (1y)',
+                'historic' => 'Historic (All)'
+            ]);
+        }
+        if (in_array('apiversion', $options)) {
+            $this->addOption('Versions', 'apiversion', [
+                'all' => 'All Vulkan versions',
+                '1.1' => 'Vulkan 1.1 and up',
+                '1.2' => 'Vulkan 1.2 and up',
+                '1.3' => 'Vulkan 1.3 and up',
+                '1.4' => 'Vulkan 1.4 and up'
+            ]);
+        }
         // Some filters can't be explictly set by the user, but need to be persisted, so we pass them as hidden inputs
         if ($this->hasFilter('platform')) {
             echo "<input type='hidden' name='platform' value='".$this->getFilter('platform')."' />";
