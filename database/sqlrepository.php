@@ -73,6 +73,14 @@ class SqlRepository {
         return null;
     }
 
+    public static function getStartDateFromAge($age) {
+        if ($age == 'recent' || $age == null) {
+            $start_date = mktime(0, 0, 0, 1, 1, date('Y') - 1);
+            return date('Y-m-d', $start_date);
+        }
+        return null;
+    }
+
 	public static function getDeviceTypeSelection()
     {
         // Explicit page parameter has precedence over global setting
@@ -866,6 +874,38 @@ class SqlRepository {
         }
         return $memorytypes;
     }
+
+    /** Global core version coverage */
+    public static function listCoreVersionCoverage($ostype, $age) {
+        $params = [];
+        $whereClause = "";
+        if ($ostype) {
+            SqlRepository::appendCondition($whereClause, "ostype = :ostype");
+            $params['ostype'] = $ostype;
+        }
+        $start = SqlRepository::getStartDateFromAge($age);
+        if ($start) {
+            SqlRepository::appendCondition($whereClause, "r.submissiondate >= :startdate");
+            $params['startdate'] = $start;
+        }
+        SqlRepository::appendCondition($whereClause, "r.layered = 0");
+        $sql = "SELECT left(dp.apiversion, 3) as apiv, count(distinct(r.displayname)) as count
+                from deviceproperties dp join reports r on r.id = dp.reportid
+                $whereClause
+                group by apiv 
+                order by apiv desc";
+        // self::appendFilters($sql, $params);
+        $stmnt = DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $values = [];
+        while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $values[] = [
+                'version' => $row['apiv'],
+                'count' => $row['count']
+            ];
+        }
+        return $values;
+    }        
 
     /** Global extension coverage from aggregated extension stats table */
     public static function listExtensionCoverage($ostype, $apiversion, $age, $name) {

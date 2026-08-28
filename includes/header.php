@@ -38,7 +38,7 @@ session_start();
 	<link rel="stylesheet" type="text/css" href="external/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="external/fontawesome/css/solid.min.css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="style.css?ver=3">
+	<link rel="stylesheet" type="text/css" href="style.css?ver=5">
 	<script type="text/javascript" src="external/jquery-2.2.0.min.js"></script>
 	<script type="text/javascript" src="external/bootstrap.min.js"></script>
 	<script type="text/javascript" src="external/jquery.dataTables.min.js"></script>
@@ -81,7 +81,7 @@ session_start();
 					<li><a href="listdevices.php">Devices</a></li>
 					<li><a href="listreports.php">Reports</a></li>
 					<li><a href="listextensions.php">Extensions</a></li>
-					<li><a href="displaycoreproperty.php?name=apiversion">Versions</a></li>
+					<li><a href="listversions.php">Versions</a></li>
 					<li class="dropdown">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">Properties<span class="caret"></span></a>
 						<ul class="dropdown-menu">
