@@ -67,12 +67,17 @@ $format_names = $stmnt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 try {
     $apiversion = null;
+    $startdate = null;
     if (isset($_GET['apiversion'])) {
         $apiversion = $_GET['apiversion'];
     }
     if ((isset($argc)) && ($argc > 1)) {
         $apiversion = $argv[1];
-    }    
+    }
+    if (isset($_GET['recent'])) {
+        $startdate = mktime(0, 0, 0, 1, 1, date('Y') - 1);
+        $startdate = date('Y-m-d', $startdate);
+    }
     foreach (['lineartiling', 'optimaltiling', 'buffer'] as $format_listing_type) {
 
         switch ($format_listing_type) {
@@ -100,6 +105,11 @@ try {
             $params['apiversion'] = $apiversion;
             $api_version_filter = 'AND r.apiversion >= :apiversion';
         }
+        $date_filter = null;
+        if ($startdate !== null) {
+            $params['startdate'] = $startdate;
+            $date_filter = 'AND r.submissiondate >= :startdate';
+        }
 
         $formats = [];
         $formats_combined = [];
@@ -116,6 +126,7 @@ try {
                     JOIN deviceformats df ON df.reportid = r.id
                     WHERE df.$column > 0
                     $api_version_filter
+                    $date_filter
                     GROUP BY df.formatid, r.ostype, r.displayname
                 ) grouped_formats
                 GROUP BY ostype, name
@@ -147,6 +158,7 @@ try {
                     JOIN deviceformats df ON df.reportid = r.id
                     WHERE df.$column > 0
                     $api_version_filter
+                    $date_filter
                     GROUP BY df.formatid, r.displayname
                 ) grouped_formats
                 GROUP BY name
@@ -183,6 +195,14 @@ try {
                 }
                 $sql_count .= " " . $api_filter_loc;
                 $sql_count_params['apiversion'] = $apiversion;
+            }
+            if ($date_filter) {
+                $date_filter_loc = $date_filter;
+                if (stripos($sql_count, 'WHERE') == false) {
+                    $date_filter_loc = str_replace('AND', 'WHERE', $date_filter_loc);
+                }
+                $sql_count .= " " . $date_filter_loc;
+                $sql_count_params['startdate'] = $startdate;                
             }
             $deviceCount = DB::getCount($sql_count, $sql_count_params);
 
@@ -243,10 +263,14 @@ try {
             $html = ob_get_contents();
             ob_end_clean();
 
-            $filename = "../static/".$parameter_name."_".$platform.".html";
+            $filename = "../static/".$parameter_name."_".$platform;
             if ($apiversion !== null) {
-                $filename = "../static/".$parameter_name."_".$platform."_".str_replace('.', '_', $apiversion).".html";
+                $filename = "../static/".$parameter_name."_".$platform."_".str_replace('.', '_', $apiversion);
             }
+            if ($date_filter !== null) {
+                $filename .= "_recent";
+            }
+            $filename .= '.html';
             file_put_contents($filename, $html);
         }
     }
