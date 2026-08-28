@@ -2,7 +2,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -18,8 +18,40 @@
  *
  */
 
+var formatTableNames = [
+    'deviceformats_linear',
+    'deviceformats_optimal',
+    'deviceformats_buffer'
+];
+
+function getVisibleFormatTableName() {
+    for (var i = 0, arrlen = formatTableNames.length; i < arrlen; i++) {
+        if ($('#' + formatTableNames[i]).is(':visible')) {
+            return formatTableNames[i];
+        }
+    }
+
+    return null;
+}
+
+function syncFormatTableFixedHeaders(activeTableName) {
+    for (var i = 0, arrlen = formatTableNames.length; i < arrlen; i++) {
+        var tableName = formatTableNames[i];
+        var table = $('#' + tableName).DataTable();
+
+        if (tableName === activeTableName) {
+            table.columns.adjust();
+            table.fixedHeader.enable();
+            table.fixedHeader.adjust();
+        } else {
+            table.fixedHeader.disable();
+        }
+    }
+}
+
 $(document).ready(
     function() {
+
         var tableNames = [
             'deviceextensions',
             'devicelayerextensions',
@@ -105,12 +137,9 @@ $(document).ready(
         }
 
         // Feature tables
-        tableNames = [
-            'deviceformats_linear',
-            'deviceformats_optimal',
-            'deviceformats_buffer',
+        tableNames = formatTableNames.concat([
             'devicequeues'
-        ];
+        ]);
         for (var i = 0, arrlen = tableNames.length; i < arrlen; i++) {
             $('#' + tableNames[i]).dataTable({
                 "pageLength": -1,
@@ -194,7 +223,7 @@ $(document).ready(
                 });
             }
         });
-
+        syncFormatTableFixedHeaders(getVisibleFormatTableName());
     });
 
 $(function() {
@@ -231,4 +260,17 @@ $(function() {
     $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
         window.location.hash = e.target.hash;
     });
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        var target = $(e.target).attr("href");
+        // Make sure fixed headers work properly
+        var targetTableNames = {
+            '#formats': 'deviceformats_optimal',
+            '#formats_optimal': 'deviceformats_optimal',
+            '#formats_linear': 'deviceformats_linear',
+            '#formats_buffer': 'deviceformats_buffer'
+        };
+        syncFormatTableFixedHeaders(targetTableNames[target] || null);
+    });
+
 });
