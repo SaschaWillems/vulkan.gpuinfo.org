@@ -68,6 +68,7 @@ $format_names = $stmnt->fetchAll(PDO::FETCH_KEY_PAIR);
 try {
     $apiversion = null;
     $startdate = null;
+    $age = null;
     if (isset($_GET['apiversion'])) {
         $apiversion = $_GET['apiversion'];
     }
@@ -75,9 +76,20 @@ try {
         $apiversion = $argv[1];
     }
     if (isset($_GET['recent'])) {
-        $startdate = mktime(0, 0, 0, 1, 1, date('Y') - 1);
-        $startdate = date('Y-m-d', $startdate);
+        $age = 'recent';
+        $startdate = date('Y-m-d', strtotime('-1 year'));
     }
+
+    // We don't need to update the stats if no reports have been uploaded since the last generation
+    $cachekey = "format_stats_".$apiversion."_".$age;
+    $stmnt = DB::$connection->prepare("select TIMESTAMPDIFF(SECOND, max(r.submissiondate), (select date from cacheinfo where identifier = :cachekey)) from reports r");
+    $stmnt->execute(['cachekey' => $cachekey]);
+    $delta = $stmnt->fetchColumn(0);
+    if ($delta > 0) {
+        logToFile("[Extension stats] Skipping generation, no new report since last generation run");
+        exit;
+    }
+
     foreach (['lineartiling', 'optimaltiling', 'buffer'] as $format_listing_type) {
 
         switch ($format_listing_type) {
@@ -274,8 +286,8 @@ try {
     }
 
     // Update cache info
-    $stmnt = DB::$connection->prepare("REPLACE into cacheinfo (identifier, date) values ('format_stats_$apiversion', now())");
-    $stmnt->execute();   
+    $stmnt = DB::$connection->prepare("REPLACE into cacheinfo (identifier, date) values (:cachekey, now())");
+    $stmnt->execute(['cachekey' => $cachekey]); 
 
 } catch (Exception $e) {
     echo "Error at generating format listings: ". $e->getMessage();
