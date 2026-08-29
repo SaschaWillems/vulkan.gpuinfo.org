@@ -117,7 +117,7 @@ try {
         $per_device_columns = buildPerDeviceFlagColumns($column, $format_flags);
         $aggregate_columns = buildFlagAggregateColumns($format_flags);
 
-        // Gaher per-OS data
+        // Gather per-OS data
         $sql = "SELECT name, ostype,
                 $aggregate_columns
                 FROM (
@@ -126,6 +126,7 @@ try {
                     FROM reports r
                     JOIN deviceformats df ON df.reportid = r.id
                     WHERE df.$column > 0
+                    AND r.layered = 0
                     $api_version_filter
                     $date_filter
                     GROUP BY df.formatid, r.ostype, r.displayname
@@ -158,6 +159,7 @@ try {
                     FROM reports r
                     JOIN deviceformats df ON df.reportid = r.id
                     WHERE df.$column > 0
+                    AND r.layered = 0
                     $api_version_filter
                     $date_filter
                     GROUP BY df.formatid, r.displayname
@@ -178,34 +180,26 @@ try {
         $statement_count++;
         $os_types[] = 'all';
 
-        // Per-OS listing (single operating system)
+        // Generate HTML files to be included in the format feature pages
         foreach ($os_types as $ostype) {
-            $sql_count = "SELECT count(distinct(r.displayname)) from reports r";
+            $sql_count = "SELECT count(distinct(r.displayname)) from reports r where r.layered = 0";
             $sql_count_params = [];
             if ($ostype !== 'all') {
                 $platform = platformname($ostype);
                 if ($platform == null) {
                     continue;
                 }
-                $sql_count .= ' where r.ostype = :ostype';
-                $sql_count_params = ['ostype' => $ostype];
+                $sql_count .= ' AND r.ostype = :ostype';
+                $sql_count_params['ostype'] = $ostype;
             } else {
                 $platform = 'all';
             }
             if ($api_version_filter) {
-                $api_filter_loc = $api_version_filter;
-                if (stripos($sql_count, 'WHERE') == false) {
-                    $api_filter_loc = str_replace('AND', 'WHERE', $api_filter_loc);
-                }
-                $sql_count .= " " . $api_filter_loc;
+                $sql_count .= " " . $api_version_filter;
                 $sql_count_params['apiversion'] = $apiversion;
             }
             if ($date_filter) {
-                $date_filter_loc = $date_filter;
-                if (stripos($sql_count, 'WHERE') == false) {
-                    $date_filter_loc = str_replace('AND', 'WHERE', $date_filter_loc);
-                }
-                $sql_count .= " " . $date_filter_loc;
+                $sql_count .= " " . $date_filter;
                 $sql_count_params['startdate'] = $startdate;                
             }
             $deviceCount = DB::getCount($sql_count, $sql_count_params);
@@ -296,4 +290,4 @@ DB::disconnect();
 
 echo "success".PHP_EOL;
 echo sprintf("Format listing generated: %d queries took %f ms", $statement_count, $elapsed);
-logToFile("[Format stats] Generating took $elapsed ms");
+logToFile("[Format stats] Generating took $elapsed ms (apiversion = $apiversion, startdate = $startdate)");
