@@ -266,7 +266,8 @@ try {
 
             echo "  </tbody>";
             echo "</table>";
-            echo "Last updated at ".date("Y-m-d h:i:s");
+            $dt = new DateTime("now", new DateTimeZone('UTC'));
+            echo "<div class='timestamp'>Last updated at ".$dt->format("Y-m-d h:i:s e")."</div>";
 
             $html = ob_get_contents();
             ob_end_clean();
