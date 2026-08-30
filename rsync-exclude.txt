@@ -1,0 +1,12 @@
+.git/*
+.vscode/*
+docs/*
+dangerzone/*
+Khronos-Schemas/*
+reportcache/*
+static/*
+logs/*
+.gitignore
+*.sql
+*.md
+rsync-exclude.txt
