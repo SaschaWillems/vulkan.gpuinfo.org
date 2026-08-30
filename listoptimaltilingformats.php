@@ -24,27 +24,29 @@ require 'pagegenerator.php';
 require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
+require './includes/filterlist.class.php';
+
+$filters = ['platform', 'age', 'apiversion'];
+$filter_list = new FilterList($filters);
 
 PageGenerator::header("Optimal tiling formats");
 $platform = PageGenerator::getDefaultOSSelection();
-$minapiversion = null;
-if (SqlRepository::getMinApiVersion() !== null) {
-    $minapiversion = "_".str_replace(".", "_", SqlRepository::getMinApiVersion());
-}
-PageGenerator::globalFormatPageFilterText();
 ?>
 
 <center>
-	<?php 
-		PageGenerator::platformNavigation('listoptimaltilingformats.php', $platform, true);
-    ?>
-	<div class="alert alert-warning">
-	Additional format feature flags have been added recently (August 2026) and are not available for all reports. Coverage numbers for those do not match actual support yet.
-	</div>
-    <?php
-		include "./static/optimaltilingformat_".$platform.$minapiversion.".html";
-		PageGenerator::footer();
-	?>
+	<?php PageGenerator::platformNavigation('listoptimaltilingformats.php', $platform, true); ?>
+    <div class='tablediv' style='width:auto; display: inline-block;'>
+        <div class="alert alert-warning">
+            Additional format feature flags have been added recently (August 2026) and are not available for all reports. Coverage numbers for those do not match actual support yet.
+        </div>
+        <div class='table-options'>
+            <?php $filter_list->addDefaultFilterOptions() ?>
+        </div>    
+        <?php
+            include $filter_list->getFormatListingInclude('optimaltilingformat');
+        ?>
+    </div>
+    <?php PageGenerator::footer(); ?>
 </center>
 
 <script>
@@ -75,5 +77,4 @@ PageGenerator::globalFormatPageFilterText();
 </script>
 
 </body>
-
 </html>

@@ -128,4 +128,22 @@ class FilterList
         }
     }
 
+    /** Gets the filename for including pre-generated format listings */
+    public function getFormatListingInclude($prefix)
+    {
+        $platform = 'all';
+        $apiversion = null;
+        $age = '_recent';
+        if ($this->hasFilter('platform')) {
+            $platform = $this->getFilter('platform');
+        }
+        if ($this->getFilter('age') == 'historic') {
+            $age = null;
+        }
+        if ($this->hasFilter('apiversion') && ($this->getFilter('apiversion') !== 'all')) {
+            $apiversion = "_".str_replace('.', '_', $this->getFilter('apiversion'));
+        }
+        return "./static/{$prefix}_{$platform}{$apiversion}{$age}.html";
+    }
+
 }
