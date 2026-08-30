@@ -218,7 +218,6 @@ try {
 
             ob_start();
             
-            echo "<div class='tablediv' style='width:auto; display: inline-block;'>";
             echo "<table id='formats' class='table table-striped table-bordered table-hover responsive table-header-rotated format-table with-platform-selection'>";
             echo "<thead>";
             echo "  <tr>";
@@ -268,7 +267,6 @@ try {
             echo "  </tbody>";
             echo "</table>";
             echo "Last updated at ".date("Y-m-d h:i:s");
-            echo "</div>";
 
             $html = ob_get_contents();
             ob_end_clean();
