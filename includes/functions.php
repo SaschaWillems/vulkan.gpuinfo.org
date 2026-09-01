@@ -170,7 +170,11 @@ function listSubgroupStageFlags($flag)
 		return "<span class='na'>n/a</span>";
 	}
 
-	$res = null;
+	if ($flag === 0) {
+		return "<span class='na'> none</span>";
+	}
+
+	$res = [];
 	$arr_values = array_values($flags);
 	$index = 0;
 	foreach ($flags as $i => $value) {
@@ -179,10 +183,10 @@ function listSubgroupStageFlags($flag)
 		} else {
 			$class = ($flag & $i) ? "supported" : "na";
 		}
-		$res .= "<span class='" . $class . "'>" . strtolower($arr_values[$index]) . "</span><br>";
+		$res[] = "<span class='" . $class . "'>" . strtolower($arr_values[$index]) . "</span>";
 		$index++;
 	}
-	return $res;
+	return implode('<br>', $res);
 }
 
 function listSampleCountFlags($value)
@@ -700,6 +704,7 @@ function getPropertyDisplayValue($key, $value, $shorten = false)
 			break;
 		case 'subgroupSupportedStages':
 		case 'subgroupProperties.supportedStages':
+		case 'requiredSubgroupSizeStages':
 			$displayvalue = listSubgroupStageFlags($value);
 			break;
 		case 'subgroupSupportedOperations':
