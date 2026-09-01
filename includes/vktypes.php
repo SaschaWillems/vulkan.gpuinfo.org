@@ -131,8 +131,8 @@ class VkTypes {
             0x00000800 => 'VK_SHADER_STAGE_MISS_BIT_KHR',
             0x00001000 => 'VK_SHADER_STAGE_INTERSECTION_BIT_KHR',
             0x00002000 => 'VK_SHADER_STAGE_CALLABLE_BIT_KHR',
-            0x00000040 => 'VK_SHADER_STAGE_TASK_BIT_NV',
-            0x00000080 => 'VK_SHADER_STAGE_MESH_BIT_NV',
+            0x00000040 => 'VK_SHADER_STAGE_TASK_BIT_EXT',
+            0x00000080 => 'VK_SHADER_STAGE_MESH_BIT_EXT',
             0x00004000 => 'VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI'
         ];
         return self::getFlags($flags, $value);

@@ -19,6 +19,8 @@
  * PURPOSE.  See the GNU AGPL 3.0 for more details.
  */
 
+require 'vktypes.php';
+
 function versionToString($version)
 {
 	$versionStr = ($version >> 22) . "." . (($version >> 12) & 0x3ff) . "." . ($version & 0xfff);
@@ -154,39 +156,14 @@ function listSubgroupFeatureFlags($flag)
 
 function listSubgroupStageFlags($flag)
 {
-	$flags = array(
-		0x0001 => "VERTEX",
-		0x0002 => "TESSELLATION CONTROL",
-		0x0004 => "TESSELLATION EVALUATION",
-		0x0008 => "GEOMETRY",
-		0x0010 => "FRAGMENT",
-		0x0020 => "COMPUTE",
-		0x0040 => "TASK",
-		0x0080 => "MESH",		
-		0x001F => "ALL GRAPHICS",
-	);
-
-	if ($flag === null) {
-		return "<span class='na'>n/a</span>";
-	}
-
-	if ($flag === 0) {
+	if ($flag === 0 || $flag === null) {
 		return "<span class='na'> none</span>";
 	}
-
-	$res = [];
-	$arr_values = array_values($flags);
-	$index = 0;
-	foreach ($flags as $i => $value) {
-		if ($i == 0x001F) {
-			$class = (($flag & $i) == $i) ? "supported" : "na";
-		} else {
-			$class = ($flag & $i) ? "supported" : "na";
-		}
-		$res[] = "<span class='" . $class . "'>" . strtolower($arr_values[$index]) . "</span>";
-		$index++;
+	$supported_stages = VkTypes::VkShaderStageFlags($flag);
+	foreach ($supported_stages as &$stage) {
+		$stage = str_replace('VK_SHADER_STAGE_', '', $stage);
 	}
-	return implode('<br>', $res);
+	return implode('<br>', $supported_stages);
 }
 
 function listSampleCountFlags($value)
