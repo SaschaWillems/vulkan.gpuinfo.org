@@ -879,7 +879,7 @@ class SqlRepository {
     public static function listCoreVersionCoverage($ostype, $age) {
         $params = [];
         $whereClause = "";
-        if ($ostype) {
+        if ($ostype !== null) {
             SqlRepository::appendCondition($whereClause, "ostype = :ostype");
             $params['ostype'] = $ostype;
         }
