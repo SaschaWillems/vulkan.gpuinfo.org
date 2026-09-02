@@ -123,8 +123,12 @@ PageGenerator::pageCaption("Extension coverage");
 		</table>
 	</div>
 	<div>
-		<?= "$devicecount devices" ?><br/>
-		<?= "Last updated at $updated_at" ?>
+		<?php
+			echo "$devicecount devices <br/>";
+			$dt = new DateTime($updated_at, new DateTimeZone('Europe/Berlin'));
+			$dt->setTimezone(new DateTimeZone("UTC"));
+			echo "<div class='timestamp'>Last updated at ".$dt->format("Y-m-d h:i:s e")."</div>"
+		?>
 	</div>
 
 	<script>
