@@ -75,8 +75,7 @@ class SqlRepository {
 
     public static function getStartDateFromAge($age) {
         if ($age == 'recent' || $age == null) {
-            $start_date = mktime(0, 0, 0, 1, 1, date('Y') - 1);
-            return date('Y-m-d', $start_date);
+            return date('Y-m-d', strtotime('-1 year'));
         }
         return null;
     }
@@ -174,11 +173,45 @@ class SqlRepository {
         }
     }
 
+    public static function appendQuickFilters(&$sql, &$params, $includeOsType = true) {
+        if ($includeOsType) {
+            // This can be skipped as some views have separate filter conditions for the os that should not be overriden
+            $ostype = self::getOSType();
+            if ($ostype !== null) {
+                self::appendCondition($sql, "ostype = :ostype");
+                $params['ostype'] = $ostype;
+            }
+        }
+        $start = SqlRepository::getStartDateFromAge(GET_sanitized('age'));
+        if ($start) {
+            SqlRepository::appendCondition($sql, "r.submissiondate >= :startdate");
+            $params['startdate'] = $start;
+        }
+        if (isset($_GET['apiversion']) && (strcasecmp($_GET['apiversion'], 'all') !== 0)) {
+            $apiversion= GET_sanitized('apiversion');
+            self::appendCondition($sql, "r.apiversion >= :apiversion");
+            $params['apiversion'] = $apiversion;
+        }
+        // Layered implementations are always excluded so they don't affect stuff like coverage numbers
+        self::appendCondition($sql, "r.layered = 0");
+    }
+
     public static function deviceCount($sqlAppend = null) {
         // @todo: count(distinct displayname) ? (slightly different numbers)
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $sqlAppend";
         $params = [];
         self::appendFilters($sql, $params);
+        $stmnt= DB::$connection->prepare($sql);
+        $stmnt->execute($params);
+        $count = $stmnt->fetch(PDO::FETCH_COLUMN);
+        return $count;
+    }
+
+    public static function deviceCountQuickFilters($sqlAppend = null) {
+        // @todo: count(distinct displayname) ? (slightly different numbers)
+        $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $sqlAppend";
+        $params = [];
+        self::appendQuickFilters($sql, $params);
         $stmnt= DB::$connection->prepare($sql);
         $stmnt->execute($params);
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);
