@@ -23,13 +23,16 @@
 /** Manages filters from url parameters */
 class FilterList
 {
+    const DefaultQuickFilters = ['platform', 'age', 'apiversion'];
 
     public $filters = [];
 
     public function __construct($filters)
     {
-        foreach ($filters as $filter) {
-            $this->addFilter($filter);
+        if ($filters) {
+            foreach ($filters as $filter) {
+                $this->addFilter($filter);
+            }
         }
     }
 
@@ -74,6 +77,7 @@ class FilterList
     /** Adds HTML select elements for age and api version */
     public function addDefaultFilterOptions($options = ['age', 'apiversion'])
     {
+        echo "<div class='table-options'>";
         echo "<form method='get'>";
         if (in_array('age', $options)) {
             $this->addOption('Age', 'age', [
@@ -101,6 +105,7 @@ class FilterList
             echo "<input type='hidden' name='extension' value='".$this->getFilter('extension')."' />";
         }        
         echo "</form>";
+        echo "</div>";
     }
 
     /** Applies the currently set default filter options (age, api, platform) to the given url */
