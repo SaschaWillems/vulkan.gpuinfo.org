@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -23,20 +23,22 @@
 require 'pagegenerator.php';
 require './database/database.class.php';
 require './database/sqlrepository.php';
-require './includes/functions.php';
 require './includes/constants.php';
+require './includes/functions.php';
+require './includes/filterlist.class.php';
 
+$filter_list = new FilterList(FilterList::DefaultQuickFilters);
 PageGenerator::header("Core 1.0 properties");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Core 1.0 device properties coverage");
-PageGenerator::globalFilterText();
 ?>
 
 <center>
 	<?php PageGenerator::platformNavigation('listpropertiescore10.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
-		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
+		<?php $filter_list->addDefaultFilterOptions() ?>
+		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				</tr>
 				<th>Property</th>
@@ -80,7 +82,7 @@ PageGenerator::globalFilterText();
 
 	<script>
 		$(document).ready(function() {
-			var table = $('#features').DataTable({
+			var table = $('#properties').DataTable({
 				"pageLength": -1,
 				"paging": false,
 				"stateSave": false,

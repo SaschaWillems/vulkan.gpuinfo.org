@@ -247,7 +247,7 @@ class SqlRepository {
     }      
 
     /** Global core feature listings */
-    public static function listCoreFeatures($version) { 
+    public static function listCoreFeatures($version) {
         $table = self::getDeviceFeaturesTable($version);
 
         // Collect feature column names
@@ -266,12 +266,12 @@ class SqlRepository {
         if ($version !== self::VK_API_VERSION_1_0) {
             $join = "join $table df on df.reportid = id";
         }
-        $deviceCount = SqlRepository::deviceCount($join);
+        $deviceCount = SqlRepository::deviceCountQuickFilters($join);
 
         // Get device support coverage
         $params = [];
         $sql ="SELECT ifnull(r.displayname, dp.devicename) as device, $sqlColumnList FROM $table df join deviceproperties dp on dp.reportid = df.reportid join reports r on r.id = df.reportid";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " group by device";
 
         // $supportedCounts = [];
@@ -442,7 +442,7 @@ class SqlRepository {
         if ($version !== self::VK_API_VERSION_1_0) {
             $join = "join $table df on df.reportid = id";
         }
-        $deviceCount = SqlRepository::deviceCount($join);        
+        $deviceCount = SqlRepository::deviceCountQuickFilters($join);        
 
         // Collect property column names
         $sql = "SELECT COLUMN_NAME from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = '$table' and COLUMN_NAME not in ("."'" . implode("','", $ignore_columns) . "') order by COLUMN_NAME";
@@ -461,7 +461,7 @@ class SqlRepository {
         }
         $sqlColumnList = rtrim($sqlColumns, ',');
         $sql = "SELECT r.displayname as device, $sqlColumnList FROM $table dp join reports r on r.id = dp.reportid";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " GROUP BY device";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);
