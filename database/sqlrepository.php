@@ -862,7 +862,7 @@ class SqlRepository {
 
     /** Global profiles listing */
     public static function listProfiles() {
-        $deviceCount = SqlRepository::deviceCount("join deviceprofiles d on d.reportid = r.id");
+        $deviceCount = SqlRepository::deviceCountQuickFilters("join deviceprofiles d on d.reportid = r.id");
         $sql = "SELECT
                 name,
                 count(distinct (case when supported = 1 then displayname end)) as coverage
@@ -870,7 +870,7 @@ class SqlRepository {
                 deviceprofiles dp
                 join profiles p on p.id = dp.profileid
                 join reports r on r.id = dp.reportid";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " GROUP by name";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
