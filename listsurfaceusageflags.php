@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright 2016-2024 (C) by Sascha Willems (www.saschawillems.de)
+ * Copyright 2016-2026 (C) by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -25,17 +25,19 @@ require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
 require './includes/constants.php';
+require './includes/filterlist.class.php';
 
+$filter_list = new FilterList(FilterList::DefaultQuickFilters);
 PageGenerator::header("usage flags");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Surface usage flag support");
-PageGenerator::globalFilterText();
 ?>
 
 <div class="centered">
 	<?php PageGenerator::platformNavigation('listsurfaceusageflags.php', $platform, true); ?>
 
 		<div class='tablediv' style='width:auto; display: inline-block;'>
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<table id="usageflags" class="table table-striped table-bordered table-hover reporttable responsive with-platform-selection">
 			<thead>
 				<tr>

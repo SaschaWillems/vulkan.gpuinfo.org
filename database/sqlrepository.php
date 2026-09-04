@@ -665,13 +665,13 @@ class SqlRepository {
 
     /** Global memory type listings */
     public static function listMemoryTypes() {
-        $deviceCount = SqlRepository::deviceCount();
+        $deviceCount = SqlRepository::deviceCountQuickFilters();
         $sql = "SELECT
             propertyflags as memtype, count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
             from devicememorytypes dmt
             join reports r on r.id = dmt.reportid
             join deviceproperties dp on dp.reportid = r.id";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " group by memtype desc";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
@@ -687,7 +687,7 @@ class SqlRepository {
 
     /** Global surface format listing */
     public static function listSurfaceFormats() {
-        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.2'");
+        $deviceCount = SqlRepository::deviceCountQuickFilters("WHERE r.version >= '1.2'");
         $sql = "SELECT
             VkFormat(dsf.format) as format,
             dsf.colorspace,
@@ -695,7 +695,7 @@ class SqlRepository {
             from reports r
             join devicesurfaceformats dsf on dsf.reportid = r.id
             join deviceproperties dp on dp.reportid = r.id";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " group by format, colorspace";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
@@ -712,7 +712,7 @@ class SqlRepository {
 
     /** Global surface present mode listing */
     public static function listSurfacePresentModes() {
-        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.2'");
+        $deviceCount = SqlRepository::deviceCountQuickFilters("WHERE r.version >= '1.2'");
         $sql = "SELECT
             vkpm.name as mode,
             count(distinct(ifnull(r.displayname, dp.devicename))) as coverage
@@ -720,7 +720,7 @@ class SqlRepository {
             join reports r on r.id = dsm.reportid
             join VkPresentMode vkpm on vkpm.value = dsm.presentmode
             join deviceproperties dp on dp.reportid = r.id";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " group by mode";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
@@ -736,7 +736,7 @@ class SqlRepository {
 
     /** Global surface usage flags listing */
     public static function listSurfaceUsageFlags($flags) {
-        $deviceCount = SqlRepository::deviceCount("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
+        $deviceCount = SqlRepository::deviceCountQuickFilters("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
         $surfaceusageflags = [];
         foreach ($flags as $enum => $flag_name) {
             $sql = "SELECT
@@ -744,7 +744,7 @@ class SqlRepository {
                 from devicesurfacecapabilities dsf
                 join reports r on r.id = dsf.reportid
                 where supportedUsageFlags & $enum = $enum";
-            self::appendFilters($sql, $params);
+            self::appendQuickFilters($sql, $params);
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute($params);
             $row = $stmnt->fetch(PDO::FETCH_ASSOC);
@@ -758,7 +758,7 @@ class SqlRepository {
 
     /** Global surface transform modes listing */
     public static function listSurfaceTransformModes($flags) {
-        $deviceCount = SqlRepository::deviceCount("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
+        $deviceCount = SqlRepository::deviceCountQuickFilters("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
         $result = [];
         foreach ($flags as $enum => $flag_name) {
             $sql = "SELECT
@@ -766,7 +766,7 @@ class SqlRepository {
                 from devicesurfacecapabilities dsf
                 join reports r on r.id = dsf.reportid
                 where supportedTransforms & $enum = $enum";
-            self::appendFilters($sql, $params);
+            self::appendQuickFilters($sql, $params);
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute($params);
             $row = $stmnt->fetch(PDO::FETCH_ASSOC);
@@ -780,7 +780,7 @@ class SqlRepository {
 
     /** Global surface composite alpha flags listing */
     public static function listSurfaceCompositeAlphaModes($flags) {
-        $deviceCount = SqlRepository::deviceCount("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
+        $deviceCount = SqlRepository::deviceCountQuickFilters("join devicesurfacecapabilities d on d.reportid = r.id where r.version >= '1.2'");
         $result = [];
         foreach ($flags as $enum => $flag_name) {
             $sql = "SELECT
@@ -788,7 +788,7 @@ class SqlRepository {
                 from devicesurfacecapabilities dsf
                 join reports r on r.id = dsf.reportid
                 where supportedCompositeAlpha & $enum = $enum";
-            self::appendFilters($sql, $params);
+            self::appendQuickFilters($sql, $params);
             $stmnt = DB::$connection->prepare($sql);
             $stmnt->execute($params);
             $row = $stmnt->fetch(PDO::FETCH_ASSOC);
