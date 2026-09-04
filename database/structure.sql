@@ -8,82 +8,15 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 
-DELIMITER $$
-CREATE  PROCEDURE `delete_report` (IN `inReportid` INT)   BEGIN
-
-	start transaction;
-	delete from `deviceextensions` where reportID = inReportid;
-	delete from `devicefeatures` where reportID = inReportid;
-	delete from `devicefeatures11` where reportID = inReportid;    
-	delete from `devicefeatures12` where reportID = inReportid;    
-	delete from `devicefeatures13` where reportID = inReportid;    
-	delete from `devicefeatures2` where reportID = inReportid;
-	delete from `deviceformats` where reportID = inReportid;
-	delete from `devicelayerextensions` where reportID = inReportid;
-	delete from `devicelayers` where reportID = inReportid;
-	delete from `devicelimits` where reportID = inReportid;
-	delete from `devicememoryheaps` where reportid = inReportid;
-	delete from `devicememorytypes` where reportid = inReportid;
-	delete from `deviceplatformdetails` where reportid = inReportid;
-	delete from `deviceproperties` where reportid = inReportid;
-	delete from `deviceproperties11` where reportid = inReportid;
-	delete from `deviceproperties12` where reportid = inReportid;
-	delete from `deviceproperties13` where reportid = inReportid;
-	delete from `deviceproperties2` where reportid = inReportid;
-	delete from `devicequeues` where reportid = inReportid;
-	delete from `devicesurfacecapabilities` where reportid = inReportid;
-	delete from `devicesurfacemodes` where reportid = inReportid;
-    delete from `deviceprofiles` where reportid = inReportid;
-	delete from `reportsjson` where reportid = inReportid;
-	delete from `reports` where id = inReportid;
-	commit;
-END$$
-
-CREATE  PROCEDURE `truncate_all` ()   BEGIN
-    
-END$$
-
-CREATE  FUNCTION `VendorId` (`val` INTEGER) RETURNS CHAR(255) CHARSET latin1 COLLATE latin1_swedish_ci  BEGIN
-	DECLARE res char(255);
-	SELECT name from vendorids where id = val into res;
-    select ifnull(res, HEX(val)) into res;
-	return res;
-END$$
-
-CREATE  FUNCTION `VkFormat` (`val` INTEGER) RETURNS CHAR(255) CHARSET utf8mb3 COLLATE utf8mb3_general_ci  BEGIN
-	DECLARE res char(255);
-	SELECT name from VkFormat where value = val into res;
-	
-	IF (res = '') THEN
-		RETURN 'unknown';
-	ELSE
-		RETURN res;
-	END IF;
-
-END$$
-
-CREATE  FUNCTION `VkPhysicalDeviceType` (`val` INTEGER) RETURNS CHAR(255) CHARSET utf8mb3 COLLATE utf8mb3_general_ci  BEGIN
-	DECLARE res char(255);
-	SELECT name from VkPhysicalDeviceType where value = val into res;
-	
-	IF (res = '') THEN
-		RETURN 'unknown';
-	ELSE
-		RETURN res;
-	END IF;
-
-END$$
-
-CREATE  FUNCTION `VkVersion` (`val` BIGINT) RETURNS TEXT CHARSET latin1 COLLATE latin1_swedish_ci  BEGIN
-RETURN CONCAT(cast(val >> 22 as char), ".", cast((val >> 12) & 1023 as char), "." , cast(val & 4095 as char));
-END$$
-
-DELIMITER ;
-
 CREATE TABLE `blacklist` (
   `devicename` char(255) NOT NULL,
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+CREATE TABLE `cacheinfo` (
+  `identifier` varchar(64) NOT NULL,
+  `date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `devicealiases` (
   `devicename` varchar(255) NOT NULL,
@@ -93,7 +26,13 @@ CREATE TABLE `devicealiases` (
 CREATE TABLE `deviceextensions` (
   `reportid` int(11) NOT NULL,
   `extensionid` int(11) NOT NULL,
-  `specversion` int(11) DEFAULT NULL
+  `specversion` int(11) DEFAULT NULL,
+  `date` timestamp NULL DEFAULT current_timestamp(),
+  `datewindows` timestamp NULL DEFAULT NULL,
+  `datelinux` timestamp NULL DEFAULT NULL,
+  `dateandroid` timestamp NULL DEFAULT NULL,
+  `datemacos` timestamp NULL DEFAULT NULL,
+  `dateios` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 DELIMITER $$
 CREATE TRIGGER `deviceextensions_AFTER_INSERT` AFTER INSERT ON `deviceextensions` FOR EACH ROW begin
@@ -119,6 +58,11 @@ CREATE TRIGGER `deviceextensions_AFTER_INSERT` AFTER INSERT ON `deviceextensions
 end
 $$
 DELIMITER ;
+
+CREATE TABLE `deviceextensions_blacklist` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `devicefeatures` (
   `reportid` int(11) NOT NULL,
@@ -273,6 +217,31 @@ CREATE TABLE `devicefeatures13` (
   `maintenance4` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+CREATE TABLE `devicefeatures14` (
+  `reportid` int(11) NOT NULL,
+  `globalPriorityQuery` int(11) DEFAULT NULL,
+  `shaderSubgroupRotate` int(11) DEFAULT NULL,
+  `shaderSubgroupRotateClustered` int(11) DEFAULT NULL,
+  `shaderFloatControls2` int(11) DEFAULT NULL,
+  `shaderExpectAssume` int(11) DEFAULT NULL,
+  `rectangularLines` int(11) DEFAULT NULL,
+  `bresenhamLines` int(11) DEFAULT NULL,
+  `smoothLines` int(11) DEFAULT NULL,
+  `stippledRectangularLines` int(11) DEFAULT NULL,
+  `stippledBresenhamLines` int(11) DEFAULT NULL,
+  `stippledSmoothLines` int(11) DEFAULT NULL,
+  `vertexAttributeInstanceRateDivisor` int(11) DEFAULT NULL,
+  `vertexAttributeInstanceRateZeroDivisor` int(11) DEFAULT NULL,
+  `indexTypeUint8` int(11) DEFAULT NULL,
+  `dynamicRenderingLocalRead` int(11) DEFAULT NULL,
+  `maintenance5` int(11) DEFAULT NULL,
+  `maintenance6` int(11) DEFAULT NULL,
+  `pipelineProtectedAccess` int(11) DEFAULT NULL,
+  `pipelineRobustness` int(11) DEFAULT NULL,
+  `hostImageCopy` int(11) DEFAULT NULL,
+  `pushDescriptor` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 CREATE TABLE `deviceformats` (
   `reportid` int(11) NOT NULL,
   `formatid` int(11) NOT NULL,
@@ -287,6 +256,30 @@ CREATE TABLE `deviceinstanceextensions` (
   `extensionid` int(11) NOT NULL,
   `specversion` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+DELIMITER $$
+CREATE TRIGGER `deviceinstanceextensions_AFTER_INSERT` AFTER INSERT ON `deviceinstanceextensions` FOR EACH ROW begin
+	declare reportostype int default -1;
+    select ostype into reportostype from reports where id = new.reportid;
+    
+    if reportostype = 0 then
+		
+        update instanceextensions set datewindows = now() where id = new.extensionid and datewindows is null;
+    elseif reportostype = 1 then
+		
+        update instanceextensions set datelinux = now() where id = new.extensionid and datelinux is null;
+    elseif reportostype = 2 then
+		
+        update instanceextensions set dateandroid = now() where id = new.extensionid and dateandroid is null;
+    elseif reportostype = 3 then 
+		
+        update instanceextensions set datemacos = now() where id = new.extensionid and datemacos is null;
+	elseif reportostype = 4 then
+		
+        update instanceextensions set dateios = now() where id = new.extensionid and dateios is null;
+    end if;
+end
+$$
+DELIMITER ;
 
 CREATE TABLE `deviceinstancelayerextensions` (
   `reportid` int(11) NOT NULL,
@@ -523,7 +516,7 @@ CREATE TABLE `deviceproperties11` (
   `maxMultiviewInstanceIndex` int(10) UNSIGNED DEFAULT NULL,
   `protectedNoFault` tinyint(1) DEFAULT NULL,
   `maxPerSetDescriptors` int(10) UNSIGNED DEFAULT NULL,
-  `maxMemoryAllocationSize` bigint(20) DEFAULT NULL
+  `maxMemoryAllocationSize` mediumtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `deviceproperties12` (
@@ -631,6 +624,35 @@ CREATE TABLE `deviceproperties13` (
   `maxBufferSize` tinytext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+CREATE TABLE `deviceproperties14` (
+  `reportid` int(11) NOT NULL,
+  `lineSubPixelPrecisionBits` int(10) UNSIGNED DEFAULT NULL,
+  `maxVertexAttribDivisor` int(10) UNSIGNED DEFAULT NULL,
+  `supportsNonZeroFirstInstance` tinyint(1) DEFAULT NULL,
+  `maxPushDescriptors` int(10) UNSIGNED DEFAULT NULL,
+  `dynamicRenderingLocalReadDepthStencilAttachments` tinyint(1) DEFAULT NULL,
+  `dynamicRenderingLocalReadMultisampledAttachments` tinyint(1) DEFAULT NULL,
+  `earlyFragmentMultisampleCoverageAfterSampleCounting` tinyint(1) DEFAULT NULL,
+  `earlyFragmentSampleMaskTestBeforeSampleCounting` tinyint(1) DEFAULT NULL,
+  `depthStencilSwizzleOneSupport` tinyint(1) DEFAULT NULL,
+  `polygonModePointSize` tinyint(1) DEFAULT NULL,
+  `nonStrictSinglePixelWideLinesUseParallelogram` tinyint(1) DEFAULT NULL,
+  `nonStrictWideLinesUseParallelogram` tinyint(1) DEFAULT NULL,
+  `blockTexelViewCompatibleMultipleLayers` tinyint(1) DEFAULT NULL,
+  `maxCombinedImageSamplerDescriptorCount` int(10) UNSIGNED DEFAULT NULL,
+  `fragmentShadingRateClampCombinerInputs` tinyint(1) DEFAULT NULL,
+  `defaultRobustnessStorageBuffers` int(10) UNSIGNED DEFAULT NULL,
+  `defaultRobustnessUniformBuffers` int(10) UNSIGNED DEFAULT NULL,
+  `defaultRobustnessVertexInputs` int(10) UNSIGNED DEFAULT NULL,
+  `defaultRobustnessImages` int(10) UNSIGNED DEFAULT NULL,
+  `copySrcLayoutCount` int(10) UNSIGNED DEFAULT NULL,
+  `pCopySrcLayouts` varchar(1024) DEFAULT NULL,
+  `copyDstLayoutCount` int(10) UNSIGNED DEFAULT NULL,
+  `pCopyDstLayouts` varchar(1024) DEFAULT NULL,
+  `optimalTilingLayoutUUID` text DEFAULT NULL,
+  `identicalMemoryTypeRequirements` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 CREATE TABLE `devicequeues` (
   `reportid` int(11) NOT NULL,
   `id` int(11) NOT NULL,
@@ -684,9 +706,27 @@ CREATE TABLE `extensions` (
   `hasproperties` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+CREATE TABLE `extension_stats` (
+  `name` varchar(255) NOT NULL,
+  `ostype` int(11) DEFAULT NULL,
+  `apiversion` char(3) DEFAULT NULL,
+  `age` int(11) DEFAULT NULL,
+  `coverage` int(11) NOT NULL,
+  `firstseen` date NOT NULL,
+  `hasfeatures` tinyint(4) NOT NULL,
+  `hasproperties` tinyint(4) NOT NULL,
+  `state` tinyint(4) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 CREATE TABLE `instanceextensions` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL DEFAULT ''
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `date` timestamp NULL DEFAULT current_timestamp(),
+  `datewindows` timestamp NULL DEFAULT NULL,
+  `datelinux` timestamp NULL DEFAULT NULL,
+  `dateandroid` timestamp NULL DEFAULT NULL,
+  `datemacos` timestamp NULL DEFAULT NULL,
+  `dateios` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `instancelayers` (
@@ -744,7 +784,10 @@ CREATE TABLE `reports` (
   `headerversion` char(16) DEFAULT NULL,
   `displayname` varchar(128) DEFAULT NULL,
   `ostype` int(11) DEFAULT NULL,
-  `internalid` char(64) DEFAULT NULL
+  `internalid` char(64) DEFAULT NULL,
+  `hasFormatFeatureFlags2` tinyint(4) DEFAULT NULL,
+  `devicetype` int(11) DEFAULT NULL,
+  `layered` tinyint(4) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 DELIMITER $$
 CREATE TRIGGER `reports_BEFORE_INSERT` BEFORE INSERT ON `reports` FOR EACH ROW begin
@@ -760,13 +803,17 @@ CREATE TRIGGER `reports_BEFORE_INSERT` BEFORE INSERT ON `reports` FOR EACH ROW b
 			if new.osname = 'osx' then
 				set new.ostype = 3;
 			else
-				if new.osname = 'ios' then
-					set new.ostype = 4;
+				if new.osname = 'macos' then
+					set new.ostype = 3;
 				else
-					if new.osname = 'unknown' then
-						set new.ostype = -1;
+					if new.osname = 'ios' then
+						set new.ostype = 4;
 					else
-						set new.ostype = 1;
+						if new.osname = 'unknown' then
+							set new.ostype = -1;
+						else
+							set new.ostype = 1;
+						end if;
 					end if;
 				end if;
 			end if;
@@ -775,11 +822,6 @@ CREATE TRIGGER `reports_BEFORE_INSERT` BEFORE INSERT ON `reports` FOR EACH ROW b
 end
 $$
 DELIMITER ;
-
-CREATE TABLE `reportsjson` (
-  `reportid` int(11) NOT NULL,
-  `json` mediumtext NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `reportupdatehistory` (
   `id` int(11) NOT NULL,
@@ -852,34 +894,13 @@ CREATE TABLE `VkPresentMode` (
   `value` int(11) NOT NULL,
   `name` varchar(45) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-DROP TABLE IF EXISTS `viewDeviceCount`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewDeviceCount`  AS SELECT (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`reports` `r` join `deviceproperties` `dp` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 0) AS `windows`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`reports` `r` join `deviceproperties` `dp` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 1) AS `linux`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`reports` `r` join `deviceproperties` `dp` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 2) AS `android` ;
-DROP TABLE IF EXISTS `viewExtensions`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewExtensions`  AS SELECT `ext`.`name` AS `name`, (select count(distinct `r`.`id`) from (`reports` `r` join `deviceextensions` `de` on(`r`.`id` = `de`.`reportid`)) where `de`.`extensionid` = `ext`.`id`) AS `coverage` FROM `extensions` AS `ext` ;
-DROP TABLE IF EXISTS `viewExtensionsPlatforms`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewExtensionsPlatforms`  AS SELECT `ext`.`name` AS `name`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`deviceproperties` `dp` join `reports` `r` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 0 and `r`.`id` in (select `de`.`reportid` from `deviceextensions` `de` where `de`.`extensionid` = `ext`.`id`)) AS `windows`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`deviceproperties` `dp` join `reports` `r` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 1 and `r`.`id` in (select `de`.`reportid` from `deviceextensions` `de` where `de`.`extensionid` = `ext`.`id`)) AS `linux`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`deviceproperties` `dp` join `reports` `r` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 2 and `r`.`id` in (select `de`.`reportid` from `deviceextensions` `de` where `de`.`extensionid` = `ext`.`id`)) AS `android`, (select count(distinct `df2`.`name`) from `devicefeatures2` `df2` where `df2`.`extension` = `ext`.`name`) AS `features2`, (select count(distinct `dp2`.`name`) from `deviceproperties2` `dp2` where `dp2`.`extension` = `ext`.`name`) AS `properties2` FROM `extensions` AS `ext` ;
-DROP TABLE IF EXISTS `viewFormatList`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewFormatList`  AS SELECT `VkFormat`.`value` AS `value`, `VkFormat`.`name` AS `name` FROM `VkFormat` ;
-DROP TABLE IF EXISTS `viewFormats`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewFormats`  AS SELECT `vf`.`name` AS `name`, (select count(distinct `df`.`reportid`) from `deviceformats` `df` where `df`.`formatid` = `vf`.`value` and `df`.`lineartilingfeatures` > 0) AS `linear`, (select count(distinct `df`.`reportid`) from `deviceformats` `df` where `df`.`formatid` = `vf`.`value` and `df`.`optimaltilingfeatures` > 0) AS `optimal`, (select count(distinct `df`.`reportid`) from `deviceformats` `df` where `df`.`formatid` = `vf`.`value` and `df`.`bufferfeatures` > 0) AS `buffer` FROM `VkFormat` AS `vf` ;
-DROP TABLE IF EXISTS `viewReportCount`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewReportCount`  AS SELECT (select count(0) from `reports` where `reports`.`ostype` = 0) AS `windows`, (select count(0) from `reports` where `reports`.`ostype` = 1) AS `linux`, (select count(0) from `reports` where `reports`.`ostype` = 2) AS `android` ;
-DROP TABLE IF EXISTS `viewSurfaceFormats`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewSurfaceFormats`  AS SELECT DISTINCT `VKFORMAT`(`df`.`format`) AS `formatname`, `df`.`format` AS `format`, (select count(distinct `dfs`.`reportid`) from `devicesurfaceformats` `dfs` where `dfs`.`format` = `df`.`format`) AS `coverage` FROM `devicesurfaceformats` AS `df` ;
-DROP TABLE IF EXISTS `viewSurfacePresentModes`;
-
-CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `viewSurfacePresentModes`  AS SELECT DISTINCT `dp`.`presentmode` AS `presentmode`, (select count(distinct `dfp`.`reportid`) from `devicesurfacemodes` `dfp` where `dfp`.`presentmode` = `dp`.`presentmode`) AS `coverage` FROM `devicesurfacemodes` AS `dp` ;
 
 
 ALTER TABLE `blacklist`
   ADD PRIMARY KEY (`id`,`devicename`);
+
+ALTER TABLE `cacheinfo`
+  ADD PRIMARY KEY (`identifier`);
 
 ALTER TABLE `devicealiases`
   ADD PRIMARY KEY (`devicename`),
@@ -890,13 +911,18 @@ ALTER TABLE `deviceextensions`
   ADD KEY `deviceextensions_extensionid_IDX` (`extensionid`) USING BTREE,
   ADD KEY `deviceextensions_reportid_IDX` (`reportid`) USING BTREE;
 
+ALTER TABLE `deviceextensions_blacklist`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `deviceextensions_blacklist_name_IDX` (`name`) USING BTREE;
+
 ALTER TABLE `devicefeatures`
   ADD PRIMARY KEY (`reportid`);
 
 ALTER TABLE `devicefeatures2`
   ADD PRIMARY KEY (`reportid`,`id`),
   ADD KEY `index2` (`extension`),
-  ADD KEY `ext_name_supported` (`name`,`extension`,`supported`);
+  ADD KEY `ext_name_supported` (`name`,`extension`,`supported`),
+  ADD KEY `devicefeatures2_supported_IDX` (`supported`) USING BTREE;
 
 ALTER TABLE `devicefeatures11`
   ADD PRIMARY KEY (`reportid`);
@@ -907,11 +933,16 @@ ALTER TABLE `devicefeatures12`
 ALTER TABLE `devicefeatures13`
   ADD PRIMARY KEY (`reportid`);
 
+ALTER TABLE `devicefeatures14`
+  ADD PRIMARY KEY (`reportid`);
+
 ALTER TABLE `deviceformats`
   ADD PRIMARY KEY (`reportid`,`formatid`),
   ADD KEY `index_id_linear` (`formatid`,`lineartilingfeatures`),
   ADD KEY `linear_tiling_format` (`lineartilingfeatures`),
-  ADD KEY `deviceformats_formatid_IDX` (`formatid`) USING BTREE;
+  ADD KEY `deviceformats_formatid_IDX` (`formatid`) USING BTREE,
+  ADD KEY `deviceformats_optimaltilingfeatures_IDX` (`optimaltilingfeatures`) USING BTREE,
+  ADD KEY `deviceformats_bufferfeatures_IDX` (`bufferfeatures`) USING BTREE;
 
 ALTER TABLE `deviceinstanceextensions`
   ADD PRIMARY KEY (`reportid`,`extensionid`),
@@ -954,7 +985,8 @@ ALTER TABLE `deviceproperties`
 
 ALTER TABLE `deviceproperties2`
   ADD PRIMARY KEY (`reportid`,`id`),
-  ADD KEY `index2` (`extension`);
+  ADD KEY `index2` (`extension`),
+  ADD KEY `deviceproperties2_value_IDX` (`value`(1000)) USING BTREE;
 
 ALTER TABLE `deviceproperties11`
   ADD PRIMARY KEY (`reportid`);
@@ -963,6 +995,9 @@ ALTER TABLE `deviceproperties12`
   ADD PRIMARY KEY (`reportid`);
 
 ALTER TABLE `deviceproperties13`
+  ADD PRIMARY KEY (`reportid`);
+
+ALTER TABLE `deviceproperties14`
   ADD PRIMARY KEY (`reportid`);
 
 ALTER TABLE `devicequeues`
@@ -983,6 +1018,14 @@ ALTER TABLE `extensions`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`),
   ADD KEY `index_name` (`name`);
+
+ALTER TABLE `extension_stats`
+  ADD KEY `extension_stats_name_IDX` (`name`) USING BTREE,
+  ADD KEY `extension_stats_ostype_IDX` (`ostype`) USING BTREE,
+  ADD KEY `extension_stats_apiversion_IDX` (`apiversion`) USING BTREE,
+  ADD KEY `extension_stats_age_IDX` (`age`) USING BTREE,
+  ADD KEY `extension_stats_full_IDX` (`name`,`ostype`,`apiversion`,`age`) USING BTREE,
+  ADD KEY `extension_stats_state_IDX` (`state`) USING BTREE;
 
 ALTER TABLE `instanceextensions`
   ADD PRIMARY KEY (`id`),
@@ -1025,11 +1068,10 @@ ALTER TABLE `reports`
   ADD KEY `index_apiversion` (`apiversion`),
   ADD KEY `index_displayname` (`displayname`),
   ADD KEY `reports_submissiondate_IDX` (`submissiondate`) USING BTREE,
-  ADD KEY `reports_id_IDX` (`id`) USING BTREE;
-
-ALTER TABLE `reportsjson`
-  ADD PRIMARY KEY (`reportid`),
-  ADD KEY `reportid` (`reportid`);
+  ADD KEY `reports_id_IDX` (`id`) USING BTREE,
+  ADD KEY `reports_devicetype_IDX` (`devicetype`) USING BTREE,
+  ADD KEY `reports_layered_IDX` (`layered`) USING BTREE,
+  ADD KEY `reports_apiversion_IDX` (`apiversion`,`ostype`,`displayname`,`id`) USING BTREE;
 
 ALTER TABLE `reportupdatehistory`
   ADD PRIMARY KEY (`id`,`reportId`);
@@ -1053,6 +1095,9 @@ ALTER TABLE `VkPresentMode`
 
 
 ALTER TABLE `blacklist`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `deviceextensions_blacklist`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `devicefeatures2`
@@ -1102,16 +1147,46 @@ ALTER TABLE `reports`
 
 ALTER TABLE `reportupdatehistory`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+DROP TABLE IF EXISTS `viewDeviceCount`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewDeviceCount`  AS SELECT (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`reports` `r` join `deviceproperties` `dp` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 0) AS `windows`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`reports` `r` join `deviceproperties` `dp` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 1) AS `linux`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`reports` `r` join `deviceproperties` `dp` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 2) AS `android` ;
+DROP TABLE IF EXISTS `viewExtensions`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewExtensions`  AS SELECT `ext`.`name` AS `name`, (select count(distinct `r`.`id`) from (`reports` `r` join `deviceextensions` `de` on(`r`.`id` = `de`.`reportid`)) where `de`.`extensionid` = `ext`.`id`) AS `coverage` FROM `extensions` AS `ext` ;
+DROP TABLE IF EXISTS `viewExtensionsPlatforms`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewExtensionsPlatforms`  AS SELECT `ext`.`name` AS `name`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`deviceproperties` `dp` join `reports` `r` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 0 and `r`.`id` in (select `de`.`reportid` from `deviceextensions` `de` where `de`.`extensionid` = `ext`.`id`)) AS `windows`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`deviceproperties` `dp` join `reports` `r` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 1 and `r`.`id` in (select `de`.`reportid` from `deviceextensions` `de` where `de`.`extensionid` = `ext`.`id`)) AS `linux`, (select count(distinct ifnull(`r`.`displayname`,`dp`.`devicename`)) from (`deviceproperties` `dp` join `reports` `r` on(`r`.`id` = `dp`.`reportid`)) where `r`.`ostype` = 2 and `r`.`id` in (select `de`.`reportid` from `deviceextensions` `de` where `de`.`extensionid` = `ext`.`id`)) AS `android`, (select count(distinct `df2`.`name`) from `devicefeatures2` `df2` where `df2`.`extension` = `ext`.`name`) AS `features2`, (select count(distinct `dp2`.`name`) from `deviceproperties2` `dp2` where `dp2`.`extension` = `ext`.`name`) AS `properties2` FROM `extensions` AS `ext` ;
+DROP TABLE IF EXISTS `viewFormatList`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewFormatList`  AS SELECT `VkFormat`.`value` AS `value`, `VkFormat`.`name` AS `name` FROM `VkFormat` ;
+DROP TABLE IF EXISTS `viewFormats`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewFormats`  AS SELECT `vf`.`name` AS `name`, (select count(distinct `df`.`reportid`) from `deviceformats` `df` where `df`.`formatid` = `vf`.`value` and `df`.`lineartilingfeatures` > 0) AS `linear`, (select count(distinct `df`.`reportid`) from `deviceformats` `df` where `df`.`formatid` = `vf`.`value` and `df`.`optimaltilingfeatures` > 0) AS `optimal`, (select count(distinct `df`.`reportid`) from `deviceformats` `df` where `df`.`formatid` = `vf`.`value` and `df`.`bufferfeatures` > 0) AS `buffer` FROM `VkFormat` AS `vf` ;
+DROP TABLE IF EXISTS `viewReportCount`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewReportCount`  AS SELECT (select count(0) from `reports` where `reports`.`ostype` = 0) AS `windows`, (select count(0) from `reports` where `reports`.`ostype` = 1) AS `linux`, (select count(0) from `reports` where `reports`.`ostype` = 2) AS `android` ;
+DROP TABLE IF EXISTS `viewSurfaceFormats`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewSurfaceFormats`  AS SELECT DISTINCT `VKFORMAT`(`df`.`format`) AS `formatname`, `df`.`format` AS `format`, (select count(distinct `dfs`.`reportid`) from `devicesurfaceformats` `dfs` where `dfs`.`format` = `df`.`format`) AS `coverage` FROM `devicesurfaceformats` AS `df` ;
+DROP TABLE IF EXISTS `viewSurfacePresentModes`;
+
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `viewSurfacePresentModes`  AS SELECT DISTINCT `dp`.`presentmode` AS `presentmode`, (select count(distinct `dfp`.`reportid`) from `devicesurfacemodes` `dfp` where `dfp`.`presentmode` = `dp`.`presentmode`) AS `coverage` FROM `devicesurfacemodes` AS `dp` ;
 
 
 ALTER TABLE `devicefeatures13`
   ADD CONSTRAINT `devicefeatures13_report` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `devicefeatures14`
+  ADD CONSTRAINT `devicefeatures14_report` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `deviceformats`
   ADD CONSTRAINT `df_report` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `deviceproperties13`
   ADD CONSTRAINT `deviceproperties13_report` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `deviceproperties14`
+  ADD CONSTRAINT `deviceproperties14_report` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `devicequeues`
   ADD CONSTRAINT `fk_qf_rep` FOREIGN KEY (`reportid`) REFERENCES `reports` (`id`);

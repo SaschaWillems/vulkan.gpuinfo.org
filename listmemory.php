@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -23,17 +23,19 @@ require 'pagegenerator.php';
 require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
+require './includes/filterlist.class.php';
 
+$filter_list = new FilterList(FilterList::DefaultQuickFilters);
 PageGenerator::header("Memory");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Memory types");
-PageGenerator::globalFilterText();
 ?>
 
 <center>
 	<?php PageGenerator::platformNavigation('listmemory.php', $platform, true); ?>
 
 	<div class="tablediv" style="width:auto; display: inline-block;">
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<table id="limits" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
