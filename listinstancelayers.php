@@ -30,7 +30,6 @@ $filter_list = new FilterList(FilterList::DefaultQuickFilters);
 PageGenerator::header("Instance layers");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Listing available instance layers");
-PageGenerator::globalFilterText();
 ?>
 
 <center>	
