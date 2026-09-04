@@ -51,44 +51,10 @@ class SqlRepository {
         };
     }    
 
-    public static function getMinApiVersion() {
-        if (isset($_SESSION['minversion'])) {
-            return $_SESSION['minversion'];
-        }
-        return null;
-    }
-
-    public static function getMinStartDate() {
-        if (isset($_SESSION['date_range'])) {
-            $max_report_age = (int)$_SESSION['date_range'];
-            if ($max_report_age !== null) {
-                $start_date = mktime(0, 0, 0, 1, 1, date('Y') - $max_report_age);
-                return date('Y-m-d', $start_date);
-            }
-        }
-        // @todo
-        // Limit to max. 2 years by default
-        // $start_date = mktime(0, 0, 0, 1, 1, date('Y') - 2);
-        // return date('Y-m-d', $start_date);
-        return null;
-    }
-
     public static function getStartDateFromAge($age) {
         if ($age == 'recent' || $age == null) {
             return date('Y-m-d', strtotime('-1 year'));
         }
-        return null;
-    }
-
-	public static function getDeviceTypeSelection()
-    {
-        // Explicit page parameter has precedence over global setting
-        if (isset($_GET['device_types'])) {
-            return GET_sanitized('device_types');
-        }
-		if (isset($_SESSION['device_types'])) {
-			return sanitize($_SESSION['device_types']);
-		}
         return null;
     }
 
@@ -98,9 +64,6 @@ class SqlRepository {
         if (isset($_GET['layered_implementations'])) {
             return GET_sanitized('layered_implementations');
         }
-		if (isset($_SESSION['layered_implementations'])) {
-			return sanitize($_SESSION['layered_implementations']);
-		}
         return null;
     }    
 
@@ -108,12 +71,6 @@ class SqlRepository {
         if (isset($_GET['platform'])) {
             return ostype(GET_sanitized('platform'));
         }
-		if (isset($_SESSION['default_os_selection'])) {
-			$default_os = sanitize($_SESSION['default_os_selection']);
-            if ($default_os !== 'all') {
-                return ostype($default_os);
-            }
-		};
         return null;
     }
 
@@ -133,6 +90,7 @@ class SqlRepository {
     }
 
     // Append global filter settings to a given sql statement
+    // @todo: consolidate
     public static function appendFilters(&$sql, &$params, $includeOsType = true) {
         if ($includeOsType) {
             // This can be skipped as some views have separate filter conditions for the os that should not be overriden
@@ -141,31 +99,6 @@ class SqlRepository {
                 self::appendCondition($sql, "ostype = :ostype");
                 $params['ostype'] = $ostype;
             }
-        }
-        $apiversion = self::getMinApiVersion();
-        if ($apiversion) {
-            self::appendCondition($sql, "r.apiversion >= :apiversion");
-            $params['apiversion'] = $apiversion;
-        }
-        $start_date = self::getMinStartDate();
-        if ($start_date) {
-            self::appendCondition($sql, "r.submissiondate >= :startdate");
-            $params['startdate'] = $start_date;            
-        }
-        $device_types = self::getDeviceTypeSelection();
-        if ($device_types) {
-            if ($device_types == 'no_virtual') {
-                self::appendCondition($sql, "r.devicetype != :devicetype");
-                $params['devicetype'] = 3;
-            }
-            if ($device_types == 'no_cpu') {
-                self::appendCondition($sql, "r.devicetype != :devicetype");
-                $params['devicetype'] = 4;
-            }
-            if ($device_types = 'no_cpu_no_virtual') {
-                self::appendCondition($sql, "r.devicetype < :devicetype");
-                $params['devicetype'] = 3;
-            }            
         }
         $layered_implementations = self::getLayeredImplementationsOption();
         if (!$layered_implementations) {

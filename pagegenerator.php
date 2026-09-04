@@ -196,9 +196,6 @@ HTML;
         if (isset($_GET['platform'])) {
             return GET_sanitized('platform');
         }
-		if (isset($_SESSION['default_os_selection'])) {
-			return sanitize($_SESSION['default_os_selection']);
-		}
         return 'all';
     }
 
