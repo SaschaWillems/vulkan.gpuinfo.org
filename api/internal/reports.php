@@ -279,6 +279,22 @@ if ($platform !== null && $platform !== 'all') {
     $params['ostype'] = $platform;
 }
 
+// Min. report age
+$age = getRequestFilterValue('age');
+if ($age) {
+    $startdate = SqlRepository::getStartDateFromAge($age);
+    if ($startdate) {
+        SqlRepository::appendCondition($whereClause, "r.submissiondate >= :startdate");
+        $params['startdate'] = $startdate;
+    }
+}
+// Min. api version
+$apiversion = getRequestFilterValue('apiversion');
+if (($apiversion) && (strcasecmp($apiversion, 'all') !== 0)) {
+    SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
+    $params['apiversion'] = $apiversion;
+}
+
 SqlRepository::appendFilters($whereClause, $params, false);
 
 if ($orderByColumn == "api") {

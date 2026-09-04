@@ -26,13 +26,8 @@ include './includes/filterlist.class.php';
 include './database/database.class.php';
 include './database/sqlrepository.php';
 
-$filters = [
-	'platform',
-	'extension',
-	'submitter',
-	'apiversion'
-];
-$filter_list = new FilterList($filters);
+$filters = ['extension', 'submitter'];
+$filter_list = new FilterList(array_merge($filters, FilterList::DefaultQuickFilters));
 
 PageGenerator::header("Devices");
 
@@ -55,7 +50,7 @@ if ($filter_list->hasFilter('submitter')) {
 	$caption .= " submitted by $submitter";
 	$caption .= " (<a href=\"listreports.php?submitter=$submitter\">Show reports</a>)";
 }
-if ($filter_list->hasFilter('apiversion')) {
+if ($filter_list->hasFilter('apiversion') && (strcasecmp($filter_list->hasFilter('apiversion'), 'all') == 0)) {
 	$apiversion = $filter_list->getFilter('apiversion');
 	$caption .= " with api version $apiversion and up";
 }
@@ -66,9 +61,6 @@ $order_column = ($platform == 'android') ? 4 : 3;
 <center>
 
 	<div class='header'><h4><?= $caption ?></h4> </div>
-	<?php
-		PageGenerator::globalFilterText();
-	?>	
 
 	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">
@@ -86,7 +78,8 @@ $order_column = ($platform == 'android') ? 4 : 3;
 	}
 	?>
 
-	<div class='tablediv tab-content' style='display: inline-flex;'>
+	<div class='tablediv tab-content' style='width:auto; display: inline-block;'>
+		<?php $filter_list->addDefaultFilterOptions(['age', 'apiversion'], 'historic') ?>
 		<div id='devices_div' class='tab-pane fade in active'>
 			<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 				<thead>
@@ -170,6 +163,7 @@ $order_column = ($platform == 'android') ? 4 : 3;
 						'extension': 	'<?= $filter_list->getFilter('extension') ?>',
 						'submitter':	'<?= $filter_list->getFilter('submitter') ?>',
 						'apiversion':	'<?= $filter_list->getFilter('apiversion') ?>',
+						'age': 			'<?= $filter_list->getFilter('age') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {

@@ -365,17 +365,20 @@ if (isset($_REQUEST["platform"])) {
     }
 }
 
-// Min. api version
-// Global filter
-$minApiVersion = SqlRepository::getMinApiVersion();
-if ($minApiVersion) {
-    SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
-    $params['apiversion'] = $minApiVersion;
+// Min. report age
+$age = getRequestFilterValue('age');
+if ($age) {
+    $startdate = SqlRepository::getStartDateFromAge($age);
+    if ($startdate) {
+        SqlRepository::appendCondition($whereClause, "r.submissiondate >= :startdate");
+        $params['startdate'] = $startdate;
+    }
 }
-// Explicit
-if (isset($_REQUEST['filter']['apiversion'])) {
+// Min. api version
+$apiversion = getRequestFilterValue('apiversion');
+if (($apiversion) && (strcasecmp($apiversion, 'all') !== 0)) {
     SqlRepository::appendCondition($whereClause, "r.apiversion >= :apiversion");
-    $params['apiversion'] = $_REQUEST['filter']['apiversion'];
+    $params['apiversion'] = $apiversion;
 }
 
 SqlRepository::appendFilters($whereClause, $params, false);

@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2025 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -28,7 +28,6 @@ include './database/sqlrepository.php';
 
 // Read filters to apply
 $filters = [
-	'platform',
 	'submitter',
 	'devicename',
 	'displayname',
@@ -52,7 +51,7 @@ $filters = [
 	'featureflagbit',	
 	'option'
 ];
-$filter_list = new FilterList($filters);
+$filter_list = new FilterList(array_merge($filters, FilterList::DefaultQuickFilters));
 
 $caption = "Reports";
 $pageTitle = null;
@@ -186,13 +185,13 @@ if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !
 } else {
 	$platform = PageGenerator::getDefaultOSSelection();	
 }
+
+$haslimit = isset($_GET["limit"]);
+$displayGpuName = $platform == 'android';
 ?>
 
 <center>
 	<div class='header'><h4><?= $caption ?></h4> </div>
-	<?php
-		PageGenerator::globalFilterText();
-	?>
 
 	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">
@@ -204,15 +203,14 @@ if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !
 		</div>
 	</div>
 
-	<?php
-	PageGenerator::platformNavigation('listreports.php', $platform, true, $filter_list->filters);
-	?>
-	<div class='tablediv tab-content' style='display: inline-flex;'>
+	<?php PageGenerator::platformNavigation('listreports.php', $platform, true, $filter_list->filters); ?>
+	<div class='tablediv tab-content' style='width:auto; display: inline-block;'>
+		<?php $filter_list->addDefaultFilterOptions(['age', 'apiversion'], 'historic') ?>
 		<table id='reports' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 			<thead>
 				<tr>
 					<th></th>
-					<?php if (isset($_GET["limit"])) echo "<th></th>" ?>
+					<?php if ($haslimit) echo "<th></th>" ?>
 					<th></th>
 					<th></th>
 					<th></th>
@@ -222,11 +220,13 @@ if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !
 					<th></th>
 					<th></th>
 					<th></th>
+					<?php if ($displayGpuName) { echo "<th></th>"; } ?>						
 				</tr>
 				<tr>
 					<th>id</th>
-					<?php if (isset($_GET["limit"])) echo "<th>Limit</th>" ?>
+					<?php if ($haslimit) echo "<th>Limit</th>" ?>
 					<th>Device</th>
+					<?php if ($displayGpuName) { echo "<th>GPU</th>"; } ?>						
 					<th>Driver</th>
 					<th>Api</th>
 					<th>Vendor</th>
@@ -268,9 +268,10 @@ if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !
 			],
 			"columnDefs": [{
 				"searchable": false,
-				"targets": [0, <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>],
+				"targets": [0, <?php echo $haslimit ? "10" : "9" ?>],
 				"orderable": false,
-				"targets": <?php echo (isset($_GET["limit"])) ? "10" : "9" ?>,
+				"targets": <?php echo $haslimit ? "10" : "9" ?>,
+				<?php if ($platform !== 'all') { echo '"visible": false, "targets": '.($haslimit ? 7 : 6).','; } ?>
 			}],
 			"ajax": {
 				url: "api/internal/reports.php",
@@ -299,6 +300,8 @@ if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !
 						'bufferformat':				'<?= $filter_list->getFilter('bufferformat') ?>',
 						'featureflagbit':			'<?= $filter_list->getFilter('featureflagbit') ?>',
 						'option': 					'<?= $filter_list->getFilter('option') ?>',
+						'apiversion': 				'<?= $filter_list->getFilter('apiversion') ?>',
+						'age': 						'<?= $filter_list->getFilter('age') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {
@@ -309,9 +312,11 @@ if ($filter_list->hasFilter('platform') && $filter_list->getFilter('platform') !
 			"columns": [{
 					data: 'id'
 				},
-				<?php if (isset($_GET["limit"])) echo "{ data: 'devicelimit'},\n" ?> {
+				<?php if ($haslimit) echo "{ data: 'devicelimit'},\n" ?>
+				{
 					data: 'device'
 				},
+				<?php if ($displayGpuName) echo "{ data: 'gpuname' }, \n" ?>
 				{
 					data: 'driver'
 				},
