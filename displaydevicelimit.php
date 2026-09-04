@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2022 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,15 +27,12 @@ require './includes/functions.php';
 require './includes/chart.php';
 include './includes/filterlist.class.php';
 
-$filters = ['platform', 'name'];
+$filters = array_merge(['name'], FilterList::DefaultQuickFilters);
 $filter_list = new FilterList($filters);
-$name = $filter_list->getFilter('name');
-$platform = 'all';
-if ($filter_list->hasFilter('platform')) {
-	$platform = $filter_list->getFilter('platform');
-}
 
+$name = $filter_list->getFilter('name');
 PageGenerator::header($name);
+$platform = PageGenerator::getDefaultOSSelection();
 
 try {
 	DB::connect();
@@ -59,6 +56,7 @@ $caption = "Value distribution for <code>$name</code> ".PageGenerator::filterInf
 <center>
 	<?php PageGenerator::platformNavigation('displaydevicelimit.php', $platform, true, $filter_list->filters); ?>
 	<div class='chart-div'>
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<div id="chart"></div>
 		<div class='chart-table-div'>
 			<table id="extensions" class="table table-striped table-bordered table-hover reporttable">

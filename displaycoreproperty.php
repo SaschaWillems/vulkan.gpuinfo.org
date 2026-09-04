@@ -27,16 +27,12 @@ require './includes/functions.php';
 require './includes/chart.php';
 include './includes/filterlist.class.php';
 
-$filters = ['platform', 'name', 'core'];
+$filters = array_merge(['name', 'core'], FilterList::DefaultQuickFilters);
 $filter_list = new FilterList($filters);
 
 $extension = $filter_list->getFilter('extension');
 $name = $filter_list->getFilter('name');
 $core = $filter_list->getFilter('core');
-$platform = 'all';
-if ($filter_list->hasFilter('platform')) {
-	$platform = $filter_list->getFilter('platform');
-}
 
 PageGenerator::header($name);
 $platform = PageGenerator::getDefaultOSSelection();
@@ -54,12 +50,12 @@ try {
 }
 
 PageGenerator::pageCaption("Value distribution for <code>$name</code> ");
-PageGenerator::globalFilterText();
 ?>
 
 <center>
 	<?php PageGenerator::platformNavigation('displaycoreproperty.php', $platform, true, $filter_list->filters); ?>
 	<div class='chart-div'>
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<div id="chart"></div>
 		<div class='chart-table-div'>
 			<table id="extensions" class="table table-striped table-bordered table-hover reporttable">

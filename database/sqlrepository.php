@@ -503,7 +503,7 @@ class SqlRepository {
     public static function listCoreLimitValues($name) {
         $params = [];
         $sql = "SELECT `$name` as value, count(0) as count from devicelimits dl join reports r on r.id = dl.reportid";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " group by 1 order by 2 desc";        
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);
@@ -533,7 +533,7 @@ class SqlRepository {
             default:
                 $sql = "SELECT dp.`$name` as value, null as displayvalue, count(0) as count from $table dp join reports r on r.id = dp.reportid";
         } 
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " group by 1 order by $orderByIndex desc";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);
