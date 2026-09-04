@@ -67,12 +67,18 @@ class FilterList
 
     private function addOption($caption, $label, $options, $default = null) {
         echo "<div>$caption: <select name='$label' id='$label' class='form-control' onchange='this.form.submit()'>";
+        $selected = null;
         foreach ($options as $value => $text) {
-            $selected = ($this->hasFilter($label) && $this->getFilter($label) == $value) ? 'selected' : '';
-            if (($default) && ($select == '')) {
-                $selected = strcasecmp($value, $default) == 0 ? 'selected' : '';
+            if ($this->hasFilter($label) && $this->getFilter($label) == $value) {
+                $selected = $value;    
             }
-            echo "<option value=\"$value\" $selected>$text</option>";
+        }
+        if ($default && (!$selected)) {
+            $selected = $default;
+        }
+        foreach ($options as $value => $text) {
+            $selector = (strcasecmp($value, $selected) == 0) ? 'selected' : '';
+            echo "<option value=\"$value\" $selector>$text</option>";
         };
         echo "</select></div>";
     }
