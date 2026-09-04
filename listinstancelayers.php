@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -24,7 +24,9 @@ require 'pagegenerator.php';
 require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
+require './includes/filterlist.class.php';
 
+$filter_list = new FilterList(FilterList::DefaultQuickFilters);
 PageGenerator::header("Instance layers");
 $platform = PageGenerator::getDefaultOSSelection();
 PageGenerator::pageCaption("Listing available instance layers");
@@ -35,6 +37,7 @@ PageGenerator::globalFilterText();
 	<?php PageGenerator::platformNavigation('listinstancelayers.php', $platform, true); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<table id="instancelayers" class="table table-striped table-bordered table-hover responsive" style='width:auto;'>
 			<thead>
 				<tr>

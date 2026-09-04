@@ -808,7 +808,7 @@ class SqlRepository {
         if ($ostype !== null) {
             $dateColumn = 'date'.strtolower(platformname($ostype));
         }        
-        $deviceCount = SqlRepository::deviceCount();
+        $deviceCount = SqlRepository::deviceCountQuickFilters();
         $sql = "SELECT 
             distinct(name),
             count(distinct(r.displayname)) as coverage,
@@ -816,7 +816,7 @@ class SqlRepository {
             from deviceinstanceextensions di            
             join instanceextensions ie on di.extensionid = ie.id
             right join reports r on r.id = di.reportid";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " GROUP by name";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
@@ -836,14 +836,14 @@ class SqlRepository {
 
     /** Global instance layer listing */
     public static function listInstanceLayers() {
-        $deviceCount = SqlRepository::deviceCount();
+        $deviceCount = SqlRepository::deviceCountQuickFilters();
         $sql = "SELECT 
             distinct(name),
             count(distinct(r.displayname)) as coverage
             from deviceinstancelayers dl
             join instancelayers il on dl.layerid = il.id
             right join reports r on r.id = dl.reportid";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " GROUP by name";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
