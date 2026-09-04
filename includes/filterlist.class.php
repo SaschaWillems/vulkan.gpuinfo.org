@@ -65,17 +65,20 @@ class FilterList
         return (count($this->filters) > 0);
     }
 
-    private function addOption($caption, $label, $options) {
+    private function addOption($caption, $label, $options, $default = null) {
         echo "<div>$caption: <select name='$label' id='$label' class='form-control' onchange='this.form.submit()'>";
         foreach ($options as $value => $text) {
             $selected = ($this->hasFilter($label) && $this->getFilter($label) == $value) ? 'selected' : '';
+            if (($default) && ($select == '')) {
+                $selected = strcasecmp($value, $default) == 0 ? 'selected' : '';
+            }
             echo "<option value=\"$value\" $selected>$text</option>";
         };
         echo "</select></div>";
     }
 
     /** Adds HTML select elements for age and api version */
-    public function addDefaultFilterOptions($options = ['age', 'apiversion'])
+    public function addDefaultFilterOptions($options = ['age', 'apiversion'], $defaultage = 'recent')
     {
         echo "<div class='table-options'>";
         echo "<form method='get'>";
@@ -83,7 +86,7 @@ class FilterList
             $this->addOption('Age', 'age', [
                 'recent' => 'Recent (1y)',
                 'historic' => 'Historic (All)'
-            ]);
+            ], $defaultage);
         }
         if (in_array('apiversion', $options)) {
             $this->addOption('Versions', 'apiversion', [
