@@ -95,15 +95,11 @@ class FilterList
             ]);
         }
         // Some filters can't be explictly set by the user, but need to be persisted, so we pass them as hidden inputs
-        if ($this->hasFilter('platform')) {
-            echo "<input type='hidden' name='platform' value='".$this->getFilter('platform')."' />";
+        foreach ($this->filters as $filter => $content) {
+            if (!in_array($filter, ['age', 'apiversion'])) {
+                echo "<input type='hidden' name='$filter' value='$content' />";
+            }
         }
-        if ($this->hasFilter('namefilter')) {
-            echo "<input type='hidden' name='namefilter' value='".$this->getFilter('namefilter')."' />";
-        }
-        if ($this->hasFilter('extension')) {
-            echo "<input type='hidden' name='extension' value='".$this->getFilter('extension')."' />";
-        }        
         echo "</form>";
         echo "</div>";
     }
