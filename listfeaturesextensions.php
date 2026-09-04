@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,8 +27,8 @@ require './includes/constants.php';
 include './includes/functions.php';
 include './includes/filterlist.class.php';
 
-$filters = ['extension'];
-$filter_list = new FilterList($filters);
+$filter_list = new FilterList(FilterList::DefaultQuickFilters);
+$filter_list->addFilter('extension');
 $extension = $filter_list->getFilter('extension');
 
 PageGenerator::header("Extension device features");
@@ -39,13 +39,13 @@ if ($extension) {
 } else {
 	PageGenerator::pageCaption("Extension device feature coverage");
 }
-PageGenerator::globalFilterText();
 ?>
 
 <center>
 	<?php PageGenerator::platformNavigation('listfeaturesextensions.php', $platform, true, $filter_list->filters); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<table id="features" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
@@ -74,7 +74,7 @@ PageGenerator::globalFilterText();
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data!</b><br>";
 				}
-				DB::log('api/listfeaturesextensions.php', null, (microtime(true) - $start) * 1000);
+				DB::log('listfeaturesextensions.php', null, (microtime(true) - $start) * 1000);
 				DB::disconnect();
 				?>
 			</tbody>

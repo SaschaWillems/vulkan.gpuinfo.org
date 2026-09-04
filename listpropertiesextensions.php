@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2024 Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -27,8 +27,8 @@ require './includes/constants.php';
 require './includes/functions.php';
 require './includes/filterlist.class.php';
 
-$filters = ['extension'];
-$filter_list = new FilterList($filters);
+$filter_list = new FilterList(FilterList::DefaultQuickFilters);
+$filter_list->addFilter('extension');
 $extension = $filter_list->getFilter('extension');
 
 PageGenerator::header("Extension device properties");
@@ -39,13 +39,13 @@ if ($extension) {
 } else {
 	PageGenerator::pageCaption("Extension device properties coverage");
 }
-PageGenerator::globalFilterText();
 ?>
 
 <center>
 	<?php PageGenerator::platformNavigation('listpropertiesextensions.php', $platform, true, $filter_list->filters); ?>
 
 	<div class='tablediv' style='width:auto; display: inline-block;'>
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<table id="properties" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>

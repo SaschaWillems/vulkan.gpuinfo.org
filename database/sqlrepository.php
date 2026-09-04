@@ -298,7 +298,7 @@ class SqlRepository {
     /** Global extension feature listing */
     public static function listExtensionFeatures($extension) {
         // Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
-        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.4'");      
+        $deviceCount = SqlRepository::deviceCountQuickFilters("WHERE r.version >= '1.4'");      
         // Limit to features for a given extension
         $ext_filter = null;
         if ($extension) {
@@ -319,7 +319,7 @@ class SqlRepository {
             WHERE
                 supported = 1
                 $ext_filter";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " GROUP BY extension , name ORDER BY extension ASC , name ASC";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);
@@ -576,7 +576,7 @@ class SqlRepository {
     /** Global extension properties listing */
     public static function listExtensionProperties($extension) {
         // Get the total count of devices that have been submitted with a report version that has support for extension features (introduced with 1.4)
-        $deviceCount = SqlRepository::deviceCount("WHERE r.version >= '1.4'");      
+        $deviceCount = SqlRepository::deviceCountQuickFilters("WHERE r.version >= '1.4'");      
         // Limit to features for a given extension
         $ext_filter = null;
         if ($extension) {
@@ -632,9 +632,9 @@ class SqlRepository {
             $sql_union_c .= " $ext_filter";
         }
                 
-        self::appendFilters($sql_union_a, $params);
-        self::appendFilters($sql_union_b, $params);
-        self::appendFilters($sql_union_c, $params);
+        self::appendQuickFilters($sql_union_a, $params);
+        self::appendQuickFilters($sql_union_b, $params);
+        self::appendQuickFilters($sql_union_c, $params);
 
         $sql = "SELECT extension, name, type, sum(supporteddevices) as supporteddevices FROM
             (
