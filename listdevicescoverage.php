@@ -29,7 +29,6 @@ include './database/sqlrepository.php';
 
 // Supported filter values for this listing
 $filters = [
-	'platform',
 	'submitter',
 	'devicename',
 	'displayname',
@@ -44,7 +43,6 @@ $filters = [
 	'coreproperty',
 	'linearformat',
 	'optimalformat',
-	// 'bufferformat',
 	'memorytype',
 	'surfaceformat',
 	'surfaceformatcolorspace',
@@ -60,9 +58,8 @@ $filters = [
 	'profile',
 	'queuefamilyflags',
 	'minapiversion',
-	'apiversion'
 ];
-$filter_list = new FilterList($filters);
+$filter_list = new FilterList(array_merge($filters, FilterList::DefaultQuickFilters));
 
 $platform = "all";
 $caption = null;
@@ -272,7 +269,6 @@ PageGenerator::header($pageTitle);
 			?>
 		</h4>
 	</div>
-<?php PageGenerator::globalFilterText(); ?>	
 
 	<!-- Compare block (only visible when at least one report is selected) -->
 	<div id="compare-div" class="well well-sm" role="alert" style="text-align: center; display: none;">
@@ -286,8 +282,8 @@ PageGenerator::header($pageTitle);
 
 	<?php PageGenerator::platformNavigation('listdevicescoverage.php', $platform, true, $filter_list->filters); ?>
 
-	<div class='tablediv tab-content' style='display: inline-flex;'>
-
+	<div class='tablediv tab-content' style='width:auto; display: inline-block;'>
+		<?php $filter_list->addDefaultFilterOptions(['age', 'apiversion']) ?>
 		<div id='devices_div' class='tab-pane fade in active'>
 			<table id='devices' class='table table-striped table-bordered table-hover responsive' style='width:auto'>
 				<thead>
@@ -329,13 +325,9 @@ PageGenerator::header($pageTitle);
 			"serverSide": true,
 			"paging": true,
 			"searching": true,
-			"lengthChange": true,
-			"lengthMenu": [
-				[10, 25, 50, 100, -1],
-				[10, 25, 50, 100, "All"]
-			],
 			"dom": 'lrtip',
-			"pageLength": 50,
+			"pageLength": 25,
+			"lengthChange": false,			
 			"order": [
 				[0, 'asc']
 			],
@@ -378,6 +370,7 @@ PageGenerator::header($pageTitle);
 						'profile':						'<?= $filter_list->getFilter('profile') ?>',
 						'queuefamilyflags':				'<?= $filter_list->getFilter('queuefamilyflags') ?>',
 						'apiversion':					'<?= $filter_list->hasFilter('minapiversion') ? $filter_list->getFilter('minapiversion') : $filter_list->getFilter('apiversion') ?>',
+						'age':							'<?= $filter_list->getFilter('age') ?>',
 					}
 				},
 				error: function(xhr, error, thrown) {
