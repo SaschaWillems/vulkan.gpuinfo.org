@@ -136,7 +136,6 @@ session_start();
 						</ul>
 					</li>
 					<li><a href="listprofiles.php">Profiles</a></li>
-					<li><a href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
 					<li><a href="download.php"><i class="fas fa-download"> </i> Download</a></li>
 					<li><a href="about.php"><i class="fas fa-question-circle"></i> About</a></li>
 				</ul>
