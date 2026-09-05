@@ -120,6 +120,9 @@ function getQueueFlags($flag)
 		0x0010 => "PROTECTED_BIT",
 		0x0020 => "VIDEO_DECODE_BIT_KHR",
 		0x0040 => "VIDEO_ENCODE_BIT_KHR",
+		0x0100 => "OPTICAL_FLOW_BIT_NV",
+		0x0400 => "DATA_GRAPH_BIT_ARM"
+
 	);
 	return getFlags($flags, $flag);
 }
