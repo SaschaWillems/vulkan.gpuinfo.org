@@ -83,10 +83,12 @@ try {
 		if ($res['features2'] > 0 || $res['properties2'] > 0) {
 			$links = [];
 			if ($res['features2'] > 0) {
-				$links[] = "<a href='listfeaturesextensions.php?extension=$extension_name'>features</a>";
+				$link = $filter_list->applyDefaultUrlFilter("listfeaturesextensions.php?extension=$extension_name");
+				$links[] = "<a href='$link'>features</a>";
 			}
 			if ($res['properties2'] > 0) {
-				$links[] = "<a href='listpropertiesextensions.php?extension=$extension_name'>properties</a>";
+				$link = $filter_list->applyDefaultUrlFilter("listpropertiesextensions.php?extension=$extension_name");
+				$links[] = "<a href='$link'>properties</a>";
 			}
 			$link_info = implode(' and ', $links);
 			$extension_detail .= "<div style='margin-top: 10px;' class='subcaption-level-1'>This extension has additional $link_info</div>";
@@ -154,6 +156,7 @@ $caption = "Device coverage for <code>$extension_name</code>";
 					foreach ($extension_coverage as $i => $coverage) {
 						$color_style = "style='border-left: ".Chart::platformColors[$i]." 3px solid'";
 						$link = "listdevicescoverage.php?extension=$extension_name&platform=".strtolower($coverage['platform']);
+						$link = $filter_list->applyDefaultUrlFilter($link);
 						echo "<tr>";
 						echo "<td $color_style>".$coverage['platform']."</td>";
 						echo "<td><a href='$link'>".$coverage['coverage']."<span style='font-size:10px;'>%</span></a></td>";						
