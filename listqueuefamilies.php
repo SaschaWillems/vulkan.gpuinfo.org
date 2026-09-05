@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -23,23 +23,18 @@ require 'pagegenerator.php';
 require './database/database.class.php';
 require './database/sqlrepository.php';
 require './includes/functions.php';
+require './includes/filterlist.class.php';
 
-$platform = 'all';
-if (isset($_GET['platform'])) {
-	$platform = GET_sanitized('platform');
-}
-
-PageGenerator::header("Queue families");
+$filter_list = new FilterList(FilterList::DefaultQuickFilters);
+PageGenerator::header("Queue family types");
+PageGenerator::pageCaption("Queue family types");
 ?>
-
-<div class='header'>
-	<?php echo "<h4>Queue families for " . PageGenerator::filterInfo()?>
-</div>
 
 <center>
 	<?php PageGenerator::platformNavigation('listqueuefamilies.php', $platform, true); ?>
 
 	<div class="tablediv" style="width:auto; display: inline-block;">
+		<?php $filter_list->addDefaultFilterOptions() ?>
 		<table id="limits" class="table table-striped table-bordered table-hover responsive with-platform-selection">
 			<thead>
 				<tr>
@@ -69,7 +64,7 @@ PageGenerator::header("Queue families");
 				} catch (PDOException $e) {
 					echo "<b>Error while fetching data: " . $e->getMessage() . "</b><br>";
 				}
-				// DB::log('listqueuefamilies.php', null, (microtime(true) - $start) * 1000);
+				DB::log('listqueuefamilies.php', null, (microtime(true) - $start) * 1000);
 				DB::disconnect();
 				?>
 			</tbody>
