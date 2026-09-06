@@ -60,11 +60,6 @@ class FilterList
         return (key_exists($name, $this->filters));
     }
 
-    public function hasFilters()
-    {
-        return (count($this->filters) > 0);
-    }
-
     private function addOption($caption, $label, $options, $default = null) {
         echo "<div>$caption: <select name='$label' id='$label' class='form-control' onchange='this.form.submit()'>";
         $selected = null;

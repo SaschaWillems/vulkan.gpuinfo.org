@@ -74,13 +74,6 @@ class SqlRepository {
         return null;
     }
 
-    public static function getGetValue($name) {
-        if (isset($_GET[$name])) {
-            return GET_sanitized($name);
-        }
-        return null;
-    }
-
     public static function appendCondition(&$sql, $condition) {
         if (strpos(strtolower($sql), 'where') !== false) {
             $sql .= " and $condition";
@@ -150,16 +143,6 @@ class SqlRepository {
         $count = $stmnt->fetch(PDO::FETCH_COLUMN);
         return $count;
     }
-
-    public static function deviceCountOsType($osType = 0) {
-        $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id where r.ostype = :ostype";
-        $params['ostype'] = $osType;
-        self::appendFilters($sql, $params, false);
-        $stmnt= DB::$connection->prepare($sql);
-        $stmnt->execute($params);
-        $count = $stmnt->fetch(PDO::FETCH_COLUMN);
-        return $count;
-    }    
 
     public static function deviceCountOsApiAge($ostype = null, $apiversion = '1.0', $age = null) {
         $whereClause = "where r.layered = 0 ";
