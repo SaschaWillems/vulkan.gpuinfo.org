@@ -820,25 +820,25 @@ class SqlRepository {
         return $profiles;        
     }
 
-    /** Global queue family listings */
+    /** Global queue family type listings */
     public static function listQueueFamilies() {
-        $deviceCount = SqlRepository::deviceCount();
+        $deviceCount = SqlRepository::deviceCountQuickFilters();
         $sql = "SELECT
             flags, count(distinct(r.displayname)) as coverage
             from devicequeues dq
             join reports r on r.id = dq.reportid";
-        self::appendFilters($sql, $params);
+        self::appendQuickFilters($sql, $params);
         $sql .= " group by flags asc";
         $stmnt = DB::$connection->prepare($sql);
         $stmnt->execute($params);        
-        $memorytypes = [];
+        $queuefamilies = [];
         while ($row = $stmnt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            $memorytypes[] = [
+            $queuefamilies[] = [
                 'flags' => $row['flags'],
                 'coverage' => round($row['coverage'] / $deviceCount * 100, 2)
             ];
         }
-        return $memorytypes;
+        return $queuefamilies;
     }
 
     /** Global core version coverage */
