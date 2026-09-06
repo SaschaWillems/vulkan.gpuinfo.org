@@ -39,10 +39,8 @@ $platform = PageGenerator::getDefaultOSSelection();
         <div class="alert alert-warning">
             Additional format feature flags have been added recently (August 2026) and are not available for all reports. Coverage numbers for those do not match actual support yet.
         </div>
-        <div class='table-options'>
-            <?php $filter_list->addDefaultFilterOptions() ?>
-        </div>    
         <?php
+            $filter_list->addDefaultFilterOptions();
             include $filter_list->getFormatListingInclude('lineartilingformat');
         ?>
     </div>
