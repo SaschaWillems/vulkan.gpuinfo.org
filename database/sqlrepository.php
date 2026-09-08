@@ -122,19 +122,7 @@ class SqlRepository {
         self::appendCondition($sql, "r.layered = 0");
     }
 
-    public static function deviceCount($sqlAppend = null) {
-        // @todo: count(distinct displayname) ? (slightly different numbers)
-        $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $sqlAppend";
-        $params = [];
-        self::appendFilters($sql, $params);
-        $stmnt= DB::$connection->prepare($sql);
-        $stmnt->execute($params);
-        $count = $stmnt->fetch(PDO::FETCH_COLUMN);
-        return $count;
-    }
-
     public static function deviceCountQuickFilters($sqlAppend = null) {
-        // @todo: count(distinct displayname) ? (slightly different numbers)
         $sql = "SELECT count(distinct(ifnull(r.displayname, dp.devicename))) from reports r join deviceproperties dp on dp.reportid = r.id $sqlAppend";
         $params = [];
         self::appendQuickFilters($sql, $params);
