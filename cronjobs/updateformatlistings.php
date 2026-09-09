@@ -90,6 +90,42 @@ try {
         exit;
     }
 
+    $device_counts = [];
+    $sql_count = "SELECT count(distinct(displayname))
+        FROM reports
+        WHERE layered = 0";
+    $sql_count_params = [];
+    if ($apiversion !== null) {
+        $sql_count .= " AND apiversion >= :apiversion";
+        $sql_count_params['apiversion'] = $apiversion;
+    }
+    if ($startdate !== null) {
+        $sql_count .= " AND submissiondate >= :startdate";
+        $sql_count_params['startdate'] = $startdate;
+    }
+    $stmnt = DB::$connection->prepare($sql_count);
+    $stmnt->execute($sql_count_params);
+    $device_counts['all'] = (int) $stmnt->fetchColumn(0);
+    $sql_count = "SELECT ostype, count(distinct(displayname)) AS devicecount
+        FROM reports
+        WHERE layered = 0";
+    $sql_count_params = [];
+    if ($apiversion !== null) {
+        $sql_count .= " AND apiversion >= :apiversion";
+        $sql_count_params['apiversion'] = $apiversion;
+    }
+    if ($startdate !== null) {
+        $sql_count .= " AND submissiondate >= :startdate";
+        $sql_count_params['startdate'] = $startdate;
+    }
+    $sql_count .= " GROUP BY ostype";
+    $stmnt = DB::$connection->prepare($sql_count);
+    $stmnt->execute($sql_count_params);
+    foreach ($stmnt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $device_counts[$row['ostype']] = (int) $row['devicecount'];
+    }
+    $statement_count++;
+
     foreach (['lineartiling', 'optimaltiling', 'buffer'] as $format_listing_type) {
 
         switch ($format_listing_type) {
@@ -194,27 +230,15 @@ try {
 
         // Generate HTML files to be included in the format feature pages
         foreach ($os_types as $ostype) {
-            $sql_count = "SELECT count(distinct(r.displayname)) from reports r where r.layered = 0";
-            $sql_count_params = [];
             if ($ostype !== 'all') {
                 $platform = platformname($ostype);
                 if ($platform == null) {
                     continue;
                 }
-                $sql_count .= ' AND r.ostype = :ostype';
-                $sql_count_params['ostype'] = $ostype;
             } else {
                 $platform = 'all';
             }
-            if ($api_version_filter) {
-                $sql_count .= " " . $api_version_filter;
-                $sql_count_params['apiversion'] = $apiversion;
-            }
-            if ($date_filter) {
-                $sql_count .= " " . $date_filter;
-                $sql_count_params['startdate'] = $startdate;                
-            }
-            $deviceCount = DB::getCount($sql_count, $sql_count_params);
+            $deviceCount = $device_counts[$ostype] ?? 0;
 
             ob_start();
             
