@@ -928,34 +928,30 @@ class SqlRepository {
 
     /** Check if core limit exists */
     public static function coreLimitExists($name) {
-        $result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :table and column_name = :columnname");
+        $result = DB::$connection->prepare("SELECT EXISTS(SELECT 1 from information_schema.columns where TABLE_NAME = :table and column_name = :columnname)");
         $result->execute(["table" => 'devicelimits', "columnname" => $name]);
-        $result->fetch(PDO::FETCH_ASSOC);
-        return ($result->rowCount() > 0);
+        return (bool)$result->fetch(PDO::FETCH_COLUMN);        
     }
 
     /** Check if core property exists */
     public static function corePropertyExists($version, $name) {
         $table = self::getDevicePropertiesTable($version);
-        $result = DB::$connection->prepare("SELECT * from information_schema.columns where TABLE_NAME = :table and column_name = :columnname");
+        $result = DB::$connection->prepare("SELECT EXISTS(SELECT 1 from information_schema.columns where TABLE_NAME = :table and column_name = :columnname)");
         $result->execute(["table" => $table, "columnname" => $name]);
-        $result->fetch(PDO::FETCH_ASSOC);
-        return ($result->rowCount() > 0);
+        return (bool)$result->fetch(PDO::FETCH_COLUMN);
     }
 
     /** Check if extension property exists */
     public static function extensionPropertyExists($name, $extension) {
-        $result = DB::$connection->prepare("SELECT * from deviceproperties2 where name = :name and extension = :extension");
+        $result = DB::$connection->prepare("SELECT EXISTS(SELECT 1 from deviceproperties2 where name = :name and extension = :extension)");
         $result->execute([":name" => $name, ":extension" => $extension]);
-        $result->fetch(PDO::FETCH_ASSOC);
-        return ($result->rowCount() > 0);
+        return (bool)$result->fetch(PDO::FETCH_COLUMN);
     }
 
     /** Check if extension exists */
     public static function extensionExists($name) {
-        $result = DB::$connection->prepare("SELECT * from extensions where name = :name");
+        $result = DB::$connection->prepare("SELECT EXISTS(SELECT 1 from extensions where name = :name)");
         $result->execute([":name" => $name]);
-        $result->fetch(PDO::FETCH_ASSOC);
-        return $result->rowCount() > 0;
+        return (bool)$result->fetch(PDO::FETCH_COLUMN);
     }
 }
