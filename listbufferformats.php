@@ -31,6 +31,7 @@ $filter_list = new FilterList($filters);
 
 PageGenerator::header("Optimal tiling formats");
 $platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Buffer format feature flag coverage");
 ?>
 
 <center>

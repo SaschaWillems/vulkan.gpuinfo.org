@@ -31,6 +31,7 @@ $filter_list = new FilterList($filters);
 
 PageGenerator::header("Linear tiling formats");
 $platform = PageGenerator::getDefaultOSSelection();
+PageGenerator::pageCaption("Linear tiled image format feature flag coverage");
 ?>
 
 <center>
