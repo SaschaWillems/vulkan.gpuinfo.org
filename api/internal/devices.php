@@ -26,9 +26,6 @@ include '../../database/sqlrepository.php';
 include '../../includes/functions.php';
 include '../../includes/constants.php';
 
-session_name(SESSION_NAME);
-session_start();
-
 DB::connect();
 
 $start = microtime(true);

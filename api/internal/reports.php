@@ -25,9 +25,6 @@ include '../../database/sqlrepository.php';
 include '../../includes/functions.php';
 include '../../includes/constants.php';
 
-session_name(SESSION_NAME);
-session_start();
-
 // PHP doesn't require this, but it makes the script easier to follow
 $data = [];
 $params = [];
