@@ -87,32 +87,33 @@ if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
     $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
 }
 
-// Filtering
-$searchClause = null;
-$searchColumns = array('id');
+// Per-column filtering
+$filter_mapping = [
+    'id' => 'id',
+    'devicelimit' => 'devicelimit',
+    'device' => 'devicename',
+    'gpuname' => 'gpuname',
+    'driver' => 'p.driverversion',
+    'api' => 'p.apiversion',
+    'vendor' => 'vendor',
+    'devicetype' => 'p.devicetypes',
+    'osname' => 'r.osname',
+    'osversion' => 'r.osversion',
+    'osarchitecture' => 'r.osarchitecture'
+];
 
-// Dynamic limit column
-$limit = $_REQUEST['filter']['devicelimit'];
-if ($limit != '') {
-    array_push($searchColumns, 'devicelimit');
-}
-
-array_push($searchColumns, 'devicename', 'p.driverversion', 'p.apiversion', 'vendor', 'p.devicetype', 'r.osname', 'r.osversion', 'r.osarchitecture');
-
-if (isset($_REQUEST['filter']['portability'])) {
-    if ($_REQUEST['filter']['portability']) {
-        $searchColumns = ['id', 'devicename', 'r.osname', 'r.osversion', 'p.driverversion', 'p.apiversion'];
-    }
-}
-// Per-column, filtering
-$filters = array();
+$filters = [];
 for ($i = 0; $i < count($_REQUEST['columns']); $i++) {
     $column = $_REQUEST['columns'][$i];
     if (($column['searchable'] == 'true') && ($column['search']['value'] != '')) {
-        $filters[] = $searchColumns[$i] . ' like :filter_' . $i;
-        $params['filter_' . $i] = '%' . $column['search']['value'] . '%';
+        if (array_key_exists($column['data'], $filter_mapping)) {
+            $sqlname = $filter_mapping[$column['data']];
+            $filters[] = "$sqlname like :filter_$i";
+            $params['filter_' . $i] = '%' . $column['search']['value'] . '%';
+        }
     }
 }
+$searchClause = null;
 if (sizeof($filters) > 0) {
     $searchClause = 'having ' . implode(' and ', $filters);
 }
@@ -307,6 +308,7 @@ $sql = sprintf(
     "SELECT
         r.id,
         r.displayname as devicename,
+        r.devicename as gpuname,
         ifnull(p.driverversionraw, p.driverversion) as driver,
         p.driverversion,
         p.vendorid,
@@ -335,6 +337,7 @@ if ($devices->rowCount() > 0) {
             'id' => $device["id"],
             'devicelimit' => ($limit != '') ? $device["devicelimit"] : null,
             'device' => '<a href="displayreport.php?id=' . $device["id"] . '">' . $device["devicename"] . '</a>',
+            'gpuname' => $device['gpuname'],
             'driver' => $driver,
             'api' => $device["api"],
             'vendor' => $device["vendor"],
