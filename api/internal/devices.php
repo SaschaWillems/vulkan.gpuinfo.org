@@ -54,11 +54,17 @@ if (isset($_REQUEST['filter']['core'])) {
 }
 
 // Ordering
+$allowedOrderColumns = ['device', 'gpuname', 'api', 'driver', 'submissiondate'];
+$allowedOrderDirs = ['asc', 'desc'];
 $orderByColumn = '';
 $orderByDir = '';
 if (isset($_REQUEST['order'])) {
     $orderByColumn = $_REQUEST['order'][0]['column'];
     $orderByDir = $_REQUEST['order'][0]['dir'];
+    if ((!in_array(strtolower($orderByColumn), $allowedOrderColumns, true)) || (!in_array(strtolower($orderByDir), $allowedOrderDirs, true))) {
+        $orderByColumn = 'submissiondate';
+        $orderByDir = 'desc';
+    }
     if (strcasecmp($orderByColumn, 'driver') == 0) {
         $orderByColumn = 'driverversionraw';
     }
@@ -66,11 +72,18 @@ if (isset($_REQUEST['order'])) {
 
 // Paging
 $paging = '';
-if (isset($_REQUEST['start']) && $_REQUEST['length'] != '-1') {
-    $paging = "LIMIT " . $_REQUEST["length"] . " OFFSET " . $_REQUEST["start"];
+if (isset($_REQUEST['start']) && $_REQUEST['length']) {
+    $length = (int)$_REQUEST["length"];
+    $start = (int)$_REQUEST["start"];
+    if ($length < 1 || $length > 100) {
+        http_response_code(400);
+        exit("Pagination range exceeded");
+    }
+    $paging = "LIMIT $length OFFSET $start";    
 }
-if (trim($paging) == "") {
-    exit("No pagination parameters specified");
+if (trim($paging) == '') {
+    http_response_code(400);
+    exit("Pagination missing");
 }
 
 // Filtering
