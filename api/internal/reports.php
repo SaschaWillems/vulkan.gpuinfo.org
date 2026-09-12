@@ -208,7 +208,7 @@ $limit = getRequestFilterValue('devicelimit');;
 if ($limit) {
     $limitvalue =  getRequestFilterValue('devicelimitvalue');
     $selectAddColumns = ",(select dl.`$limit` from devicelimits dl where dl.reportid = r.id) as devicelimit";
-    appendWhereClause("r.id in (select reportid from devicelimits where cast(`$limit` as char) = '$limitvalue')", []);
+    appendWhereClause("r.id in (select reportid from devicelimits where cast(`$limit` as char) = :devicelimitvalue)", ['devicelimitvalue' => $limitvalue]);
 }
 // Devicename (or displayname)
 $devicename = getRequestFilterValue('devicename');
