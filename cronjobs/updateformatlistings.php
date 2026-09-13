@@ -296,9 +296,9 @@ try {
             $html = ob_get_contents();
             ob_end_clean();
 
-            $filename = "../static/".$parameter_name."_".$platform;
+            $filename = "../static/".$parameter_name."_".strtolower($platform);
             if ($apiversion !== null) {
-                $filename = "../static/".$parameter_name."_".$platform."_".str_replace('.', '_', $apiversion);
+                $filename = "../static/".$parameter_name."_".strtolower($platform)."_".str_replace('.', '_', $apiversion);
             }
             if ($date_filter !== null) {
                 $filename .= "_recent";
