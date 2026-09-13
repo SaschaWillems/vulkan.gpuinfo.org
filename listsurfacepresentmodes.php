@@ -55,7 +55,7 @@ PageGenerator::pageCaption("Surface present mode support");
 				try {
 					$surfacepresentmodes = SqlRepository::listSurfacePresentModes();
 					foreach ($surfacepresentmodes as $surfacepresentmode) {
-						$coverageLink = "listdevicescoverage.php?" . $type . "surfacepresentmode=" . $surfacepresentmode['mode'] . "&platform=$platform";
+						$coverageLink = "listdevicescoverage.php?surfacepresentmode=" . $surfacepresentmode['mode'] . "&platform=$platform";
 						$coverage = $surfacepresentmode['coverage'] ;
 						echo "<tr>";
 						echo "<td class='value'>" . $surfacepresentmode['mode'] . "</td>";
