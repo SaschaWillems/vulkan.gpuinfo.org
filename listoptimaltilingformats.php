@@ -36,7 +36,7 @@ PageGenerator::pageCaption("Optimal tiled image format feature flag coverage");
 
 <center>
 	<?php PageGenerator::platformNavigation('listoptimaltilingformats.php', $platform, true); ?>
-    <div class='tablediv' style='width:auto; display: inline-block;'>
+    <div id='formats-tablediv' class='tablediv' style='width:auto; display: inline-block; visibility: hidden'>
         <div class="alert alert-warning">
             Additional format feature flags have been added recently (August 2026) and are not available for all reports. Coverage numbers for those do not match actual support yet.
         </div>
@@ -65,7 +65,10 @@ PageGenerator::pageCaption("Optimal tiled image format feature flag coverage");
                     orderable: true,
                     targets: 0
                 }
-            ]
+            ],
+            initComplete: function() {
+                $('#formats-tablediv').css('visibility', 'visible');
+            }
         });
 
         $("#searchbox").on("keyup search input paste cut", function() {
