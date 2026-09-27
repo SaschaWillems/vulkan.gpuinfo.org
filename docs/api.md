@@ -148,7 +148,7 @@ Returns a JSON array of devices and known driver version supporting the requeste
 
 | Type | Value | Remark |
 | - | - | - |
-| URL | `https://vulkan.gpuinfo.org/api/v2/drivercoverage/feature2`` | `GET` method |
+| URL | `https://vulkan.gpuinfo.org/api/v2/drivercoverage/feature2` | `GET` method |
 | URL Parameter | `extension` **required** | The device extension to list devices for. Must be a known extension present on the database. |
 | URL Parameter | `feature` **required** | The device extension feature to request support for. Must be a known feature for the requested extension. |
 | URL Parameter | `platform` **optional** | Platform to limit results to (Windows, Linux, Android), if not supplied, devices for all platforms are returned. |
