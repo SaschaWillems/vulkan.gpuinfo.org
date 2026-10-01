@@ -23,7 +23,7 @@
 
 require './../../database/database.class.php';
 require './../../includes/functions.php';
-require './../../includes/vktypes.php';
+require_once './../../includes/vktypes.php';
 
 header("Content-type: application/json");
 
