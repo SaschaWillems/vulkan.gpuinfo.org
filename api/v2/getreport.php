@@ -28,12 +28,7 @@
 	if (!$validKey) {
 		http_response_code(401);
 		header('WWW-Authenticate: ApiKey');
-		die("Missing, invalid or inactive api key. Please contect me if you need api access.");
-	}
-	if (!$validKey) {
-		http_response_code(401);
-		header('WWW-Authenticate: ApiKey');
-		die("Missing, invalid or inactive api key. Please contect me if you need api access.");
+		die("Missing, invalid or inactive api key. Please contact me if you need api access.");
 	}
 	
 	if (!isset($_GET['id'])) {
