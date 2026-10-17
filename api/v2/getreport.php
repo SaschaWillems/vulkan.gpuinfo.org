@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database back-end
 	*	
-	* Copyright (C) 2011-2025 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2011-2026 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,29 @@
 	// Return report as json (uploaded from client application)
 	
 	include './../../includes/functions.php';
+	include_once './../../database/database.class.php';
+
+	$apikey = $_SERVER['HTTP_X_API_KEY'] ?? ($_GET['apikey'] ?? '');
+	$validKey = false;
+	if (is_string($apikey) && $apikey !== '') {
+		DB::connect();
+		try {
+			$validKey = DB::validateApiKey($apikey);
+		} catch (Exception $e) {
+			DB::disconnect();
+			http_response_code(500);
+			echo "Internal error";
+			die();
+		}
+		DB::disconnect();
+	}
+
+	if (!$validKey) {
+		http_response_code(401);
+		header('WWW-Authenticate: ApiKey');
+		echo "Missing, invalid or inactive api key. Please contect me if you need api access.";
+		die();
+	}
 	
 	if (!isset($_GET['id'])) {
 		header('HTTP/ 400 missing_or');

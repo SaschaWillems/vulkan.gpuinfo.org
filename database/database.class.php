@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -54,6 +54,23 @@ class DB
         $stmnt = DB::$connection->prepare("SELECT max(date) from reportupdatehistory where reportid = :reportid");
         $stmnt->execute(["reportid" => $reportID]);
         return $stmnt->fetchColumn();
+    }
+
+    // Returns true if an active api key exists
+    public static function validateApiKey($apikey)
+    {
+        if (!is_string($apikey) || $apikey === '') {
+            return false;
+        }
+        $stmnt = DB::$connection->prepare("SELECT id FROM apikeys WHERE apikey = :apikey AND active = 1 AND (expires IS NULL OR expires > NOW())");
+        $stmnt->execute(["apikey" => $apikey]);
+        $id = $stmnt->fetchColumn();
+        if ($id === false) {
+            return false;
+        }
+        $upd = DB::$connection->prepare("UPDATE apikeys SET lastused = NOW(), requestcount = requestcount + 1 WHERE id = :id");
+        $upd->execute(["id" => $id]);
+        return true;
     }
 
     public static function log($page, $statement, $executiontime)
