@@ -24,26 +24,16 @@
 	include './../../includes/functions.php';
 	include_once './../../database/database.class.php';
 
-	$apikey = $_SERVER['HTTP_X_API_KEY'] ?? ($_GET['apikey'] ?? '');
-	$validKey = false;
-	if (is_string($apikey) && $apikey !== '') {
-		DB::connect();
-		try {
-			$validKey = DB::validateApiKey($apikey);
-		} catch (Exception $e) {
-			DB::disconnect();
-			http_response_code(500);
-			echo "Internal error";
-			die();
-		}
-		DB::disconnect();
-	}
-
+	$validKey = DB::validateApiKey();
 	if (!$validKey) {
 		http_response_code(401);
 		header('WWW-Authenticate: ApiKey');
-		echo "Missing, invalid or inactive api key. Please contect me if you need api access.";
-		die();
+		die("Missing, invalid or inactive api key. Please contect me if you need api access.");
+	}
+	if (!$validKey) {
+		http_response_code(401);
+		header('WWW-Authenticate: ApiKey');
+		die("Missing, invalid or inactive api key. Please contect me if you need api access.");
 	}
 	
 	if (!isset($_GET['id'])) {
