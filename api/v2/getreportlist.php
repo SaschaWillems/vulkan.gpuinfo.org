@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database server implementation
 	*	
-	* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2016-2016 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,26 @@
 	// Return list of all available reports as json
 	
 	include './../../database/database.class.php';
+
+	$apikey = $_SERVER['HTTP_X_API_KEY'] ?? ($_GET['apikey'] ?? '');
+	$validKey = false;
+	if (is_string($apikey) && $apikey !== '') {
+		DB::connect();
+		try {
+			$validKey = DB::validateApiKey($apikey);
+		} catch (Exception $e) {
+			DB::disconnect();
+			http_response_code(500);
+			die("Database error");
+		}
+		DB::disconnect();
+	}
+
+	if (!$validKey) {
+		http_response_code(401);
+		header('WWW-Authenticate: ApiKey');
+		die("Missing, invalid or inactive api key. Please contect me if you need api access.");
+	}
 	
 	/**
 	 * Formats a JSON string for pretty printing
@@ -80,7 +100,7 @@
 	DB::connect();	
 			
 	try {
-		$sql ="select 
+		$sql ="SELECT 
 			concat('0x', hex(cast(dp.vendorid as unsigned))) as vendorid,
 			concat('0x', hex(cast(dp.deviceid as unsigned))) as deviceid,
 			VendorID(dp.vendorid) as vendorname,
