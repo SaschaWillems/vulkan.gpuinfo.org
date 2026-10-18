@@ -120,10 +120,10 @@
 			header('Content-type:application/json;charset=utf-8');
 			//echo _format_json(json_encode($rows), false);			
 			echo json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-		} 
-		else {
+			logToFile("Json report listing api called (geterportjson.php)");
+		} else {
 			header('HTTP/ 404 empty_response');
-			echo json_encode(array("info", "No reports with version > 1.4"));
+			echo json_encode(array("info", "No reports with report version > 1.4"));
 		}
 	} catch (Exception $e) {
 		header('HTTP/ 500 server_error');

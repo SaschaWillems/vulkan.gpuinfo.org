@@ -43,9 +43,9 @@
 
 	if (file_exists($filename)) {
 		$json = file_get_contents($filename);
-		logToFile("Json for report $reportid served from file");
+		logToFile("Json for report $reportid served from file (geterport.php)");
 	} else {
-		logToFile("Json for report $reportid not found");
+		logToFile("Json for report $reportid not found (geterport.php)");
 	}
 
 	if ($json) {
