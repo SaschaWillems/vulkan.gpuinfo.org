@@ -762,8 +762,10 @@ try {
 
     header("Content-Disposition: attachment; filename=".strtolower($filename));
     echo json_encode($profile->json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    logToFile("[API] Profile generated for report $reportid");
 } catch (Exception $e) {
     echo json_encode(['error' => "Could not generate profile"]);
+    logToFile("[API] Could not generate profile for report $reportid");
 } finally {
     DB::disconnect();
 }
