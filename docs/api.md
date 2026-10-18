@@ -37,7 +37,7 @@ All hosting is paid by myself and excessive API usage can cause issues for me an
 
 **⚠️ Note**: Some of the API calls require a valid API key to protect them from misuse. If you want to access such API calls please contact me to get your API key.
 
-That key can be passed in the request header as `X_API_KEY` or as an url argument named `apikey`.
+That key can be passed in the request header as `X-API-KEY` or as an url argument named `apikey`.
 
 # License
 
