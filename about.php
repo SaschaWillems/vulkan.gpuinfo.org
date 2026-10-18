@@ -99,7 +99,7 @@ PageGenerator::header('About');
 
 		<div class="entry">
 			<p class="question">Q: Is the database available for download?</p>
-			<p class="answer">A: No, there is no database download available. I provide access to it through apis, and if you're interested in fetching data from it, please contact me.</p>
+			<p class="answer">A: No, there is no database download available. I provide access to it through apis, and if you're interested in fetching data from it, please contact me. Some apis require an api key.</p>
 		</div>
 
 		<div class="entry">

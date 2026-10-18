@@ -31,13 +31,34 @@ Also note that if you plan on using the API, **don't use it for creating your ow
 
 APIs in the internal folder are not supposed to be used outside of the database. They aren't stable and may be changed or even removed at any time.
 
-All hosting is paid by myself, so please ask before using the API in such a way.
+# Fair use
+
+All hosting is paid by myself and excessive API usage can cause issues for me and/or my hoster.
+
+**⚠️ Note**: Some of the API calls require a valid API key to protect them from misuse. If you want to access such API calls please contact me to get your API key.
+
+That key can be passed in the request header as `X-API-KEY` or as an url argument named `apikey`.
+
+# License
+
+All data provided via the the api is is licensed under the Creative Commons Attribution 4.0 International License. 
 
 # <a name='Endpoints'></a>Endpoints
 
 ## <a name='Reports'></a>Reports
 
-Report endpoints return data for a single report.
+### <a name='Report'></a>Report listing
+
+⚠️**Requires an active api key**
+
+This endpoint returns a JSON with all reports available in the database. Each entry contains fields that identify a report and a link to get the full JSON report.
+
+| Type | Value | Remark |
+| - | - | - |
+| URL | `https://vulkan.gpuinfo.org/api/v2/getreportlist` | `GET` method |
+| URL Parameter | none | |
+
+Example: https://vulkan.gpuinfo.org/api/v2/getreportlist
 
 ### <a name='VulkanProfile'></a>Vulkan Profile
 
@@ -51,6 +72,8 @@ The profile endpoint returns a JSON for a Vulkan profile to be used with [LunarG
 Example: https://vulkan.gpuinfo.org/api/v3/getprofile?id=14204
 
 ### <a name='Report'></a>Report
+
+⚠️**Requires an active api key**
 
 This endpoint returns a custom JSON for a single report. Unlike the profile JSON this JSON contains all information for a single report stored in the database.
 

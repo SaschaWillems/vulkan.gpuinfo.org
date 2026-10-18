@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database server implementation
 	*	
-	* Copyright (C) by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2011-2026 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -43,6 +43,7 @@
 		$endpoint = new apiendpoint();
 		$endpoint->setWhereClause($whereClause);
 		$endpoint->execute($params, ["extension" => $extension]);
+		logToFile("[API] Extension coverage api called for $extension");
 	} catch (Throwable $e) {
 		echo json_encode(["error" => "Server error while fetching report list"]);
 	}

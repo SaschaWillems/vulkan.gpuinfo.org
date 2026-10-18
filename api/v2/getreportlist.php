@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database server implementation
 	*	
-	* Copyright (C) 2016-2017 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,13 @@
 	// Return list of all available reports as json
 	
 	include './../../database/database.class.php';
+
+	$validKey = DB::validateApiKey();
+	if (!$validKey) {
+		http_response_code(401);
+		header('WWW-Authenticate: ApiKey');
+		die("Missing, invalid or inactive api key. Please contact me if you need api access.");
+	}
 	
 	/**
 	 * Formats a JSON string for pretty printing
@@ -80,7 +87,7 @@
 	DB::connect();	
 			
 	try {
-		$sql ="select 
+		$sql ="SELECT 
 			concat('0x', hex(cast(dp.vendorid as unsigned))) as vendorid,
 			concat('0x', hex(cast(dp.deviceid as unsigned))) as deviceid,
 			VendorID(dp.vendorid) as vendorname,
@@ -113,10 +120,10 @@
 			header('Content-type:application/json;charset=utf-8');
 			//echo _format_json(json_encode($rows), false);			
 			echo json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-		} 
-		else {
+			logToFile("[API] JSON report listing api called (geterportjson.php)");
+		} else {
 			header('HTTP/ 404 empty_response');
-			echo json_encode(array("info", "No reports with version > 1.4"));
+			echo json_encode(array("info", "No reports with report version > 1.4"));
 		}
 	} catch (Exception $e) {
 		header('HTTP/ 500 server_error');

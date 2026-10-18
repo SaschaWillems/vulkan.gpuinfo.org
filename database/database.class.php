@@ -4,7 +4,7 @@
  *
  * Vulkan hardware capability database server implementation
  *	
- * Copyright (C) 2016-2023 by Sascha Willems (www.saschawillems.de)
+ * Copyright (C) 2016-2026 by Sascha Willems (www.saschawillems.de)
  *	
  * This code is free software, you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public
@@ -54,6 +54,33 @@ class DB
         $stmnt = DB::$connection->prepare("SELECT max(date) from reportupdatehistory where reportid = :reportid");
         $stmnt->execute(["reportid" => $reportID]);
         return $stmnt->fetchColumn();
+    }
+
+    // Returns true if the passed api key exists and is active
+    public static function validateApiKey()
+    {
+        // Key can be provided via header or as an url argument
+        $apikey = $_SERVER['HTTP_X_API_KEY'] ?? ($_GET['apikey'] ?? '');        
+        if (!is_string($apikey) || $apikey === '') {
+            return false;
+        }
+        DB::connect();
+        try {
+            $stmnt = DB::$connection->prepare("SELECT id FROM apikeys WHERE apikey = :apikey AND active = 1 AND (expires IS NULL OR expires > NOW())");
+            $stmnt->execute(["apikey" => $apikey]);
+            $id = $stmnt->fetchColumn();
+            if ($id === false) {
+                return false;
+            }
+            $upd = DB::$connection->prepare("UPDATE apikeys SET lastused = NOW(), requestcount = requestcount + 1 WHERE id = :id");
+            $upd->execute(["id" => $id]);
+        } catch (Exception $e) {
+	 		DB::disconnect();
+	 		http_response_code(500);
+	 		die("Database error");
+	 	}
+	 	DB::disconnect();        
+        return true;
     }
 
     public static function log($page, $statement, $executiontime)

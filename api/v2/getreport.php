@@ -3,7 +3,7 @@
 	*
 	* Vulkan hardware capability database back-end
 	*	
-	* Copyright (C) 2011-2025 by Sascha Willems (www.saschawillems.de)
+	* Copyright (C) 2011-2026 by Sascha Willems (www.saschawillems.de)
 	*	
 	* This code is free software, you can redistribute it and/or
 	* modify it under the terms of the GNU Affero General Public
@@ -22,6 +22,14 @@
 	// Return report as json (uploaded from client application)
 	
 	include './../../includes/functions.php';
+	include_once './../../database/database.class.php';
+
+	$validKey = DB::validateApiKey();
+	if (!$validKey) {
+		http_response_code(401);
+		header('WWW-Authenticate: ApiKey');
+		die("Missing, invalid or inactive api key. Please contact me if you need api access.");
+	}
 	
 	if (!isset($_GET['id'])) {
 		header('HTTP/ 400 missing_or');
@@ -35,9 +43,9 @@
 
 	if (file_exists($filename)) {
 		$json = file_get_contents($filename);
-		logToFile("Json for report $reportid served from file");
+		logToFile("[API] Json for report $reportid served from file (geterport.php)");
 	} else {
-		logToFile("Json for report $reportid not found");
+		logToFile("[API] Json for report $reportid not found (geterport.php)");
 	}
 
 	if ($json) {
