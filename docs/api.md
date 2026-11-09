@@ -56,9 +56,11 @@ This endpoint returns a JSON with all reports available in the database. Each en
 | Type | Value | Remark |
 | - | - | - |
 | URL | `https://vulkan.gpuinfo.org/api/v2/getreportlist` | `GET` method |
-| URL Parameter | none | |
+| URL Parameter | `startdate` optional | Include reports submitted on or after this date, in `YYYY-MM-DD` format. Invalid dates return HTTP 400. |
 
 Example: https://vulkan.gpuinfo.org/api/v2/getreportlist
+
+Example with a starting date: https://vulkan.gpuinfo.org/api/v2/getreportlist?startdate=2026-01-01
 
 ### <a name='VulkanProfile'></a>Vulkan Profile
 
