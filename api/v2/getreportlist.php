@@ -22,68 +22,23 @@
 	// Return list of all available reports as json
 	
 	include './../../database/database.class.php';
+	include './../../includes/functions.php';
 
 	$validKey = DB::validateApiKey();
 	if (!$validKey) {
 		http_response_code(401);
 		header('WWW-Authenticate: ApiKey');
-		die("Missing, invalid or inactive api key. Please contact me if you need api access.");
-	}
-	
-	/**
-	 * Formats a JSON string for pretty printing
-	 *
-	 * @param string $json The JSON to make pretty
-	 * @param bool $html Insert nonbreaking spaces and <br />s for tabs and linebreaks
-	 * @return string The prettified output
-	 * @author Jay Roberts (https://github.com/GloryFish)
-	 */
-     function _format_json($json, $html = false) {
-		$tabcount = 0; 
-		$result = ''; 
-		$inquote = false; 
-		$ignorenext = false; 
-		if ($html) { 
-		    $tab = "&nbsp;&nbsp;&nbsp;"; 
-		    $newline = "<br/>"; 
-		} else { 
-		    $tab = "\t"; 
-		    $newline = "\n"; 
-		} 
-		for($i = 0; $i < strlen($json); $i++) { 
-		    $char = $json[$i]; 
-		    if ($ignorenext) { 
-		        $result .= $char; 
-		        $ignorenext = false; 
-		    } else { 
-		        switch($char) { 
-		            case '{': 
-		                $tabcount++; 
-		                $result .= $char . $newline . str_repeat($tab, $tabcount); 
-		                break; 
-		            case '}': 
-		                $tabcount--; 
-		                $result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char; 
-		                break; 
-		            case ',': 
-		                $result .= $char . $newline . str_repeat($tab, $tabcount); 
-		                break; 
-		            case '"': 
-		                $inquote = !$inquote; 
-		                $result .= $char; 
-		                break; 
-		            case '\\': 
-		                if ($inquote) $ignorenext = true; 
-		                $result .= $char; 
-		                break; 
-		            default: 
-		                $result .= $char; 
-		        } 
-		    } 
-		} 
-		return $result; 
+		exit("Missing, invalid or inactive api key. Please contact me if you need api access.");
 	}
 
+	$startdate = $_GET['startdate'] ?? null;
+	if ($startdate !== null) {
+		if (!is_string($startdate) || !preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $startdate, $dateParts) || !checkdate((int)$dateParts[2], (int)$dateParts[3], (int)$dateParts[1])) {
+			http_response_code(400);
+			exit("Invalid startdate. Please provide a valid date in YYYY-MM-DD format.");
+		}
+	}
+	
 	DB::connect();	
 			
 	try {
@@ -104,11 +59,17 @@
 			concat('https://vulkan.gpuinfo.org/api/v2/getreport.php?id=', dp.reportid) as url
 			from deviceproperties dp
 			join reports r on r.id = dp.reportid
-			where r.version >= '1.4'
-			order by vendorid, devicename, apiversion desc, driverversionraw";
+			where r.version >= '1.4'";
+
+		$params = [];
+		if ($startdate !== null) {
+			$sql .= " and r.submissiondate >= :startdate";
+			$params['startdate'] = $startdate;
+		}
+		$sql .= " order by vendorid, devicename, apiversion desc, driverversionraw";
 
 		$stmnt = DB::$connection->prepare($sql);
-		$stmnt->execute();
+		$stmnt->execute($params);
 	
 		if ($stmnt->rowCount() > 0) {		
 			$rows = array();
@@ -118,12 +79,15 @@
 			}
 
 			header('Content-type:application/json;charset=utf-8');
-			//echo _format_json(json_encode($rows), false);			
 			echo json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 			logToFile("[API] JSON report listing api called (geterportjson.php)");
 		} else {
 			header('HTTP/ 404 empty_response');
-			echo json_encode(array("info", "No reports with report version > 1.4"));
+			if ($startdate !== null) {
+				echo json_encode(array("info", "No reports found for the specified startdate"));
+			} else {
+				echo json_encode(array("info", "No reports with report version > 1.4"));
+			}
 		}
 	} catch (Exception $e) {
 		header('HTTP/ 500 server_error');
